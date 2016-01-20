@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <GL/glut.h>
 
+
 Game::Game(void)
 {
 	// Set up the game state

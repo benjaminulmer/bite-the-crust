@@ -43,8 +43,8 @@
     <LibraryPath>C:\Program Files %28x86%29\NVIDIA Corporation\Cg\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Program Files %28x86%29\NVIDIA Corporation\Cg\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\NVIDIA Corporation\Cg\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\CPSC585\SDL2-2.0.3\include;\\samba.cs.ucalgary.ca\lawg\Documents\585 Stuff\Open Asset Import Library\include\assimp;C:\Program Files %28x86%29\NVIDIA Corporation\Cg\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\CPSC585\SDL2-2.0.3\lib;C:\Program Files %28x86%29\NVIDIA Corporation\Cg\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

@@ -1,51 +1,50 @@
 #include "Game.h"
-#include <GL/glut.h>
-
+#include <SDL.h>
 
 Game::Game(void)
 {
-	// Set up the game state
-	renderingEngine = RenderingEngine::GetInstance();
-	// We'll be preloading actual data, but for now I'm just defining examples by hand
-	TestEntity *cube = new TestEntity;
-	cube->vertices.push_back(Vector3f(-0.5, -0.5, 0.0));
-	cube->vertices.push_back(Vector3f(-0.5, 0.5, 0.0));
-	cube->vertices.push_back(Vector3f(0.5, 0.5, 0.0));
-	cube->vertices.push_back(Vector3f(0.5, -0.5, 0.0));
-	cube->position = Vector3f(0, 0, 0);
-	entities.push_back(cube);
 }
 
-// Get the singleton instance of the Game. 
-//Only has to be singleton so that the loop can be a static function for the GLUT callback.
-Game* Game::GetInstance() {
-	static Game instance;
-	return &instance;
-}
-
-// The callback for glut to use in idle, so that we can control our game loop. I'd rather we didn't need this.
-void Game::IdleCallback() {
-	Game::GetInstance()->MainLoop();
-}
-
-// The entry point of the game, which could take in console arguments, which we might want to pass to the renderer for GLUT
-void Game::Run(int argc, char* argv[]) {
-	// Initialize the engines
-	renderingEngine->Initialize(argc, argv);
-
-	// I'd like to have the main loop here, but GLUT requires control of the loop
-	glutMainLoop();
+// The entry point of the game
+void Game::Run() {
+	// Preload data, initialize subsystems, anything to do before entering the main loop
+	MainLoop();
 }
 
 void Game::MainLoop() {
-	// This is where the time stepping would go, and the other main steps, like input and simulation
-	renderingEngine->PushEntities(entities);
-	glutPostRedisplay();
+	// Cap the minimum timestep physics will use
+	unsigned int minTimeStepMs = (unsigned int)(1 / 60000.0); // 60 FPS, converted to ms and trucated to int
+	int simCount;
+	// Limit how many simulations we'll run when it's slow, to avoid death spiral
+	int maxSimulations = 5;
+	unsigned int oldTimeMs = SDL_GetTicks();
+	
+	// Game loop
+	while (true) {
+		// Update the player and AI cars
+		inputEngine->ProcessEvents();
+		aiEngine->UpdateAI();
+
+		// Figure out timestep and run physics
+		unsigned int newTimeMs = SDL_GetTicks();
+		unsigned int timeStepMs = newTimeMs - oldTimeMs;
+		oldTimeMs = newTimeMs;
+
+		// If timestep is small enough, just use it, otherwise break down into smaller chunks
+		while (timeStepMs > 0.0 && simCount < maxSimulations) {
+			unsigned int deltaTimeMs = min(timeStepMs, minTimeStepMs);
+			physicsEngine->Simulate(deltaTimeMs);
+			timeStepMs -= deltaTimeMs;
+			simCount++;
+		}
+		simCount = 0;
+
+		// Render
+		renderingEngine->PushEntities();
+		renderingEngine->Draw();
+	}
 }
 
 Game::~Game(void)
 {
-	for (int i = 0; i < entities.size(); i++) {
-		delete entities[i];
-	}
 }

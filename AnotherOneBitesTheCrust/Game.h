@@ -5,26 +5,26 @@
 
 #pragma once
 #include "RenderingEngine.h"
-#include "TestEntity.h"
+#include "PhysicsEngine.h"
+#include "InputEngine.h"
+#include "AIEngine.h"
+#include "AudioEngine.h"
 
 class Game
 {
 public:
-	static Game* GetInstance();
-	static void IdleCallback();
-private:
 	Game(void);
 	~Game(void);
-	Game(Game const&); // Don't implement default copy constructor
-	void operator=(Game const&); // Don't implement assignment operator
 
-public:
 	// member variables
 	RenderingEngine *renderingEngine;
-	vector<TestEntity*> entities;
+	PhysicsEngine *physicsEngine;
+	InputEngine *inputEngine;
+	AIEngine *aiEngine;
+	AudioEngine *audioEngine;
 
 	// member functions
-	 void Run(int argc, char* argv[]);
+	 void Run();
 	 void MainLoop();
 };
 

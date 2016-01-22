@@ -12,7 +12,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1E50F1C2-ACE9-4F7C-9AA1-AA9E3DD2DE87}</ProjectGuid>
-    <RootNamespace>AnotherOneBitesTheCrust</RootNamespace>
+    <RootNamespace>SDL</RootNamespace>
+    <ProjectName>AnotherOneBitesTheCrust</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -39,24 +40,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Program Files %28x86%29\NVIDIA Corporation\Cg\include;C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\CPSC585\SDL2-2.0.3\lib;C:\Program Files %28x86%29\NVIDIA Corporation\Cg\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\CPSC585\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\CPSC585\SDL2-2.0.3\include;\\samba.cs.ucalgary.ca\lawg\Documents\585 Stuff\Open Asset Import Library\include\assimp;C:\Program Files %28x86%29\NVIDIA Corporation\Cg\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\CPSC585\SDL2-2.0.3\lib;C:\Program Files %28x86%29\NVIDIA Corporation\Cg\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\CPSC585\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalOptions>/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glut32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\CPSC585\SDL2-2.0.3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -65,24 +64,15 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\CPSC585\SDL2-2.0.3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="AIEngine.h" />
-    <ClInclude Include="AudioEngine.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="InputEngine.h" />
-    <ClInclude Include="PhysicsEngine.h" />
-    <ClInclude Include="RenderingEngine.h" />
-  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AIEngine.cpp" />
     <ClCompile Include="AudioEngine.cpp" />
@@ -91,6 +81,16 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
+    <ClCompile Include="TestEntity.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AIEngine.h" />
+    <ClInclude Include="AudioEngine.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="InputEngine.h" />
+    <ClInclude Include="PhysicsEngine.h" />
+    <ClInclude Include="RenderingEngine.h" />
+    <ClInclude Include="TestEntity.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

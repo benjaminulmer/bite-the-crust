@@ -1,8 +1,20 @@
 // The entry point, which just sets up the Game and runs it
 
 #include "Game.h"
+#include <SDL.h>
+#include <iostream>
 
 int main(int argc, char *argv[]) {
-	Game game;
-	game.Run();
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
+		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
+		return 1;
+	}
+	//Game game;
+	//game.Run();
+
+	std::cout << "test" << std::endl;
+	std::cin.ignore();
+
+	SDL_Quit();
+	return 0;
 }

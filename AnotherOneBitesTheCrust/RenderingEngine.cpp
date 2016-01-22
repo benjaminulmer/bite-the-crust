@@ -3,7 +3,6 @@
 #include "Game.h"
 #include <math.h>
 #include <iostream>
-#include <GL/glut.h>
 
 RenderingEngine::RenderingEngine() {}
 

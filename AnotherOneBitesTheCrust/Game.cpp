@@ -13,7 +13,7 @@ void Game::Run() {
 
 void Game::MainLoop() {
 	// Cap the minimum timestep physics will use
-	unsigned int minTimeStepMs = (unsigned int)(1 / 60000.0); // 60 FPS, converted to ms and trucated to int
+	unsigned int minTimeStepMs = (unsigned int)(1000.0/60.0); // 60 FPS, converted to ms and trucated to int
 	int simCount = 0;
 	// Limit how many simulations we'll run when it's slow, to avoid death spiral
 	int maxSimulations = 5;

@@ -9,11 +9,8 @@ int main(int argc, char *argv[]) {
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		return 1;
 	}
-	//Game game;
-	//game.Run();
-
-	std::cout << "test" << std::endl;
-	std::cin.ignore();
+	Game game;
+	game.Run();
 
 	SDL_Quit();
 	return 0;

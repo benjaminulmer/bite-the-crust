@@ -5,6 +5,6 @@ public:
 	PhysicsEngine(void);
 	~PhysicsEngine(void);
 
-	void Simulate(unsigned int deltaTimeMs);
+	void simulate(unsigned int deltaTimeMs);
 };
 

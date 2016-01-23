@@ -5,6 +5,6 @@ public:
 	AIEngine(void);
 	~AIEngine(void);
 
-	void UpdateAI();
+	void updateAI();
 };
 

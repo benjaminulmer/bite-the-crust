@@ -5,7 +5,7 @@ PhysicsEngine::PhysicsEngine(void)
 {
 }
 
-void PhysicsEngine::Simulate(unsigned int deltaTimeMs) {}
+void PhysicsEngine::simulate(unsigned int deltaTimeMs) {}
 
 PhysicsEngine::~PhysicsEngine(void)
 {

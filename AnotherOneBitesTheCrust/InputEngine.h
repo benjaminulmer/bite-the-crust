@@ -5,6 +5,6 @@ public:
 	InputEngine(void);
 	~InputEngine(void);
 
-	void ProcessEvents();
+	void processEvents();
 };
 

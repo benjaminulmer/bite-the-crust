@@ -6,12 +6,12 @@ Game::Game(void)
 }
 
 // The entry point of the game
-void Game::Run() {
+void Game::run() {
 	// Preload data, initialize subsystems, anything to do before entering the main loop
-	MainLoop();
+	mainLoop();
 }
 
-void Game::MainLoop() {
+void Game::mainLoop() {
 	// Cap the minimum timestep physics will use
 	unsigned int minTimeStepMs = (unsigned int)(1000.0/60.0); // 60 FPS, converted to ms and trucated to int
 	int simCount = 0;
@@ -22,8 +22,8 @@ void Game::MainLoop() {
 	// Game loop
 	while (true) {
 		// Update the player and AI cars
-		inputEngine->ProcessEvents();
-		aiEngine->UpdateAI();
+		inputEngine->processEvents();
+		aiEngine->updateAI();
 
 		// Figure out timestep and run physics
 		unsigned int newTimeMs = SDL_GetTicks();
@@ -33,15 +33,15 @@ void Game::MainLoop() {
 		// If timestep is small enough, just use it, otherwise break down into smaller chunks
 		while (timeStepMs > 0.0 && simCount < maxSimulations) {
 			unsigned int deltaTimeMs = min(timeStepMs, minTimeStepMs);
-			physicsEngine->Simulate(deltaTimeMs);
+			physicsEngine->simulate(deltaTimeMs);
 			timeStepMs -= deltaTimeMs;
 			simCount++;
 		}
 		simCount = 0;
 
 		// Render
-		renderingEngine->PushEntities();
-		renderingEngine->Draw();
+		renderingEngine->pushEntities();
+		renderingEngine->draw();
 	}
 }
 

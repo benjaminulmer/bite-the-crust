@@ -5,7 +5,7 @@ InputEngine::InputEngine(void)
 {
 }
 
-void InputEngine::ProcessEvents() {}
+void InputEngine::processEvents() {}
 
 InputEngine::~InputEngine(void)
 {

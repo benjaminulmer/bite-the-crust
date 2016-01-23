@@ -15,7 +15,7 @@ public:
 	RenderingEngine(void);
 	~RenderingEngine(void);
 
-	void PushEntities();
-	void Draw();
+	void pushEntities();
+	void draw();
 };
 

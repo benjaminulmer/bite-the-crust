@@ -24,7 +24,7 @@ public:
 	AudioEngine *audioEngine;
 
 	// member functions
-	 void Run();
-	 void MainLoop();
+	 void run();
+	 void mainLoop();
 };
 

@@ -7,10 +7,10 @@
 RenderingEngine::RenderingEngine() {}
 
 // Push all the entity data to the renderer.
-void RenderingEngine::PushEntities() {
+void RenderingEngine::pushEntities() {
 }
 
-void RenderingEngine::Draw() {
+void RenderingEngine::draw() {
 	// Draw all our entities
 }
 

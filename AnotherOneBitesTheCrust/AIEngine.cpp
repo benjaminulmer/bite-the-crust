@@ -5,7 +5,7 @@ AIEngine::AIEngine(void)
 {
 }
 
-void AIEngine::UpdateAI() {}
+void AIEngine::updateAI() {}
 
 AIEngine::~AIEngine(void)
 {

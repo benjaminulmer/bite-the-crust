@@ -16,15 +16,17 @@ public:
 	Game(void);
 	~Game(void);
 
-	// member variables
 	RenderingEngine *renderingEngine;
 	PhysicsEngine *physicsEngine;
 	InputEngine *inputEngine;
 	AIEngine *aiEngine;
 	AudioEngine *audioEngine;
 
-	// member functions
-	 void run();
+	void run();
+
+private:
 	 void mainLoop();
+	 void processSDLEvents();
+	 void quitGame();
 };
 

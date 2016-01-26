@@ -8,6 +8,10 @@ Game::Game(void)
 // The entry point of the game
 void Game::run() {
 	// Preload data, initialize subsystems, anything to do before entering the main loop
+	SDL_Window* window = SDL_CreateWindow("AOBtC", 300, 300, 300, 300, 0);
+
+	inputEngine = new InputEngine();
+
 	mainLoop();
 }
 
@@ -21,8 +25,10 @@ void Game::mainLoop() {
 	
 	// Game loop
 	while (true) {
+		processSDLEvents();
+
 		// Update the player and AI cars
-		inputEngine->processEvents();
+		inputEngine->getInput();
 		aiEngine->updateAI();
 
 		// Figure out timestep and run physics
@@ -43,6 +49,26 @@ void Game::mainLoop() {
 		renderingEngine->pushEntities();
 		renderingEngine->draw();
 	}
+}
+
+void Game::processSDLEvents() {
+	SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_QUIT) {
+			quitGame();
+		}
+		else {
+			inputEngine->processEvent(event);
+		}
+	}
+}
+
+void Game::quitGame() {
+	// Delete subsystems 
+	delete inputEngine;
+
+	SDL_Quit();
+	exit(0);
 }
 
 Game::~Game(void)

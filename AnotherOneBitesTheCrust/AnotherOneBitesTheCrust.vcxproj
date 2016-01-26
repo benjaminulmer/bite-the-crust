@@ -40,8 +40,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\CPSC585\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\CPSC585\SDL2-2.0.3\include;C:\CPSC585\PhysX-3.3-master\PhysXSDK\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\CPSC585\SDL2-2.0.3\lib\x86;C:\CPSC585\PhysX-3.3-master\PhysXSDK\Lib\vc11win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
@@ -80,6 +80,7 @@
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
+    <ClCompile Include="PhysxErrorCallback.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
     <ClCompile Include="TestEntity.cpp" />
   </ItemGroup>
@@ -89,6 +90,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="PhysicsEngine.h" />
+    <ClInclude Include="PhysxErrorCallback.h" />
     <ClInclude Include="RenderingEngine.h" />
     <ClInclude Include="TestEntity.h" />
   </ItemGroup>

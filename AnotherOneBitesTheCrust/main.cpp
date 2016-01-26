@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
 	Game game;
 	game.run();
 
+	std::cin.ignore();
 	SDL_Quit();
 	return 0;
-}
+} 

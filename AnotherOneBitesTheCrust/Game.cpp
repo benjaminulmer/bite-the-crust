@@ -8,7 +8,9 @@ Game::Game(void)
 // The entry point of the game
 void Game::run() {
 	// Preload data, initialize subsystems, anything to do before entering the main loop
-	mainLoop();
+	PhysicsEngine physics = PhysicsEngine();
+
+	//mainLoop();
 }
 
 void Game::mainLoop() {

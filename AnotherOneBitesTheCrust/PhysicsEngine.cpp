@@ -5,6 +5,10 @@
 PhysicsEngine::PhysicsEngine(void)
 {
 	/*
+using namespace physx;
+
+PhysicsEngine::PhysicsEngine(void)
+{
 	bool recordMemoryAllocations = true;
 	PxTolerancesScale scale = PxTolerancesScale();
 
@@ -26,6 +30,7 @@ PhysicsEngine::PhysicsEngine(void)
 
 	// Initialize physx extensions
 	PxInitExtensions(*physics);
+
 	*/
 }
 

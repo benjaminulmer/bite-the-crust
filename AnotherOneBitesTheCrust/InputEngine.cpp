@@ -7,7 +7,7 @@ InputEngine::InputEngine(void) {
 	}
 }
 
-void InputEngine::processEvent(SDL_Event event) {
+void InputEngine::processControllerEvent(SDL_Event event) {
 	if (event.type == SDL_CONTROLLERBUTTONDOWN) {
 		if (event.cbutton.button == SDL_CONTROLLER_BUTTON_A) {
 			std::cout << "a" << std::endl;

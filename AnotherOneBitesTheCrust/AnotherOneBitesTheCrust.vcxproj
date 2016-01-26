@@ -57,6 +57,9 @@
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "$(ProjectDir)SDL2.dll" "$(SolutionDir)Debug\" /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -91,6 +94,11 @@
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="RenderingEngine.h" />
     <ClInclude Include="TestEntity.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SDL2.dll">
+      <DeploymentContent>false</DeploymentContent>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

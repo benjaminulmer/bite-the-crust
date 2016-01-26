@@ -1,7 +1,7 @@
 #pragma once
-#include <PxPhysicsAPI.h>
+//#include <PxPhysicsAPI.h>
 
-using namespace physx;
+//using namespace physx;
 
 class PhysicsEngine
 {

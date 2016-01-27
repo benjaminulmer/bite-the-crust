@@ -40,8 +40,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\CPSC585\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>\\samba.cs.ucalgary.ca\lawg\Documents\GitHub\bite-the-crust\glew-1.13.0\include;C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+    <LibraryPath>\\samba.cs.ucalgary.ca\lawg\Documents\GitHub\bite-the-crust\glew-1.13.0\lib\Release\Win32;C:\CPSC585\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
@@ -51,10 +51,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>\\samba.cs.ucalgary.ca\lawg\Documents\GitHub\bite-the-crust\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glu32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -84,6 +85,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
+    <ClCompile Include="ShaderTools.cpp" />
     <ClCompile Include="TestEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +95,8 @@
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="RenderingEngine.h" />
+    <ClInclude Include="res_path.h" />
+    <ClInclude Include="ShaderTools.h" />
     <ClInclude Include="TestEntity.h" />
   </ItemGroup>
   <ItemGroup>

@@ -29,6 +29,10 @@ void RenderingEngine::displayFunc()
 	glBindVertexArray(vaoID);
 	glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
+	glUseProgram(floorShaderID);
+	glBindVertexArray(floorID);
+	glDrawArrays(GL_QUADS, 0, 4);
+
 }
 
 void RenderingEngine::generateIDs()
@@ -39,10 +43,15 @@ void RenderingEngine::generateIDs()
 	string vsSource = loadShaderStringfromFile(vsShader);
 	string fsSource = loadShaderStringfromFile(fsShader);
 	basicProgramID = CreateShaderProgram(vsSource, fsSource);
+	floorShaderID = CreateShaderProgram(vsSource, fsSource);
 
 	glGenVertexArrays(1, &vaoID);	//generate VAO
 	glGenBuffers(1, &vertBufferID);	//generate buffer for vertices
 	glGenBuffers(1, &colorBufferID);	//generate buffer for colors
+
+	glGenVertexArrays(1, &floorID);
+	glGenBuffers(1, &floorBuffer);
+	glGenBuffers(1, &floorColorBuffer);
 }
 
 void RenderingEngine::deleteIDs()
@@ -51,6 +60,11 @@ void RenderingEngine::deleteIDs()
 	glDeleteVertexArrays(1, &vaoID);
 	glDeleteBuffers(1, &vertBufferID);
 	glDeleteBuffers(1, &colorBufferID);
+
+	glDeleteProgram(floorShaderID);
+	glDeleteVertexArrays(1, &floorID);
+	glDeleteBuffers(1, &floorBuffer);
+	glDeleteBuffers(1, &floorColorBuffer);
 }
 
 void RenderingEngine::setupVAO()
@@ -81,8 +95,31 @@ void RenderingEngine::setupVAO()
 		(void*)0
 		);
 
+	glBindVertexArray(floorID);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, floorBuffer);	//binding vertex vbo
+	glVertexAttribPointer(
+		0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+		);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, floorColorBuffer);	//binding color vbo
+	glVertexAttribPointer(
+		1,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+		);
 	
-	//glBindVertexArray(0);
+	glBindVertexArray(0);
 }
 
 void RenderingEngine::loadBuffer()
@@ -90,9 +127,13 @@ void RenderingEngine::loadBuffer()
 	cout << "Loading the buffers" << endl;
 
 	vector <vec3> verts;
-	verts.push_back(vec3(2,2,-1));
-	verts.push_back(vec3(1,-1,-1));
-	verts.push_back(vec3(-1,-1,-1));
+	verts.push_back(vec3(2,-2,2));
+	verts.push_back(vec3(2,-2,-2));
+	verts.push_back(vec3(-2,-2,-2));
+	verts.push_back(vec3(-2,-2,2));
+
+	glBindBuffer(GL_ARRAY_BUFFER, floorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*verts.size(), verts.data(), GL_STATIC_DRAW);
 
 	static const GLfloat g_vertex_buffer_data[] = {
       -1.0f,-1.0f,-1.0f, // triangle 1 : begin
@@ -141,6 +182,10 @@ void RenderingEngine::loadBuffer()
 	colors.push_back(vec3(1,0,0));
 	colors.push_back(vec3(0,1,0));
 	colors.push_back(vec3(0,0,1));
+	colors.push_back(vec3(1,1,1));
+
+	glBindBuffer(GL_ARRAY_BUFFER, floorColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*4, colors.data(), GL_STATIC_DRAW);
 
 	static const GLfloat g_color_buffer_data[] = {
      0.583f,  0.771f,  0.014f,
@@ -194,6 +239,8 @@ void RenderingEngine::loadModelViewMatrix()
 	//M = rotate(M, 0.0f, myRotationAxis);
 	//
 	M = mat4(1.0f);
+	floorM = mat4(1.0f);
+	floorM = scale(floorM, vec3(5.0f));
 	//M = translate(M, vec3(0.0f,0.0f,0.0f));
 
 	//V = mat4(1.0f);
@@ -214,7 +261,7 @@ void RenderingEngine::loadProjectionMatrix()
 void RenderingEngine::setupModelViewProjectionTransform()
 {
 	MVP = P * V * M;
-
+	floorMVP = P * V * floorM;
 }
 
 void RenderingEngine::reloadMVPUniform()
@@ -228,6 +275,14 @@ void RenderingEngine::reloadMVPUniform()
 						value_ptr(MVP)
 						);
 
+	GLint floorMVPID = glGetUniformLocation(floorShaderID, "MVP");
+
+	glUseProgram(floorShaderID);
+	glUniformMatrix4fv( floorMVPID,
+						1,
+						GL_FALSE,
+						value_ptr(floorMVP)
+						);
 }
 
 void RenderingEngine::init()

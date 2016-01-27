@@ -59,7 +59,7 @@ void Game::initSystems()
 	
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);		//enable double buffering
 
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);				//blue background
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
 
 	renderingEngine.init();
 

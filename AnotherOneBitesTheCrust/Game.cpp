@@ -57,7 +57,8 @@ void Game::processSDLEvents() {
 		if (event.type == SDL_QUIT) {
 			quitGame();
 		}
-		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN) {
+		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN ||
+			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED) {
 			inputEngine->processControllerEvent(event);
 		}
 		else {

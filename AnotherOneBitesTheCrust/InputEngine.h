@@ -4,6 +4,8 @@
 class InputEngine
 {
 public:
+	static const int MAX_NUM_CONTROLLERS = 4;
+
 	InputEngine(void);
 	~InputEngine(void);
 
@@ -11,6 +13,8 @@ public:
 	void getInput();
 
 private:
-	SDL_GameController* controllers[4];
+	SDL_GameController* controllers[MAX_NUM_CONTROLLERS];
+
+	void openControllers();
 };
 

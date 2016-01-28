@@ -40,8 +40,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\CPSC585\SDL2-2.0.3\include;C:\CPSC585\PhysX-3.3-master\PhysXSDK\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\CPSC585\PhysX-3.3-master\PhysXSDK\Lib\vc11win32;\\cs-fs01\Profiles\ug\blulmer\Desktop\SDL2-2.0.4\VisualC\Win32\Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\CPSC585\SDL2-2.0.4\include;C:\CPSC585\PhysX-3.3-master\PhysXSDK\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\CPSC585\PhysX-3.3-master\PhysXSDK\Lib\vc11win32;C:\CPSC585\SDL2-2.0.4\VisualC\Win32\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>

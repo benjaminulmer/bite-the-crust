@@ -40,8 +40,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>\\samba.cs.ucalgary.ca\lawg\Documents\GitHub\bite-the-crust\glew-1.13.0\include;C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
-    <LibraryPath>\\samba.cs.ucalgary.ca\lawg\Documents\GitHub\bite-the-crust\glew-1.13.0\lib\Release\Win32;C:\CPSC585\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Gorman\Documents\GitHub\bite-the-crust\SDL2-2.0.4\include;C:\Users\Gorman\Documents\GitHub\bite-the-crust\glew-1.13.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Gorman\Documents\GitHub\bite-the-crust\SDL2-2.0.4\VisualC\Win32\Not Release;C:\Users\Gorman\Documents\GitHub\bite-the-crust\glew-1.13.0\lib\Not Release\Win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\CPSC585\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
@@ -51,7 +51,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>\\samba.cs.ucalgary.ca\lawg\Documents\GitHub\bite-the-crust\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Gorman\Documents\GitHub\bite-the-crust\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

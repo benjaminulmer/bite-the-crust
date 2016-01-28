@@ -25,11 +25,36 @@ void RenderingEngine::displayFunc()
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+	M = mat4(1.0f);
+	
+	MVP = P * V * M;
+
+	GLint mvpID = glGetUniformLocation(basicProgramID, "MVP");
+
+	glUseProgram(basicProgramID);
+	glUniformMatrix4fv( mvpID,
+						1,
+						GL_FALSE,
+						value_ptr(MVP)
+						);
 	glUseProgram(basicProgramID);
 	glBindVertexArray(vaoID);
 	glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
-	glUseProgram(floorShaderID);
+	floorM = scale(M, vec3(2.0f));
+	floorM = rotate(floorM, 45.0f, vec3(0,1,0));
+
+	//scale rotate translate
+
+	MVP = P * V * floorM;
+
+	glUseProgram(basicProgramID);
+	glUniformMatrix4fv( mvpID,
+						1,
+						GL_FALSE,
+						value_ptr(MVP)
+						);
+	glUseProgram(basicProgramID);
 	glBindVertexArray(floorID);
 	glDrawArrays(GL_QUADS, 0, 4);
 
@@ -43,7 +68,6 @@ void RenderingEngine::generateIDs()
 	string vsSource = loadShaderStringfromFile(vsShader);
 	string fsSource = loadShaderStringfromFile(fsShader);
 	basicProgramID = CreateShaderProgram(vsSource, fsSource);
-	floorShaderID = CreateShaderProgram(vsSource, fsSource);
 
 	glGenVertexArrays(1, &vaoID);	//generate VAO
 	glGenBuffers(1, &vertBufferID);	//generate buffer for vertices
@@ -61,7 +85,6 @@ void RenderingEngine::deleteIDs()
 	glDeleteBuffers(1, &vertBufferID);
 	glDeleteBuffers(1, &colorBufferID);
 
-	glDeleteProgram(floorShaderID);
 	glDeleteVertexArrays(1, &floorID);
 	glDeleteBuffers(1, &floorBuffer);
 	glDeleteBuffers(1, &floorColorBuffer);
@@ -240,7 +263,7 @@ void RenderingEngine::loadModelViewMatrix()
 	//
 	M = mat4(1.0f);
 	floorM = mat4(1.0f);
-	floorM = scale(floorM, vec3(5.0f));
+	//floorM = scale(floorM, vec3(5.0f));
 	//M = translate(M, vec3(0.0f,0.0f,0.0f));
 
 	//V = mat4(1.0f);
@@ -261,7 +284,6 @@ void RenderingEngine::loadProjectionMatrix()
 void RenderingEngine::setupModelViewProjectionTransform()
 {
 	MVP = P * V * M;
-	floorMVP = P * V * floorM;
 }
 
 void RenderingEngine::reloadMVPUniform()
@@ -275,14 +297,6 @@ void RenderingEngine::reloadMVPUniform()
 						value_ptr(MVP)
 						);
 
-	GLint floorMVPID = glGetUniformLocation(floorShaderID, "MVP");
-
-	glUseProgram(floorShaderID);
-	glUniformMatrix4fv( floorMVPID,
-						1,
-						GL_FALSE,
-						value_ptr(floorMVP)
-						);
 }
 
 void RenderingEngine::init()
@@ -298,5 +312,5 @@ void RenderingEngine::init()
 	loadModelViewMatrix();
 	loadProjectionMatrix();
 	setupModelViewProjectionTransform();
-	reloadMVPUniform();
+	//reloadMVPUniform();
 }

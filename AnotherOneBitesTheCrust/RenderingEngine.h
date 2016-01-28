@@ -51,8 +51,7 @@ public:
 
 
 	
-	GLuint basicProgramID;		//shader program for cube
-	GLuint floorShaderID;
+	GLuint basicProgramID;		//shader program 
 
 	GLuint vaoID;			//cube vao
 	GLuint vertBufferID;	//VBO for vertices
@@ -66,7 +65,6 @@ public:
 	mat4 M;
 	mat4 V;
 	mat4 P;
-	mat4 floorMVP;
 	mat4 floorM;
 
 };

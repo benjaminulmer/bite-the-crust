@@ -1,10 +1,5 @@
 #include "PhysicsEngine.h"
 
-//using namespace physx;
-
-PhysicsEngine::PhysicsEngine(void)
-{
-	/*
 using namespace physx;
 
 PhysicsEngine::PhysicsEngine(void)
@@ -31,7 +26,6 @@ PhysicsEngine::PhysicsEngine(void)
 	// Initialize physx extensions
 	PxInitExtensions(*physics);
 
-	*/
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs) {}

@@ -11,6 +11,7 @@ void Game::run() {
 	SDL_Window* window = SDL_CreateWindow("AOBtC", 300, 300, 300, 300, 0);
 
 	inputEngine = new InputEngine();
+	physicsEngine = new PhysicsEngine();
 
 	mainLoop();
 }

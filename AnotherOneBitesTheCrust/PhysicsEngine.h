@@ -12,6 +12,8 @@ public:
 private:
 	physx::PxDefaultErrorCallback* defaultErrorCallback;
 	physx::PxDefaultAllocator* defaultAllocator;
+	PxTolerancesScale scale;
+
 	physx::PxFoundation* foundation;
 	physx::PxProfileZoneManager* profileZoneManager;
 	physx::PxPhysics* physics;
@@ -19,4 +21,6 @@ private:
 
 	physx::PxScene* scene;
 	physx::PxMaterial* planeMaterial;
+
+	physx::PxRigidDynamic* aSphereActor;
 };

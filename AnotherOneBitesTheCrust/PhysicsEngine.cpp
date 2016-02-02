@@ -1,15 +1,17 @@
 #include "PhysicsEngine.h"
+#include <iostream>
 
 using namespace physx;
 
 PhysicsEngine::PhysicsEngine(void) {
 	// Initializaiton values
 	bool recordMemoryAllocations = true;
-	PxTolerancesScale scale = PxTolerancesScale();
+	scale = PxTolerancesScale();
 	float staticFriction = 0.9;
 	float dynamicFriction = 0.9;
 	float restitution = 0.5;
 	// END
+	static PxSimulationFilterShader gDefaultFilterShader;
 
 	defaultErrorCallback = new PxDefaultErrorCallback();
 	defaultAllocator = new PxDefaultAllocator();
@@ -36,22 +38,29 @@ PhysicsEngine::PhysicsEngine(void) {
 	// Create scene
 	PxSceneDesc sceneDesc(physics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+
+	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
+	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+
 	scene = physics->createScene(sceneDesc);
 
 	// Make material and add plane and sphere to scene
 	planeMaterial = physics->createMaterial(staticFriction, dynamicFriction, restitution);
-	PxRigidStatic* plane = PxCreatePlane(*physics, PxPlane(PxVec3(0,1,0), PxVec3(0,0,0)), *planeMaterial);
-	//scene->addActor(*plane);
+	PxRigidStatic* plane = PxCreatePlane(*physics, PxPlane(PxVec3(0,0,0), PxVec3(0,1,0)), *planeMaterial);
+	scene->addActor(*plane);
 
-	//PxRigidDynamic* aSphereActor = PxCreateDynamic(*physics, PxTransform(PxVec3(0,1,0)), PxSphereGeometry(1), *planeMaterial, PxReal(0.5));
-	//aSphereActor->setLinearVelocity(PxVec3(1,0,0));
+	aSphereActor = PxCreateDynamic(*physics, PxTransform(PxVec3(0,1,0)), PxSphereGeometry(1), *planeMaterial, PxReal(0.5));
+	aSphereActor->setLinearVelocity(PxVec3(1,0,0));
+	scene->addActor(*aSphereActor);
 }
 
 
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
-	//scene->simulate(deltaTimeMs);
-	//scene->fetchResults(true);
+	scene->simulate(deltaTimeMs);
+	scene->fetchResults(true);
+
+	std::cout << aSphereActor->getGlobalPose().p.x << std::endl;
 }
 
 PhysicsEngine::~PhysicsEngine(void) {

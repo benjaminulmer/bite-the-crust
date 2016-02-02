@@ -7,9 +7,9 @@ PhysicsEngine::PhysicsEngine(void) {
 	// Initializaiton values
 	bool recordMemoryAllocations = true;
 	scale = PxTolerancesScale();
-	float staticFriction = 0.9;
-	float dynamicFriction = 0.9;
-	float restitution = 0.5;
+	PxReal staticFriction = PxReal(0.9);
+	PxReal dynamicFriction = PxReal(0.9);
+	PxReal restitution = PxReal(0.5);
 	// END
 	static PxSimulationFilterShader gDefaultFilterShader;
 
@@ -45,8 +45,10 @@ PhysicsEngine::PhysicsEngine(void) {
 	scene = physics->createScene(sceneDesc);
 
 	// Make material and add plane and sphere to scene
+	PxVec3 norm = PxVec3(1,1,0);
+	norm.normalize();
 	planeMaterial = physics->createMaterial(staticFriction, dynamicFriction, restitution);
-	PxRigidStatic* plane = PxCreatePlane(*physics, PxPlane(PxVec3(0,0,0), PxVec3(0,1,0)), *planeMaterial);
+	PxRigidStatic* plane = PxCreatePlane(*physics, PxPlane(PxVec3(0,0,0), norm), *planeMaterial);
 	scene->addActor(*plane);
 
 	aSphereActor = PxCreateDynamic(*physics, PxTransform(PxVec3(0,1,0)), PxSphereGeometry(1), *planeMaterial, PxReal(0.5));
@@ -54,13 +56,11 @@ PhysicsEngine::PhysicsEngine(void) {
 	scene->addActor(*aSphereActor);
 }
 
-
-
 void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
-	scene->simulate(deltaTimeMs);
+	scene->simulate(PxReal(deltaTimeMs/1000.0));
 	scene->fetchResults(true);
 
-	std::cout << aSphereActor->getGlobalPose().p.x << std::endl;
+	std::cout << aSphereActor->getGlobalPose().p.x << " : " << aSphereActor->getGlobalPose().p.y << " : " << aSphereActor->getGlobalPose().p.z << std::endl;
 }
 
 PhysicsEngine::~PhysicsEngine(void) {

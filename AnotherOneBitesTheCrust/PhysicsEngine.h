@@ -10,9 +10,12 @@ public:
 	void simulate(unsigned int deltaTimeMs);
 	
 private:
+	//simulationData simData;
+	//vehicleData vehicleData;
+
 	physx::PxDefaultErrorCallback* defaultErrorCallback;
 	physx::PxDefaultAllocator* defaultAllocator;
-	PxTolerancesScale scale;
+	physx::PxTolerancesScale scale;
 
 	physx::PxFoundation* foundation;
 	physx::PxProfileZoneManager* profileZoneManager;

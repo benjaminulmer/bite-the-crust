@@ -10,13 +10,28 @@
 #include "AIEngine.h"
 #include "AudioEngine.h"
 
+#include <SDL.h>
+#include <iostream>
+#include <string>
+#include <GL\glew.h>
+
+using namespace std;
+
+enum class GameState
+{
+	MENU,
+	PLAY,
+	PAUSE,
+	EXIT
+};
+
 class Game
 {
 public:
 	Game(void);
 	~Game(void);
 
-	RenderingEngine *renderingEngine;
+	RenderingEngine renderingEngine;
 	PhysicsEngine *physicsEngine;
 	InputEngine *inputEngine;
 	AIEngine *aiEngine;
@@ -25,8 +40,17 @@ public:
 	void run();
 
 private:
-	 void mainLoop();
-	 void processSDLEvents();
-	 void quitGame();
+	void initSystems();
+	void mainLoop();
+	void processSDLEvents();
+	void quitGame();
+
+	SDL_Window* window;
+	int screenWidth;
+	int screenHeight;
+
+	GameState gameState;
+	
+	RenderingEngine cube;
 };
 

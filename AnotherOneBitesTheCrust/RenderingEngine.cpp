@@ -6,6 +6,7 @@
 
 RenderingEngine::RenderingEngine() {}
 
+RenderingEngine::~RenderingEngine(void) {}
 // Push all the entity data to the renderer.
 void RenderingEngine::pushEntities() {
 }
@@ -18,7 +19,7 @@ void RenderingEngine::draw() {
 
 }
 
-RenderingEngine::~RenderingEngine(void) {}
+
 
 void RenderingEngine::displayFunc()
 {
@@ -57,6 +58,8 @@ void RenderingEngine::displayFunc()
 	glUseProgram(basicProgramID);
 	glBindVertexArray(floorID);
 	glDrawArrays(GL_QUADS, 0, 4);
+
+
 
 }
 

@@ -26,6 +26,13 @@ using glm::mat4;
 using glm::perspective;
 
 
+struct Renderables
+{
+	vector <vec3> vertices;
+	mat4 model;
+	GLuint vaoID;
+};
+
 
 class RenderingEngine
 {

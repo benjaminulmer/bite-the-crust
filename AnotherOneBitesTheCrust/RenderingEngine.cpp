@@ -66,8 +66,8 @@ void RenderingEngine::displayFunc()
 void RenderingEngine::generateIDs()
 {
 	cout << "Generating IDs" << endl;
-	string vsShader = getResourcePath("Shaders") + "basic_vs.glsl";
-	string fsShader = getResourcePath("Shaders") + "basic_fs.glsl";
+	string vsShader = "res\\Shaders\\basic_vs.glsl";
+	string fsShader = "res\\Shaders\\basic_fs.glsl";
 	string vsSource = loadShaderStringfromFile(vsShader);
 	string fsSource = loadShaderStringfromFile(fsShader);
 	basicProgramID = CreateShaderProgram(vsSource, fsSource);

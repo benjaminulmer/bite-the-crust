@@ -26,38 +26,45 @@ void RenderingEngine::displayFunc()
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	M = mat4(1.0f);
-	
-	MVP = P * V * M;
+	//M = mat4(1.0f);
+	//
+	//MVP = P * V * M;
 
-	GLint mvpID = glGetUniformLocation(basicProgramID, "MVP");
+	//GLint mvpID = glGetUniformLocation(basicProgramID, "MVP");
 
-	glUseProgram(basicProgramID);
-	glUniformMatrix4fv( mvpID,
-						1,
-						GL_FALSE,
-						value_ptr(MVP)
-						);
+	//glUseProgram(basicProgramID);
+	//glUniformMatrix4fv( mvpID,
+	//					1,
+	//					GL_FALSE,
+	//					value_ptr(MVP)
+	//					);
 	glUseProgram(basicProgramID);
 	glBindVertexArray(vaoID);
-	glDrawArrays(GL_TRIANGLES, 0, 12*3);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
+	//glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
-	floorM = scale(M, vec3(2.0f));
-	floorM = rotate(floorM, 45.0f, vec3(0,1,0));
+	glDrawElements(GL_TRIANGLES,
+					6,
+					GL_UNSIGNED_INT,
+					(void*)0
+					);
 
-	//scale rotate translate
+	//floorM = scale(M, vec3(1.0f));
+	//floorM = rotate(floorM, 45.0f, vec3(0,1,0));
+	//floorM = glm::translate(floorM, vec3(2, 0,0));
 
-	MVP = P * V * floorM;
+	////scale rotate translate
 
-	glUseProgram(basicProgramID);
-	glUniformMatrix4fv( mvpID,
-						1,
-						GL_FALSE,
-						value_ptr(MVP)
-						);
-	glUseProgram(basicProgramID);
-	glBindVertexArray(floorID);
-	glDrawArrays(GL_QUADS, 0, 4);
+	//MVP = P * V * floorM;
+
+	//glUniformMatrix4fv( mvpID,
+	//					1,
+	//					GL_FALSE,
+	//					value_ptr(MVP)
+	//					);
+
+	//glBindVertexArray(vaoID);
+	//glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
 
 
@@ -75,6 +82,7 @@ void RenderingEngine::generateIDs()
 	glGenVertexArrays(1, &vaoID);	//generate VAO
 	glGenBuffers(1, &vertBufferID);	//generate buffer for vertices
 	glGenBuffers(1, &colorBufferID);	//generate buffer for colors
+	glGenBuffers(1, &eboID);
 
 	glGenVertexArrays(1, &floorID);
 	glGenBuffers(1, &floorBuffer);
@@ -121,6 +129,10 @@ void RenderingEngine::setupVAO()
 		(void*)0
 		);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
+
+	glBindVertexArray(0);
+
 	glBindVertexArray(floorID);
 
 	glEnableVertexAttribArray(0);
@@ -152,59 +164,75 @@ void RenderingEngine::loadBuffer()
 {
 	cout << "Loading the buffers" << endl;
 
-	vector <vec3> verts;
-	verts.push_back(vec3(2,-2,2));
-	verts.push_back(vec3(2,-2,-2));
-	verts.push_back(vec3(-2,-2,-2));
-	verts.push_back(vec3(-2,-2,2));
+	//vector <vec3> verts;
+	//verts.push_back(vec3(2,-2,2));
+	//verts.push_back(vec3(2,-2,-2));
+	//verts.push_back(vec3(-2,-2,-2));
+	//verts.push_back(vec3(-2,-2,2));
 
-	glBindBuffer(GL_ARRAY_BUFFER, floorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*verts.size(), verts.data(), GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, floorBuffer);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*verts.size(), verts.data(), GL_STATIC_DRAW);
 
-	static const GLfloat g_vertex_buffer_data[] = {
-      -1.0f,-1.0f,-1.0f, // triangle 1 : begin
-      -1.0f,-1.0f, 1.0f,
-      -1.0f, 1.0f, 1.0f, // triangle 1 : end
-      1.0f, 1.0f,-1.0f, // triangle 2 : begin
-      -1.0f,-1.0f,-1.0f,
-      -1.0f, 1.0f,-1.0f, // triangle 2 : end
-     1.0f,-1.0f, 1.0f,
-     -1.0f,-1.0f,-1.0f,
-     1.0f,-1.0f,-1.0f,
-     1.0f, 1.0f,-1.0f,
-     1.0f,-1.0f,-1.0f,
-     -1.0f,-1.0f,-1.0f,
-     -1.0f,-1.0f,-1.0f,
-     -1.0f, 1.0f, 1.0f,
-     -1.0f, 1.0f,-1.0f,
-     1.0f,-1.0f, 1.0f,
-     -1.0f,-1.0f, 1.0f,
-     -1.0f,-1.0f,-1.0f,
-     -1.0f, 1.0f, 1.0f,
-     -1.0f,-1.0f, 1.0f,
-     1.0f,-1.0f, 1.0f,
-     1.0f, 1.0f, 1.0f,
-     1.0f,-1.0f,-1.0f,
-     1.0f, 1.0f,-1.0f,
-     1.0f,-1.0f,-1.0f,
-     1.0f, 1.0f, 1.0f,
-     1.0f,-1.0f, 1.0f,
-     1.0f, 1.0f, 1.0f,
-     1.0f, 1.0f,-1.0f,
-     -1.0f, 1.0f,-1.0f,
-     1.0f, 1.0f, 1.0f,
-     -1.0f, 1.0f,-1.0f,
-     -1.0f, 1.0f, 1.0f,
-     1.0f, 1.0f, 1.0f,
-     -1.0f, 1.0f, 1.0f,
-     1.0f,-1.0f, 1.0f
- };
+	//static const GLfloat g_vertex_buffer_data[] = {
+ //     -1.0f,-1.0f,-1.0f, // triangle 1 : begin
+ //     -1.0f,-1.0f, 1.0f,
+ //     -1.0f, 1.0f, 1.0f, // triangle 1 : end
+ //     1.0f, 1.0f,-1.0f, // triangle 2 : begin
+ //     -1.0f,-1.0f,-1.0f,
+ //     -1.0f, 1.0f,-1.0f, // triangle 2 : end
+ //    1.0f,-1.0f, 1.0f,
+ //    -1.0f,-1.0f,-1.0f,
+ //    1.0f,-1.0f,-1.0f,
+ //    1.0f, 1.0f,-1.0f,
+ //    1.0f,-1.0f,-1.0f,
+ //    -1.0f,-1.0f,-1.0f,
+ //    -1.0f,-1.0f,-1.0f,
+ //    -1.0f, 1.0f, 1.0f,
+ //    -1.0f, 1.0f,-1.0f,
+ //    1.0f,-1.0f, 1.0f,
+ //    -1.0f,-1.0f, 1.0f,
+ //    -1.0f,-1.0f,-1.0f,
+ //    -1.0f, 1.0f, 1.0f,
+ //    -1.0f,-1.0f, 1.0f,
+ //    1.0f,-1.0f, 1.0f,
+ //    1.0f, 1.0f, 1.0f,
+ //    1.0f,-1.0f,-1.0f,
+ //    1.0f, 1.0f,-1.0f,
+ //    1.0f,-1.0f,-1.0f,
+ //    1.0f, 1.0f, 1.0f,
+ //    1.0f,-1.0f, 1.0f,
+ //    1.0f, 1.0f, 1.0f,
+ //    1.0f, 1.0f,-1.0f,
+ //    -1.0f, 1.0f,-1.0f,
+ //    1.0f, 1.0f, 1.0f,
+ //    -1.0f, 1.0f,-1.0f,
+ //    -1.0f, 1.0f, 1.0f,
+ //    1.0f, 1.0f, 1.0f,
+ //    -1.0f, 1.0f, 1.0f,
+ //    1.0f,-1.0f, 1.0f
+ //};
+
+	GLfloat vertices[] = {
+		1,1,0,
+		1,-1,0,
+		-1,-1,0,
+		-1,1,0
+	};
+		
 	
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertBufferID);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	vector <vec3> colors;
+	GLuint faces[] = {
+		2, 3, 0,
+		2, 0, 1
+	};
+		
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(faces), faces, GL_STATIC_DRAW);
+
+	/*vector <vec3> colors;
 	colors.push_back(vec3(1,0,0));
 	colors.push_back(vec3(0,1,0));
 	colors.push_back(vec3(0,0,1));
@@ -250,11 +278,19 @@ void RenderingEngine::loadBuffer()
      0.673f,  0.211f,  0.457f,
      0.820f,  0.883f,  0.371f,
      0.982f,  0.099f,  0.879f
- };
+ };*/
 	
+	GLfloat squareColors[] = {
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1,
+		1, 1, 1
+	};
 	
 	glBindBuffer(GL_ARRAY_BUFFER, colorBufferID);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(squareColors), squareColors, GL_STATIC_DRAW);
+
+
 }
 
 void RenderingEngine::loadModelViewMatrix()
@@ -271,7 +307,7 @@ void RenderingEngine::loadModelViewMatrix()
 
 	//V = mat4(1.0f);
 
-	V = glm::lookAt(vec3(4,3,3),	//at (2,0,0)
+	V = glm::lookAt(vec3(0,3,2),	//at (2,0,0)
 					vec3(0,0,0),	//looking at (0,0,0)
 					vec3(0,1,0)		//right side up
 					);
@@ -315,5 +351,36 @@ void RenderingEngine::init()
 	loadModelViewMatrix();
 	loadProjectionMatrix();
 	setupModelViewProjectionTransform();
-	//reloadMVPUniform();
+	reloadMVPUniform();
 }
+
+static const GLfloat tetVertices[] = {
+  0.0f, 0.0f, -0.75f, 1.0f,
+  0.0f, 0.75f, 0.0f, 1.0f,
+  -0.75f, -0.75f, 0.0f, 1.0f,
+  0.75f, -0.75f, 0.0f, 1.0f,
+};
+static const GLushort tetFaceIndices[] = {
+  0,1,2,
+  0,1,3,
+  1,2,3,
+  0,2,3
+};
+static const GLfloat tetColours[] = {
+  1.0f,1.0f,1.0f,1.0f,
+  1.0f,0.0f,0.0f,1.0f,
+  0.0f,1.0f,0.0f,1.0f,
+  0.0f,0.0f,1.0f,1.0f
+};
+static const GLfloat tetNormals[] = {
+  0.0f,0.0f,-1.0f, 
+  0.0f,1.0f,0.0f,
+  -0.707107f, -0.707107f,0.0f,
+  0.707107f, -0.707107f,0.0f
+};
+
+#define VERTEX_DATA 0
+#define VERTEX_COLOR 1
+#define VERTEX_NORMAL 2
+#define VERTEX_INDICES 3
+

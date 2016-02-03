@@ -63,6 +63,7 @@ public:
 	GLuint vaoID;			//cube vao
 	GLuint vertBufferID;	//VBO for vertices
 	GLuint colorBufferID;	//VBO for colors
+	GLuint eboID;
 
 	GLuint floorID;
 	GLuint floorBuffer;
@@ -73,6 +74,13 @@ public:
 	mat4 V;
 	mat4 P;
 	mat4 floorM;
+
+	GLuint myVAO;			//vao
+	GLuint myVBO;			//vbo
+	GLuint myIndexBuffer;	//ebo
+
+	GLuint myShaderProgram;
+
 
 };
 

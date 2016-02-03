@@ -61,7 +61,7 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
 	scene->simulate(PxReal(deltaTimeMs/1000.0));
 	scene->fetchResults(true);
 
-	std::cout << aSphereActor->getGlobalPose().p.x << " : " << aSphereActor->getGlobalPose().p.y << " : " << aSphereActor->getGlobalPose().p.z << std::endl;
+	//std::cout << aSphereActor->getGlobalPose().p.x << " : " << aSphereActor->getGlobalPose().p.y << " : " << aSphereActor->getGlobalPose().p.z << std::endl;
 }
 
 PhysicsEngine::~PhysicsEngine(void) {

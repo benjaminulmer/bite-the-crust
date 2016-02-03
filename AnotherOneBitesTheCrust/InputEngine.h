@@ -4,10 +4,10 @@
 class InputEngine
 {
 public:
-	static const int MAX_NUM_CONTROLLERS = 4;
-
 	InputEngine(void);
 	~InputEngine(void);
+
+	static const int MAX_NUM_CONTROLLERS = 4;
 
 	void processControllerEvent(SDL_Event event);
 	void getInput();

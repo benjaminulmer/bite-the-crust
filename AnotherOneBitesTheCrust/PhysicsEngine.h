@@ -13,9 +13,15 @@ private:
 	//simulationData simData;
 	//vehicleData vehicleData;
 
+	// Initialization parameters
+	physx::PxTolerancesScale scale;
+	
+
+	// END initialization parameters
+
 	physx::PxDefaultErrorCallback* defaultErrorCallback;
 	physx::PxDefaultAllocator* defaultAllocator;
-	physx::PxTolerancesScale scale;
+	
 
 	physx::PxFoundation* foundation;
 	physx::PxProfileZoneManager* profileZoneManager;
@@ -26,4 +32,6 @@ private:
 	physx::PxMaterial* planeMaterial;
 
 	physx::PxRigidDynamic* aSphereActor;
+
+	void initSimulationData();
 };

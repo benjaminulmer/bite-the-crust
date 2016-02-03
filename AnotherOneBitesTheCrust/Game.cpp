@@ -25,6 +25,7 @@ void Game::run() {
 	initSystems();
 
 	inputEngine = new InputEngine();
+	physicsEngine = new PhysicsEngine();
 
 
 
@@ -110,7 +111,8 @@ void Game::processSDLEvents() {
 		if (event.type == SDL_QUIT) {
 			gameState = GameState::EXIT;
 		}
-		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN) {
+		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN ||
+			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED) {
 			inputEngine->processControllerEvent(event);
 		}
 		else if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)

@@ -28,6 +28,7 @@ using glm::perspective;
 
 struct Renderables
 {
+	string name;
 	vector <vec3> vertices;
 	mat4 model;
 	GLuint vaoID;

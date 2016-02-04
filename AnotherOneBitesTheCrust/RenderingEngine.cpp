@@ -26,21 +26,21 @@ void RenderingEngine::displayFunc()
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	//M = mat4(1.0f);
-	//
-	//MVP = P * V * M;
+	M = mat4(1.0f);
+	
+	MVP = P * V * M;
 
-	//GLint mvpID = glGetUniformLocation(basicProgramID, "MVP");
+	GLint mvpID = glGetUniformLocation(basicProgramID, "MVP");
 
-	//glUseProgram(basicProgramID);
-	//glUniformMatrix4fv( mvpID,
-	//					1,
-	//					GL_FALSE,
-	//					value_ptr(MVP)
-	//					);
 	glUseProgram(basicProgramID);
+	glUniformMatrix4fv( mvpID,
+						1,
+						GL_FALSE,
+						value_ptr(MVP)
+						);
+	//glUseProgram(basicProgramID);
 	glBindVertexArray(vaoID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
 	//glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
 	glDrawElements(GL_TRIANGLES,
@@ -49,22 +49,21 @@ void RenderingEngine::displayFunc()
 					(void*)0
 					);
 
-	//floorM = scale(M, vec3(1.0f));
-	//floorM = rotate(floorM, 45.0f, vec3(0,1,0));
+	floorM = scale(M, vec3(1.0f));
+	floorM = rotate(floorM, 45.0f, vec3(0,1,0));
 	//floorM = glm::translate(floorM, vec3(2, 0,0));
-
 	////scale rotate translate
 
-	//MVP = P * V * floorM;
+	MVP = P * V * floorM;
 
-	//glUniformMatrix4fv( mvpID,
-	//					1,
-	//					GL_FALSE,
-	//					value_ptr(MVP)
-	//					);
+	glUniformMatrix4fv( mvpID,
+						1,
+						GL_FALSE,
+						value_ptr(MVP)
+						);
 
-	//glBindVertexArray(vaoID);
-	//glDrawArrays(GL_TRIANGLES, 0, 12*3);
+	glBindVertexArray(floorID);
+	glDrawArrays(GL_QUADS, 0, 12*3);
 
 
 
@@ -164,14 +163,14 @@ void RenderingEngine::loadBuffer()
 {
 	cout << "Loading the buffers" << endl;
 
-	//vector <vec3> verts;
-	//verts.push_back(vec3(2,-2,2));
-	//verts.push_back(vec3(2,-2,-2));
-	//verts.push_back(vec3(-2,-2,-2));
-	//verts.push_back(vec3(-2,-2,2));
+	vector <vec3> verts;
+	verts.push_back(vec3(2,-2,2));
+	verts.push_back(vec3(2,-2,-2));
+	verts.push_back(vec3(-2,-2,-2));
+	verts.push_back(vec3(-2,-2,2));
 
-	//glBindBuffer(GL_ARRAY_BUFFER, floorBuffer);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*verts.size(), verts.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, floorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*verts.size(), verts.data(), GL_STATIC_DRAW);
 
 	//static const GLfloat g_vertex_buffer_data[] = {
  //     -1.0f,-1.0f,-1.0f, // triangle 1 : begin
@@ -232,7 +231,7 @@ void RenderingEngine::loadBuffer()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(faces), faces, GL_STATIC_DRAW);
 
-	/*vector <vec3> colors;
+	vector <vec3> colors;
 	colors.push_back(vec3(1,0,0));
 	colors.push_back(vec3(0,1,0));
 	colors.push_back(vec3(0,0,1));
@@ -241,7 +240,7 @@ void RenderingEngine::loadBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, floorColorBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*4, colors.data(), GL_STATIC_DRAW);
 
-	static const GLfloat g_color_buffer_data[] = {
+	/*static const GLfloat g_color_buffer_data[] = {
      0.583f,  0.771f,  0.014f,
      0.609f,  0.115f,  0.436f,
      0.327f,  0.483f,  0.844f,
@@ -351,7 +350,7 @@ void RenderingEngine::init()
 	loadModelViewMatrix();
 	loadProjectionMatrix();
 	setupModelViewProjectionTransform();
-	reloadMVPUniform();
+	//reloadMVPUniform();
 }
 
 static const GLfloat tetVertices[] = {

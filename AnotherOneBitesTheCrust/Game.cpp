@@ -68,7 +68,7 @@ void Game::initSystems()
 }
 
 void Game::setupEntities() {
-	Renderable* plane = new Renderable();;
+	Renderable* plane = new Renderable();
 	plane->addPoint(vec3(2,-2,2),vec3(1,0,0));
 	plane->addPoint(vec3(2,-2,-2),vec3(0,1,0));
 	plane->addPoint(vec3(-2,-2,-2),vec3(0,0,1));
@@ -78,17 +78,20 @@ void Game::setupEntities() {
 	renderables.push_back(plane);
 	renderingEngine.assignBuffers(plane);
 
-	Renderable* triangle = new Renderable();;
+	Renderable* triangle = new Renderable();
 	triangle->addPoint(vec3(0,0,0), vec3(0,0,1));
 	triangle->addPoint(vec3(0,1,0), vec3(1,0,1));
 	triangle->addPoint(vec3(1,1,0), vec3(1,1,0));
+	triangle->createFace(0);
+	triangle->createFace(1);
+	triangle->createFace(2);
 	renderables.push_back(triangle);
 	renderingEngine.assignBuffers(triangle);
 
-	Entity* ground = new Entity();
-	ground->setPosition(vec3(0,0,0));
-	ground->setRenderable(plane);
-	entities.push_back(ground);
+	//Entity* ground = new Entity();
+	//ground->setPosition(vec3(0,0,0));
+	//ground->setRenderable(plane);
+	//entities.push_back(ground);
 	Entity* tri = new Entity();
 	tri->setPosition(vec3(-1,1, 1.0));
 	tri->setRenderable(triangle);

@@ -63,7 +63,8 @@ void RenderingEngine::displayFunc()
 						);
 
 	glBindVertexArray(floorID);
-	glDrawArrays(GL_QUADS, 0, 12*3);
+	//glDrawArrays(GL_QUADS, 0, 12*3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 
 
 
@@ -86,6 +87,7 @@ void RenderingEngine::generateIDs()
 	glGenVertexArrays(1, &floorID);
 	glGenBuffers(1, &floorBuffer);
 	glGenBuffers(1, &floorColorBuffer);
+	glGenBuffers(1, &floorEBO);
 }
 
 void RenderingEngine::deleteIDs()
@@ -155,6 +157,8 @@ void RenderingEngine::setupVAO()
 		0,
 		(void*)0
 		);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, floorEBO);
 	
 	glBindVertexArray(0);
 }
@@ -171,6 +175,16 @@ void RenderingEngine::loadBuffer()
 
 	glBindBuffer(GL_ARRAY_BUFFER, floorBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*verts.size(), verts.data(), GL_STATIC_DRAW);
+
+	vector <GLuint> feces;
+	feces.push_back(0);
+	feces.push_back(1);
+	feces.push_back(2);
+	feces.push_back(2);
+	feces.push_back(3);
+	feces.push_back(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, floorEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*6, feces.data(), GL_STATIC_DRAW);
 
 	//static const GLfloat g_vertex_buffer_data[] = {
  //     -1.0f,-1.0f,-1.0f, // triangle 1 : begin

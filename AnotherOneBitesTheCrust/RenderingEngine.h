@@ -69,6 +69,7 @@ public:
 	GLuint floorID;
 	GLuint floorBuffer;
 	GLuint floorColorBuffer;
+	GLuint floorEBO;
 
 	mat4 MVP;
 	mat4 M;

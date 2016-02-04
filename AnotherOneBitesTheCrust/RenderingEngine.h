@@ -18,6 +18,7 @@
 #include "res_path.h"
 #include "ShaderTools.h"
 #include "Renderable.h"
+#include "Camera.h"
 
 using namespace std;
 using glm::vec3;
@@ -53,6 +54,7 @@ public:
 	void loadProjectionMatrix();
 	void setupModelViewProjectionTransform();
 	void reloadMVPUniform();
+	void updateView(Camera& c);
 
 	void assignBuffers(Renderable* r);
 	void deleteBuffers(Renderable* r);

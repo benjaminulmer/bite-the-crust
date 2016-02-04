@@ -301,6 +301,10 @@ void RenderingEngine::reloadMVPUniform()
 
 }
 
+void RenderingEngine::updateView(Camera& c) {
+	V = glm::lookAt(c.getPosition(), c.getLookAtPosition(), c.getUpVector());
+}
+
 void RenderingEngine::init()
 {
 	cout << "Initialize" << endl;

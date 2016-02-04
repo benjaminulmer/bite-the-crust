@@ -93,6 +93,11 @@ void Game::setupEntities() {
 	tri->setPosition(vec3(0.5, 1, 0.5));
 	tri->setRenderable(triangle);
 	entities.push_back(tri);
+
+	camera.setUpVector(glm::vec3(0,1,0));
+	camera.setPosition(glm::vec3(4,3,3));
+	camera.setLookAtPosition(glm::vec3(0,0,0));
+	renderingEngine.updateView(camera);
 }
 
 

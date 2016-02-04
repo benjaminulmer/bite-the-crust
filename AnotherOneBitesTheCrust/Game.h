@@ -11,6 +11,7 @@
 #include "AudioEngine.h"
 #include "Renderable.h"
 #include "Entity.h"
+#include "Camera.h"
 
 #include <SDL.h>
 #include <iostream>
@@ -53,6 +54,7 @@ private:
 	int screenHeight;
 
 	GameState gameState;
+	Camera camera;
 	std::vector<Entity*> entities;
 	std::vector<Renderable*> renderables;
 };

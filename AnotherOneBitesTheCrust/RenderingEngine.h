@@ -5,7 +5,6 @@
 
 #pragma once
 #include <vector>
-#include "TestEntity.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -18,7 +17,7 @@
 
 #include "res_path.h"
 #include "ShaderTools.h"
-
+#include "Renderable.h"
 
 using namespace std;
 using glm::vec3;
@@ -44,7 +43,7 @@ public:
 	void draw();
 
 	void init();
-	void displayFunc();
+	void displayFunc(vector<Renderable*> renderables);
 
 	void generateIDs();
 	void deleteIDs();
@@ -55,7 +54,8 @@ public:
 	void setupModelViewProjectionTransform();
 	void reloadMVPUniform();
 
-
+	void assignBuffers(Renderable* r);
+	void deleteBuffers(Renderable* r);
 
 	
 	GLuint basicProgramID;		//shader program 

@@ -1,5 +1,4 @@
 #include "RenderingEngine.h"
-#include "TestEntity.h"
 #include "Game.h"
 #include <math.h>
 #include <iostream>
@@ -21,7 +20,7 @@ void RenderingEngine::draw() {
 
 
 
-void RenderingEngine::displayFunc()
+void RenderingEngine::displayFunc(vector<Renderable*> renderables)
 {
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -32,13 +31,11 @@ void RenderingEngine::displayFunc()
 
 	GLint mvpID = glGetUniformLocation(basicProgramID, "MVP");
 
-	glUseProgram(basicProgramID);
 	glUniformMatrix4fv( mvpID,
 						1,
 						GL_FALSE,
 						value_ptr(MVP)
 						);
-	glUseProgram(basicProgramID);
 	glBindVertexArray(vaoID);
 	glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
@@ -49,17 +46,18 @@ void RenderingEngine::displayFunc()
 
 	MVP = P * V * floorM;
 
-	glUseProgram(basicProgramID);
 	glUniformMatrix4fv( mvpID,
 						1,
 						GL_FALSE,
 						value_ptr(MVP)
 						);
-	glUseProgram(basicProgramID);
-	glBindVertexArray(floorID);
-	glDrawArrays(GL_QUADS, 0, 4);
+	//glBindVertexArray(floorID);
+	//glDrawArrays(GL_QUADS, 0, 4);
 
-
+	for (int i = 0; i < (int)renderables.size(); i++) {
+		glBindVertexArray(renderables[i]->getVAO());
+		glDrawArrays(GL_TRIANGLES, 0, renderables[i]->getVertexCount());
+	}
 
 }
 
@@ -71,6 +69,7 @@ void RenderingEngine::generateIDs()
 	string vsSource = loadShaderStringfromFile(vsShader);
 	string fsSource = loadShaderStringfromFile(fsShader);
 	basicProgramID = CreateShaderProgram(vsSource, fsSource);
+	glUseProgram(basicProgramID);
 
 	glGenVertexArrays(1, &vaoID);	//generate VAO
 	glGenBuffers(1, &vertBufferID);	//generate buffer for vertices
@@ -293,7 +292,7 @@ void RenderingEngine::reloadMVPUniform()
 {
 	GLint mvpID = glGetUniformLocation(basicProgramID, "MVP");
 
-	glUseProgram(basicProgramID);
+	//glUseProgram(basicProgramID);
 	glUniformMatrix4fv( mvpID,
 						1,
 						GL_FALSE,
@@ -316,4 +315,52 @@ void RenderingEngine::init()
 	loadProjectionMatrix();
 	setupModelViewProjectionTransform();
 	//reloadMVPUniform();
+}
+
+void RenderingEngine::assignBuffers(Renderable* r) {
+	GLuint vertexBuffer;
+	GLuint colourBuffer;
+	GLuint vao;
+	glGenBuffers(1, &vertexBuffer);
+	glGenBuffers(1, &colourBuffer);
+	glGenVertexArrays(1, &vao);
+	vector<vec3> vertices = r->getVertices();
+	vector<vec3> colours = r->getColours();
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*vertices.size(), vertices.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, colourBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*colours.size(), colours.data(), GL_STATIC_DRAW);
+	r->setVertexVBO(vertexBuffer);
+	r->setColourVBO(colourBuffer);
+
+	glBindVertexArray(vao);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glVertexAttribPointer(
+		0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, colourBuffer);
+	glVertexAttribPointer(
+		1,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+	glBindVertexArray(0);
+	r->setVAO(vao);
+}
+
+void RenderingEngine::deleteBuffers(Renderable *r) {
+	GLuint vao = r->getVAO();
+	GLuint vbuf = r->getVertexVBO();
+	GLuint cbuf = r->getColourVBO();
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbuf);
+	glDeleteBuffers(1, &cbuf);
 }

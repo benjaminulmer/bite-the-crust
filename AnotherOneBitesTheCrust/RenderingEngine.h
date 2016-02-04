@@ -44,7 +44,7 @@ public:
 	void draw();
 
 	void init();
-	void displayFunc(vector<Renderable*> renderables);
+	void displayFunc(vector<Entity*> renderables);
 
 	void generateIDs();
 	void deleteIDs();

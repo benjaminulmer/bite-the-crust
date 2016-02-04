@@ -20,7 +20,7 @@ void RenderingEngine::draw() {
 
 
 
-void RenderingEngine::displayFunc(vector<Renderable*> renderables)
+void RenderingEngine::displayFunc(vector<Entity*> entities)
 {
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -39,7 +39,7 @@ void RenderingEngine::displayFunc(vector<Renderable*> renderables)
 	glBindVertexArray(vaoID);
 	glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
-	floorM = scale(M, vec3(2.0f));
+	/*floorM = scale(M, vec3(2.0f));
 	floorM = rotate(floorM, 45.0f, vec3(0,1,0));
 
 	//scale rotate translate
@@ -51,12 +51,23 @@ void RenderingEngine::displayFunc(vector<Renderable*> renderables)
 						GL_FALSE,
 						value_ptr(MVP)
 						);
-	//glBindVertexArray(floorID);
-	//glDrawArrays(GL_QUADS, 0, 4);
+	glBindVertexArray(floorID);
+	glDrawArrays(GL_QUADS, 0, 4);*/
 
-	for (int i = 0; i < (int)renderables.size(); i++) {
-		glBindVertexArray(renderables[i]->getVAO());
-		glDrawArrays(GL_TRIANGLES, 0, renderables[i]->getVertexCount());
+	for (int i = 0; i < (int)entities.size(); i++) {
+		if (!entities[i]->hasRenderable())
+			continue;
+		M = mat4(1.0f);
+		M = glm::translate(M, entities[i]->getPosition());
+		M = glm::rotate(M, 45.0f, vec3(0,1,0));
+		MVP = P * V * M;
+		glUniformMatrix4fv( mvpID,
+					1,
+					GL_FALSE,
+					value_ptr(MVP)
+					);
+		glBindVertexArray(entities[i]->getRenderable()->getVAO());
+		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertexCount());
 	}
 
 }

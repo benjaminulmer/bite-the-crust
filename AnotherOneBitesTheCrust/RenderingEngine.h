@@ -26,10 +26,11 @@ using glm::mat4;
 using glm::perspective;
 
 
-struct Renderables
+struct Entity
 {
 	string name;
 	vector <vec3> vertices;
+	vector <vec3> faces;
 	mat4 model;
 	GLuint vaoID;
 };
@@ -56,6 +57,9 @@ public:
 	void setupModelViewProjectionTransform();
 	void reloadMVPUniform();
 
+	void addEntity();
+	void updateEntity();
+	void deleteEntity();
 
 
 	
@@ -83,6 +87,7 @@ public:
 
 	GLuint myShaderProgram;
 
+	vector <Entity> entities;
 
 };
 

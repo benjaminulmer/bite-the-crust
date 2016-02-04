@@ -1,5 +1,4 @@
 #include "RenderingEngine.h"
-#include "TestEntity.h"
 #include "Game.h"
 #include <math.h>
 #include <iostream>
@@ -21,7 +20,7 @@ void RenderingEngine::draw() {
 
 
 
-void RenderingEngine::displayFunc()
+void RenderingEngine::displayFunc(vector<Entity*> entities)
 {
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -32,13 +31,12 @@ void RenderingEngine::displayFunc()
 
 	GLint mvpID = glGetUniformLocation(basicProgramID, "MVP");
 
-	glUseProgram(basicProgramID);
 	glUniformMatrix4fv( mvpID,
 						1,
 						GL_FALSE,
 						value_ptr(MVP)
 						);
-	//glUseProgram(basicProgramID);
+
 	glBindVertexArray(vaoID);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
 	//glDrawArrays(GL_TRIANGLES, 0, 12*3);
@@ -67,7 +65,24 @@ void RenderingEngine::displayFunc()
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 
 
+	//glBindVertexArray(floorID);
+	//glDrawArrays(GL_QUADS, 0, 4);
 
+	for (int i = 0; i < (int)entities.size(); i++) {
+		if (!entities[i]->hasRenderable())
+			continue;
+		M = mat4(1.0f);
+		M = glm::translate(M, entities[i]->getPosition());
+		M = glm::rotate(M, 45.0f, vec3(0,1,0));
+		MVP = P * V * M;
+		glUniformMatrix4fv( mvpID,
+					1,
+					GL_FALSE,
+					value_ptr(MVP)
+					);
+		glBindVertexArray(entities[i]->getRenderable()->getVAO());
+		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertexCount());
+	}
 }
 
 void RenderingEngine::generateIDs()
@@ -78,6 +93,7 @@ void RenderingEngine::generateIDs()
 	string vsSource = loadShaderStringfromFile(vsShader);
 	string fsSource = loadShaderStringfromFile(fsShader);
 	basicProgramID = CreateShaderProgram(vsSource, fsSource);
+	glUseProgram(basicProgramID);
 
 	glGenVertexArrays(1, &vaoID);	//generate VAO
 	glGenBuffers(1, &vertBufferID);	//generate buffer for vertices
@@ -342,13 +358,17 @@ void RenderingEngine::reloadMVPUniform()
 {
 	GLint mvpID = glGetUniformLocation(basicProgramID, "MVP");
 
-	glUseProgram(basicProgramID);
+	//glUseProgram(basicProgramID);
 	glUniformMatrix4fv( mvpID,
 						1,
 						GL_FALSE,
 						value_ptr(MVP)
 						);
 
+}
+
+void RenderingEngine::updateView(Camera& c) {
+	V = glm::lookAt(c.getPosition(), c.getLookAtPosition(), c.getUpVector());
 }
 
 void RenderingEngine::init()
@@ -367,33 +387,50 @@ void RenderingEngine::init()
 	//reloadMVPUniform();
 }
 
-static const GLfloat tetVertices[] = {
-  0.0f, 0.0f, -0.75f, 1.0f,
-  0.0f, 0.75f, 0.0f, 1.0f,
-  -0.75f, -0.75f, 0.0f, 1.0f,
-  0.75f, -0.75f, 0.0f, 1.0f,
-};
-static const GLushort tetFaceIndices[] = {
-  0,1,2,
-  0,1,3,
-  1,2,3,
-  0,2,3
-};
-static const GLfloat tetColours[] = {
-  1.0f,1.0f,1.0f,1.0f,
-  1.0f,0.0f,0.0f,1.0f,
-  0.0f,1.0f,0.0f,1.0f,
-  0.0f,0.0f,1.0f,1.0f
-};
-static const GLfloat tetNormals[] = {
-  0.0f,0.0f,-1.0f, 
-  0.0f,1.0f,0.0f,
-  -0.707107f, -0.707107f,0.0f,
-  0.707107f, -0.707107f,0.0f
-};
+void RenderingEngine::assignBuffers(Renderable* r) {
+	GLuint vertexBuffer;
+	GLuint colourBuffer;
+	GLuint vao;
+	glGenBuffers(1, &vertexBuffer);
+	glGenBuffers(1, &colourBuffer);
+	glGenVertexArrays(1, &vao);
+	vector<vec3> vertices = r->getVertices();
+	vector<vec3> colours = r->getColours();
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*vertices.size(), vertices.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, colourBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*colours.size(), colours.data(), GL_STATIC_DRAW);
+	r->setVertexVBO(vertexBuffer);
+	r->setColourVBO(colourBuffer);
 
-#define VERTEX_DATA 0
-#define VERTEX_COLOR 1
-#define VERTEX_NORMAL 2
-#define VERTEX_INDICES 3
+	glBindVertexArray(vao);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glVertexAttribPointer(
+		0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, colourBuffer);
+	glVertexAttribPointer(
+		1,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+	glBindVertexArray(0);
+	r->setVAO(vao);
+}
 
+void RenderingEngine::deleteBuffers(Renderable *r) {
+	GLuint vao = r->getVAO();
+	GLuint vbuf = r->getVertexVBO();
+	GLuint cbuf = r->getColourVBO();
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbuf);
+	glDeleteBuffers(1, &cbuf);
+}

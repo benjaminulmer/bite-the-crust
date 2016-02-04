@@ -23,6 +23,7 @@ Game::Game(void)
 void Game::run() {
 	// Preload data, initialize subsystems, anything to do before entering the main loop
 	initSystems();
+	setupEntities();
 
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
@@ -66,6 +67,39 @@ void Game::initSystems()
 
 }
 
+void Game::setupEntities() {
+	Renderable* plane = new Renderable();;
+	plane->addPoint(vec3(2,-2,2),vec3(1,0,0));
+	plane->addPoint(vec3(2,-2,-2),vec3(0,1,0));
+	plane->addPoint(vec3(-2,-2,-2),vec3(0,0,1));
+	plane->addPoint(vec3(-2,-2,2),vec3(1,1,1));
+	plane->addPoint(vec3(2,-2,2),vec3(1,0,0));
+	plane->addPoint(vec3(-2,-2,-2),vec3(0,0,1));
+	renderables.push_back(plane);
+	renderingEngine.assignBuffers(plane);
+
+	Renderable* triangle = new Renderable();;
+	triangle->addPoint(vec3(0,0,0), vec3(0,0,1));
+	triangle->addPoint(vec3(0,1,0), vec3(1,0,1));
+	triangle->addPoint(vec3(1,1,0), vec3(1,1,0));
+	renderables.push_back(triangle);
+	renderingEngine.assignBuffers(triangle);
+
+	Entity* ground = new Entity();
+	ground->setPosition(vec3(0,0,0));
+	ground->setRenderable(plane);
+	entities.push_back(ground);
+	Entity* tri = new Entity();
+	tri->setPosition(vec3(-1,1, 1.0));
+	tri->setRenderable(triangle);
+	entities.push_back(tri);
+
+	camera.setUpVector(glm::vec3(0,1,0));
+	camera.setPosition(glm::vec3(4,3,3));
+	camera.setLookAtPosition(glm::vec3(0,0,0));
+	renderingEngine.updateView(camera);
+}
+
 
 void Game::mainLoop() {
 	// Cap the minimum timestep physics will use
@@ -99,7 +133,7 @@ void Game::mainLoop() {
 
 		// Render
 		//renderingEngine->pushEntities();
-		renderingEngine.displayFunc();
+		renderingEngine.displayFunc(entities);
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -127,4 +161,10 @@ void Game::processSDLEvents() {
 
 Game::~Game(void)
 {
+	for (int i = 0; i < entities.size(); i++) {
+		delete entities[i];
+	}
+	for (int i = 0; i < (int)renderables.size(); i++) {
+		delete renderables[i];
+	}
 }

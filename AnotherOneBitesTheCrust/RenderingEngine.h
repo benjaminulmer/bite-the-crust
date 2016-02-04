@@ -5,7 +5,6 @@
 
 #pragma once
 #include <vector>
-#include "TestEntity.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -18,7 +17,8 @@
 
 #include "res_path.h"
 #include "ShaderTools.h"
-
+#include "Renderable.h"
+#include "Camera.h"
 
 using namespace std;
 using glm::vec3;
@@ -26,14 +26,14 @@ using glm::mat4;
 using glm::perspective;
 
 
-struct Entity
+/*struct Entity
 {
 	string name;
 	vector <vec3> vertices;
 	vector <vec3> faces;
 	mat4 model;
 	GLuint vaoID;
-};
+};*/
 
 
 class RenderingEngine
@@ -46,7 +46,7 @@ public:
 	void draw();
 
 	void init();
-	void displayFunc();
+	void displayFunc(vector<Entity*> renderables);
 
 	void generateIDs();
 	void deleteIDs();
@@ -56,11 +56,14 @@ public:
 	void loadProjectionMatrix();
 	void setupModelViewProjectionTransform();
 	void reloadMVPUniform();
+	void updateView(Camera& c);
 
 	void addEntity();
 	void updateEntity();
 	void deleteEntity();
 
+	void assignBuffers(Renderable* r);
+	void deleteBuffers(Renderable* r);
 
 	
 	GLuint basicProgramID;		//shader program 

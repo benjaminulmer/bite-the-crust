@@ -9,6 +9,9 @@
 #include "InputEngine.h"
 #include "AIEngine.h"
 #include "AudioEngine.h"
+#include "Renderable.h"
+#include "Entity.h"
+#include "Camera.h"
 
 #include <SDL.h>
 #include <iostream>
@@ -41,6 +44,7 @@ public:
 
 private:
 	void initSystems();
+	void setupEntities();
 	void mainLoop();
 	void processSDLEvents();
 	void quitGame();
@@ -50,7 +54,8 @@ private:
 	int screenHeight;
 
 	GameState gameState;
-	
-	RenderingEngine cube;
+	Camera camera;
+	std::vector<Entity*> entities;
+	std::vector<Renderable*> renderables;
 };
 

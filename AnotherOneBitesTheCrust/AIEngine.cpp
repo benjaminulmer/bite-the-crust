@@ -5,7 +5,7 @@ AIEngine::AIEngine(void)
 {
 }
 
-void AIEngine::updateAI() {}
+ControllerInput AIEngine::updateAI(const Player& player, const Map& map) {}
 
 AIEngine::~AIEngine(void)
 {

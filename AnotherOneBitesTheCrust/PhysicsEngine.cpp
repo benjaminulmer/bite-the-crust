@@ -1,4 +1,6 @@
 #include "PhysicsEngine.h"
+#include "FilterShader.h"
+#include "FrictionPairsCreator.h"
 #include <iostream>
 
 using namespace physx;
@@ -16,7 +18,7 @@ void PhysicsEngine::initSimulationData() {
 	defaultErrorCallback = new PxDefaultErrorCallback();
 	defaultAllocator = new PxDefaultAllocator();
 
-	stepSizeS = 1.0/60.0;
+	stepSizeS = 1.0f/60.0f;
 	numWorkers = 1;
 }
 
@@ -38,10 +40,11 @@ void PhysicsEngine::initPhysX() {
 	cooking = PxCreateCooking(PX_PHYSICS_VERSION, *foundation, params); 
 
 	// Create scene
+	cpuDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
 	PxSceneDesc sceneDesc(physics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
-	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.cpuDispatcher = cpuDispatcher;
+	sceneDesc.filterShader = FilterShader;
 	scene = physics->createScene(sceneDesc);
 }
 
@@ -51,10 +54,13 @@ void PhysicsEngine::initVehicles() {
 	PxVehicleSetBasisVectors(PxVec3(0,1,0), PxVec3(0,0,1)); 
 	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
-	//VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, defaultAllocator);
-	//VehicleSceneQueryData::setUpBatchedSceneQuery(0, *gVehicleSceneQueryData, gScene);
+	vehicleSceneQueryData = VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, *defaultAllocator);
+	batchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *vehicleSceneQueryData, scene);
 
-	//frictionPairs = createFrictionPairs(materials array)
+	
+	FrictionPairsCreator fpc;
+	int test = fpc.MAX_NUM_SURFACE_TYPES;
+	frictionPairs = fpc.createFrictionPairs(materials array*);
 
 	//groundPlane = createDrivablePlane(material, physics);
 	//scene->addActor(*groundPlane);
@@ -80,7 +86,7 @@ void PhysicsEngine::testScene() {
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
-	PxF32 deltaTimeS = deltaTimeMs / 1000.0;
+	PxF32 deltaTimeS = deltaTimeMs/1000.0f;
 	deltaTimeSAcc += deltaTimeS;
 
 	if (deltaTimeSAcc >= stepSizeS) {

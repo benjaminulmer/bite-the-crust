@@ -155,6 +155,8 @@
   <ItemGroup>
     <ClCompile Include="AIEngine.cpp" />
     <ClCompile Include="AudioEngine.cpp" />
+    <ClCompile Include="FilterShader.cpp" />
+    <ClCompile Include="FrictionPairsCreator.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
@@ -162,10 +164,13 @@
     <ClCompile Include="RenderingEngine.cpp" />
     <ClCompile Include="ShaderTools.cpp" />
     <ClCompile Include="TestEntity.cpp" />
+    <ClCompile Include="VehicleSceneQueryData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
     <ClInclude Include="AudioEngine.h" />
+    <ClInclude Include="FilterShader.h" />
+    <ClInclude Include="FrictionPairsCreator.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="PhysicsEngine.h" />
@@ -173,6 +178,7 @@
     <ClInclude Include="res_path.h" />
     <ClInclude Include="ShaderTools.h" />
     <ClInclude Include="TestEntity.h" />
+    <ClInclude Include="VehicleSceneQueryData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

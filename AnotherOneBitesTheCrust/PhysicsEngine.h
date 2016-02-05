@@ -1,5 +1,6 @@
 #pragma once
 #include <PxPhysicsAPI.h>
+#include "VehicleSceneQueryData.h"
 
 class PhysicsEngine
 {
@@ -22,17 +23,18 @@ private:
 	physx::PxPhysics* physics;
 	physx::PxCooking* cooking;
 	physx::PxDefaultCpuDispatcher* cpuDispatcher;
-
-
 	physx::PxScene* scene;
+	
+	VehicleSceneQueryData* vehicleSceneQueryData;
+	physx::PxBatchQuery* batchQuery;
+	physx::PxVehicleDrivableSurfaceToTireFrictionPairs* frictionPairs;
+
+
+
+
 
 	physx::PxRigidStatic* groundPlane;
 	physx::PxRigidDynamic* aSphereActor; // Test object
-
-
-
-
-
 
 	physx::PxF32 deltaTimeSAcc;
 	

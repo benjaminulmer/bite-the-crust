@@ -52,6 +52,18 @@ void PhysicsEngine::initVehicles() {
 	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
 	//VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, defaultAllocator);
+	//VehicleSceneQueryData::setUpBatchedSceneQuery(0, *gVehicleSceneQueryData, gScene);
+
+	//frictionPairs = createFrictionPairs(materials array)
+
+	//groundPlane = createDrivablePlane(material, physics);
+	//scene->addActor(*groundPlane);
+
+	//VehicleDesc vehicleDesc = initVehicleDesc();
+	//gVehicle4W = createVehicle4W(vehicleDesc, gPhysics, gCooking);
+	//PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y*0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
+	//gVehicle4W->getRigidDynamicActor()->setGlobalPose(startTransform);
+	//gScene->addActor(*gVehicle4W->getRigidDynamicActor());
 }
 
 void PhysicsEngine::testScene() {

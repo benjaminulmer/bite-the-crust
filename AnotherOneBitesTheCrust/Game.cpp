@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "DrivingInput.h"
 
 void fatalError(string errorString)
 {
@@ -12,7 +13,6 @@ void fatalError(string errorString)
 
 Game::Game(void)
 {
-
 		window = nullptr;
 		screenWidth = 1024;		//pro csgo resolution
 		screenHeight = 768;
@@ -27,8 +27,6 @@ void Game::run() {
 
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
-
-
 
 	mainLoop();
 }
@@ -64,7 +62,6 @@ void Game::initSystems()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
 
 	renderingEngine.init();
-
 }
 
 void Game::setupEntities() {
@@ -109,7 +106,7 @@ void Game::mainLoop() {
 		processSDLEvents();
 
 		// Update the player and AI cars
-		inputEngine->getInput();
+		DrivingInput* playerInput = inputEngine->getInput();
 		aiEngine->updateAI();
 
 		// Figure out timestep and run physics
@@ -117,7 +114,7 @@ void Game::mainLoop() {
 		unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 		oldTimeMs = newTimeMs;
 
-		physicsEngine->simulate(deltaTimeMs);
+		physicsEngine->simulate(deltaTimeMs, playerInput);
 
 		// Render
 		//renderingEngine->pushEntities();

@@ -33,5 +33,6 @@
     <ClInclude Include="res_path.h" />
     <ClInclude Include="ShaderTools.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
+    <ClInclude Include="DrivingInput.h" />
   </ItemGroup>
 </Project>

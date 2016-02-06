@@ -78,14 +78,19 @@ void PhysicsEngine::initVehicles() {
 void PhysicsEngine::testScene() {
 }
 
-void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
+void PhysicsEngine::simulate(unsigned int deltaTimeMs, DrivingInput* playerInput) {
 	PxF32 deltaTimeS = deltaTimeMs/1000.0f;
 	deltaTimeSAcc += deltaTimeS;
 
 	if (deltaTimeSAcc >= stepSizeS) {
 		deltaTimeSAcc -= stepSizeS;
 
-		testVehicle->mDriveDynData.setAnalogInput(0, 1.0f);
+		testVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, playerInput->accel);
+		testVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, playerInput->brake);
+		testVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, playerInput->leftSteer);
+		testVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, playerInput->rightSteer);
+
+		//std::cout << playerInput->accel << std::endl;
 
 		PxVehicleWheels* vehicles[1] = {testVehicle};
 		PxRaycastQueryResult* raycastResults = vehicleSceneQueryData->getRaycastQueryResultBuffer(0);

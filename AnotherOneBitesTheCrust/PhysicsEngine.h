@@ -3,6 +3,7 @@
 #include "VehicleSceneQueryData.h"
 #include "FrictionPairs.h"
 #include "PhysicsCreator.h"
+#include "DrivingInput.h"
 
 class PhysicsEngine
 {
@@ -10,7 +11,7 @@ public:
 	PhysicsEngine(void);
 	~PhysicsEngine(void);
 
-	void simulate(unsigned int deltaTimeMs);
+	void simulate(unsigned int deltaTimeMs, DrivingInput* playerInput);
 	void fetchSimulationResults();
 	
 private:

@@ -9,6 +9,10 @@ InputEngine::InputEngine(void) {
 void InputEngine::openControllers() {
 	for(int i = 0; i < SDL_NumJoysticks() && i < MAX_NUM_CONTROLLERS; i++) {
 		controllers[i] = SDL_GameControllerOpen(i);
+		inputs[i].accel = 0;
+		inputs[i].brake = 0;
+		inputs[i].leftSteer = 0;
+		inputs[i].rightSteer = 0;
 	}
 	std::cout << "NUM CONTROLLERS: " << SDL_NumJoysticks() << std::endl;
 }
@@ -23,13 +27,19 @@ void InputEngine::processControllerEvent(SDL_Event event) {
 	// Controller axis events
 	else if (event.type == SDL_CONTROLLERAXISMOTION) {
 		if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX) {
-			std::cout << "left axis: " << event.caxis.value << std::endl;
+			if (event.caxis.value < 1) {
+				inputs[0].leftSteer = (float)event.caxis.value/MIN_AXIS_VALUE;
+				inputs[0].rightSteer = 0;			}
+			else {
+				inputs[0].rightSteer = (float)event.caxis.value/MAX_AXIS_VALUE;
+				inputs[0].leftSteer = 0;
+			}
 		}
 		else if (event.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT) {
-			std::cout << "left trig: " << event.caxis.value << std::endl;
+			inputs[0].brake = (float)event.caxis.value/MAX_AXIS_VALUE;
 		}
 		else if (event.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT) {
-			std::cout << "righ trig: " << event.caxis.value << std::endl;
+			inputs[0].accel = (float)event.caxis.value/MAX_AXIS_VALUE;
 		}
 	}
 	// Controller added or removed
@@ -40,7 +50,8 @@ void InputEngine::processControllerEvent(SDL_Event event) {
 	//std::cout << "event received" << std::endl;
 }
 
-void InputEngine::getInput() {
+DrivingInput* InputEngine::getInput() {
+	return &inputs[0];
 }
 
 InputEngine::~InputEngine(void)

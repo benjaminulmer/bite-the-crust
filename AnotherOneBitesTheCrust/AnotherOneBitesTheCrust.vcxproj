@@ -100,7 +100,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;PhysX3VehicleCHECKED.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -157,26 +157,34 @@
     <ClCompile Include="AudioEngine.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="FilterShader.cpp" />
+    <ClCompile Include="FrictionPairs.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PhysicsCreator.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="Renderable.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
     <ClCompile Include="ShaderTools.cpp" />
+    <ClCompile Include="VehicleSceneQueryData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
     <ClInclude Include="AudioEngine.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="FilterShader.h" />
+    <ClInclude Include="FrictionPairs.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputEngine.h" />
+    <ClInclude Include="PhysicsCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="Renderable.h" />
     <ClInclude Include="RenderingEngine.h" />
     <ClInclude Include="res_path.h" />
     <ClInclude Include="ShaderTools.h" />
+    <ClInclude Include="VehicleSceneQueryData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

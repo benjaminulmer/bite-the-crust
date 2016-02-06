@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\Include\glm;$(SolutionDir)\Include\SDL;$(SolutionDir)\Include\PhysX;$(SolutionDir)\Include\glew-1.13.0;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\Include\glm;$(SolutionDir)\Include\SDL;$(SolutionDir)\Include\PhysX;$(SolutionDir)\Include\glew-1.13.0;$(SolutionDir)\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\Lib\PhysX;$(SolutionDir)\Lib\SDL;$(SolutionDir)\Lib\glew-1.13.0\glewRelease\Win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -164,9 +164,11 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PhysicsCreator.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
+    <ClCompile Include="PhysicsEntity.cpp" />
     <ClCompile Include="Renderable.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
     <ClCompile Include="ShaderTools.cpp" />
+    <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -181,10 +183,12 @@
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="PhysicsCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />
+    <ClInclude Include="PhysicsEntity.h" />
     <ClInclude Include="Renderable.h" />
     <ClInclude Include="RenderingEngine.h" />
     <ClInclude Include="res_path.h" />
     <ClInclude Include="ShaderTools.h" />
+    <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

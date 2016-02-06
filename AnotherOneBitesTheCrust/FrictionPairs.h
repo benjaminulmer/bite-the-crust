@@ -4,9 +4,6 @@
 class FrictionPairs
 {
 public:
-	FrictionPairs(void);
-	~FrictionPairs(void);
-
 	enum
 	{
 		SURFACE_TYPE_TARMAC,
@@ -20,8 +17,6 @@ public:
 		MAX_NUM_TIRE_TYPES
 	};
 
-private:
-	physx::PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const physx::PxMaterial* defaultMaterial);
-
+	static physx::PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const physx::PxMaterial* defaultMaterial);
 };
 

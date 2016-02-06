@@ -1,13 +1,8 @@
 #include "FrictionPairs.h"
 
-
-FrictionPairs::FrictionPairs(void) 
-{
-}
-
 using namespace physx;
 
-PxVehicleDrivableSurfaceToTireFrictionPairs* FrictionPairs::createFrictionPairs(const PxMaterial* defaultMaterials){
+PxVehicleDrivableSurfaceToTireFrictionPairs* FrictionPairs::createFrictionPairs(const PxMaterial* defaultMaterial){
 	//Tire model friction for each combination of drivable surface type and tire type.
 	PxF32 tireFrictionMultipliers[MAX_NUM_SURFACE_TYPES][MAX_NUM_TIRE_TYPES]=
 	{
@@ -19,7 +14,7 @@ PxVehicleDrivableSurfaceToTireFrictionPairs* FrictionPairs::createFrictionPairs(
 	surfaceTypes[0].mType = SURFACE_TYPE_TARMAC;
 
 	const PxMaterial* surfaceMaterials[1];
-	surfaceMaterials[0] = defaultMaterials;
+	surfaceMaterials[0] = defaultMaterial;
 
 	PxVehicleDrivableSurfaceToTireFrictionPairs* surfaceTirePairs =
 		PxVehicleDrivableSurfaceToTireFrictionPairs::allocate(MAX_NUM_TIRE_TYPES,MAX_NUM_SURFACE_TYPES);
@@ -32,8 +27,4 @@ PxVehicleDrivableSurfaceToTireFrictionPairs* FrictionPairs::createFrictionPairs(
 		}
 	}
 	return surfaceTirePairs;
-}
-
-FrictionPairs::~FrictionPairs(void)
-{
 }

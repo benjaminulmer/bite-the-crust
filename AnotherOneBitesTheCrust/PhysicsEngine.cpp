@@ -1,6 +1,5 @@
 #include "PhysicsEngine.h"
 #include "FilterShader.h"
-#include "FrictionPairsCreator.h"
 #include <iostream>
 
 using namespace physx;
@@ -57,32 +56,26 @@ void PhysicsEngine::initVehicles() {
 	vehicleSceneQueryData = VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, *defaultAllocator);
 	batchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *vehicleSceneQueryData, scene);
 
-	
-	FrictionPairsCreator fpc;
-	int test = fpc.MAX_NUM_SURFACE_TYPES;
-	frictionPairs = fpc.createFrictionPairs(materials array*);
+	drivingSurfaces[0] = physics->createMaterial(0.5f, 0.5f, 0.6f);
+	frictionPairs = FrictionPairs::createFrictionPairs(drivingSurfaces[0]);
 
-	//groundPlane = createDrivablePlane(material, physics);
-	//scene->addActor(*groundPlane);
+	groundPlane = PhysicsCreator::createDrivablePlane(drivingSurfaces[0], physics);
+	scene->addActor(*groundPlane);
 
-	//VehicleDesc vehicleDesc = initVehicleDesc();
-	//gVehicle4W = createVehicle4W(vehicleDesc, gPhysics, gCooking);
-	//PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y*0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
-	//gVehicle4W->getRigidDynamicActor()->setGlobalPose(startTransform);
-	//gScene->addActor(*gVehicle4W->getRigidDynamicActor());
+	testChassisMat = physics->createMaterial(0.5f, 0.5f, 0.6f);
+	testWheelMat = physics->createMaterial(0.5f, 0.5f, 0.6f);
+	VehicleDesc vehicleDesc = initVehicleDesc();
+	testVehicle = PhysicsCreator::createVehicle4W(vehicleDesc, physics, cooking);
+	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y*0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
+	testVehicle->getRigidDynamicActor()->setGlobalPose(startTransform);
+	scene->addActor(*testVehicle->getRigidDynamicActor());
+
+	testVehicle->setToRestState();
+	testVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	testVehicle->mDriveDynData.setUseAutoGears(true);
 }
 
 void PhysicsEngine::testScene() {
-	/// Create sample scene
-	PxMaterial* planeMaterial = physics->createMaterial(PxReal(0.9), PxReal(0.9), PxReal(0.5));
-
-	// Create plane and sphere and add them too scene
-	groundPlane = PxCreatePlane(*physics, PxPlane(PxVec3(0,0,0), PxVec3(0,1,0)), *planeMaterial);
-	scene->addActor(*groundPlane);
-
-	aSphereActor = PxCreateDynamic(*physics, PxTransform(PxVec3(10,1,10)), PxSphereGeometry(1), *planeMaterial, PxReal(0.5));
-	aSphereActor->setLinearVelocity(PxVec3(1,0,0));
-	scene->addActor(*aSphereActor);
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
@@ -91,13 +84,63 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
 
 	if (deltaTimeSAcc >= stepSizeS) {
 		deltaTimeSAcc -= stepSizeS;
+
+		testVehicle->mDriveDynData.setAnalogInput(0, 1.0f);
+
+		PxVehicleWheels* vehicles[1] = {testVehicle};
+		PxRaycastQueryResult* raycastResults = vehicleSceneQueryData->getRaycastQueryResultBuffer(0);
+		const PxU32 raycastResultsSize = vehicleSceneQueryData->getRaycastQueryResultBufferSize();
+		PxVehicleSuspensionRaycasts(batchQuery, 1, vehicles, raycastResultsSize, raycastResults);
+
+		//Vehicle update.
+		const PxVec3 grav = scene->getGravity();
+		PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
+		PxVehicleWheelQueryResult vehicleQueryResults[1] = {{wheelQueryResults, testVehicle->mWheelsSimData.getNbWheels()}};
+		PxVehicleUpdates(stepSizeS, grav, *frictionPairs, 1, vehicles, vehicleQueryResults);
+
 		scene->simulate(stepSizeS);
 	}
-	std::cout << aSphereActor->getGlobalPose().p.x << " : " << aSphereActor->getGlobalPose().p.y << " : " << aSphereActor->getGlobalPose().p.z << std::endl;
+	std::cout << testVehicle->getRigidDynamicActor()->getGlobalPose().p.x << " : " << testVehicle->getRigidDynamicActor()->getGlobalPose().p.y << " : " << testVehicle->getRigidDynamicActor()->getGlobalPose().p.z << std::endl;
 }
 
 void PhysicsEngine::fetchSimulationResults() {
 	scene->fetchResults(true);
+}
+
+VehicleDesc PhysicsEngine::initVehicleDesc()
+{
+	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
+	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
+	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
+	const PxF32 chassisMass = 1500.0f;
+	const PxVec3 chassisDims(2.5f,2.0f,5.0f);
+	const PxVec3 chassisMOI
+		((chassisDims.y*chassisDims.y + chassisDims.z*chassisDims.z)*chassisMass/12.0f,
+		 (chassisDims.x*chassisDims.x + chassisDims.z*chassisDims.z)*0.8f*chassisMass/12.0f,
+		 (chassisDims.x*chassisDims.x + chassisDims.y*chassisDims.y)*chassisMass/12.0f);
+	const PxVec3 chassisCMOffset(0.0f, -chassisDims.y*0.5f + 0.65f, 0.25f);
+
+	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
+	//Moment of inertia is just the moment of inertia of a cylinder.
+	const PxF32 wheelMass = 20.0f;
+	const PxF32 wheelRadius = 0.5f;
+	const PxF32 wheelWidth = 0.4f;
+	const PxF32 wheelMOI = 0.5f*wheelMass*wheelRadius*wheelRadius;
+	const PxU32 nbWheels = 6;
+
+	VehicleDesc vehicleDesc;
+	vehicleDesc.chassisMass = chassisMass;
+	vehicleDesc.chassisDims = chassisDims;
+	vehicleDesc.chassisMOI = chassisMOI;
+	vehicleDesc.chassisCMOffset = chassisCMOffset;
+	vehicleDesc.chassisMaterial = testChassisMat;
+	vehicleDesc.wheelMass = wheelMass;
+	vehicleDesc.wheelRadius = wheelRadius;
+	vehicleDesc.wheelWidth = wheelWidth;
+	vehicleDesc.wheelMOI = wheelMOI;
+	vehicleDesc.numWheels = nbWheels;
+	vehicleDesc.wheelMaterial = testWheelMat;
+	return vehicleDesc;
 }
 
 PhysicsEngine::~PhysicsEngine(void) {	

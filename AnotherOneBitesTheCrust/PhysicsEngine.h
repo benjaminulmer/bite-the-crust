@@ -1,6 +1,8 @@
 #pragma once
 #include <PxPhysicsAPI.h>
 #include "VehicleSceneQueryData.h"
+#include "FrictionPairs.h"
+#include "PhysicsCreator.h"
 
 class PhysicsEngine
 {
@@ -27,14 +29,15 @@ private:
 	
 	VehicleSceneQueryData* vehicleSceneQueryData;
 	physx::PxBatchQuery* batchQuery;
+
+	physx::PxMaterial* drivingSurfaces[FrictionPairs::MAX_NUM_SURFACE_TYPES];
 	physx::PxVehicleDrivableSurfaceToTireFrictionPairs* frictionPairs;
 
-
-
-
+	physx::PxMaterial* testChassisMat;
+	physx::PxMaterial* testWheelMat;
+	physx::PxVehicleDrive4W* testVehicle;
 
 	physx::PxRigidStatic* groundPlane;
-	physx::PxRigidDynamic* aSphereActor; // Test object
 
 	physx::PxF32 deltaTimeSAcc;
 	
@@ -42,6 +45,7 @@ private:
 	void initSimulationData();
 	void initPhysX();
 	void initVehicles();
+	VehicleDesc initVehicleDesc();
 
 	void testScene(); // Test method
 };

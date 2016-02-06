@@ -48,7 +48,10 @@
     <ClCompile Include="FilterShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FrictionPairsCreator.cpp">
+    <ClCompile Include="FrictionPairs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,7 +89,10 @@
     <ClInclude Include="FilterShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FrictionPairsCreator.h">
+    <ClInclude Include="FrictionPairs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsCreator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

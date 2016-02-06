@@ -64,6 +64,7 @@ void Game::initSystems()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
 
 	renderingEngine.init();
+	renderingEngine.testOBJLoading();
 
 }
 
@@ -99,6 +100,61 @@ void Game::setupEntities() {
 	renderables.push_back(triangle);
 	renderingEngine.assignBuffers(triangle);
 
+	Renderable* vehicle = new Renderable();
+	vehicle->addPoint(vec3(0,0,0), vec3(1,0,0));
+	vehicle->addPoint(vec3(2.5,0,0), vec3(0,1,0));
+	vehicle->addPoint(vec3(2.5,2,0), vec3(0,0,1));
+	vehicle->addPoint(vec3(0,2,0), vec3(1,1,1));
+	vehicle->addPoint(vec3(0,0,-5), vec3(0,1,1));
+	vehicle->addPoint(vec3(2.5,0,-5), vec3(1,0,1));
+	vehicle->addPoint(vec3(2.5,2,-5), vec3(1,1,0));
+	vehicle->addPoint(vec3(0,2,-5), vec3(1,1,1));
+
+	vehicle->createFace(0);
+	vehicle->createFace(1);
+	vehicle->createFace(2);
+	vehicle->createFace(2);
+	vehicle->createFace(3);
+	vehicle->createFace(0);
+	
+	vehicle->createFace(1);
+	vehicle->createFace(5);
+	vehicle->createFace(6);
+	vehicle->createFace(6);
+	vehicle->createFace(2);
+	vehicle->createFace(1);
+
+	vehicle->createFace(0);
+	vehicle->createFace(4);
+	vehicle->createFace(7);
+	vehicle->createFace(7);
+	vehicle->createFace(3);
+	vehicle->createFace(0);
+
+	vehicle->createFace(4);
+	vehicle->createFace(5);
+	vehicle->createFace(6);
+	vehicle->createFace(6);
+	vehicle->createFace(7);
+	vehicle->createFace(4);
+
+	vehicle->createFace(0);
+	vehicle->createFace(1);
+	vehicle->createFace(5);
+	vehicle->createFace(5);
+	vehicle->createFace(4);
+	vehicle->createFace(0);
+
+	vehicle->createFace(2);
+	vehicle->createFace(6);
+	vehicle->createFace(7);
+	vehicle->createFace(7);
+	vehicle->createFace(3);
+	vehicle->createFace(2);
+
+	renderables.push_back(vehicle);
+	renderingEngine.assignBuffers(vehicle);
+
 	Entity* ground = new Entity();
 	ground->setPosition(vec3(0,0,0));
 	ground->setRenderable(plane);
@@ -107,10 +163,14 @@ void Game::setupEntities() {
 	Entity* tri = new Entity();
 	tri->setPosition(vec3(-1,1, 1.0));		//change position here
 	tri->setRenderable(triangle);
-	entities.push_back(tri);
+	//entities.push_back(tri);
+
+	Entity* vcl = new Entity();
+	vcl->setRenderable(vehicle);
+	entities.push_back(vcl);
 
 	//set camera
-	camera.setPosition(glm::vec3(4,3,3));			//location of camera
+	camera.setPosition(glm::vec3(4,3,8));			//location of camera
 	camera.setLookAtPosition(glm::vec3(0,0,0));		//where camera is pointing
 	camera.setUpVector(glm::vec3(0,1,0));			//orientation on camera
 	renderingEngine.updateView(camera);
@@ -152,11 +212,12 @@ void Game::mainLoop() {
 		//renderingEngine->pushEntities();
 
 		x+=0.0001;
-		cout << x << endl;
-		entities[1]->setPosition(vec3(x,0,0));
+		//cout << x << endl;
+		//entities[1]->setPosition(vec3(x,0,0));
 
 		//display
-		renderingEngine.displayFunc(entities);
+		//renderingEngine.displayFunc(entities);
+		renderingEngine.draw();
 		//swap buffers
 		SDL_GL_SwapWindow(window);
 	}

@@ -62,11 +62,9 @@ void Game::initSystems()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
 
 	renderingEngine.init();
-<<<<<<< HEAD
-	renderingEngine.testOBJLoading();
 
-=======
->>>>>>> refs/remotes/origin/Ben
+	//renderingEngine.testOBJLoading();
+
 }
 
 void Game::setupEntities() {
@@ -171,7 +169,7 @@ void Game::setupEntities() {
 	entities.push_back(vcl);
 
 	//set camera
-	camera.setPosition(glm::vec3(4,3,8));			//location of camera
+	camera.setPosition(glm::vec3(0,3,-8));			//location of camera
 	camera.setLookAtPosition(glm::vec3(0,0,0));		//where camera is pointing
 	camera.setUpVector(glm::vec3(0,1,0));			//orientation on camera
 	renderingEngine.updateView(camera);
@@ -204,12 +202,17 @@ void Game::mainLoop() {
 		//cout << x << endl;
 		//entities[1]->setPosition(vec3(x,0,0));
 
+
+		physicsEngine->fetchSimulationResults();
+		cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
+
+		entities[1]->setPosition(vec3(physicsEngine->getPosX(),physicsEngine->getPosY(),physicsEngine->getPosZ()));
+
 		//display
-		//renderingEngine.displayFunc(entities);
-		renderingEngine.draw();
+		renderingEngine.displayFunc(entities);
+		//renderingEngine.draw();
 		//swap buffers
 		SDL_GL_SwapWindow(window);
-		physicsEngine->fetchSimulationResults();
 	}
 }
 

@@ -105,12 +105,25 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs, DrivingInput* playerInput
 
 		scene->simulate(stepSizeS);
 	}
-	std::cout << testVehicle->getRigidDynamicActor()->getGlobalPose().p.x << " : " << testVehicle->getRigidDynamicActor()->getGlobalPose().p.y << " : " << testVehicle->getRigidDynamicActor()->getGlobalPose().p.z << std::endl;
+	//std::cout << testVehicle->getRigidDynamicActor()->getGlobalPose().p.x << " : " << testVehicle->getRigidDynamicActor()->getGlobalPose().p.y << " : " << testVehicle->getRigidDynamicActor()->getGlobalPose().p.z << std::endl;
 }
 
 void PhysicsEngine::fetchSimulationResults() {
 	scene->fetchResults(true);
 }
+
+double PhysicsEngine::getPosX(){
+	return testVehicle->getRigidDynamicActor()->getGlobalPose().p.x;
+}
+
+double PhysicsEngine::getPosY(){
+	return testVehicle->getRigidDynamicActor()->getGlobalPose().p.y;
+}
+
+double PhysicsEngine::getPosZ(){
+	return testVehicle->getRigidDynamicActor()->getGlobalPose().p.z;
+}
+
 
 VehicleDesc PhysicsEngine::initVehicleDesc()
 {
@@ -125,9 +138,9 @@ VehicleDesc PhysicsEngine::initVehicleDesc()
 		 (chassisDims.x*chassisDims.x + chassisDims.y*chassisDims.y)*chassisMass/12.0f);
 	const PxVec3 chassisCMOffset(0.0f, -chassisDims.y*0.5f + 0.65f, 0.25f);
 
-<<<<<<< HEAD
+
 	//std::cout << aSphereActor->getGlobalPose().p.x << " : " << aSphereActor->getGlobalPose().p.y << " : " << aSphereActor->getGlobalPose().p.z << std::endl;
-=======
+
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
 	const PxF32 wheelMass = 20.0f;
@@ -149,7 +162,7 @@ VehicleDesc PhysicsEngine::initVehicleDesc()
 	vehicleDesc.numWheels = nbWheels;
 	vehicleDesc.wheelMaterial = testWheelMat;
 	return vehicleDesc;
->>>>>>> refs/remotes/origin/Ben
+
 }
 
 PhysicsEngine::~PhysicsEngine(void) {	

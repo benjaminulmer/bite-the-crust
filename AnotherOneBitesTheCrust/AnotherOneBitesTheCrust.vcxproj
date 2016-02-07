@@ -162,11 +162,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
-<<<<<<< HEAD
-    <ClCompile Include="objModel.cpp" />
-=======
     <ClCompile Include="PhysicsCreator.cpp" />
->>>>>>> refs/remotes/origin/Ben
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="Renderable.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
@@ -183,11 +179,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="DrivingInput.h" />
     <ClInclude Include="InputEngine.h" />
-<<<<<<< HEAD
-    <ClInclude Include="objModel.h" />
-=======
     <ClInclude Include="PhysicsCreator.h" />
->>>>>>> refs/remotes/origin/Ben
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="Renderable.h" />
     <ClInclude Include="RenderingEngine.h" />

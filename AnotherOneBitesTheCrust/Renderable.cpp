@@ -15,6 +15,11 @@ void Renderable::addPoint(glm::vec3 vertex, glm::vec3 colour) {
 	points.push_back(point);
 }
 
+void Renderable::createFace(GLuint face)
+{
+	faces.push_back(face);
+}
+
 std::vector<glm::vec3> Renderable::getVertices() {
 	std::vector<glm::vec3> vertices;
 	for (int i = 0; i < (int)points.size(); i++) {
@@ -29,6 +34,10 @@ std::vector<glm::vec3> Renderable::getColours() {
 		vertices.push_back(points[i].colour);
 	}
 	return vertices;
+}
+
+std::vector<GLuint> Renderable::getFaces(){
+	return faces;
 }
 
 std::vector<GLPoint> Renderable::getPoints() {

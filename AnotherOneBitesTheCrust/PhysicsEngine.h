@@ -13,6 +13,9 @@ public:
 
 	void simulate(unsigned int deltaTimeMs, DrivingInput* playerInput);
 	void fetchSimulationResults();
+	double getPosX();
+	double getPosY();
+	double getPosZ();
 	
 private:
 	physx::PxTolerancesScale scale;
@@ -49,4 +52,6 @@ private:
 	VehicleDesc initVehicleDesc();
 
 	void testScene(); // Test method
+
+
 };

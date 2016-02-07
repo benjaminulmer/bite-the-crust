@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "DrivingInput.h"
 
 void fatalError(string errorString)
 {
@@ -12,7 +13,6 @@ void fatalError(string errorString)
 
 Game::Game(void)
 {
-
 		window = nullptr;
 		screenWidth = 1024;		//pro csgo resolution
 		screenHeight = 768;
@@ -27,8 +27,6 @@ void Game::run() {
 
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
-
-
 
 	mainLoop();
 }
@@ -64,8 +62,11 @@ void Game::initSystems()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
 
 	renderingEngine.init();
+<<<<<<< HEAD
 	renderingEngine.testOBJLoading();
 
+=======
+>>>>>>> refs/remotes/origin/Ben
 }
 
 void Game::setupEntities() {
@@ -178,11 +179,6 @@ void Game::setupEntities() {
 
 
 void Game::mainLoop() {
-	// Cap the minimum timestep physics will use
-	unsigned int minTimeStepMs = (unsigned int)(1000.0/60.0); // 60 FPS, converted to ms and trucated to int
-	int simCount = 0;
-	// Limit how many simulations we'll run when it's slow, to avoid death spiral
-	int maxSimulations = 5;
 	unsigned int oldTimeMs = SDL_GetTicks();
 	
 	float x = 0;
@@ -191,22 +187,15 @@ void Game::mainLoop() {
 		processSDLEvents();
 
 		// Update the player and AI cars
-		inputEngine->getInput();
+		DrivingInput* playerInput = inputEngine->getInput();
 		aiEngine->updateAI();
 
 		// Figure out timestep and run physics
 		unsigned int newTimeMs = SDL_GetTicks();
-		unsigned int timeStepMs = newTimeMs - oldTimeMs;
+		unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 		oldTimeMs = newTimeMs;
 
-		// If timestep is small enough, just use it, otherwise break down into smaller chunks
-		while (timeStepMs > 0.0 && simCount < maxSimulations) {
-			unsigned int deltaTimeMs = min(timeStepMs, minTimeStepMs);
-			physicsEngine->simulate(deltaTimeMs);
-			timeStepMs -= deltaTimeMs;
-			simCount++;
-		}
-		simCount = 0;
+		physicsEngine->simulate(deltaTimeMs, playerInput);
 
 		// Render
 		//renderingEngine->pushEntities();
@@ -220,6 +209,7 @@ void Game::mainLoop() {
 		renderingEngine.draw();
 		//swap buffers
 		SDL_GL_SwapWindow(window);
+		physicsEngine->fetchSimulationResults();
 	}
 }
 
@@ -245,10 +235,10 @@ void Game::processSDLEvents() {
 
 Game::~Game(void)
 {
-	for (int i = 0; i < entities.size(); i++) {
+	for (unsigned int i = 0; i < entities.size(); i++) {
 		delete entities[i];
 	}
-	for (int i = 0; i < (int)renderables.size(); i++) {
+	for (unsigned int i = 0; i < renderables.size(); i++) {
 		delete renderables[i];
 	}
 }

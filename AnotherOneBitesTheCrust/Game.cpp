@@ -63,7 +63,7 @@ void Game::initSystems()
 
 	renderingEngine.init();
 
-	renderingEngine.testOBJLoading();
+	//renderingEngine.testOBJLoading();
 
 }
 

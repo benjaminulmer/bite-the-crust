@@ -63,7 +63,7 @@ void Game::initSystems()
 
 	renderingEngine.init();
 
-	//renderingEngine.testOBJLoading();
+	renderingEngine.testOBJLoading();
 
 }
 
@@ -170,7 +170,7 @@ void Game::setupEntities() {
 
 	//set camera
 	camera.setPosition(glm::vec3(0,3,-8));			//location of camera
-	camera.setLookAtPosition(glm::vec3(0,0,0));		//where camera is pointing
+	camera.setLookAtPosition(glm::vec3(0,2,0));		//where camera is pointing
 	camera.setUpVector(glm::vec3(0,1,0));			//orientation on camera
 	renderingEngine.updateView(camera);
 }
@@ -197,11 +197,6 @@ void Game::mainLoop() {
 
 		// Render
 		//renderingEngine->pushEntities();
-
-		x+=0.0001;
-		//cout << x << endl;
-		//entities[1]->setPosition(vec3(x,0,0));
-
 
 		physicsEngine->fetchSimulationResults();
 		cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;

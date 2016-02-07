@@ -25,15 +25,6 @@ using glm::vec3;
 using glm::mat4;
 using glm::perspective;
 
-
-struct Renderables
-{
-	vector <vec3> vertices;
-	mat4 model;
-	GLuint vaoID;
-};
-
-
 class RenderingEngine
 {
 public:
@@ -45,36 +36,37 @@ public:
 
 	void init();
 	void displayFunc(vector<Entity*> renderables);
-
 	void generateIDs();
 	void deleteIDs();
-	void setupVAO();
-	void loadBuffer();
-	void loadModelViewMatrix();
 	void loadProjectionMatrix();
-	void setupModelViewProjectionTransform();
-	void reloadMVPUniform();
 	void updateView(Camera& c);
 
 	void assignBuffers(Renderable* r);
 	void deleteBuffers(Renderable* r);
 
-	
+	void testOBJLoading();
+
+bool loadOBJ(
+	const char * path, 
+	std::vector<glm::vec3> & out_vertices, 
+
+	std::vector<glm::vec3> & out_normals,
+	std::vector<GLuint> & out_faces
+);
 	GLuint basicProgramID;		//shader program 
 
-	GLuint vaoID;			//cube vao
-	GLuint vertBufferID;	//VBO for vertices
-	GLuint colorBufferID;	//VBO for colors
+	GLuint vanVAO;
+	GLuint vanVerts;
+	GLuint vanColors;
+	GLuint vanIndexBuffer;
 
-	GLuint floorID;
-	GLuint floorBuffer;
-	GLuint floorColorBuffer;
+	vector <vec3> colors;
+	vector <vec3> vertices;
+	vector <GLuint> faces;
 
 	mat4 MVP;
 	mat4 M;
 	mat4 V;
 	mat4 P;
-	mat4 floorM;
-
 };
 

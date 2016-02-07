@@ -21,8 +21,10 @@ public:
 	~Renderable(void);
 
 	void addPoint(glm::vec3 vertex, glm::vec3 colour);
+	void createFace(GLuint face);
 	std::vector<glm::vec3> getVertices();
 	std::vector<glm::vec3> getColours();
+	std::vector<GLuint> getFaces();
 	std::vector<GLPoint> getPoints();
 	void setVAO(GLuint v);
 	GLuint getVAO();
@@ -33,8 +35,10 @@ public:
 	int getVertexCount();
 private:
 	std::vector<GLPoint> points;
+	std::vector<GLuint> faces;
 	GLuint vertexVBO, colourVBO;
 	GLuint vao;
+	GLuint indexBuffer;
 	// Model
 	// Texture
 };

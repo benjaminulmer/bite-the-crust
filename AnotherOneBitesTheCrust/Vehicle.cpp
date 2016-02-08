@@ -4,7 +4,7 @@ using namespace physx;
 
 Vehicle::Vehicle(void)
 {
-	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
+	//Set up the default chassis mass, dimensions, moment of inertia, and center of mass offset.
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
 	chassisMass = 1500.0f;

@@ -195,18 +195,17 @@ void Game::mainLoop() {
 		oldTimeMs = newTimeMs;
 
 		physicsEngine->simulate(deltaTimeMs, playerInput);
-
-		// Render
-		//renderingEngine->pushEntities();
-
 		physicsEngine->fetchSimulationResults();
 		cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
+		cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;
 
-		entities[1]->setPosition(vec3(physicsEngine->getPosX(),physicsEngine->getPosY(),physicsEngine->getPosZ()));
+		camera.setPosition(playerVehicle->getPosition() + glm::vec3(0, 10,-10));
+		camera.setLookAtPosition(playerVehicle->getPosition());
+		renderingEngine.updateView(camera);
 
 		//display
 		renderingEngine.displayFunc(entities);
-		//renderingEngine.draw();
+
 		//swap buffers
 		SDL_GL_SwapWindow(window);
 	}

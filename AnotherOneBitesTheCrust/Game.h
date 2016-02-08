@@ -55,6 +55,7 @@ private:
 
 	GameState gameState;
 	Camera camera;
+	Vehicle* playerVehicle;
 	std::vector<Entity*> entities;
 	std::vector<Renderable*> renderables;
 };

@@ -1,20 +1,6 @@
 #pragma once
 #include <PxPhysicsAPI.h>
-
-struct VehicleDesc
-{
-	physx::PxF32 chassisMass;
-	physx::PxVec3 chassisDims;
-	physx::PxVec3 chassisMOI;
-	physx::PxVec3 chassisCMOffset;
-	physx::PxMaterial* chassisMaterial;
-	physx::PxF32 wheelMass;
-	physx::PxF32 wheelWidth;
-	physx::PxF32 wheelRadius;
-	physx::PxF32 wheelMOI;
-	physx::PxMaterial* wheelMaterial;
-	physx::PxU32 numWheels;
-};
+#include "Vehicle.h"
 
 class PhysicsCreator
 {
@@ -33,7 +19,7 @@ public:
 	 physx::PxMaterial** chassisMaterials, physx::PxConvexMesh** chassisConvexMeshes, const physx::PxU32 numChassisMeshes, 
 	 physx::PxPhysics& physics);
 
-	static physx::PxVehicleDrive4W* createVehicle4W(const VehicleDesc& vehDesc, physx::PxPhysics* physics, physx::PxCooking* cooking);
+	static physx::PxVehicleDrive4W* createVehicle4W(const Vehicle* vehDesc, physx::PxPhysics* physics, physx::PxCooking* cooking);
 
 private:
 	static void computeWheelCenterActorOffsets4W(const physx::PxF32 wheelFrontZ, const physx::PxF32 wheelRearZ, const physx::PxVec3& chassisDims, 

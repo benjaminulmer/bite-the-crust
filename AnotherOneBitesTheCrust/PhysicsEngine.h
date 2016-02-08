@@ -4,6 +4,7 @@
 #include "FrictionPairs.h"
 #include "PhysicsCreator.h"
 #include "DrivingInput.h"
+#include "Vehicle.h"
 
 class PhysicsEngine
 {
@@ -16,7 +17,8 @@ public:
 	double getPosX();
 	double getPosY();
 	double getPosZ();
-	
+	void initVehicle(Vehicle* vehicle);
+
 private:
 	physx::PxTolerancesScale scale;
 	physx::PxDefaultErrorCallback* defaultErrorCallback;
@@ -49,7 +51,6 @@ private:
 	void initSimulationData();
 	void initPhysX();
 	void initVehicles();
-	VehicleDesc initVehicleDesc();
 
 	void testScene(); // Test method
 

@@ -164,6 +164,7 @@ void Game::setupEntities() {
 	//entities.push_back(tri);
 
 	playerVehicle = new Vehicle();
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
 	playerVehicle->setRenderable(vehicle);
 	physicsEngine->initVehicle(playerVehicle);
 	entities.push_back(playerVehicle);

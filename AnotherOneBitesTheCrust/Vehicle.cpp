@@ -36,6 +36,16 @@ Vehicle::~Vehicle(void)
 {
 }
 
+void Vehicle::updateTuning() {
+	// Recalculate variables which are based off of other variables, if some of them have been changed.
+	chassisMOI = PxVec3
+	((chassisDims.y*chassisDims.y + chassisDims.z*chassisDims.z)*chassisMass/12.0f,
+	 (chassisDims.x*chassisDims.x + chassisDims.z*chassisDims.z)*0.8f*chassisMass/12.0f,
+	 (chassisDims.x*chassisDims.x + chassisDims.y*chassisDims.y)*chassisMass/12.0f);
+	chassisCMOffset = PxVec3(0.0f, -chassisDims.y*0.5f + 0.65f, 0.25f);
+	wheelMOI = 0.5f*wheelMass*wheelRadius*wheelRadius;
+}
+
 void Vehicle::handleInput(DrivingInput* input) {
 	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->accel);
 	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->brake);

@@ -12,6 +12,7 @@
 #include "Renderable.h"
 #include "Entity.h"
 #include "Camera.h"
+#include "ContentLoading.h"
 
 #include <SDL.h>
 #include <iostream>

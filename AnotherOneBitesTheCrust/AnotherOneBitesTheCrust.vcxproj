@@ -156,6 +156,7 @@
     <ClCompile Include="AIEngine.cpp" />
     <ClCompile Include="AudioEngine.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ContentLoading.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="FilterShader.cpp" />
     <ClCompile Include="FrictionPairs.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="AIEngine.h" />
     <ClInclude Include="AudioEngine.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ContentLoading.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="FilterShader.h" />
     <ClInclude Include="FrictionPairs.h" />

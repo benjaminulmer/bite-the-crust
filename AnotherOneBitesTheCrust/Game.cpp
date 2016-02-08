@@ -63,7 +63,7 @@ void Game::initSystems()
 
 	renderingEngine.init();
 
-	//renderingEngine.testOBJLoading();
+	renderingEngine.testOBJLoading();
 
 }
 
@@ -169,7 +169,7 @@ void Game::setupEntities() {
 	entities.push_back(vcl);
 
 	//set camera
-	camera.setPosition(glm::vec3(0,3,-8));			//location of camera
+	camera.setPosition(glm::vec3(0,3,8));			//location of camera
 	camera.setLookAtPosition(glm::vec3(0,2,0));		//where camera is pointing
 	camera.setUpVector(glm::vec3(0,1,0));			//orientation on camera
 	renderingEngine.updateView(camera);

@@ -277,12 +277,12 @@ void PhysicsCreator::setupWheelsSimulationData
 	}
 }
 
-PxVehicleDrive4W* PhysicsCreator::createVehicle4W(const VehicleDesc& vehicle4WDesc, PxPhysics* physics, PxCooking* cooking) 
+PxVehicleDrive4W* PhysicsCreator::createVehicle4W(const Vehicle* vehicle, PxPhysics* physics, PxCooking* cooking) 
 {
-	const PxVec3 chassisDims = vehicle4WDesc.chassisDims;
-	const PxF32 wheelWidth = vehicle4WDesc.wheelWidth;
-	const PxF32 wheelRadius = vehicle4WDesc.wheelRadius;
-	const PxU32 numWheels = vehicle4WDesc.numWheels;
+	const PxVec3 chassisDims = vehicle->chassisDims;
+	const PxF32 wheelWidth = vehicle->wheelWidth;
+	const PxF32 wheelRadius = vehicle->wheelRadius;
+	const PxU32 numWheels = vehicle->numWheels;
 
 	//Construct a physx actor with shapes for the chassis and wheels.
 	//Set the rigid body mass, moment of inertia, and center of mass offset.
@@ -298,25 +298,25 @@ PxVehicleDrive4W* PhysicsCreator::createVehicle4W(const VehicleDesc& vehicle4WDe
 		for(PxU32 i = PxVehicleDrive4WWheelOrder::eFRONT_LEFT; i <= PxVehicleDrive4WWheelOrder::eREAR_RIGHT; i++)
 		{
 			wheelConvexMeshes[i] = wheelMesh;
-			wheelMaterials[i] = vehicle4WDesc.wheelMaterial;
+			wheelMaterials[i] = vehicle->wheelMaterial;
 		}
 		//Set the meshes and materials for the non-driven wheels
 		for(PxU32 i = PxVehicleDrive4WWheelOrder::eREAR_RIGHT + 1; i < numWheels; i++)
 		{
 			wheelConvexMeshes[i] = wheelMesh;
-			wheelMaterials[i] = vehicle4WDesc.wheelMaterial;
+			wheelMaterials[i] = vehicle->wheelMaterial;
 		}
 
 		//Chassis just has a single convex shape for simplicity.
 		PxConvexMesh* chassisConvexMesh = createChassisMesh(chassisDims, *physics, *cooking);
 		PxConvexMesh* chassisConvexMeshes[1] = {chassisConvexMesh};
-		PxMaterial* chassisMaterials[1] = {vehicle4WDesc.chassisMaterial};
+		PxMaterial* chassisMaterials[1] = {vehicle->chassisMaterial};
 
 		//Rigid body data.
 		PxVehicleChassisData rigidBodyData;
-		rigidBodyData.mMOI = vehicle4WDesc.chassisMOI;
-		rigidBodyData.mMass = vehicle4WDesc.chassisMass;
-		rigidBodyData.mCMOffset = vehicle4WDesc.chassisCMOffset;
+		rigidBodyData.mMOI = vehicle->chassisMOI;
+		rigidBodyData.mMass = vehicle->chassisMass;
+		rigidBodyData.mCMOffset = vehicle->chassisCMOffset;
 
 		veh4WActor = createVehicleActor
 			(rigidBodyData,
@@ -336,9 +336,9 @@ PxVehicleDrive4W* PhysicsCreator::createVehicle4W(const VehicleDesc& vehicle4WDe
 
 		//Set up the simulation data for all wheels.
 		setupWheelsSimulationData
-			(vehicle4WDesc.wheelMass, vehicle4WDesc.wheelMOI, wheelRadius, wheelWidth, 
+			(vehicle->wheelMass, vehicle->wheelMOI, wheelRadius, wheelWidth, 
 			 numWheels, wheelCenterActorOffsets,
-			 vehicle4WDesc.chassisCMOffset, vehicle4WDesc.chassisMass,
+			 vehicle->chassisCMOffset, vehicle->chassisMass,
 			 wheelsSimData);
 	}
 

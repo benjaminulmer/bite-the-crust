@@ -25,9 +25,6 @@ void Game::run() {
 	initSystems();
 	setupEntities();
 
-	inputEngine = new InputEngine();
-	physicsEngine = new PhysicsEngine();
-
 	mainLoop();
 }
 
@@ -62,6 +59,8 @@ void Game::initSystems()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
 
 	renderingEngine.init();
+	inputEngine = new InputEngine();
+	physicsEngine = new PhysicsEngine();
 
 	renderingEngine.testOBJLoading();
 
@@ -164,9 +163,11 @@ void Game::setupEntities() {
 	tri->setRenderable(triangle);
 	//entities.push_back(tri);
 
-	Entity* vcl = new Entity();
-	vcl->setRenderable(vehicle);
-	entities.push_back(vcl);
+	playerVehicle = new Vehicle();
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
+	playerVehicle->setRenderable(vehicle);
+	physicsEngine->initVehicle(playerVehicle);
+	entities.push_back(playerVehicle);
 
 	//set camera
 	camera.setPosition(glm::vec3(0,3,8));			//location of camera
@@ -186,6 +187,7 @@ void Game::mainLoop() {
 
 		// Update the player and AI cars
 		DrivingInput* playerInput = inputEngine->getInput();
+		playerVehicle->handleInput(playerInput);
 		aiEngine->updateAI();
 
 		// Figure out timestep and run physics
@@ -194,18 +196,17 @@ void Game::mainLoop() {
 		oldTimeMs = newTimeMs;
 
 		physicsEngine->simulate(deltaTimeMs, playerInput);
-
-		// Render
-		//renderingEngine->pushEntities();
-
 		physicsEngine->fetchSimulationResults();
 		cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
+		cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;
 
-		entities[1]->setPosition(vec3(physicsEngine->getPosX(),physicsEngine->getPosY(),physicsEngine->getPosZ()));
+		camera.setPosition(playerVehicle->getPosition() + glm::vec3(0, 10,-10));
+		camera.setLookAtPosition(playerVehicle->getPosition());
+		renderingEngine.updateView(camera);
 
 		//display
 		renderingEngine.displayFunc(entities);
-		//renderingEngine.draw();
+
 		//swap buffers
 		SDL_GL_SwapWindow(window);
 	}

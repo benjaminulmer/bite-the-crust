@@ -35,7 +35,9 @@ public:
 	void draw();
 
 	void init();
-	void displayFunc(vector<Entity*> renderables);
+	void displayFunc(vector<Entity*> entities);
+	mat4 calculateDefaultModel(mat4 model, Entity * entity);
+
 	void generateIDs();
 	void deleteIDs();
 	void loadProjectionMatrix();
@@ -46,10 +48,11 @@ public:
 
 	void testOBJLoading();
 
+	
+
 bool loadOBJ(
 	const char * path, 
 	std::vector<glm::vec3> & out_vertices, 
-
 	std::vector<glm::vec3> & out_normals,
 	std::vector<GLuint> & out_faces
 );

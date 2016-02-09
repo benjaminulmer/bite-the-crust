@@ -108,6 +108,8 @@ bool RenderingEngine::loadOBJ(
 	return true;
 }
 
+
+
 void RenderingEngine::pushEntities() {
 }
 
@@ -151,10 +153,14 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 		M = mat4(1.0f);
 
 		//Translations done here. Order of translations is scale, rotate, translate
-		//M = glm::scale(M, vec3(x,y,z))
-		//M = glm::rotate(M, 45.0f, vec3(0,1,0));
+		//M = glm::scale(M, vec3(2.0f));
 		M = glm::translate(M, entities[i]->getPosition());
+
 		
+		//M = glm::rotate(M, -1.5708f, vec3(0,1,0));
+		
+		M = calculateDefaultModel(M, entities[i]);
+
 		MVP = P * V * M;
 		glUniformMatrix4fv( mvpID,
 					1,
@@ -164,6 +170,17 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 		glBindVertexArray(entities[i]->getRenderable()->getVAO());
 		glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->getFaces().size(), GL_UNSIGNED_INT, (void*)0);
 	}
+}
+
+mat4 RenderingEngine::calculateDefaultModel(mat4 model, Entity * entity)
+{
+	
+	//Translations done here. Order of translations is scale, rotate, translate
+	
+	model = glm::scale(model,entity->getDefaultScale());
+	model = glm::translate(model, entity->getDefaultTranslation());
+	model = glm::rotate(model, entity->getDefaultRotationAngle(), entity->getDefaultRotationAxis());
+	return model;
 }
 
 void RenderingEngine::generateIDs()

@@ -20,6 +20,21 @@ void Renderable::createFace(GLuint face)
 	faces.push_back(face);
 }
 
+void Renderable::setPoints(std::vector<glm::vec3> vertices)
+{
+	for(int i = 0; i<vertices.size(); i++)
+	{
+		GLPoint point(vertices.at(i), glm::vec3(1,1,1));
+		points.push_back(point);
+	}
+}
+
+void Renderable::setFaces(std::vector<GLuint> face)
+{
+	faces = face;
+}
+
+
 std::vector<glm::vec3> Renderable::getVertices() {
 	std::vector<glm::vec3> vertices;
 	for (int i = 0; i < (int)points.size(); i++) {

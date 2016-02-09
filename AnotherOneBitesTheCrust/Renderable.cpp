@@ -22,7 +22,7 @@ void Renderable::createFace(GLuint face)
 
 void Renderable::setPoints(std::vector<glm::vec3> vertices)
 {
-	for(int i = 0; i<vertices.size(); i++)
+	for(unsigned int i = 0; i<vertices.size(); i++)
 	{
 		GLPoint point(vertices.at(i), glm::vec3(1,1,1));
 		points.push_back(point);

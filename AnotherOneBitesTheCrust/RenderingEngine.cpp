@@ -300,7 +300,7 @@ void RenderingEngine::testOBJLoading()
 	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
 
-	for(int i = 0; i < vertices.size(); i++)
+	for(unsigned int i = 0; i < vertices.size(); i++)
 	{
 		colors.push_back(vec3(1,1,1));
 	}

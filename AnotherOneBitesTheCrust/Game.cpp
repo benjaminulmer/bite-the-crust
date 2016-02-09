@@ -191,7 +191,7 @@ void Game::setupEntities() {
 	playerVehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
 	playerVehicle->setRenderable(van);
-	playerVehicle->setDefaultRotation(-1.5708,vec3(0,1,0));
+	playerVehicle->setDefaultRotation(-1.5708f,vec3(0,1,0));
 	playerVehicle->setDefaultTranslation(vec3(0.0f));
 	playerVehicle->setDefaultScale(vec3(1.0f));
 	physicsEngine->initVehicle(playerVehicle);

@@ -69,10 +69,10 @@ void Game::initSystems()
 void Game::setupEntities() {
 	Renderable* plane = new Renderable();
 	//add vertices and colors
-	plane->addPoint(vec3(2,-2,2),vec3(1,0,0));
-	plane->addPoint(vec3(2,-2,-2),vec3(0,1,0));
-	plane->addPoint(vec3(-2,-2,-2),vec3(0,0,1));
-	plane->addPoint(vec3(-2,-2,2),vec3(1,1,1));
+	plane->addPoint(vec3(20,-2,20),vec3(1,0,0));
+	plane->addPoint(vec3(20,-2,-20),vec3(0,1,0));
+	plane->addPoint(vec3(-20,-2,-20),vec3(0,0,1));
+	plane->addPoint(vec3(-20,-2,20),vec3(1,1,1));
 	//faces
 	plane->createFace(0);
 	plane->createFace(1);
@@ -170,7 +170,7 @@ void Game::setupEntities() {
 	entities.push_back(playerVehicle);
 
 	//set camera
-	camera.setPosition(glm::vec3(0,3,-8));			//location of camera
+	camera.setPosition(glm::vec3(0,3,8));			//location of camera
 	camera.setLookAtPosition(glm::vec3(0,2,0));		//where camera is pointing
 	camera.setUpVector(glm::vec3(0,1,0));			//orientation on camera
 	renderingEngine.updateView(camera);
@@ -200,7 +200,7 @@ void Game::mainLoop() {
 		cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
 		cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;
 
-		camera.setPosition(playerVehicle->getPosition() + glm::vec3(0, 10,-10));
+		camera.setPosition(playerVehicle->getPosition() + glm::vec3(0, 10,10));
 		camera.setLookAtPosition(playerVehicle->getPosition());
 		renderingEngine.updateView(camera);
 

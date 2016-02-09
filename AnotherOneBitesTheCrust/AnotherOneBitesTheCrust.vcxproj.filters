@@ -16,6 +16,9 @@
     <ClCompile Include="RenderingEngine.cpp" />
     <ClCompile Include="ShaderTools.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
+    <ClCompile Include="PhysicsEntity.cpp" />
+    <ClCompile Include="Vehicle.cpp" />
+    <ClCompile Include="ContentLoading.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
@@ -34,5 +37,8 @@
     <ClInclude Include="ShaderTools.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
     <ClInclude Include="DrivingInput.h" />
+    <ClInclude Include="PhysicsEntity.h" />
+    <ClInclude Include="Vehicle.h" />
+    <ClInclude Include="ContentLoading.h" />
   </ItemGroup>
 </Project>

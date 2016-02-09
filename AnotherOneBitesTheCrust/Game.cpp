@@ -25,9 +25,6 @@ void Game::run() {
 	initSystems();
 	setupEntities();
 
-	inputEngine = new InputEngine();
-	physicsEngine = new PhysicsEngine();
-
 	mainLoop();
 }
 
@@ -58,10 +55,16 @@ void Game::initSystems()
 	}
 	
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);		//enable double buffering
+	if( SDL_GL_SetSwapInterval( 1 ) < 0 )
+	{
+		printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
+	}
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
 
 	renderingEngine.init();
+	inputEngine = new InputEngine();
+	physicsEngine = new PhysicsEngine();
 
 	renderingEngine.testOBJLoading();
 
@@ -70,10 +73,10 @@ void Game::initSystems()
 void Game::setupEntities() {
 	Renderable* plane = new Renderable();
 	//add vertices and colors
-	plane->addPoint(vec3(2,-2,2),vec3(1,0,0));
-	plane->addPoint(vec3(2,-2,-2),vec3(0,1,0));
-	plane->addPoint(vec3(-2,-2,-2),vec3(0,0,1));
-	plane->addPoint(vec3(-2,-2,2),vec3(1,1,1));
+	plane->addPoint(vec3(20,-2,20),vec3(1,0,0));
+	plane->addPoint(vec3(20,-2,-20),vec3(0,1,0));
+	plane->addPoint(vec3(-20,-2,-20),vec3(0,0,1));
+	plane->addPoint(vec3(-20,-2,20),vec3(1,1,1));
 	//faces
 	plane->createFace(0);
 	plane->createFace(1);
@@ -154,9 +157,24 @@ void Game::setupEntities() {
 	renderables.push_back(vehicle);
 	renderingEngine.assignBuffers(vehicle);
 
+	Renderable* van = new Renderable();
+	vector<vec3>vanVerts;
+	vector<vec3>vanNormals;
+	vector<GLuint>vanFaces;
+	bool res = renderingEngine.loadOBJ("res\\Models\\Van.obj", vanVerts, vanNormals, vanFaces);
+
+	cout << "Faces of van " << vanVerts.size() << endl;
+	van->setPoints(vanVerts);
+	van->setFaces(vanFaces);
+	renderables.push_back(van);
+	renderingEngine.assignBuffers(van);
+
 	Entity* ground = new Entity();
 	ground->setPosition(vec3(0,0,0));
 	ground->setRenderable(plane);
+	ground->setDefaultRotation(0,vec3(0,1,0));
+	ground->setDefaultTranslation(vec3(0.0f));
+	ground->setDefaultScale(vec3(1.0f));
 	entities.push_back(ground);
 
 	Entity* tri = new Entity();
@@ -164,9 +182,20 @@ void Game::setupEntities() {
 	tri->setRenderable(triangle);
 	//entities.push_back(tri);
 
-	Entity* vcl = new Entity();
-	vcl->setRenderable(vehicle);
-	entities.push_back(vcl);
+	//playerVehicle = new Vehicle();
+	//ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
+	//playerVehicle->setRenderable(vehicle);
+	//physicsEngine->initVehicle(playerVehicle);
+	//entities.push_back(playerVehicle);
+
+	playerVehicle = new Vehicle();
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
+	playerVehicle->setRenderable(van);
+	playerVehicle->setDefaultRotation(-1.5708,vec3(0,1,0));
+	playerVehicle->setDefaultTranslation(vec3(0.0f));
+	playerVehicle->setDefaultScale(vec3(1.0f));
+	physicsEngine->initVehicle(playerVehicle);
+	entities.push_back(playerVehicle);
 
 	//set camera
 	camera.setPosition(glm::vec3(0,3,8));			//location of camera
@@ -186,6 +215,7 @@ void Game::mainLoop() {
 
 		// Update the player and AI cars
 		DrivingInput* playerInput = inputEngine->getInput();
+		playerVehicle->handleInput(playerInput);
 		aiEngine->updateAI();
 
 		// Figure out timestep and run physics
@@ -194,18 +224,17 @@ void Game::mainLoop() {
 		oldTimeMs = newTimeMs;
 
 		physicsEngine->simulate(deltaTimeMs, playerInput);
-
-		// Render
-		//renderingEngine->pushEntities();
-
 		physicsEngine->fetchSimulationResults();
-		cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
+		//cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
+		//cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;
 
-		entities[1]->setPosition(vec3(physicsEngine->getPosX(),physicsEngine->getPosY(),physicsEngine->getPosZ()));
+		camera.setPosition(playerVehicle->getPosition() + glm::vec3(0, 10,10));
+		camera.setLookAtPosition(playerVehicle->getPosition());
+		renderingEngine.updateView(camera);
 
 		//display
 		renderingEngine.displayFunc(entities);
-		//renderingEngine.draw();
+
 		//swap buffers
 		SDL_GL_SwapWindow(window);
 	}

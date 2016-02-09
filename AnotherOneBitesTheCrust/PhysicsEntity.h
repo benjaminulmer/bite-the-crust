@@ -13,6 +13,7 @@ public:
 	void setActor(physx::PxRigidActor* a);
 	physx::PxRigidActor* getActor();
 	glm::vec3 getPosition();
+	glm::mat4 getModelMatrix();
 private:
 	physx::PxRigidActor* actor;
 };

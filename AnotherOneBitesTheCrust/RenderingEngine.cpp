@@ -153,7 +153,7 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 		//Translations done here. Order of translations is scale, rotate, translate
 		//M = glm::scale(M, vec3(x,y,z))
 		//M = glm::rotate(M, 45.0f, vec3(0,1,0));
-		M = glm::translate(M, entities[i]->getPosition());
+		M = entities[i]->getModelMatrix();
 		
 		MVP = P * V * M;
 		glUniformMatrix4fv( mvpID,

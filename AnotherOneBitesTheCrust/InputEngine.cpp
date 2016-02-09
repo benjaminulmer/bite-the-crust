@@ -28,11 +28,12 @@ void InputEngine::processControllerEvent(SDL_Event event) {
 	else if (event.type == SDL_CONTROLLERAXISMOTION) {
 		if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX) {
 			if (event.caxis.value < 1) {
-				inputs[0].leftSteer = (float)event.caxis.value/MIN_AXIS_VALUE;
-				inputs[0].rightSteer = 0;			}
-			else {
-				inputs[0].rightSteer = (float)event.caxis.value/MAX_AXIS_VALUE;
+				inputs[0].rightSteer = (float)event.caxis.value/MIN_AXIS_VALUE;
 				inputs[0].leftSteer = 0;
+			} 
+			else {
+				inputs[0].leftSteer = (float)event.caxis.value/MAX_AXIS_VALUE;
+				inputs[0].rightSteer = 0;
 			}
 		}
 		else if (event.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT) {

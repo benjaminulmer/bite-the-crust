@@ -56,7 +56,7 @@ void PhysicsEngine::initVehicles() {
 	vehicleSceneQueryData = VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, *defaultAllocator);
 	batchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *vehicleSceneQueryData, scene);
 
-	drivingSurfaces[0] = physics->createMaterial(0.5f, 0.5f, 0.6f);
+	drivingSurfaces[0] = physics->createMaterial(0.8f, 0.8f, 0.6f);
 	frictionPairs = FrictionPairs::createFrictionPairs(drivingSurfaces[0]);
 
 	groundPlane = PhysicsCreator::createDrivablePlane(drivingSurfaces[0], physics);

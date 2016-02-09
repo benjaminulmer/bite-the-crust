@@ -52,6 +52,10 @@ glm::vec3 Entity::getPosition() {
 	return position;
 }
 
+glm::mat4 Entity::getModelMatrix() {
+	return glm::mat4(1.0f);
+}
+
 void Entity::setPosition(glm::vec3 pos) {
 	position = pos;
 }

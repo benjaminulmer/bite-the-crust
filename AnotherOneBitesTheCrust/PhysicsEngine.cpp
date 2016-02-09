@@ -50,7 +50,7 @@ void PhysicsEngine::initPhysX() {
 void PhysicsEngine::initVehicles() {
 	PxInitVehicleSDK(*physics); 
 
-	PxVehicleSetBasisVectors(PxVec3(0,1,0), PxVec3(0,0,-1)); 
+	PxVehicleSetBasisVectors(PxVec3(0,1,0), PxVec3(0,0,1)); 
 	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
 	vehicleSceneQueryData = VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, *defaultAllocator);

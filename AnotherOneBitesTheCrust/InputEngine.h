@@ -18,6 +18,8 @@ public:
 private:
 	SDL_GameController* controllers[MAX_NUM_CONTROLLERS];
 	DrivingInput inputs[MAX_NUM_CONTROLLERS];
+	float deadzonePercent;
+	int deadzoneSize;
 
 	void openControllers();
 };

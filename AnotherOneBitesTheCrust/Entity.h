@@ -9,7 +9,17 @@ public:
 	Entity(void);
 	~Entity(void);
 
-	glm::vec3 getPosition();
+	void setDefaultRotation(float radians, glm::vec3 axis);
+	void setDefaultTranslation(glm::vec3 trans);
+	void setDefaultScale(glm::vec3 scale);
+
+	float getDefaultRotationAngle();
+	glm::vec3 getDefaultRotationAxis();
+	glm::vec3 getDefaultTranslation();
+	glm::vec3 getDefaultScale();
+
+	virtual glm::vec3 getPosition();
+	virtual glm::mat4 getModelMatrix();
 	void setPosition(glm::vec3 pos);
 	bool hasRenderable(); 
 	void setRenderable(Renderable* r);
@@ -17,5 +27,9 @@ public:
 private:
 	glm::vec3 position;
 	Renderable* renderable;
+	float defaultRotation;
+	glm::vec3 defaultRotationAxis;
+	glm::vec3 defaultTranslation;
+	glm::vec3 defaultScale;
 };
 

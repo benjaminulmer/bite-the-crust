@@ -73,10 +73,10 @@ void Game::initSystems()
 void Game::setupEntities() {
 	Renderable* plane = new Renderable();
 	//add vertices and colors
-	plane->addPoint(vec3(20,-2,20),vec3(1,0,0));
-	plane->addPoint(vec3(20,-2,-20),vec3(0,1,0));
-	plane->addPoint(vec3(-20,-2,-20),vec3(0,0,1));
-	plane->addPoint(vec3(-20,-2,20),vec3(1,1,1));
+	plane->addPoint(vec3(20,0,20),vec3(1,0,0));
+	plane->addPoint(vec3(20,0,-20),vec3(0,1,0));
+	plane->addPoint(vec3(-20,0,-20),vec3(0,0,1));
+	plane->addPoint(vec3(-20,0,20),vec3(1,1,1));
 	//faces
 	plane->createFace(0);
 	plane->createFace(1);
@@ -182,20 +182,23 @@ void Game::setupEntities() {
 	tri->setRenderable(triangle);
 	//entities.push_back(tri);
 
-	//playerVehicle = new Vehicle();
-	//ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
-	//playerVehicle->setRenderable(vehicle);
-	//physicsEngine->initVehicle(playerVehicle);
-	//entities.push_back(playerVehicle);
-
 	playerVehicle = new Vehicle();
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
+	playerVehicle->setRenderable(vehicle);
+	physicsEngine->initVehicle(playerVehicle);
+	playerVehicle->setDefaultRotation(0,vec3(0,1,0));
+	playerVehicle->setDefaultTranslation(vec3(-1.25f,0.0f,-2.5f));
+	playerVehicle->setDefaultScale(vec3(1.0f));
+	entities.push_back(playerVehicle);
+
+	/*playerVehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
 	playerVehicle->setRenderable(van);
 	playerVehicle->setDefaultRotation(-1.5708f,vec3(0,1,0));
 	playerVehicle->setDefaultTranslation(vec3(0.0f));
-	playerVehicle->setDefaultScale(vec3(1.0f));
-	physicsEngine->initVehicle(playerVehicle);
-	entities.push_back(playerVehicle);
+	playerVehicle->setDefaultScale(vec3(1.0f));*/
+	//physicsEngine->initVehicle(playerVehicle);
+	//entities.push_back(playerVehicle);
 
 	//set camera
 	camera.setPosition(glm::vec3(0,3,8));			//location of camera
@@ -228,7 +231,7 @@ void Game::mainLoop() {
 		//cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
 		//cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;
 
-		camera.setPosition(playerVehicle->getPosition() + glm::vec3(0, 10,10));
+		camera.setPosition(playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-20,0)));
 		camera.setLookAtPosition(playerVehicle->getPosition());
 		renderingEngine.updateView(camera);
 

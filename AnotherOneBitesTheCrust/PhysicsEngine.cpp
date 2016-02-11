@@ -70,7 +70,7 @@ void PhysicsEngine::initVehicle(Vehicle* vehicle) {
 	wheelMaterial = physics->createMaterial(vehicle->wheelStaticFriction, vehicle->wheelDynamicFriction, vehicle->wheelRestitution);
 	vehicle->chassisMaterial = chassisMaterial;
 	vehicle->wheelMaterial = wheelMaterial;
-	testVehicle = PhysicsCreator::createVehicle4W(vehicle, physics, cooking);
+	PxVehicleDrive4W* testVehicle = PhysicsCreator::createVehicle4W(vehicle, physics, cooking);
 	PxTransform startTransform(PxVec3(0, (vehicle->chassisDims.y*0.5f + vehicle->wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
 	PxRigidDynamic* actor = testVehicle->getRigidDynamicActor();
 	actor->setGlobalPose(startTransform);
@@ -80,6 +80,7 @@ void PhysicsEngine::initVehicle(Vehicle* vehicle) {
 	testVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	testVehicle->mDriveDynData.setUseAutoGears(true);
 	vehicle->physicsVehicle = testVehicle;
+	vehicles.push_back(testVehicle);
 }
 
 void PhysicsEngine::testScene() {
@@ -94,16 +95,16 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs, DrivingInput* playerInput
 
 		//std::cout << playerInput->accel << std::endl;
 
-		PxVehicleWheels* vehicles[1] = {testVehicle};
+		PxVehicleWheels** vehiclesPointer = vehicles.data();
 		PxRaycastQueryResult* raycastResults = vehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 		const PxU32 raycastResultsSize = vehicleSceneQueryData->getRaycastQueryResultBufferSize();
-		PxVehicleSuspensionRaycasts(batchQuery, 1, vehicles, raycastResultsSize, raycastResults);
+		PxVehicleSuspensionRaycasts(batchQuery, 1, vehiclesPointer, raycastResultsSize, raycastResults);
 
 		//Vehicle update.
 		const PxVec3 grav = scene->getGravity();
 		PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-		PxVehicleWheelQueryResult vehicleQueryResults[1] = {{wheelQueryResults, testVehicle->mWheelsSimData.getNbWheels()}};
-		PxVehicleUpdates(stepSizeS, grav, *frictionPairs, 1, vehicles, vehicleQueryResults);
+		PxVehicleWheelQueryResult vehicleQueryResults[1] = {{wheelQueryResults, vehicles.at(0)->mWheelsSimData.getNbWheels()}};
+		PxVehicleUpdates(stepSizeS, grav, *frictionPairs, 1, vehiclesPointer, vehicleQueryResults);
 
 		scene->simulate(stepSizeS);
 	}
@@ -112,18 +113,6 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs, DrivingInput* playerInput
 
 void PhysicsEngine::fetchSimulationResults() {
 	scene->fetchResults(true);
-}
-
-double PhysicsEngine::getPosX(){
-	return testVehicle->getRigidDynamicActor()->getGlobalPose().p.x;
-}
-
-double PhysicsEngine::getPosY(){
-	return testVehicle->getRigidDynamicActor()->getGlobalPose().p.y;
-}
-
-double PhysicsEngine::getPosZ(){
-	return testVehicle->getRigidDynamicActor()->getGlobalPose().p.z;
 }
 
 PhysicsEngine::~PhysicsEngine(void) {	

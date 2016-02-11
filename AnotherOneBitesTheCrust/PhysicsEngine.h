@@ -41,12 +41,12 @@ private:
 
 	physx::PxMaterial* testChassisMat;
 	physx::PxMaterial* testWheelMat;
-	physx::PxVehicleDrive4W* testVehicle;
 
 	physx::PxRigidStatic* groundPlane;
 
 	physx::PxF32 deltaTimeSAcc;
 	
+	std::vector<physx::PxVehicleWheels*> vehicles;
 
 	void initSimulationData();
 	void initPhysX();

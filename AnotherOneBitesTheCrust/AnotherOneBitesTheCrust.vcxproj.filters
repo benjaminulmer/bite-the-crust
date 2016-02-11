@@ -41,4 +41,8 @@
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="ContentLoading.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\Shaders\per-fragment-phong.fs.glsl" />
+    <None Include="res\Shaders\per-fragment-phong.vs.glsl" />
+  </ItemGroup>
 </Project>

@@ -193,6 +193,10 @@
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\Shaders\per-fragment-phong.fs.glsl" />
+    <None Include="res\Shaders\per-fragment-phong.vs.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

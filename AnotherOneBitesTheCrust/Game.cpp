@@ -66,120 +66,131 @@ void Game::initSystems()
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
 
-	renderingEngine.testOBJLoading();
+	//renderingEngine.testOBJLoading();
 
 }
 
 void Game::setupEntities() {
-	Renderable* plane = new Renderable();
-	//add vertices and colors
-	plane->addPoint(vec3(20,-2,20),vec3(1,0,0));
-	plane->addPoint(vec3(20,-2,-20),vec3(0,1,0));
-	plane->addPoint(vec3(-20,-2,-20),vec3(0,0,1));
-	plane->addPoint(vec3(-20,-2,20),vec3(1,1,1));
-	//faces
-	plane->createFace(0);
-	plane->createFace(1);
-	plane->createFace(2);
-	plane->createFace(2);
-	plane->createFace(3);
-	plane->createFace(0);
+	//Renderable* plane = new Renderable();
+	////add vertices and colors
+	//plane->addPoint(vec3(20,-2,20),vec3(1,0,0));
+	//plane->addPoint(vec3(20,-2,-20),vec3(0,1,0));
+	//plane->addPoint(vec3(-20,-2,-20),vec3(0,0,1));
+	//plane->addPoint(vec3(-20,-2,20),vec3(1,1,1));
+	////faces
+	//plane->createFace(0);
+	//plane->createFace(1);
+	//plane->createFace(2);
+	//plane->createFace(2);
+	//plane->createFace(3);
+	//plane->createFace(0);
 
-	renderables.push_back(plane);
-	renderingEngine.assignBuffers(plane);
+	//renderables.push_back(plane);
+	//renderingEngine.assignBuffers(plane);
 
 
-	Renderable* triangle = new Renderable();
-	//vertices and corresponding colors
-	triangle->addPoint(vec3(0,0,0), vec3(1,0,0));
-	triangle->addPoint(vec3(0,1,0), vec3(0,1,0));
-	triangle->addPoint(vec3(1,1,0), vec3(0,0,1));
-	//faces
-	triangle->createFace(0);
-	triangle->createFace(1);
-	triangle->createFace(2);
+	//Renderable* triangle = new Renderable();
+	////vertices and corresponding colors
+	//triangle->addPoint(vec3(0,0,0), vec3(1,0,0));
+	//triangle->addPoint(vec3(0,1,0), vec3(0,1,0));
+	//triangle->addPoint(vec3(1,1,0), vec3(0,0,1));
+	////faces
+	//triangle->createFace(0);
+	//triangle->createFace(1);
+	//triangle->createFace(2);
 
-	renderables.push_back(triangle);
-	renderingEngine.assignBuffers(triangle);
+	//renderables.push_back(triangle);
+	//renderingEngine.assignBuffers(triangle);
 
-	Renderable* vehicle = new Renderable();
-	vehicle->addPoint(vec3(0,0,0), vec3(1,0,0));
-	vehicle->addPoint(vec3(2.5,0,0), vec3(0,1,0));
-	vehicle->addPoint(vec3(2.5,2,0), vec3(0,0,1));
-	vehicle->addPoint(vec3(0,2,0), vec3(1,1,1));
-	vehicle->addPoint(vec3(0,0,-5), vec3(0,1,1));
-	vehicle->addPoint(vec3(2.5,0,-5), vec3(1,0,1));
-	vehicle->addPoint(vec3(2.5,2,-5), vec3(1,1,0));
-	vehicle->addPoint(vec3(0,2,-5), vec3(1,1,1));
+	//Renderable* vehicle = new Renderable();
+	//vehicle->addPoint(vec3(0,0,0), vec3(1,0,0));
+	//vehicle->addPoint(vec3(2.5,0,0), vec3(0,1,0));
+	//vehicle->addPoint(vec3(2.5,2,0), vec3(0,0,1));
+	//vehicle->addPoint(vec3(0,2,0), vec3(1,1,1));
+	//vehicle->addPoint(vec3(0,0,-5), vec3(0,1,1));
+	//vehicle->addPoint(vec3(2.5,0,-5), vec3(1,0,1));
+	//vehicle->addPoint(vec3(2.5,2,-5), vec3(1,1,0));
+	//vehicle->addPoint(vec3(0,2,-5), vec3(1,1,1));
 
-	vehicle->createFace(0);
-	vehicle->createFace(1);
-	vehicle->createFace(2);
-	vehicle->createFace(2);
-	vehicle->createFace(3);
-	vehicle->createFace(0);
-	
-	vehicle->createFace(1);
-	vehicle->createFace(5);
-	vehicle->createFace(6);
-	vehicle->createFace(6);
-	vehicle->createFace(2);
-	vehicle->createFace(1);
+	//vehicle->createFace(0);
+	//vehicle->createFace(1);
+	//vehicle->createFace(2);
+	//vehicle->createFace(2);
+	//vehicle->createFace(3);
+	//vehicle->createFace(0);
+	//
+	//vehicle->createFace(1);
+	//vehicle->createFace(5);
+	//vehicle->createFace(6);
+	//vehicle->createFace(6);
+	//vehicle->createFace(2);
+	//vehicle->createFace(1);
 
-	vehicle->createFace(0);
-	vehicle->createFace(4);
-	vehicle->createFace(7);
-	vehicle->createFace(7);
-	vehicle->createFace(3);
-	vehicle->createFace(0);
+	//vehicle->createFace(0);
+	//vehicle->createFace(4);
+	//vehicle->createFace(7);
+	//vehicle->createFace(7);
+	//vehicle->createFace(3);
+	//vehicle->createFace(0);
 
-	vehicle->createFace(4);
-	vehicle->createFace(5);
-	vehicle->createFace(6);
-	vehicle->createFace(6);
-	vehicle->createFace(7);
-	vehicle->createFace(4);
+	//vehicle->createFace(4);
+	//vehicle->createFace(5);
+	//vehicle->createFace(6);
+	//vehicle->createFace(6);
+	//vehicle->createFace(7);
+	//vehicle->createFace(4);
 
-	vehicle->createFace(0);
-	vehicle->createFace(1);
-	vehicle->createFace(5);
-	vehicle->createFace(5);
-	vehicle->createFace(4);
-	vehicle->createFace(0);
+	//vehicle->createFace(0);
+	//vehicle->createFace(1);
+	//vehicle->createFace(5);
+	//vehicle->createFace(5);
+	//vehicle->createFace(4);
+	//vehicle->createFace(0);
 
-	vehicle->createFace(2);
-	vehicle->createFace(6);
-	vehicle->createFace(7);
-	vehicle->createFace(7);
-	vehicle->createFace(3);
-	vehicle->createFace(2);
+	//vehicle->createFace(2);
+	//vehicle->createFace(6);
+	//vehicle->createFace(7);
+	//vehicle->createFace(7);
+	//vehicle->createFace(3);
+	//vehicle->createFace(2);
 
-	renderables.push_back(vehicle);
-	renderingEngine.assignBuffers(vehicle);
+	//renderables.push_back(vehicle);
+	//renderingEngine.assignBuffers(vehicle);
+
+	Renderable * floor = new Renderable();
+	vector<vec4>floorVerts;
+	vector<vec3>floorNormals;
+	bool floorRes = renderingEngine.loadOBJNonIndexed("res\\Models\\FlatFloor.obj", floorVerts, floorNormals);
+	floor->setVerts(floorVerts);
+	floor->setNorms(floorNormals);
+	renderables.push_back(floor);
+	renderingEngine.assignBuffers(floor);
 
 	Renderable* van = new Renderable();
-	vector<vec3>vanVerts;
+	vector<vec4>vanVerts;
 	vector<vec3>vanNormals;
-	vector<GLuint>vanFaces;
-	bool res = renderingEngine.loadOBJ("res\\Models\\Van.obj", vanVerts, vanNormals, vanFaces);
+	//vector<GLuint>vanFaces;
+	bool res = renderingEngine.loadOBJNonIndexed("res\\Models\\Van.obj", vanVerts, vanNormals);
 
-	cout << "Faces of van " << vanVerts.size() << endl;
-	van->setPoints(vanVerts);
-	van->setFaces(vanFaces);
+//	van->setPoints(vanVerts);
+	van->setVerts(vanVerts);
+	van->setNorms(vanNormals);
+	//van->setFaces(vanFaces);
 	renderables.push_back(van);
 	renderingEngine.assignBuffers(van);
 
 	Entity* ground = new Entity();
-	ground->setPosition(vec3(0,0,0));
-	ground->setRenderable(plane);
+	//ground->setPosition(vec3(0,0,0));
+	ground->setRenderable(floor);
 	ground->setDefaultRotation(0,vec3(0,1,0));
 	ground->setDefaultTranslation(vec3(0.0f));
-	ground->setDefaultScale(vec3(1.0f));
+	ground->setDefaultScale(vec3(2.0f));
+	ground->setColor(vec3(1,1,1));
 	entities.push_back(ground);
 
-	Entity* tri = new Entity();
-	tri->setPosition(vec3(-1,1, 1.0));		//change position here
-	tri->setRenderable(triangle);
+	//Entity* tri = new Entity();
+	//tri->setPosition(vec3(-1,1, 1.0));		//change position here
+	//tri->setRenderable(triangle);
 	//entities.push_back(tri);
 
 	//playerVehicle = new Vehicle();
@@ -194,6 +205,7 @@ void Game::setupEntities() {
 	playerVehicle->setDefaultRotation(-1.5708,vec3(0,1,0));
 	playerVehicle->setDefaultTranslation(vec3(0.0f));
 	playerVehicle->setDefaultScale(vec3(1.0f));
+	playerVehicle->setColor(vec3(1.0f,0.0f,0.0f));
 	physicsEngine->initVehicle(playerVehicle);
 	entities.push_back(playerVehicle);
 
@@ -234,6 +246,7 @@ void Game::mainLoop() {
 
 		//display
 		renderingEngine.displayFunc(entities);
+		//renderingEngine.draw();
 
 		//swap buffers
 		SDL_GL_SwapWindow(window);

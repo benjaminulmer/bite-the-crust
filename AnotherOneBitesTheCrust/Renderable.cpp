@@ -12,7 +12,7 @@ Renderable::~Renderable(void)
 
 void Renderable::addPoint(glm::vec3 vertex, glm::vec3 colour) {
 	GLPoint point(vertex, colour);
-	points.push_back(point);
+	//points.push_back(point);
 }
 
 void Renderable::createFace(GLuint face)
@@ -20,13 +20,14 @@ void Renderable::createFace(GLuint face)
 	faces.push_back(face);
 }
 
-void Renderable::setPoints(std::vector<glm::vec3> vertices)
+void Renderable::setVerts(std::vector<glm::vec4> vertices)
 {
-	for(int i = 0; i<vertices.size(); i++)
-	{
-		GLPoint point(vertices.at(i), glm::vec3(1,1,1));
-		points.push_back(point);
-	}
+	verts = vertices;
+}
+
+void Renderable::setNorms(std::vector <glm::vec3> normals)
+{
+	norms = normals;
 }
 
 void Renderable::setFaces(std::vector<GLuint> face)
@@ -35,29 +36,30 @@ void Renderable::setFaces(std::vector<GLuint> face)
 }
 
 
-std::vector<glm::vec3> Renderable::getVertices() {
-	std::vector<glm::vec3> vertices;
-	for (int i = 0; i < (int)points.size(); i++) {
-		vertices.push_back(points[i].vertex);
-	}
-	return vertices;
+std::vector<glm::vec4> Renderable::getVertices() {
+	return verts;
 }
 
-std::vector<glm::vec3> Renderable::getColours() {
-	std::vector<glm::vec3> vertices;
-	for (int i = 0; i < (int)points.size(); i++) {
-		vertices.push_back(points[i].colour);
-	}
-	return vertices;
+//std::vector<glm::vec3> Renderable::getColours() {
+//	std::vector<glm::vec3> vertices;
+//	for (int i = 0; i < (int)points.size(); i++) {
+//		vertices.push_back(points[i].colour);
+//	}
+//	return vertices;
+//}
+
+std::vector<glm::vec3> Renderable::getNormals()
+{
+	return norms;
 }
 
 std::vector<GLuint> Renderable::getFaces(){
 	return faces;
 }
 
-std::vector<GLPoint> Renderable::getPoints() {
-	return points;
-}
+//std::vector<GLPoint> Renderable::getPoints() {
+//	return points;
+//}
 
 void Renderable::setVAO(GLuint v) {
 	vao = v;
@@ -83,6 +85,6 @@ GLuint Renderable::getColourVBO() {
 	return colourVBO;
 }
 
-int Renderable::getVertexCount() {
-	return points.size();
-}
+//int Renderable::getVertexCount() {
+//	return points.size();
+//}

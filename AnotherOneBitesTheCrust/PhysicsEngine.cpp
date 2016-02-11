@@ -86,7 +86,7 @@ void PhysicsEngine::initVehicle(Vehicle* vehicle) {
 void PhysicsEngine::testScene() {
 }
 
-void PhysicsEngine::simulate(unsigned int deltaTimeMs, DrivingInput* playerInput) {
+void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
 	PxF32 deltaTimeS = deltaTimeMs/1000.0f;
 	deltaTimeSAcc += deltaTimeS;
 

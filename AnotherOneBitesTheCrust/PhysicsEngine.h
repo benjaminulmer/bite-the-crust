@@ -12,7 +12,7 @@ public:
 	PhysicsEngine(void);
 	~PhysicsEngine(void);
 
-	void simulate(unsigned int deltaTimeMs, DrivingInput* playerInput);
+	void simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();
 	double getPosX();
 	double getPosY();

@@ -215,15 +215,15 @@ void Game::mainLoop() {
 
 		// Update the player and AI cars
 		DrivingInput* playerInput = inputEngine->getInput();
-		playerVehicle->handleInput(playerInput);
-		aiEngine->updateAI();
+		playerVehicle->handleInput(&aiEngine->updateAI());
+		//aiEngine->updateAI();
 
 		// Figure out timestep and run physics
 		unsigned int newTimeMs = SDL_GetTicks();
 		unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 		oldTimeMs = newTimeMs;
 
-		physicsEngine->simulate(deltaTimeMs, playerInput);
+		physicsEngine->simulate(deltaTimeMs);
 		physicsEngine->fetchSimulationResults();
 		//cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
 		//cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;

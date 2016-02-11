@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <glm\glm.hpp>
+#include "DrivingInput.h"
 
 using std::vector;
 using glm::vec3;
@@ -39,6 +40,6 @@ public:
 	~AIEngine(void);
 
 	// Returns the ControllerInput for the AI player pointed to by Player
-	ControllerInput updateAI(const Player&, const Map&);
+	DrivingInput updateAI();
 };
 

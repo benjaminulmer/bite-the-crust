@@ -5,7 +5,16 @@ AIEngine::AIEngine(void)
 {
 }
 
-ControllerInput AIEngine::updateAI(const Player& player, const Map& map) {}
+DrivingInput AIEngine::updateAI() 
+{ 
+	DrivingInput input;
+	input.accel = 1.0;
+	input.leftSteer = 1.0;
+	input.rightSteer = 0.0;
+	input.brake = 0.0;
+
+	return input;
+}
 
 AIEngine::~AIEngine(void)
 {

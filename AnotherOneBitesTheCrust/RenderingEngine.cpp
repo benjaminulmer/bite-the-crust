@@ -525,10 +525,12 @@ void RenderingEngine::testOBJLoading()
 	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
 	glBufferData(GL_ARRAY_BUFFER, phongVerts.size() * sizeof(glm::vec4), phongVerts.data(), GL_STATIC_DRAW);
 
+
 	//for(int i = 0; i < phongVerts.size(); i++)
 	//{
 	//	colors.push_back(vec3(1,1,1));
 	//}
+
 
 	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
 	glBufferData(GL_ARRAY_BUFFER, phongNorms.size() * sizeof(glm::vec3), phongNorms.data(), GL_STATIC_DRAW);

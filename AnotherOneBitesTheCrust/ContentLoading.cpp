@@ -13,7 +13,7 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	rapidjson::Document d;
 	d.ParseStream(reader);
 	if (d.HasMember("mass")) {
-		vehicle->chassisMass = d["mass"].GetDouble();
+		vehicle->chassisMass = (float)d["mass"].GetDouble();
 	}
 	vehicle->updateTuning();
 

@@ -184,10 +184,13 @@ void Game::setupEntities() {
 	//ground->setPosition(vec3(0,0,0));
 	ground->setRenderable(floor);
 	ground->setDefaultRotation(0,vec3(0,1,0));
-	ground->setDefaultTranslation(vec3(0.0f));
-	ground->setDefaultScale(vec3(2.0f));
+	ground->setDefaultTranslation(vec3(0.0f,0.0f,0.0f));
+	ground->setDefaultScale(vec3(1.0f));
 	ground->setColor(vec3(1,1,1));
 	entities.push_back(ground);
+	
+
+
 
 	//Entity* tri = new Entity();
 	//tri->setPosition(vec3(-1,1, 1.0));		//change position here
@@ -243,9 +246,9 @@ void Game::mainLoop() {
 		physicsEngine->simulate(deltaTimeMs, playerInput);
 		physicsEngine->fetchSimulationResults();
 		//cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
-		//cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;
+		cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;
 
-		camera.setPosition(playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-20,0)));
+		camera.setPosition(playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-10,0)));
 		camera.setLookAtPosition(playerVehicle->getPosition());
 		renderingEngine.updateView(camera);
 

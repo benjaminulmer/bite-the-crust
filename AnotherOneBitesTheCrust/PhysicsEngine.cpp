@@ -63,6 +63,16 @@ void PhysicsEngine::initVehicles() {
 	scene->addActor(*groundPlane);
 }
 
+void PhysicsEngine::initDynamicEntity(PhysicsEntity* entity) {
+	PxMaterial* defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
+	PxRigidDynamic* object = PhysicsCreator::createBox(defaultMaterial, physics);
+	PxTransform startTransform(PxVec3(entity->getDefaultTranslation().x, entity->getDefaultTranslation().y, entity->getDefaultTranslation().y), PxQuat(PxIdentity));
+	object->setGlobalPose(startTransform);
+	entities.push_back(object);
+	scene->addActor(*object);
+	entity->setActor(object);
+}
+
 void PhysicsEngine::initVehicle(Vehicle* vehicle) {
 	PxMaterial* chassisMaterial;
 	PxMaterial* wheelMaterial;

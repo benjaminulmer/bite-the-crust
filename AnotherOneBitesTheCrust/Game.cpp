@@ -102,60 +102,60 @@ void Game::setupEntities() {
 	renderables.push_back(triangle);
 	renderingEngine.assignBuffers(triangle);
 
-	Renderable* vehicle = new Renderable();
-	vehicle->addPoint(vec3(0,0,0), vec3(1,0,0));
-	vehicle->addPoint(vec3(2.5,0,0), vec3(0,1,0));
-	vehicle->addPoint(vec3(2.5,2,0), vec3(0,0,1));
-	vehicle->addPoint(vec3(0,2,0), vec3(1,1,1));
-	vehicle->addPoint(vec3(0,0,-5), vec3(0,1,1));
-	vehicle->addPoint(vec3(2.5,0,-5), vec3(1,0,1));
-	vehicle->addPoint(vec3(2.5,2,-5), vec3(1,1,0));
-	vehicle->addPoint(vec3(0,2,-5), vec3(1,1,1));
+	Renderable* box = new Renderable();
+	box->addPoint(vec3(0,0,0), vec3(1,0,0));
+	box->addPoint(vec3(1,0,0), vec3(0,1,0));
+	box->addPoint(vec3(1,1,0), vec3(0,0,1));
+	box->addPoint(vec3(0,1,0), vec3(1,1,1));
+	box->addPoint(vec3(0,0,1), vec3(0,1,1));
+	box->addPoint(vec3(1,0,1), vec3(1,0,1));
+	box->addPoint(vec3(1,1,1), vec3(1,1,0));
+	box->addPoint(vec3(0,1,1), vec3(1,1,1));
 
-	vehicle->createFace(0);
-	vehicle->createFace(1);
-	vehicle->createFace(2);
-	vehicle->createFace(2);
-	vehicle->createFace(3);
-	vehicle->createFace(0);
+	box->createFace(0);
+	box->createFace(1);
+	box->createFace(2);
+	box->createFace(2);
+	box->createFace(3);
+	box->createFace(0);
 	
-	vehicle->createFace(1);
-	vehicle->createFace(5);
-	vehicle->createFace(6);
-	vehicle->createFace(6);
-	vehicle->createFace(2);
-	vehicle->createFace(1);
+	box->createFace(1);
+	box->createFace(5);
+	box->createFace(6);
+	box->createFace(6);
+	box->createFace(2);
+	box->createFace(1);
 
-	vehicle->createFace(0);
-	vehicle->createFace(4);
-	vehicle->createFace(7);
-	vehicle->createFace(7);
-	vehicle->createFace(3);
-	vehicle->createFace(0);
+	box->createFace(0);
+	box->createFace(4);
+	box->createFace(7);
+	box->createFace(7);
+	box->createFace(3);
+	box->createFace(0);
 
-	vehicle->createFace(4);
-	vehicle->createFace(5);
-	vehicle->createFace(6);
-	vehicle->createFace(6);
-	vehicle->createFace(7);
-	vehicle->createFace(4);
+	box->createFace(4);
+	box->createFace(5);
+	box->createFace(6);
+	box->createFace(6);
+	box->createFace(7);
+	box->createFace(4);
 
-	vehicle->createFace(0);
-	vehicle->createFace(1);
-	vehicle->createFace(5);
-	vehicle->createFace(5);
-	vehicle->createFace(4);
-	vehicle->createFace(0);
+	box->createFace(0);
+	box->createFace(1);
+	box->createFace(5);
+	box->createFace(5);
+	box->createFace(4);
+	box->createFace(0);
 
-	vehicle->createFace(2);
-	vehicle->createFace(6);
-	vehicle->createFace(7);
-	vehicle->createFace(7);
-	vehicle->createFace(3);
-	vehicle->createFace(2);
+	box->createFace(2);
+	box->createFace(6);
+	box->createFace(7);
+	box->createFace(7);
+	box->createFace(3);
+	box->createFace(2);
 
-	renderables.push_back(vehicle);
-	renderingEngine.assignBuffers(vehicle);
+	renderables.push_back(box);
+	renderingEngine.assignBuffers(box);
 
 	Renderable* van = new Renderable();
 	vector<vec3>vanVerts;
@@ -182,6 +182,30 @@ void Game::setupEntities() {
 	tri->setRenderable(triangle);
 	//entities.push_back(tri);
 
+	PhysicsEntity* pizzaBox = new PhysicsEntity();
+	pizzaBox->setRenderable(box);
+	pizzaBox->setDefaultRotation(-1.5708f,vec3(0,1,0));
+	pizzaBox->setDefaultTranslation(vec3(1.5f, 3.2f, -2.0f));
+	pizzaBox->setDefaultScale(vec3(2.0f, 1.0f, 1.0f));
+	physicsEngine->initDynamicEntity(pizzaBox);
+	entities.push_back(pizzaBox);
+
+	PhysicsEntity* pizzaBox2 = new PhysicsEntity();
+	pizzaBox2->setRenderable(box);
+	pizzaBox2->setDefaultRotation(-1.5708f,vec3(0,1,0));
+	pizzaBox2->setDefaultTranslation(vec3(2.5f, 2.2f, 3.0f));
+	pizzaBox2->setDefaultScale(vec3(1.0f));
+	physicsEngine->initDynamicEntity(pizzaBox2);
+	entities.push_back(pizzaBox2);
+
+	PhysicsEntity* pizzaBox3 = new PhysicsEntity();
+	pizzaBox3->setRenderable(box);
+	pizzaBox3->setDefaultRotation(-1.5708f,vec3(0,1,0));
+	pizzaBox3->setDefaultTranslation(vec3(-2.5f, 2.2f, 1.0f));
+	pizzaBox3->setDefaultScale(vec3(1.0f));
+	physicsEngine->initDynamicEntity(pizzaBox3);
+	entities.push_back(pizzaBox3);
+
 	//playerVehicle = new Vehicle();
 	//ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
 	//playerVehicle->setRenderable(vehicle);
@@ -192,7 +216,7 @@ void Game::setupEntities() {
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
 	playerVehicle->setRenderable(van);
 	playerVehicle->setDefaultRotation(-1.5708f,vec3(0,1,0));
-	playerVehicle->setDefaultTranslation(vec3(0.0f));
+	playerVehicle->setDefaultTranslation(vec3(0.0f, 0.0f, -8.0f));
 	playerVehicle->setDefaultScale(vec3(1.0f));
 	physicsEngine->initVehicle(playerVehicle);
 	entities.push_back(playerVehicle);

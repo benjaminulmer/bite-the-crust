@@ -17,6 +17,7 @@ public:
 	double getPosX();
 	double getPosY();
 	double getPosZ();
+	void initDynamicEntity(PhysicsEntity* entity);
 	void initVehicle(Vehicle* vehicle);
 
 private:
@@ -47,6 +48,7 @@ private:
 	physx::PxF32 deltaTimeSAcc;
 	
 	std::vector<physx::PxVehicleWheels*> vehicles;
+	std::vector<physx::PxRigidDynamic*> entities;
 
 	void initSimulationData();
 	void initPhysX();

@@ -15,6 +15,7 @@ void InputEngine::openControllers() {
 		inputs[i].rightSteer = 0;
 	}
 	std::cout << "NUM CONTROLLERS: " << SDL_NumJoysticks() << std::endl;
+	deadzoneSize = 6553;
 }
 
 void InputEngine::processControllerEvent(SDL_Event event) {
@@ -27,13 +28,17 @@ void InputEngine::processControllerEvent(SDL_Event event) {
 	// Controller axis events
 	else if (event.type == SDL_CONTROLLERAXISMOTION) {
 		if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX) {
-			if (event.caxis.value < 1) {
-				inputs[0].rightSteer = (float)event.caxis.value/MIN_AXIS_VALUE;
+			if (event.caxis.value < -deadzoneSize) {
+				inputs[0].rightSteer = (float)(event.caxis.value + deadzoneSize)/(MIN_AXIS_VALUE + deadzoneSize);
 				inputs[0].leftSteer = 0;
 			} 
-			else {
-				inputs[0].leftSteer = (float)event.caxis.value/MAX_AXIS_VALUE;
+			else if (event.caxis.value > deadzoneSize) {
+				inputs[0].leftSteer = (float)(event.caxis.value - deadzoneSize)/(MAX_AXIS_VALUE - deadzoneSize);
 				inputs[0].rightSteer = 0;
+			}
+			else {
+				inputs[0].rightSteer = 0;
+				inputs[0].leftSteer = 0;
 			}
 		}
 		else if (event.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT) {

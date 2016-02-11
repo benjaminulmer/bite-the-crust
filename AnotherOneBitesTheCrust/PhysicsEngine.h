@@ -17,7 +17,7 @@ public:
 	double getPosX();
 	double getPosY();
 	double getPosZ();
-	void initDynamicEntity(PhysicsEntity* entity);
+	void initDynamicEntity(PhysicsEntity* entity, float x, float y, float z);
 	void initVehicle(Vehicle* vehicle);
 
 private:

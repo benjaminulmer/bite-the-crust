@@ -3,7 +3,14 @@
 #include <math.h>
 #include <iostream>
 
-RenderingEngine::RenderingEngine() {}
+RenderingEngine::RenderingEngine()
+{
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	generateIDs();
+	loadProjectionMatrix();
+}
 
 RenderingEngine::~RenderingEngine(void) {}
 // Push all the entity data to the renderer.
@@ -11,10 +18,9 @@ RenderingEngine::~RenderingEngine(void) {}
 bool RenderingEngine::loadOBJ(
 	const char * path, 
 	std::vector<glm::vec3> & out_vertices, 
-
 	std::vector<glm::vec3> & out_normals,
-	std::vector<GLuint> & out_faces
-){
+	std::vector<GLuint> & out_faces)
+{
 	printf("Loading OBJ file %s...\n", path);
 
 	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
@@ -29,7 +35,6 @@ bool RenderingEngine::loadOBJ(
 		getchar();
 		return false;
 	}
-
 	while( 1 ){
 
 		char lineHeader[128];
@@ -110,10 +115,12 @@ bool RenderingEngine::loadOBJ(
 
 
 
-void RenderingEngine::pushEntities() {
+void RenderingEngine::pushEntities()
+{
 }
 
-void RenderingEngine::draw() {
+void RenderingEngine::draw()
+{
 	// Draw all our entities
 
 	glClearDepth(1.0);
@@ -201,21 +208,13 @@ void RenderingEngine::loadProjectionMatrix()
 }
 
 
-void RenderingEngine::updateView(Camera& c) {
+void RenderingEngine::updateView(Camera& c)
+{
 	V = glm::lookAt(c.getPosition(), c.getLookAtPosition(), c.getUpVector());
 }
 
-void RenderingEngine::init()
+void RenderingEngine::assignBuffers(Renderable* r)
 {
-	cout << "Initialize" << endl;
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
-	generateIDs();
-	loadProjectionMatrix();
-}
-
-void RenderingEngine::assignBuffers(Renderable* r) {
 	GLuint vertexBuffer;
 	GLuint colourBuffer;
 	GLuint indexBuffer;
@@ -271,7 +270,8 @@ void RenderingEngine::assignBuffers(Renderable* r) {
 	r->setVAO(vao);
 }
 
-void RenderingEngine::deleteBuffers(Renderable *r) {
+void RenderingEngine::deleteBuffers(Renderable *r)
+{
 	GLuint vao = r->getVAO();
 	GLuint vbuf = r->getVertexVBO();
 	GLuint cbuf = r->getColourVBO();

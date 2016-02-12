@@ -63,6 +63,20 @@ void PhysicsEngine::initVehicles() {
 	scene->addActor(*groundPlane);
 }
 
+// Velocity defaults to 0. todo, set up a dynamic way to change velocity/forces on entities
+void PhysicsEngine::initDynamicEntity(PhysicsEntity* entity, glm::vec3 position, glm::vec3 velocity) {
+	PxMaterial* defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
+	glm::vec3 d = entity->getRenderable()->getDimensions();
+	PxRigidDynamic* object = PhysicsCreator::createBox(defaultMaterial, physics, PxVec3(d.x, d.y, d.z));
+	PxTransform startTransform(PxVec3(position.x, position.y, position.z), PxQuat(PxIdentity));
+	object->setGlobalPose(startTransform);
+	entities.push_back(object);
+	scene->addActor(*object);
+	entity->setActor(object);
+	object->setLinearVelocity(PxVec3(velocity.x, velocity.y, velocity.z));
+	std::cout << velocity.x << ", " << velocity.y << ", " << velocity.z << std::endl;
+}
+
 void PhysicsEngine::initVehicle(Vehicle* vehicle) {
 	PxMaterial* chassisMaterial;
 	PxMaterial* wheelMaterial;

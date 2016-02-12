@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "DrivingInput.h"
+#include "DynamicEntity.h"
 
 void fatalError(string errorString)
 {
@@ -20,10 +21,12 @@ Game::Game(void)
 }
 
 // The entry point of the game
-void Game::run() {
+void Game::run()
+{
 	// Preload data, initialize subsystems, anything to do before entering the main loop
 	initSystems();
 	setupEntities();
+	connectSignals();
 
 	mainLoop();
 }
@@ -31,9 +34,7 @@ void Game::run() {
 void Game::initSystems()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);		//Initialize SDL
-
 	window = SDL_CreateWindow("Another Bites The Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
-	
 
 	if(window == nullptr)
 	{
@@ -45,7 +46,6 @@ void Game::initSystems()
 	{
 		fatalError("SDL_GL context could not be created");
 	}
-
 
 	glewExperimental = GL_TRUE;
 	GLenum error = glewInit();
@@ -62,21 +62,21 @@ void Game::initSystems()
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
 
-	renderingEngine.init();
+	renderingEngine = new RenderingEngine();
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
 
-	renderingEngine.testOBJLoading();
-
+	renderingEngine->testOBJLoading();
 }
 
-void Game::setupEntities() {
+void Game::setupEntities()
+{
 	Renderable* plane = new Renderable();
 	//add vertices and colors
-	plane->addPoint(vec3(20,-2,20),vec3(1,0,0));
-	plane->addPoint(vec3(20,-2,-20),vec3(0,1,0));
-	plane->addPoint(vec3(-20,-2,-20),vec3(0,0,1));
-	plane->addPoint(vec3(-20,-2,20),vec3(1,1,1));
+	plane->addPoint(vec3(20,0,20),vec3(1,0,0));
+	plane->addPoint(vec3(20,0,-20),vec3(0,1,0));
+	plane->addPoint(vec3(-20,0,-20),vec3(0,0,1));
+	plane->addPoint(vec3(-20,0,20),vec3(1,1,1));
 	//faces
 	plane->createFace(0);
 	plane->createFace(1);
@@ -86,88 +86,134 @@ void Game::setupEntities() {
 	plane->createFace(0);
 
 	renderables.push_back(plane);
-	renderingEngine.assignBuffers(plane);
-
-
-	Renderable* triangle = new Renderable();
-	//vertices and corresponding colors
-	triangle->addPoint(vec3(0,0,0), vec3(1,0,0));
-	triangle->addPoint(vec3(0,1,0), vec3(0,1,0));
-	triangle->addPoint(vec3(1,1,0), vec3(0,0,1));
-	//faces
-	triangle->createFace(0);
-	triangle->createFace(1);
-	triangle->createFace(2);
-
-	renderables.push_back(triangle);
-	renderingEngine.assignBuffers(triangle);
-
-	Renderable* vehicle = new Renderable();
-	vehicle->addPoint(vec3(0,0,0), vec3(1,0,0));
-	vehicle->addPoint(vec3(2.5,0,0), vec3(0,1,0));
-	vehicle->addPoint(vec3(2.5,2,0), vec3(0,0,1));
-	vehicle->addPoint(vec3(0,2,0), vec3(1,1,1));
-	vehicle->addPoint(vec3(0,0,-5), vec3(0,1,1));
-	vehicle->addPoint(vec3(2.5,0,-5), vec3(1,0,1));
-	vehicle->addPoint(vec3(2.5,2,-5), vec3(1,1,0));
-	vehicle->addPoint(vec3(0,2,-5), vec3(1,1,1));
-
-	vehicle->createFace(0);
-	vehicle->createFace(1);
-	vehicle->createFace(2);
-	vehicle->createFace(2);
-	vehicle->createFace(3);
-	vehicle->createFace(0);
+	renderingEngine->assignBuffers(plane);
 	
-	vehicle->createFace(1);
-	vehicle->createFace(5);
-	vehicle->createFace(6);
-	vehicle->createFace(6);
-	vehicle->createFace(2);
-	vehicle->createFace(1);
+	cout << plane->getDimensions().x << " " << plane->getDimensions().y << " " << plane->getDimensions().z << endl;
 
-	vehicle->createFace(0);
-	vehicle->createFace(4);
-	vehicle->createFace(7);
-	vehicle->createFace(7);
-	vehicle->createFace(3);
-	vehicle->createFace(0);
+	// Renderable for pizza boxes
+	Renderable* box = new Renderable();
+	box->addPoint(vec3(-1,-0.25,-1), vec3(1,0,0));
+	box->addPoint(vec3(1,-0.25,-1), vec3(0,1,0));
+	box->addPoint(vec3(1,0.25,-1), vec3(0,0,1));
+	box->addPoint(vec3(-1,0.25,-1), vec3(1,1,1));
+	box->addPoint(vec3(-1,-0.25,1), vec3(0,1,1));
+	box->addPoint(vec3(1,-0.25,1), vec3(1,0,1));
+	box->addPoint(vec3(1,0.25,1), vec3(1,1,0));
+	box->addPoint(vec3(-1,0.25,1), vec3(1,1,1));
 
-	vehicle->createFace(4);
-	vehicle->createFace(5);
-	vehicle->createFace(6);
-	vehicle->createFace(6);
-	vehicle->createFace(7);
-	vehicle->createFace(4);
+	box->createFace(0);
+	box->createFace(1);
+	box->createFace(2);
+	box->createFace(2);
+	box->createFace(3);
+	box->createFace(0);
+	
+	box->createFace(1);
+	box->createFace(5);
+	box->createFace(6);
+	box->createFace(6);
+	box->createFace(2);
+	box->createFace(1);
 
-	vehicle->createFace(0);
-	vehicle->createFace(1);
-	vehicle->createFace(5);
-	vehicle->createFace(5);
-	vehicle->createFace(4);
-	vehicle->createFace(0);
+	box->createFace(0);
+	box->createFace(4);
+	box->createFace(7);
+	box->createFace(7);
+	box->createFace(3);
+	box->createFace(0);
 
-	vehicle->createFace(2);
-	vehicle->createFace(6);
-	vehicle->createFace(7);
-	vehicle->createFace(7);
-	vehicle->createFace(3);
-	vehicle->createFace(2);
+	box->createFace(4);
+	box->createFace(5);
+	box->createFace(6);
+	box->createFace(6);
+	box->createFace(7);
+	box->createFace(4);
 
-	renderables.push_back(vehicle);
-	renderingEngine.assignBuffers(vehicle);
+	box->createFace(0);
+	box->createFace(1);
+	box->createFace(5);
+	box->createFace(5);
+	box->createFace(4);
+	box->createFace(0);
 
+	box->createFace(2);
+	box->createFace(6);
+	box->createFace(7);
+	box->createFace(7);
+	box->createFace(3);
+	box->createFace(2);
+
+	renderables.push_back(box);
+	renderingEngine->assignBuffers(box);
+
+	cout << box->getDimensions().x << " " << box->getDimensions().y << " " << box->getDimensions().z << endl;
+
+	// Renderable for the brick-van
+	Renderable* vehicle = new Renderable();
+ 	vehicle->addPoint(vec3(-1.75,-1,2.5), vec3(1,0,0));
+ 	vehicle->addPoint(vec3(1.75,-1,2.5), vec3(0,1,0));
+ 	vehicle->addPoint(vec3(1.75,1,2.5), vec3(0,0,1));
+ 	vehicle->addPoint(vec3(-1.75,1,2.5), vec3(1,1,1));
+ 	vehicle->addPoint(vec3(-1.75,-1,-2.5), vec3(0,1,1));
+ 	vehicle->addPoint(vec3(1.75,-1,-2.5), vec3(1,0,1));
+ 	vehicle->addPoint(vec3(1.75,1,-2.5), vec3(1,1,0));
+ 	vehicle->addPoint(vec3(-1.75,1,-2.5), vec3(1,1,1));
+ 
+ 	vehicle->createFace(0);
+ 	vehicle->createFace(1);
+ 	vehicle->createFace(2);
+ 	vehicle->createFace(2);
+ 	vehicle->createFace(3);
+ 	vehicle->createFace(0);
+ 	
+ 	vehicle->createFace(1);
+ 	vehicle->createFace(5);
+ 	vehicle->createFace(6);
+ 	vehicle->createFace(6);
+ 	vehicle->createFace(2);
+ 	vehicle->createFace(1);
+ 
+ 	vehicle->createFace(0);
+ 	vehicle->createFace(4);
+ 	vehicle->createFace(7);
+ 	vehicle->createFace(7);
+ 	vehicle->createFace(3);
+ 	vehicle->createFace(0);
+ 
+ 	vehicle->createFace(4);
+ 	vehicle->createFace(5);
+ 	vehicle->createFace(6);
+ 	vehicle->createFace(6);
+ 	vehicle->createFace(7);
+ 	vehicle->createFace(4);
+ 
+ 	vehicle->createFace(0);
+ 	vehicle->createFace(1);
+ 	vehicle->createFace(5);
+ 	vehicle->createFace(5);
+ 	vehicle->createFace(4);
+ 	vehicle->createFace(0);
+ 
+ 	vehicle->createFace(2);
+ 	vehicle->createFace(6);
+ 	vehicle->createFace(7);
+ 	vehicle->createFace(7);
+ 	vehicle->createFace(3);
+ 	vehicle->createFace(2);
+ 
+ 	renderables.push_back(vehicle);
+ 	renderingEngine->assignBuffers(vehicle);
+
+	// Renderable for the actual van model, not used right now
 	Renderable* van = new Renderable();
 	vector<vec3>vanVerts;
 	vector<vec3>vanNormals;
 	vector<GLuint>vanFaces;
-	bool res = renderingEngine.loadOBJ("res\\Models\\Van.obj", vanVerts, vanNormals, vanFaces);
-
-	cout << "Faces of van " << vanVerts.size() << endl;
+	bool res = renderingEngine->loadOBJ("res\\Models\\Van.obj", vanVerts, vanNormals, vanFaces);
 	van->setPoints(vanVerts);
 	van->setFaces(vanFaces);
 	renderables.push_back(van);
-	renderingEngine.assignBuffers(van);
+	renderingEngine->assignBuffers(van);
 
 	Entity* ground = new Entity();
 	ground->setPosition(vec3(0,0,0));
@@ -177,23 +223,11 @@ void Game::setupEntities() {
 	ground->setDefaultScale(vec3(1.0f));
 	entities.push_back(ground);
 
-	Entity* tri = new Entity();
-	tri->setPosition(vec3(-1,1, 1.0));		//change position here
-	tri->setRenderable(triangle);
-	//entities.push_back(tri);
-
-	//playerVehicle = new Vehicle();
-	//ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
-	//playerVehicle->setRenderable(vehicle);
-	//physicsEngine->initVehicle(playerVehicle);
-	//entities.push_back(playerVehicle);
-
 	playerVehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
-	playerVehicle->setRenderable(van);
-	playerVehicle->setDefaultRotation(-1.5708f,vec3(0,1,0));
-	playerVehicle->setDefaultTranslation(vec3(0.0f));
-	playerVehicle->setDefaultScale(vec3(1.0f));
+	playerVehicle->setRenderable(vehicle);
+	glm::vec3 d = vehicle->getDimensions();
+	playerVehicle->chassisDims = physx::PxVec3(d.x, d.y, d.z);
 	physicsEngine->initVehicle(playerVehicle);
 	entities.push_back(playerVehicle);
 
@@ -201,22 +235,28 @@ void Game::setupEntities() {
 	camera.setPosition(glm::vec3(0,3,8));			//location of camera
 	camera.setLookAtPosition(glm::vec3(0,2,0));		//where camera is pointing
 	camera.setUpVector(glm::vec3(0,1,0));			//orientation on camera
-	renderingEngine.updateView(camera);
+	renderingEngine->updateView(camera);
 }
 
+void Game::connectSignals()
+{
+	inputEngine->DrivingSignal.connect(playerVehicle, &Vehicle::handleInput);
+	inputEngine->FireSignal.connect(this, &Game::firePizza);
+}
 
-void Game::mainLoop() {
+void Game::mainLoop()
+{
 	unsigned int oldTimeMs = SDL_GetTicks();
 	
 	float x = 0;
 	// Game loop
-	while (gameState!= GameState::EXIT) {
-		processSDLEvents();
-
+	while (gameState!= GameState::EXIT)
+	{
 		// Update the player and AI cars
-		DrivingInput* playerInput = inputEngine->getInput();
-		playerVehicle->handleInput(&aiEngine->updateAI());
-		//aiEngine->updateAI();
+
+		processSDLEvents();
+		aiEngine->updateAI();
+
 
 		// Figure out timestep and run physics
 		unsigned int newTimeMs = SDL_GetTicks();
@@ -225,47 +265,65 @@ void Game::mainLoop() {
 
 		physicsEngine->simulate(deltaTimeMs);
 		physicsEngine->fetchSimulationResults();
-		//cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
-		//cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;
 
-		camera.setPosition(playerVehicle->getPosition() + glm::vec3(0, 10,10));
+		// Point the camera at the car
+		camera.setPosition(playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-20,0)));
 		camera.setLookAtPosition(playerVehicle->getPosition());
-		renderingEngine.updateView(camera);
+		renderingEngine->updateView(camera);
 
 		//display
-		renderingEngine.displayFunc(entities);
+		renderingEngine->displayFunc(entities);
 
 		//swap buffers
 		SDL_GL_SwapWindow(window);
 	}
 }
 
-void Game::processSDLEvents() {
+void Game::processSDLEvents()
+{
 	SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-		if (event.type == SDL_QUIT) {
+    while (SDL_PollEvent(&event))
+	{
+		if (event.type == SDL_QUIT)
+		{
 			gameState = GameState::EXIT;
 		}
 		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN ||
-			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED) {
+			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
+		{
 			inputEngine->processControllerEvent(event);
 		}
 		else if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 		{
 			gameState = GameState::EXIT;
 		}
-		else {
+		else
+		{
 			// other events, do nothing yet
 		}
 	}
 }
 
+void Game::firePizza()
+{
+	DynamicEntity* pizzaBox = new DynamicEntity();
+	pizzaBox->setRenderable(renderables.at(1)); // todo, match names to renderables or something instead of hard-coded
+	glm::vec3 position = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
+	glm::vec3 velocity = glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 40.0, 0.0));
+	physx::PxVec3 v = playerVehicle->getDynamicActor()->getLinearVelocity();
+	velocity = velocity + glm::vec3(v.x, v.y, v.z);
+	physicsEngine->initDynamicEntity(pizzaBox, position, velocity);
+	entities.push_back(pizzaBox);
+}
+
 Game::~Game(void)
 {
-	for (unsigned int i = 0; i < entities.size(); i++) {
+	for (unsigned int i = 0; i < entities.size(); i++)
+	{
 		delete entities[i];
 	}
-	for (unsigned int i = 0; i < renderables.size(); i++) {
+	for (unsigned int i = 0; i < renderables.size(); i++)
+	{
 		delete renderables[i];
 	}
 }

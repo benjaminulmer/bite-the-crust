@@ -5,6 +5,32 @@
 
 using namespace physx;
 
+PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physics, PxVec3 dimensions) {
+	PxBoxGeometry geometry(dimensions);
+	PxTransform tranform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
+	PxReal density = 1.0f;
+	PxRigidDynamic *actor = PxCreateDynamic(*physics, tranform, geometry, *material, density);
+	actor->setAngularDamping(0.75);
+	actor->setLinearVelocity(PxVec3(0, 0, 0));
+
+	//Get the plane shape so we can set query and simulation filter data.
+	PxShape* shapes[1];
+	actor->getShapes(shapes, 1);
+
+	//Set the query filter data of the ground plane so that the vehicle raycasts can hit the ground.
+	physx::PxFilterData qryFilterData;
+	setupDrivableSurface(qryFilterData);
+	shapes[0]->setQueryFilterData(qryFilterData);
+
+	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
+	PxFilterData simFilterData;
+	simFilterData.word0 = COLLISION_FLAG_OBSTACLE;
+	simFilterData.word1 = COLLISION_FLAG_OBSTACLE_AGAINST;
+	shapes[0]->setSimulationFilterData(simFilterData);
+
+	return actor;
+}
+
 PxRigidStatic* PhysicsCreator::createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics)
 {
 	//Add a plane to the scene.

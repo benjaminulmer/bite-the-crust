@@ -204,7 +204,7 @@ void RenderingEngine::generateIDs()
 
 void RenderingEngine::loadProjectionMatrix()
 {
-	P = perspective(45.0f, (float)1024/768 , 0.1f, 100.0f);
+	P = perspective(45.0f, (float)1024/768 , 0.1f, 1000.0f);
 }
 
 

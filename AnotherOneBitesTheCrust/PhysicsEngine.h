@@ -14,11 +14,8 @@ public:
 
 	void simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();
-	double getPosX();
-	double getPosY();
-	double getPosZ();
-	void initDynamicEntity(PhysicsEntity* entity, glm::vec3 position, glm::vec3 velocity = glm::vec3(0,0,0));
-	void initVehicle(Vehicle* vehicle);
+	void createDynamicEntity(PhysicsEntity* entity, glm::vec3 position, glm::vec3 velocity = glm::vec3(0,0,0));
+	void createVehicle(Vehicle* vehicle);
 
 private:
 	physx::PxTolerancesScale scale;
@@ -51,10 +48,6 @@ private:
 	std::vector<physx::PxRigidDynamic*> entities;
 
 	void initSimulationData();
-	void initPhysX();
-	void initVehicles();
-
-	void testScene(); // Test method
-
-
+	void initPhysXSDK();
+	void initVehicleSDK();
 };

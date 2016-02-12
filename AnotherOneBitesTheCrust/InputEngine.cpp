@@ -23,7 +23,6 @@ void InputEngine::processControllerEvent(SDL_Event event) {
 	// Controller button events
 	if (event.type == SDL_CONTROLLERBUTTONDOWN) {
 		if (event.cbutton.button == SDL_CONTROLLER_BUTTON_A) {
-			std::cout << "a" << std::endl;
 			FireSignal();
 		}
 	}

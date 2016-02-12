@@ -1,5 +1,5 @@
 #pragma once
-#include "physicsentity.h"
+#include "PhysicsEntity.h"
 #include <PxPhysicsAPI.h>
 #include "DrivingInput.h"
 #include "DynamicEntity.h"

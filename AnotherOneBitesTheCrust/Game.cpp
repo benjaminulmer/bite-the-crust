@@ -92,14 +92,14 @@ void Game::setupEntities()
 
 	// Renderable for pizza boxes
 	Renderable* box = new Renderable();
-	box->addPoint(vec3(-1,-0.25,-1), vec3(1,0,0));
-	box->addPoint(vec3(1,-0.25,-1), vec3(0,1,0));
-	box->addPoint(vec3(1,0.25,-1), vec3(0,0,1));
-	box->addPoint(vec3(-1,0.25,-1), vec3(1,1,1));
-	box->addPoint(vec3(-1,-0.25,1), vec3(0,1,1));
-	box->addPoint(vec3(1,-0.25,1), vec3(1,0,1));
-	box->addPoint(vec3(1,0.25,1), vec3(1,1,0));
-	box->addPoint(vec3(-1,0.25,1), vec3(1,1,1));
+	box->addPoint(vec3(-1,-0.1,-1), vec3(1,0,0));
+	box->addPoint(vec3(1,-0.1,-1), vec3(0,1,0));
+	box->addPoint(vec3(1,0.1,-1), vec3(0,0,1));
+	box->addPoint(vec3(-1,0.1,-1), vec3(1,1,1));
+	box->addPoint(vec3(-1,-0.1,1), vec3(0,1,1));
+	box->addPoint(vec3(1,-0.1,1), vec3(1,0,1));
+	box->addPoint(vec3(1,0.1,1), vec3(1,1,0));
+	box->addPoint(vec3(-1,0.1,1), vec3(1,1,1));
 
 	box->createFace(0);
 	box->createFace(1);
@@ -228,7 +228,7 @@ void Game::setupEntities()
 	playerVehicle->setRenderable(vehicle);
 	glm::vec3 d = vehicle->getDimensions();
 	playerVehicle->chassisDims = physx::PxVec3(d.x, d.y, d.z);
-	physicsEngine->initVehicle(playerVehicle);
+	physicsEngine->createVehicle(playerVehicle);
 	entities.push_back(playerVehicle);
 
 	//set camera
@@ -310,7 +310,7 @@ void Game::firePizza()
 	glm::vec3 velocity = glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 40.0, 0.0));
 	physx::PxVec3 v = playerVehicle->getDynamicActor()->getLinearVelocity();
 	velocity = velocity + glm::vec3(v.x, v.y, v.z);
-	physicsEngine->initDynamicEntity(pizzaBox, position, velocity);
+	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);
 	entities.push_back(pizzaBox);
 }
 

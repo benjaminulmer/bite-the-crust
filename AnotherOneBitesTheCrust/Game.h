@@ -48,6 +48,7 @@ public:
 private:
 	void initSystems();
 	void setupEntities();
+	void connectSignals();
 	void mainLoop();
 	void processSDLEvents();
 	void quitGame();

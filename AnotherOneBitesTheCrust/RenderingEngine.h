@@ -34,6 +34,7 @@ public:
 
 	void pushEntities();
 	void draw();
+	//void RenderText(string message, SDL_Color color, int x, int y, int size);
 
 	void init();
 	void displayFunc(vector<Entity*> entities);

@@ -28,17 +28,22 @@ void Game::run() {
 	mainLoop();
 }
 
+
+
 void Game::initSystems()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);		//Initialize SDL
 
 	window = SDL_CreateWindow("Another Bites The Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 	
+	screen = SDL_GetWindowSurface(window);
 
 	if(window == nullptr)
 	{
 		fatalError("SDL Window could not be created");
 	}
+
+
 
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	if(glContext == nullptr)
@@ -70,94 +75,8 @@ void Game::initSystems()
 
 }
 
-void Game::setupEntities() {
-
-	//Renderable* plane = new Renderable();
-	////add vertices and colors
-	//plane->addPoint(vec3(20,-2,20),vec3(1,0,0));
-	//plane->addPoint(vec3(20,-2,-20),vec3(0,1,0));
-	//plane->addPoint(vec3(-20,-2,-20),vec3(0,0,1));
-	//plane->addPoint(vec3(-20,-2,20),vec3(1,1,1));
-	////faces
-	//plane->createFace(0);
-	//plane->createFace(1);
-	//plane->createFace(2);
-	//plane->createFace(2);
-	//plane->createFace(3);
-	//plane->createFace(0);
-
-	//renderables.push_back(plane);
-	//renderingEngine.assignBuffers(plane);
-
-
-	//Renderable* triangle = new Renderable();
-	////vertices and corresponding colors
-	//triangle->addPoint(vec3(0,0,0), vec3(1,0,0));
-	//triangle->addPoint(vec3(0,1,0), vec3(0,1,0));
-	//triangle->addPoint(vec3(1,1,0), vec3(0,0,1));
-	////faces
-	//triangle->createFace(0);
-	//triangle->createFace(1);
-	//triangle->createFace(2);
-
-	//renderables.push_back(triangle);
-	//renderingEngine.assignBuffers(triangle);
-
-	//Renderable* vehicle = new Renderable();
-	//vehicle->addPoint(vec3(0,0,0), vec3(1,0,0));
-	//vehicle->addPoint(vec3(2.5,0,0), vec3(0,1,0));
-	//vehicle->addPoint(vec3(2.5,2,0), vec3(0,0,1));
-	//vehicle->addPoint(vec3(0,2,0), vec3(1,1,1));
-	//vehicle->addPoint(vec3(0,0,-5), vec3(0,1,1));
-	//vehicle->addPoint(vec3(2.5,0,-5), vec3(1,0,1));
-	//vehicle->addPoint(vec3(2.5,2,-5), vec3(1,1,0));
-	//vehicle->addPoint(vec3(0,2,-5), vec3(1,1,1));
-
-	//vehicle->createFace(0);
-	//vehicle->createFace(1);
-	//vehicle->createFace(2);
-	//vehicle->createFace(2);
-	//vehicle->createFace(3);
-	//vehicle->createFace(0);
-	//
-	//vehicle->createFace(1);
-	//vehicle->createFace(5);
-	//vehicle->createFace(6);
-	//vehicle->createFace(6);
-	//vehicle->createFace(2);
-	//vehicle->createFace(1);
-
-	//vehicle->createFace(0);
-	//vehicle->createFace(4);
-	//vehicle->createFace(7);
-	//vehicle->createFace(7);
-	//vehicle->createFace(3);
-	//vehicle->createFace(0);
-
-	//vehicle->createFace(4);
-	//vehicle->createFace(5);
-	//vehicle->createFace(6);
-	//vehicle->createFace(6);
-	//vehicle->createFace(7);
-	//vehicle->createFace(4);
-
-	//vehicle->createFace(0);
-	//vehicle->createFace(1);
-	//vehicle->createFace(5);
-	//vehicle->createFace(5);
-	//vehicle->createFace(4);
-	//vehicle->createFace(0);
-
-	//vehicle->createFace(2);
-	//vehicle->createFace(6);
-	//vehicle->createFace(7);
-	//vehicle->createFace(7);
-	//vehicle->createFace(3);
-	//vehicle->createFace(2);
-
-	//renderables.push_back(vehicle);
-	//renderingEngine.assignBuffers(vehicle);
-
+void Game::setupEntities() 
+{
 	Renderable * floor = new Renderable();
 	vector<vec3>floorVerts;
 	vector<vec3>floorNormals;
@@ -177,7 +96,6 @@ void Game::setupEntities() {
 	renderingEngine.assignBuffers(van);
 
 	Entity* ground = new Entity();
-	//ground->setPosition(vec3(0,0,0));
 	ground->setRenderable(floor);
 	ground->setDefaultRotation(0.0f,vec3(0.0f,1.0f,0.0f));
 	ground->setDefaultTranslation(vec3(0.0f,0.0f,0.0f));
@@ -195,14 +113,6 @@ void Game::setupEntities() {
 	physicsEngine->initVehicle(playerVehicle);
 	entities.push_back(playerVehicle);
 	entities.push_back(ground);
-	/*playerVehicle = new Vehicle();
-	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
-	playerVehicle->setRenderable(van);
-	playerVehicle->setDefaultRotation(-1.5708f,vec3(0,1,0));
-	playerVehicle->setDefaultTranslation(vec3(0.0f));
-	playerVehicle->setDefaultScale(vec3(1.0f));*/
-	//physicsEngine->initVehicle(playerVehicle);
-	//entities.push_back(playerVehicle);
 
 	//set camera
 	camera.setPosition(glm::vec3(0,6,8));			//location of camera
@@ -232,7 +142,6 @@ void Game::mainLoop() {
 
 		physicsEngine->simulate(deltaTimeMs, playerInput);
 		physicsEngine->fetchSimulationResults();
-		//cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
 		//cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;
 
 		camera.setPosition(playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,6,-10,0)));
@@ -242,6 +151,7 @@ void Game::mainLoop() {
 		//display
 		renderingEngine.displayFunc(entities);
 		//renderingEngine.draw();
+
 
 		//swap buffers
 		SDL_GL_SwapWindow(window);

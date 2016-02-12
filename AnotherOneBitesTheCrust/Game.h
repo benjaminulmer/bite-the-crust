@@ -19,6 +19,9 @@
 #include <string>
 #include <GL\glew.h>
 
+#include <SDL_ttf\SDL_ttf.h>
+
+
 using namespace std;
 
 enum class GameState
@@ -51,9 +54,13 @@ private:
 	void quitGame();
 
 	SDL_Window* window;
+	SDL_Surface* screen;
 	int screenWidth;
 	int screenHeight;
 
+	TTF_Font * font;
+	SDL_Surface *text;
+	
 	GameState gameState;
 	Camera camera;
 	Vehicle* playerVehicle;

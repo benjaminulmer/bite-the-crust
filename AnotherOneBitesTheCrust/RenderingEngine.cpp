@@ -2,6 +2,7 @@
 #include "Game.h"
 #include <math.h>
 #include <iostream>
+#include <ft2build.h>
 
 RenderingEngine::RenderingEngine() {}
 
@@ -105,7 +106,9 @@ bool RenderingEngine::loadOBJNonIndexed(
 void RenderingEngine::pushEntities() {
 }
 
-void RenderingEngine::draw() {
+
+void RenderingEngine::draw() 
+{
 	// Draw all our entities
 
 	glClearDepth(1.0);
@@ -193,7 +196,7 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 					);
 
 		//TODO ADD UNIFORM COLORS
-		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 4, 30, 4);
+		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 0, 32, 0);
 		glUniform3f(glGetUniformLocation(phongProgramID, "MaterialColor"), entities[i]->getColor().x, entities[i]->getColor().y, entities[i]->getColor().z);
 		glBindVertexArray(entities[i]->getRenderable()->getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertices().size());
@@ -228,7 +231,8 @@ void RenderingEngine::loadProjectionMatrix()
 }
 
 
-void RenderingEngine::updateView(Camera& c) {
+void RenderingEngine::updateView(Camera& c) 
+{
 	V = glm::lookAt(c.getPosition(), c.getLookAtPosition(), c.getUpVector());
 }
 
@@ -237,12 +241,18 @@ void RenderingEngine::init()
 	cout << "Initialize" << endl;
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
+	//glViewport(0,0,1024,768);
+	//glMatrixMode(GL_PROJECTION);
+	//glLoadIdentity();
+	//glMatrixMode(GL_MODELVIEW);
+	//glLoadIdentity();
 
 	generateIDs();
 	loadProjectionMatrix();
 }
 
-void RenderingEngine::assignBuffers(Renderable* r) {
+void RenderingEngine::assignBuffers(Renderable* r) 
+{
 	glUseProgram(phongProgramID);
 
 	GLuint vertexBuffer;
@@ -295,7 +305,8 @@ void RenderingEngine::assignBuffers(Renderable* r) {
 	
 }
 
-void RenderingEngine::deleteBuffers(Renderable *r) {
+void RenderingEngine::deleteBuffers(Renderable *r) 
+{
 	GLuint vao = r->getVAO();
 	GLuint vbuf = r->getVertexVBO();
 	GLuint cbuf = r->getColourVBO();

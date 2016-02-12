@@ -71,8 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\Include\glm;$(SolutionDir)\Include\SDL;$(SolutionDir)\Include\PhysX;$(SolutionDir)\Include\glew-1.13.0;$(SolutionDir)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\Lib\PhysX;$(SolutionDir)\Lib\SDL;$(SolutionDir)\Lib\glew-1.13.0\glewRelease\Win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\Include\SDL_ttf;$(SolutionDir)\Include\glm;$(SolutionDir)\Include\SDL;$(SolutionDir)\Include\PhysX;$(SolutionDir)\Include\glew-1.13.0;$(SolutionDir)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Lib\x86;$(SolutionDir)\Lib\PhysX;$(SolutionDir)\Lib\SDL;$(SolutionDir)\Lib\glew-1.13.0\glewRelease\Win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -100,7 +100,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;PhysX3VehicleCHECKED.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;PhysX3VehicleCHECKED.lib;glew32.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -194,8 +194,8 @@
     <ClInclude Include="VehicleSceneQueryData.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\Shaders\per-fragment-phong.fs.glsl" />
-    <None Include="res\Shaders\per-fragment-phong.vs.glsl" />
+    <None Include="res\Shaders\StandardShading.fragmentshader" />
+    <None Include="res\Shaders\StandardShading.vertexshader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

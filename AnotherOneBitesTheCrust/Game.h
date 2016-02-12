@@ -37,7 +37,7 @@ public:
 	Game(void);
 	~Game(void);
 
-	RenderingEngine renderingEngine;
+	RenderingEngine *renderingEngine;
 	PhysicsEngine *physicsEngine;
 	InputEngine *inputEngine;
 	AIEngine *aiEngine;

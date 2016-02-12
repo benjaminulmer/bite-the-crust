@@ -5,7 +5,7 @@
 class PhysicsCreator
 {
 public:
-	static physx::PxRigidDynamic* createBox(physx::PxMaterial* material, physx::PxPhysics* physics);
+	static physx::PxRigidDynamic* createBox(physx::PxMaterial* material, physx::PxPhysics* physics, physx::PxVec3 dimensions);
 
 	static physx::PxRigidStatic* createDrivablePlane(physx::PxMaterial* material, physx::PxPhysics* physics);
 

@@ -39,6 +39,7 @@ public:
 	void setColourVBO(GLuint v);
 	GLuint getColourVBO();
 	int getVertexCount();
+	glm::vec3 getDimensions();
 private:
 	std::vector<GLPoint> points;
 	std::vector<GLuint> faces;

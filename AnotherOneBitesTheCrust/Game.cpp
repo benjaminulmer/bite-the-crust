@@ -90,7 +90,8 @@ void Game::setupEntities() {
 
 	renderables.push_back(plane);
 	renderingEngine.assignBuffers(plane);
-
+	
+	cout << plane->getDimensions().x << " " << plane->getDimensions().y << " " << plane->getDimensions().z << endl;
 
 	Renderable* triangle = new Renderable();
 	//vertices and corresponding colors
@@ -159,6 +160,9 @@ void Game::setupEntities() {
 
 	renderables.push_back(box);
 	renderingEngine.assignBuffers(box);
+
+	cout << box->getDimensions().x << " " << box->getDimensions().y << " " << box->getDimensions().z << endl;
+
 
 	Renderable* vehicle = new Renderable();
  	vehicle->addPoint(vec3(-1.75,-1,2.5), vec3(1,0,0));
@@ -238,6 +242,9 @@ void Game::setupEntities() {
 	playerVehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
 	playerVehicle->setRenderable(vehicle);
+	glm::vec3 d = vehicle->getDimensions();
+	cout << d.x << ", " << d.y << ", " << d.z << endl;
+	playerVehicle->chassisDims = physx::PxVec3(d.x, d.y, d.z);
 	physicsEngine->initVehicle(playerVehicle);
 	entities.push_back(playerVehicle);
 	inputEngine->DrivingSignal.connect(playerVehicle, &Vehicle::handleInput);

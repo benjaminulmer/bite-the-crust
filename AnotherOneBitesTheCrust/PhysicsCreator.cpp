@@ -5,9 +5,7 @@
 
 using namespace physx;
 
-PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physics) {
-
-	PxVec3 dimensions(2,0.5,2);
+PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physics, PxVec3 dimensions) {
 	PxBoxGeometry geometry(dimensions);
 	PxTransform tranform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
 	PxReal density = 1.0f;

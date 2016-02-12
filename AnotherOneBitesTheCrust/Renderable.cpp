@@ -94,7 +94,7 @@ glm::vec3 Renderable::getDimensions() {
 	minX = maxX = points.at(0).vertex.x;
 	minY = maxY = points.at(0).vertex.y;
 	minZ = maxZ = points.at(0).vertex.z;
-	for (int i = 1; i < points.size(); i++) {
+	for (unsigned int i = 1; i < points.size(); i++) {
 		glm::vec3 v = points.at(i).vertex;
 		minX = glm::min(minX, v.x);
 		maxX = glm::max(maxX, v.x);

@@ -20,6 +20,7 @@
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="ContentLoading.cpp" />
     <ClCompile Include="DynamicEntity.cpp" />
+    <ClCompile Include="objModel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
@@ -42,5 +43,14 @@
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="ContentLoading.h" />
     <ClInclude Include="DynamicEntity.h" />
+    <ClInclude Include="objModel.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SDL2.dll" />
+    <None Include="glew32.dll" />
+    <None Include="nvToolsExt32_1.dll" />
+    <None Include="PhysX3CHECKED_x86.dll" />
+    <None Include="PhysX3CommonCHECKED_x86.dll" />
+    <None Include="PhysX3CookingCHECKED_x86.dll" />
   </ItemGroup>
 </Project>

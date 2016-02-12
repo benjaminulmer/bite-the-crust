@@ -11,14 +11,14 @@ RenderingEngine::~RenderingEngine(void) {}
 
 bool RenderingEngine::loadOBJNonIndexed(
 	const char * path, 
-	std::vector<glm::vec4> & out_vertices, 
+	std::vector<glm::vec3> & out_vertices, 
 	//std::vector<glm::vec2> & out_uvs,
 	std::vector<glm::vec3> & out_normals
 ){
 	printf("Loading OBJ file %s...\n", path);
 
 	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
-	std::vector<glm::vec4> temp_vertices; 
+	std::vector<glm::vec3> temp_vertices; 
 	//std::vector<glm::vec2> temp_uvs;
 	std::vector<glm::vec3> temp_normals;
 
@@ -41,9 +41,9 @@ bool RenderingEngine::loadOBJNonIndexed(
 		// else : parse lineHeader
 		
 		if ( strcmp( lineHeader, "v" ) == 0 ){
-			glm::vec4 vertex;
+			glm::vec3 vertex;
 			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
-			temp_vertices.push_back(vec4(vertex.x,vertex.y,vertex.z,1.0f));
+			temp_vertices.push_back(vertex);
 		//}else if ( strcmp( lineHeader, "vt" ) == 0 ){
 		//	glm::vec2 uv;
 		//	fscanf(file, "%f %f\n", &uv.x, &uv.y );
@@ -87,7 +87,7 @@ bool RenderingEngine::loadOBJNonIndexed(
 		unsigned int normalIndex = normalIndices[i];
 		
 		// Get the attributes thanks to the index
-		glm::vec4 vertex = temp_vertices[ vertexIndex-1 ];
+		glm::vec3 vertex = temp_vertices[ vertexIndex-1 ];
 		//glm::vec2 uv = temp_uvs[ uvIndex-1 ];
 		glm::vec3 normal = temp_normals[ normalIndex-1 ];
 		
@@ -111,27 +111,37 @@ void RenderingEngine::draw() {
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(phongProgramID);
-	GLint mvID = glGetUniformLocation(phongProgramID, "mv_matrix");
+	GLuint mvpID = glGetUniformLocation(phongProgramID, "MVP");
+	GLuint vID = glGetUniformLocation(phongProgramID, "V");
+	GLuint mID = glGetUniformLocation(phongProgramID, "M");
 
 	M = mat4(1.0f);
 	M = glm::rotate(M, 1.5f, vec3(0,1,0));
-	mat4 MV = V * M;
+	mat4 MVP = P * V * M;
 
-	glUniformMatrix4fv( mvID,
+	glUniformMatrix4fv( mvpID,
 					1,
 					GL_FALSE,
-					value_ptr(MV)
+					value_ptr(MVP)
 					);
 
-	GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
-		glUniformMatrix4fv( pID,
+	//GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
+		glUniformMatrix4fv( vID,
 					1,
 					GL_FALSE,
-					value_ptr(P)
+					value_ptr(V)
 					);
+		glUniformMatrix4fv( mID,
+					1,
+					GL_FALSE,
+					value_ptr(M)
+					);
+
+		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 4, 4, 4);
 
 	glBindVertexArray(vanVAO);
 	glDrawArrays(GL_TRIANGLES, 0, phongVerts.size());
+
 	//glDrawElements(GL_TRIANGLES, phongFaces.size(), GL_UNSIGNED_INT, (void*)0);
 }
 
@@ -141,11 +151,12 @@ void RenderingEngine::draw() {
 
 void RenderingEngine::displayFunc(vector<Entity*> entities)
 {
-
+	glClearDepth(1.0);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glUseProgram(phongProgramID);
-	GLint mvID = glGetUniformLocation(phongProgramID, "mv_matrix");
-	GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
+	GLuint mvpID = glGetUniformLocation(phongProgramID, "MVP");
+	GLuint vID = glGetUniformLocation(phongProgramID, "V");
+	GLuint mID = glGetUniformLocation(phongProgramID, "M");
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
@@ -162,22 +173,27 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 
 		M = calculateDefaultModel(M, entities[i]);
 
-		MV = V * M;
-		glUniformMatrix4fv( mvID,
+		mat4 MVP = P * V * M;
+		glUniformMatrix4fv( mvpID,
 					1,
 					GL_FALSE,
-					value_ptr(MV)
+					value_ptr(MVP)
 					);
 
-		glUniformMatrix4fv( pID,
+	//GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
+		glUniformMatrix4fv( vID,
 					1,
 					GL_FALSE,
-					value_ptr(P)
+					value_ptr(V)
+					);
+		glUniformMatrix4fv( mID,
+					1,
+					GL_FALSE,
+					value_ptr(M)
 					);
 
-		glUniform3f(glGetUniformLocation(phongProgramID, "diffuse_albedo"), entities[i]->getColor().x, entities[i]->getColor().y, entities[i]->getColor().z);
-		glUniform3f(glGetUniformLocation(phongProgramID, "ambient"), entities[i]->getAmbient().x, entities[i]->getAmbient().y, entities[i]->getAmbient().z);
-
+		//TODO ADD UNIFORM COLORS
+		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 4, 12, 4);
 		glBindVertexArray(entities[i]->getRenderable()->getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertices().size());
 		//glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->getFaces().size(), GL_UNSIGNED_INT, (void*)0);
@@ -198,12 +214,11 @@ mat4 RenderingEngine::calculateDefaultModel(mat4 model, Entity * entity)
 void RenderingEngine::generateIDs()
 {
 	cout << "Generating IDs" << endl;
-	string vsShader = "res\\Shaders\\per-fragment-phong.vs.glsl";
-	string fsShader = "res\\Shaders\\per-fragment-phong.fs.glsl";
+	string vsShader = "res\\Shaders\\StandardShading.vertexshader";
+	string fsShader = "res\\Shaders\\StandardShading.fragmentshader";
 	string vsSource = loadShaderStringfromFile(vsShader);
 	string fsSource = loadShaderStringfromFile(fsShader);
 	phongProgramID = CreateShaderProgram(vsSource, fsSource);
-	glUseProgram(phongProgramID);
 }
 
 void RenderingEngine::loadProjectionMatrix()
@@ -227,6 +242,8 @@ void RenderingEngine::init()
 }
 
 void RenderingEngine::assignBuffers(Renderable* r) {
+	glUseProgram(phongProgramID);
+
 	GLuint vertexBuffer;
 	GLuint normalBuffer;
 	//GLuint indexBuffer;
@@ -236,24 +253,18 @@ void RenderingEngine::assignBuffers(Renderable* r) {
 	glGenVertexArrays(1, &vao);			//vao
 	glGenBuffers(1, &vertexBuffer);		//vertices vbo
 	glGenBuffers(1, &normalBuffer);		//color vbo
-	//glGenBuffers(1, &indexBuffer);		//faces
 	
 
-	vector<vec4> vertices = r->getVertices();
-	//vector<vec3> colours = r->getColours();
+	vector<vec3> vertices = r->getVertices();
 	vector<vec3> normals = r->getNormals();
-	//vector<GLuint> faces = r->getFaces();
 
 	glBindVertexArray(vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vec4)*vertices.size(), vertices.data(), GL_STATIC_DRAW);	//buffering vertex data
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*vertices.size(), vertices.data(), GL_STATIC_DRAW);	//buffering vertex data
 
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*normals.size(), normals.data(), GL_STATIC_DRAW);		//buffering color data
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);			//bind faces
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * faces.size(), faces.data(), GL_STATIC_DRAW);
 
 	r->setVertexVBO(vertexBuffer);
 	r->setColourVBO(normalBuffer);
@@ -263,7 +274,7 @@ void RenderingEngine::assignBuffers(Renderable* r) {
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glVertexAttribPointer(
 		0,
-		4,
+		3,
 		GL_FLOAT,
 		GL_FALSE,
 		0,
@@ -278,9 +289,9 @@ void RenderingEngine::assignBuffers(Renderable* r) {
 		GL_FALSE,
 		0,
 		(void*)0);
-
-	glBindVertexArray(0);
 	r->setVAO(vao);
+	glBindVertexArray(0);
+	
 }
 
 void RenderingEngine::deleteBuffers(Renderable *r) {
@@ -296,8 +307,8 @@ void RenderingEngine::deleteBuffers(Renderable *r) {
 
 void RenderingEngine::testOBJLoading()
 {
-	string vsShader = "res\\Shaders\\per-fragment-phong.vs.glsl";
-	string fsShader = "res\\Shaders\\per-fragment-phong.fs.glsl";
+	string vsShader = "res\\Shaders\\StandardShading.vertexshader";
+	string fsShader = "res\\Shaders\\StandardShading.fragmentshader";
 	string vsSource = loadShaderStringfromFile(vsShader);
 	string fsSource = loadShaderStringfromFile(fsShader);
 	phongProgramID = CreateShaderProgram(vsSource, fsSource);
@@ -307,7 +318,7 @@ void RenderingEngine::testOBJLoading()
 	//std::vector<glm::vec2> uvs;
 	//std::vector<glm::vec3> normals; // Won't be used at the moment.
 	//std::vector<GLuint> faces;
-	bool res = loadOBJNonIndexed("res\\Models\\Van.obj", phongVerts, phongNorms);
+	bool res = loadOBJNonIndexed("res\\Models\\FlatFloor.obj", phongVerts, phongNorms);
 
 
 	cout << "Number of verts " << phongVerts.size() << endl;
@@ -341,7 +352,7 @@ void RenderingEngine::testOBJLoading()
 	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
 	glVertexAttribPointer(
 		0,
-		4,
+		3,
 		GL_FLOAT,
 		GL_FALSE,
 		0,

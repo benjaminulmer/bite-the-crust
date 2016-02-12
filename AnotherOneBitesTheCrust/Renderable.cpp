@@ -20,7 +20,7 @@ void Renderable::createFace(GLuint face)
 	faces.push_back(face);
 }
 
-void Renderable::setVerts(std::vector<glm::vec4> vertices)
+void Renderable::setVerts(std::vector<glm::vec3> vertices)
 {
 	verts = vertices;
 }
@@ -36,7 +36,7 @@ void Renderable::setFaces(std::vector<GLuint> face)
 }
 
 
-std::vector<glm::vec4> Renderable::getVertices() {
+std::vector<glm::vec3> Renderable::getVertices() {
 	return verts;
 }
 

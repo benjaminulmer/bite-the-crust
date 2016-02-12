@@ -23,13 +23,13 @@ public:
 	void addPoint(glm::vec3 vertex, glm::vec3 colour);
 	void createFace(GLuint face);
 
-	void setVerts(std::vector <glm::vec4> vertices);
+	void setVerts(std::vector <glm::vec3> vertices);
 	void setNorms(std::vector <glm::vec3> normals);
 	void setFaces(std::vector <GLuint> faces);
 	//void setColors(std::vector <glm::vec3> colors);
 
 
-	std::vector<glm::vec4> getVertices();
+	std::vector<glm::vec3> getVertices();
 	std::vector<glm::vec3> getNormals();
 	//std::vector<glm::vec3> getColours();
 	std::vector<GLuint> getFaces();
@@ -42,7 +42,7 @@ public:
 	GLuint getColourVBO();
 	int getVertexCount();
 private:
-	std::vector<glm::vec4> verts;
+	std::vector<glm::vec3> verts;
 	std::vector<glm::vec3> norms;
 	std::vector<GLuint> faces;
 	GLuint vertexVBO, colourVBO;

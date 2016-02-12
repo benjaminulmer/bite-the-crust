@@ -193,7 +193,8 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 					);
 
 		//TODO ADD UNIFORM COLORS
-		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 4, 12, 4);
+		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 4, 30, 4);
+		glUniform3f(glGetUniformLocation(phongProgramID, "MaterialColor"), entities[i]->getColor().x, entities[i]->getColor().y, entities[i]->getColor().z);
 		glBindVertexArray(entities[i]->getRenderable()->getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertices().size());
 		//glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->getFaces().size(), GL_UNSIGNED_INT, (void*)0);

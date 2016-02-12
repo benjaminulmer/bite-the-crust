@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <GL\glew.h>
+#include <sigslot.h>
 
 using namespace std;
 
@@ -29,7 +30,8 @@ enum class GameState
 	EXIT
 };
 
-class Game
+class Game :
+	public sigslot::has_slots<>
 {
 public:
 	Game(void);
@@ -49,6 +51,7 @@ private:
 	void mainLoop();
 	void processSDLEvents();
 	void quitGame();
+	void firePizza();
 
 	SDL_Window* window;
 	int screenWidth;

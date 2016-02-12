@@ -12,12 +12,12 @@ public:
 	PhysicsEngine(void);
 	~PhysicsEngine(void);
 
-	void simulate(unsigned int deltaTimeMs, DrivingInput* playerInput);
+	void simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();
 	double getPosX();
 	double getPosY();
 	double getPosZ();
-	void initDynamicEntity(PhysicsEntity* entity, float x, float y, float z);
+	void initDynamicEntity(PhysicsEntity* entity, glm::vec3 position, glm::vec3 velocity = glm::vec3(0,0,0));
 	void initVehicle(Vehicle* vehicle);
 
 private:

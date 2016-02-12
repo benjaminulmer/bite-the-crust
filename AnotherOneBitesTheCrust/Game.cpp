@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "DrivingInput.h"
+#include "DynamicEntity.h"
 
 void fatalError(string errorString)
 {
@@ -24,6 +25,8 @@ void Game::run() {
 	// Preload data, initialize subsystems, anything to do before entering the main loop
 	initSystems();
 	setupEntities();
+
+	inputEngine->FireSignal.connect(this, &Game::firePizza);
 
 	mainLoop();
 }
@@ -103,14 +106,14 @@ void Game::setupEntities() {
 	renderingEngine.assignBuffers(triangle);
 
 	Renderable* box = new Renderable();
-	box->addPoint(vec3(-0.5,-0.5,-0.5), vec3(1,0,0));
-	box->addPoint(vec3(0.5,-0.5,-0.5), vec3(0,1,0));
-	box->addPoint(vec3(0.5,0.5,-0.5), vec3(0,0,1));
-	box->addPoint(vec3(-0.5,0.5,-0.5), vec3(1,1,1));
-	box->addPoint(vec3(-0.5,-0.5,0.5), vec3(0,1,1));
-	box->addPoint(vec3(0.5,-0.5,0.5), vec3(1,0,1));
-	box->addPoint(vec3(0.5,0.5,0.5), vec3(1,1,0));
-	box->addPoint(vec3(-0.5,0.5,0.5), vec3(1,1,1));
+	box->addPoint(vec3(-1,-0.25,-1), vec3(1,0,0));
+	box->addPoint(vec3(1,-0.25,-1), vec3(0,1,0));
+	box->addPoint(vec3(1,0.25,-1), vec3(0,0,1));
+	box->addPoint(vec3(-1,0.25,-1), vec3(1,1,1));
+	box->addPoint(vec3(-1,-0.25,1), vec3(0,1,1));
+	box->addPoint(vec3(1,-0.25,1), vec3(1,0,1));
+	box->addPoint(vec3(1,0.25,1), vec3(1,1,0));
+	box->addPoint(vec3(-1,0.25,1), vec3(1,1,1));
 
 	box->createFace(0);
 	box->createFace(1);
@@ -232,43 +235,12 @@ void Game::setupEntities() {
 	ground->setDefaultScale(vec3(1.0f));
 	entities.push_back(ground);
 
-	Entity* tri = new Entity();
-	tri->setPosition(vec3(-1,1, 1.0));		//change position here
-	tri->setRenderable(triangle);
-	//entities.push_back(tri);
-
-	PhysicsEntity* pizzaBox = new PhysicsEntity();
-	pizzaBox->setRenderable(box);
-	physicsEngine->initDynamicEntity(pizzaBox, 1.5f, 3.0f, -2.0f);
-	entities.push_back(pizzaBox);
-
-	/*PhysicsEntity* pizzaBox2 = new PhysicsEntity();
-	pizzaBox2->setRenderable(box);
-	pizzaBox2->setDefaultRotation(-1.5708f,vec3(0,1,0));
-	pizzaBox2->setDefaultTranslation(vec3(2.5f, 2.2f, 3.0f));
-	pizzaBox2->setDefaultScale(vec3(1.0f));
-	physicsEngine->initDynamicEntity(pizzaBox2);
-	entities.push_back(pizzaBox2);
-
-	PhysicsEntity* pizzaBox3 = new PhysicsEntity();
-	pizzaBox3->setRenderable(box);
-	pizzaBox3->setDefaultRotation(-1.5708f,vec3(0,1,0));
-	pizzaBox3->setDefaultTranslation(vec3(-2.5f, 2.2f, 1.0f));
-	pizzaBox3->setDefaultScale(vec3(1.0f));
-	physicsEngine->initDynamicEntity(pizzaBox3);
-	entities.push_back(pizzaBox3);*/
-
-	//playerVehicle = new Vehicle();
-	//ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
-	//playerVehicle->setRenderable(vehicle);
-	//physicsEngine->initVehicle(playerVehicle);
-	//entities.push_back(playerVehicle);
-
 	playerVehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
 	playerVehicle->setRenderable(vehicle);
 	physicsEngine->initVehicle(playerVehicle);
 	entities.push_back(playerVehicle);
+	inputEngine->DrivingSignal.connect(playerVehicle, &Vehicle::handleInput);
 
 	/*playerVehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
@@ -296,8 +268,8 @@ void Game::mainLoop() {
 		processSDLEvents();
 
 		// Update the player and AI cars
-		DrivingInput* playerInput = inputEngine->getInput();
-		playerVehicle->handleInput(playerInput);
+		//DrivingInput* playerInput = inputEngine->getInput();
+		//playerVehicle->handleInput(playerInput);
 		aiEngine->updateAI();
 
 		// Figure out timestep and run physics
@@ -305,7 +277,7 @@ void Game::mainLoop() {
 		unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 		oldTimeMs = newTimeMs;
 
-		physicsEngine->simulate(deltaTimeMs, playerInput);
+		physicsEngine->simulate(deltaTimeMs);
 		physicsEngine->fetchSimulationResults();
 		//cout << physicsEngine->getPosX() << " " << physicsEngine->getPosY() << " " << physicsEngine->getPosZ() << endl;
 		//cout << playerVehicle->getPosition().x << " " << playerVehicle->getPosition().y << " " << playerVehicle->getPosition().z << endl;
@@ -340,6 +312,18 @@ void Game::processSDLEvents() {
 			// other events, do nothing yet
 		}
 	}
+}
+
+void Game::firePizza() {
+	cout << "Fire pizza" << endl;
+	DynamicEntity* pizzaBox = new DynamicEntity();
+	pizzaBox->setRenderable(renderables.at(2)); // todo, match names to renderables or something instead of hard-coded
+	glm::vec3 position = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
+	glm::vec3 velocity = glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 15.0, 0.0));
+	physx::PxVec3 v = playerVehicle->getDynamicActor()->getLinearVelocity();
+	velocity = velocity + glm::vec3(v.x, v.y, v.z);
+	physicsEngine->initDynamicEntity(pizzaBox, position, velocity);
+	entities.push_back(pizzaBox);
 }
 
 Game::~Game(void)

@@ -36,6 +36,10 @@ Vehicle::~Vehicle(void)
 {
 }
 
+physx::PxVehicleDrive4W* Vehicle::getPhysicsVehicle() {
+	return physicsVehicle;
+}
+
 void Vehicle::updateTuning() {
 	// Recalculate variables which are based off of other variables, if some of them have been changed.
 	chassisMOI = PxVec3

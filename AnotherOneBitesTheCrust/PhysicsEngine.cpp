@@ -63,14 +63,17 @@ void PhysicsEngine::initVehicles() {
 	scene->addActor(*groundPlane);
 }
 
-void PhysicsEngine::initDynamicEntity(PhysicsEntity* entity, float x, float y, float z) {
+// Velocity defaults to 0. todo, set up a dynamic way to change velocity/forces on entities
+void PhysicsEngine::initDynamicEntity(PhysicsEntity* entity, glm::vec3 position, glm::vec3 velocity) {
 	PxMaterial* defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
 	PxRigidDynamic* object = PhysicsCreator::createBox(defaultMaterial, physics);
-	PxTransform startTransform(PxVec3(x, y, z), PxQuat(PxIdentity));
+	PxTransform startTransform(PxVec3(position.x, position.y, position.z), PxQuat(PxIdentity));
 	object->setGlobalPose(startTransform);
 	entities.push_back(object);
 	scene->addActor(*object);
 	entity->setActor(object);
+	object->setLinearVelocity(PxVec3(velocity.x, velocity.y, velocity.z));
+	std::cout << velocity.x << ", " << velocity.y << ", " << velocity.z << std::endl;
 }
 
 void PhysicsEngine::initVehicle(Vehicle* vehicle) {
@@ -96,7 +99,7 @@ void PhysicsEngine::initVehicle(Vehicle* vehicle) {
 void PhysicsEngine::testScene() {
 }
 
-void PhysicsEngine::simulate(unsigned int deltaTimeMs, DrivingInput* playerInput) {
+void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
 	PxF32 deltaTimeS = deltaTimeMs/1000.0f;
 	deltaTimeSAcc += deltaTimeS;
 

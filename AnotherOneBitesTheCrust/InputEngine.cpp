@@ -1,5 +1,6 @@
 #include "InputEngine.h"
 #include <iostream>
+#include <sigslot.h>
 
 InputEngine::InputEngine(void) {
 	openControllers();
@@ -23,6 +24,7 @@ void InputEngine::processControllerEvent(SDL_Event event) {
 	if (event.type == SDL_CONTROLLERBUTTONDOWN) {
 		if (event.cbutton.button == SDL_CONTROLLER_BUTTON_A) {
 			std::cout << "a" << std::endl;
+			FireSignal();
 		}
 	}
 	// Controller axis events
@@ -47,6 +49,7 @@ void InputEngine::processControllerEvent(SDL_Event event) {
 		else if (event.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT) {
 			inputs[0].accel = (float)event.caxis.value/MAX_AXIS_VALUE;
 		}
+		DrivingSignal(&inputs[0]);
 	}
 	// Controller added or removed
 	else if (event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED) {

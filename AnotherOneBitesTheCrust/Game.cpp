@@ -87,8 +87,6 @@ void Game::setupEntities()
 
 	renderables.push_back(plane);
 	renderingEngine->assignBuffers(plane);
-	
-	cout << plane->getDimensions().x << " " << plane->getDimensions().y << " " << plane->getDimensions().z << endl;
 
 	// Renderable for pizza boxes
 	Renderable* box = new Renderable();
@@ -145,8 +143,6 @@ void Game::setupEntities()
 
 	renderables.push_back(box);
 	renderingEngine->assignBuffers(box);
-
-	cout << box->getDimensions().x << " " << box->getDimensions().y << " " << box->getDimensions().z << endl;
 
 	// Renderable for the brick-van
 	Renderable* vehicle = new Renderable();

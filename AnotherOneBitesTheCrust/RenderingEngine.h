@@ -49,20 +49,6 @@ public:
 
 	void testOBJLoading();
 
-bool loadOBJ(
-	const char * path, 
-	std::vector<glm::vec3> & out_vertices, 
-	std::vector<glm::vec3> & out_normals,
-	std::vector<GLuint> & out_faces
-);
-
-bool loadOBJPhong(
-	const char * path, 
-	std::vector<glm::vec4> & out_vertices, 
-	std::vector<glm::vec3> & out_normals,
-	std::vector<GLuint> & out_faces
-);
-
 bool loadOBJNonIndexed(
 	const char * path, 
 	std::vector<glm::vec3> & out_vertices, 

@@ -72,9 +72,163 @@ void Game::initSystems()
 
 	//renderingEngine.testOBJLoading();
 }
+//
+//void Game::setupEntities() 
+//{
+//	Renderable * floor = new Renderable();
+//	vector<vec3>floorVerts;
+//	vector<vec3>floorNormals;
+//	bool floorRes = renderingEngine->loadOBJNonIndexed("res\\Models\\FlatFloor.obj", floorVerts, floorNormals);
+//	floor->setVerts(floorVerts);
+//	floor->setNorms(floorNormals);
+//	renderables.push_back(floor);
+//	renderingEngine->assignBuffers(floor);
+//
+//	Renderable* van = new Renderable();
+//	vector<vec3>vanVerts;
+//	vector<vec3>vanNormals;
+//	bool res = renderingEngine->loadOBJNonIndexed("res\\Models\\Van.obj", vanVerts, vanNormals);
+//	van->setVerts(vanVerts);
+//	van->setNorms(vanNormals);
+//
+//	renderingEngine->testOBJLoading();
+//}
 
-void Game::setupEntities() 
+void Game::setupEntities()
 {
+	//Renderable* plane = new Renderable();
+	////add vertices and colors
+	//plane->addPoint(vec3(20,0,20),vec3(1,0,0));
+	//plane->addPoint(vec3(20,0,-20),vec3(0,1,0));
+	//plane->addPoint(vec3(-20,0,-20),vec3(0,0,1));
+	//plane->addPoint(vec3(-20,0,20),vec3(1,1,1));
+	////faces
+	//plane->createFace(0);
+	//plane->createFace(1);
+	//plane->createFace(2);
+	//plane->createFace(2);
+	//plane->createFace(3);
+	//plane->createFace(0);
+
+	//renderables.push_back(plane);
+	//renderingEngine->assignBuffers(plane);
+	
+	//cout << plane->getDimensions().x << " " << plane->getDimensions().y << " " << plane->getDimensions().z << endl;
+
+	// Renderable for pizza boxes
+	//Renderable* box = new Renderable();
+	//box->addPoint(vec3(-1,-0.1,-1), vec3(1,0,0));
+	//box->addPoint(vec3(1,-0.1,-1), vec3(0,1,0));
+	//box->addPoint(vec3(1,0.1,-1), vec3(0,0,1));
+	//box->addPoint(vec3(-1,0.1,-1), vec3(1,1,1));
+	//box->addPoint(vec3(-1,-0.1,1), vec3(0,1,1));
+	//box->addPoint(vec3(1,-0.1,1), vec3(1,0,1));
+	//box->addPoint(vec3(1,0.1,1), vec3(1,1,0));
+	//box->addPoint(vec3(-1,0.1,1), vec3(1,1,1));
+
+	//box->createFace(0);
+	//box->createFace(1);
+	//box->createFace(2);
+	//box->createFace(2);
+	//box->createFace(3);
+	//box->createFace(0);
+	//
+	//box->createFace(1);
+	//box->createFace(5);
+	//box->createFace(6);
+	//box->createFace(6);
+	//box->createFace(2);
+	//box->createFace(1);
+
+	//box->createFace(0);
+	//box->createFace(4);
+	//box->createFace(7);
+	//box->createFace(7);
+	//box->createFace(3);
+	//box->createFace(0);
+
+	//box->createFace(4);
+	//box->createFace(5);
+	//box->createFace(6);
+	//box->createFace(6);
+	//box->createFace(7);
+	//box->createFace(4);
+
+	//box->createFace(0);
+	//box->createFace(1);
+	//box->createFace(5);
+	//box->createFace(5);
+	//box->createFace(4);
+	//box->createFace(0);
+
+	//box->createFace(2);
+	//box->createFace(6);
+	//box->createFace(7);
+	//box->createFace(7);
+	//box->createFace(3);
+	//box->createFace(2);
+
+	//renderables.push_back(box);
+	//renderingEngine->assignBuffers(box);
+
+	//cout << box->getDimensions().x << " " << box->getDimensions().y << " " << box->getDimensions().z << endl;
+
+	// Renderable for the brick-van
+	//Renderable* vehicle = new Renderable();
+ //	vehicle->addPoint(vec3(-1.75,-1,2.5), vec3(1,0,0));
+ //	vehicle->addPoint(vec3(1.75,-1,2.5), vec3(0,1,0));
+ //	vehicle->addPoint(vec3(1.75,1,2.5), vec3(0,0,1));
+ //	vehicle->addPoint(vec3(-1.75,1,2.5), vec3(1,1,1));
+ //	vehicle->addPoint(vec3(-1.75,-1,-2.5), vec3(0,1,1));
+ //	vehicle->addPoint(vec3(1.75,-1,-2.5), vec3(1,0,1));
+ //	vehicle->addPoint(vec3(1.75,1,-2.5), vec3(1,1,0));
+ //	vehicle->addPoint(vec3(-1.75,1,-2.5), vec3(1,1,1));
+ //
+ //	vehicle->createFace(0);
+ //	vehicle->createFace(1);
+ //	vehicle->createFace(2);
+ //	vehicle->createFace(2);
+ //	vehicle->createFace(3);
+ //	vehicle->createFace(0);
+ //	
+ //	vehicle->createFace(1);
+ //	vehicle->createFace(5);
+ //	vehicle->createFace(6);
+ //	vehicle->createFace(6);
+ //	vehicle->createFace(2);
+ //	vehicle->createFace(1);
+ //
+ //	vehicle->createFace(0);
+ //	vehicle->createFace(4);
+ //	vehicle->createFace(7);
+ //	vehicle->createFace(7);
+ //	vehicle->createFace(3);
+ //	vehicle->createFace(0);
+ //
+ //	vehicle->createFace(4);
+ //	vehicle->createFace(5);
+ //	vehicle->createFace(6);
+ //	vehicle->createFace(6);
+ //	vehicle->createFace(7);
+ //	vehicle->createFace(4);
+ //
+ //	vehicle->createFace(0);
+ //	vehicle->createFace(1);
+ //	vehicle->createFace(5);
+ //	vehicle->createFace(5);
+ //	vehicle->createFace(4);
+ //	vehicle->createFace(0);
+ //
+ //	vehicle->createFace(2);
+ //	vehicle->createFace(6);
+ //	vehicle->createFace(7);
+ //	vehicle->createFace(7);
+ //	vehicle->createFace(3);
+ //	vehicle->createFace(2);
+ //
+ //	renderables.push_back(vehicle);
+ //	renderingEngine->assignBuffers(vehicle);
+
 	Renderable * floor = new Renderable();
 	vector<vec3>floorVerts;
 	vector<vec3>floorNormals;
@@ -84,168 +238,22 @@ void Game::setupEntities()
 	renderables.push_back(floor);
 	renderingEngine->assignBuffers(floor);
 
+	Renderable * box = new Renderable();
+	vector<vec3>boxVerts;
+	vector<vec3>boxNormals;
+	bool boxRes = renderingEngine->loadOBJNonIndexed("res\\Models\\PizzaBox.obj", boxVerts, boxNormals);
+	box->setVerts(boxVerts);
+	box->setNorms(boxNormals);
+	renderables.push_back(box);
+	renderingEngine->assignBuffers(box);
+
+	// Renderable for the actual van model, not used right now
 	Renderable* van = new Renderable();
 	vector<vec3>vanVerts;
 	vector<vec3>vanNormals;
 	bool res = renderingEngine->loadOBJNonIndexed("res\\Models\\Van.obj", vanVerts, vanNormals);
 	van->setVerts(vanVerts);
 	van->setNorms(vanNormals);
-
-	renderingEngine->testOBJLoading();
-}
-
-void Game::setupEntities()
-{
-	Renderable* plane = new Renderable();
-	//add vertices and colors
-	plane->addPoint(vec3(20,0,20),vec3(1,0,0));
-	plane->addPoint(vec3(20,0,-20),vec3(0,1,0));
-	plane->addPoint(vec3(-20,0,-20),vec3(0,0,1));
-	plane->addPoint(vec3(-20,0,20),vec3(1,1,1));
-	//faces
-	plane->createFace(0);
-	plane->createFace(1);
-	plane->createFace(2);
-	plane->createFace(2);
-	plane->createFace(3);
-	plane->createFace(0);
-
-	renderables.push_back(plane);
-	renderingEngine->assignBuffers(plane);
-	
-	cout << plane->getDimensions().x << " " << plane->getDimensions().y << " " << plane->getDimensions().z << endl;
-
-	// Renderable for pizza boxes
-	Renderable* box = new Renderable();
-	box->addPoint(vec3(-1,-0.1,-1), vec3(1,0,0));
-	box->addPoint(vec3(1,-0.1,-1), vec3(0,1,0));
-	box->addPoint(vec3(1,0.1,-1), vec3(0,0,1));
-	box->addPoint(vec3(-1,0.1,-1), vec3(1,1,1));
-	box->addPoint(vec3(-1,-0.1,1), vec3(0,1,1));
-	box->addPoint(vec3(1,-0.1,1), vec3(1,0,1));
-	box->addPoint(vec3(1,0.1,1), vec3(1,1,0));
-	box->addPoint(vec3(-1,0.1,1), vec3(1,1,1));
-
-	box->createFace(0);
-	box->createFace(1);
-	box->createFace(2);
-	box->createFace(2);
-	box->createFace(3);
-	box->createFace(0);
-	
-	box->createFace(1);
-	box->createFace(5);
-	box->createFace(6);
-	box->createFace(6);
-	box->createFace(2);
-	box->createFace(1);
-
-	box->createFace(0);
-	box->createFace(4);
-	box->createFace(7);
-	box->createFace(7);
-	box->createFace(3);
-	box->createFace(0);
-
-	box->createFace(4);
-	box->createFace(5);
-	box->createFace(6);
-	box->createFace(6);
-	box->createFace(7);
-	box->createFace(4);
-
-	box->createFace(0);
-	box->createFace(1);
-	box->createFace(5);
-	box->createFace(5);
-	box->createFace(4);
-	box->createFace(0);
-
-	box->createFace(2);
-	box->createFace(6);
-	box->createFace(7);
-	box->createFace(7);
-	box->createFace(3);
-	box->createFace(2);
-
-	renderables.push_back(box);
-	renderingEngine->assignBuffers(box);
-
-	cout << box->getDimensions().x << " " << box->getDimensions().y << " " << box->getDimensions().z << endl;
-
-	// Renderable for the brick-van
-	Renderable* vehicle = new Renderable();
- 	vehicle->addPoint(vec3(-1.75,-1,2.5), vec3(1,0,0));
- 	vehicle->addPoint(vec3(1.75,-1,2.5), vec3(0,1,0));
- 	vehicle->addPoint(vec3(1.75,1,2.5), vec3(0,0,1));
- 	vehicle->addPoint(vec3(-1.75,1,2.5), vec3(1,1,1));
- 	vehicle->addPoint(vec3(-1.75,-1,-2.5), vec3(0,1,1));
- 	vehicle->addPoint(vec3(1.75,-1,-2.5), vec3(1,0,1));
- 	vehicle->addPoint(vec3(1.75,1,-2.5), vec3(1,1,0));
- 	vehicle->addPoint(vec3(-1.75,1,-2.5), vec3(1,1,1));
- 
- 	vehicle->createFace(0);
- 	vehicle->createFace(1);
- 	vehicle->createFace(2);
- 	vehicle->createFace(2);
- 	vehicle->createFace(3);
- 	vehicle->createFace(0);
- 	
- 	vehicle->createFace(1);
- 	vehicle->createFace(5);
- 	vehicle->createFace(6);
- 	vehicle->createFace(6);
- 	vehicle->createFace(2);
- 	vehicle->createFace(1);
- 
- 	vehicle->createFace(0);
- 	vehicle->createFace(4);
- 	vehicle->createFace(7);
- 	vehicle->createFace(7);
- 	vehicle->createFace(3);
- 	vehicle->createFace(0);
- 
- 	vehicle->createFace(4);
- 	vehicle->createFace(5);
- 	vehicle->createFace(6);
- 	vehicle->createFace(6);
- 	vehicle->createFace(7);
- 	vehicle->createFace(4);
- 
- 	vehicle->createFace(0);
- 	vehicle->createFace(1);
- 	vehicle->createFace(5);
- 	vehicle->createFace(5);
- 	vehicle->createFace(4);
- 	vehicle->createFace(0);
- 
- 	vehicle->createFace(2);
- 	vehicle->createFace(6);
- 	vehicle->createFace(7);
- 	vehicle->createFace(7);
- 	vehicle->createFace(3);
- 	vehicle->createFace(2);
- 
- 	renderables.push_back(vehicle);
- 	renderingEngine->assignBuffers(vehicle);
-
-	Renderable * floor = new Renderable();
-	vector<vec3>floorVerts;
-	vector<vec3>floorNormals;
-	bool floorRes = renderingEngine->loadOBJNonIndexed("res\\Models\\FlatFloor.obj", floorVerts, floorNormals);
-	floor->setVerts(floorVerts);
-	floor->setNorms(floorNormals);
-	renderables.push_back(floor);
-	renderingEngine->assignBuffers(floor);
-
-	// Renderable for the actual van model, not used right now
-	Renderable* van = new Renderable();
-	vector<vec3>vanVerts;
-	vector<vec3>vanNormals;
-	vector<GLuint>vanFaces;
-	bool res = renderingEngine->loadOBJ("res\\Models\\Van.obj", vanVerts, vanNormals, vanFaces);
-	van->setVerts(vanVerts);
-	van->setFaces(vanFaces);
 	renderables.push_back(van);
 	renderingEngine->assignBuffers(van);
 
@@ -255,12 +263,16 @@ void Game::setupEntities()
 	ground->setDefaultTranslation(vec3(0.0f,0.0f,0.0f));
 	ground->setDefaultScale(vec3(1.0f));
 	ground->setColor(vec3(1.0f,1.0f,1.0f));
+	entities.push_back(ground);
 
 	playerVehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
-	playerVehicle->setRenderable(vehicle);
-	glm::vec3 d = vehicle->getDimensions();
-	playerVehicle->chassisDims = physx::PxVec3(d.x, d.y, d.z);
+	playerVehicle->setRenderable(van);
+	playerVehicle->setDefaultRotation(-1.5708f, vec3(0,1,0));
+	playerVehicle->setColor(vec3(1,0,0));
+	glm::vec3 d = van->getDimensions();
+	cout << d.x << " " << d.y << " " << d.z << endl;
+	playerVehicle->chassisDims = physx::PxVec3(2, 2, 5);
 	physicsEngine->createVehicle(playerVehicle);
 	entities.push_back(playerVehicle);
 
@@ -345,6 +357,7 @@ void Game::firePizza()
 	physx::PxVec3 v = playerVehicle->getDynamicActor()->getLinearVelocity();
 	velocity = velocity + glm::vec3(v.x, v.y, v.z);
 	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);
+	pizzaBox->setColor(vec3(0,1,1));
 	entities.push_back(pizzaBox);
 }
 

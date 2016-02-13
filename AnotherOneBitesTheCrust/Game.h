@@ -64,5 +64,10 @@ private:
 	Vehicle* playerVehicle;
 	std::vector<Entity*> entities;
 	std::vector<Renderable*> renderables;
+
+	// vehicle location for past 5 frames 
+	static const int CAMERA_POS_BUFFER_SIZE = 10;
+	glm::vec3 cameraPosBuffer[CAMERA_POS_BUFFER_SIZE];
+	int cameraPosBufferIndex;
 };
 

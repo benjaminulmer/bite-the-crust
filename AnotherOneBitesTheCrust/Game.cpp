@@ -133,11 +133,12 @@ void Game::setupEntities()
 	physicsEngine->createVehicle(playerVehicle);
 	entities.push_back(playerVehicle);
 
-	//set camera
-	camera.setPosition(glm::vec3(0,6,8));			//location of camera
-	camera.setLookAtPosition(glm::vec3(0,0,0));		//where camera is pointing
-	camera.setUpVector(glm::vec3(0,1,0));			//orientation on camera
-	renderingEngine->updateView(camera);
+	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
+	{
+		cameraPosBuffer[i] = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+	}
+	cameraPosBufferIndex = 0;
+	camera.setUpVector(glm::vec3(0,1,0));
 }
 
 void Game::connectSignals()
@@ -150,7 +151,6 @@ void Game::mainLoop()
 {
 	unsigned int oldTimeMs = SDL_GetTicks();
 	
-	float x = 0;
 	// Game loop
 	while (gameState!= GameState::EXIT)
 	{
@@ -167,13 +167,15 @@ void Game::mainLoop()
 		physicsEngine->fetchSimulationResults();
 
 		// Point the camera at the car
-		camera.setPosition(playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-20,0)));
+		cameraPosBuffer[cameraPosBufferIndex] = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+		cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
+
+		camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
 		camera.setLookAtPosition(playerVehicle->getPosition());
 		renderingEngine->updateView(camera);
 
 		//display
 		renderingEngine->displayFunc(entities);
-		//renderingEngine.draw();
 
 		//swap buffers
 		SDL_GL_SwapWindow(window);
@@ -210,7 +212,7 @@ void Game::firePizza()
 	DynamicEntity* pizzaBox = new DynamicEntity();
 	pizzaBox->setRenderable(renderables.at(1)); // todo, match names to renderables or something instead of hard-coded
 	glm::vec3 position = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
-	glm::vec3 velocity = glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 40.0, 0.0));
+	glm::vec3 velocity = glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 20.0, 0.0));
 	physx::PxVec3 v = playerVehicle->getDynamicActor()->getLinearVelocity();
 	velocity = velocity + glm::vec3(v.x, v.y, v.z);
 	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);

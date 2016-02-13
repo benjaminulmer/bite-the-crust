@@ -12,11 +12,14 @@ public:
 	void setDefaultRotation(float radians, glm::vec3 axis);
 	void setDefaultTranslation(glm::vec3 trans);
 	void setDefaultScale(glm::vec3 scale);
+	void setColor(glm::vec3 c);
 
 	float getDefaultRotationAngle();
 	glm::vec3 getDefaultRotationAxis();
 	glm::vec3 getDefaultTranslation();
 	glm::vec3 getDefaultScale();
+	glm::vec3 getColor();
+	glm::vec3 getAmbient();
 
 	virtual glm::vec3 getPosition();
 	virtual glm::mat4 getModelMatrix();
@@ -31,5 +34,8 @@ private:
 	glm::vec3 defaultRotationAxis;
 	glm::vec3 defaultTranslation;
 	glm::vec3 defaultScale;
+
+	glm::vec3 color;
+	glm::vec3 ambient_color;
 };
 

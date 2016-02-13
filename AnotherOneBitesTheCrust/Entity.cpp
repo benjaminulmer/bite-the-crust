@@ -31,12 +31,6 @@ void Entity::setDefaultScale(glm::vec3 scale)
 	defaultScale = scale;
 }
 
-void Entity::setColor(glm::vec3 c)
-{
-	color = c;
-	ambient_color = c/glm::vec3(10.0f);
-}
-
 float Entity::getDefaultRotationAngle()
 {
 	return defaultRotation;
@@ -56,19 +50,9 @@ glm::vec3 Entity::getDefaultScale()
 {
 	return defaultScale;
 }
-	
-glm::vec3 Entity::getColor()
-{
-	return color;
-}
-
-glm::vec3 Entity::getAmbient()
-{
-	return ambient_color;
-}
 
 glm::vec3 Entity::getPosition() {
-	return position;
+	return glm::vec3(0, 0, 0);
 }
 
 glm::mat4 Entity::getModelMatrix() {
@@ -76,7 +60,7 @@ glm::mat4 Entity::getModelMatrix() {
 }
 
 void Entity::setPosition(glm::vec3 pos) {
-	position = pos;
+	return;
 }
 
 bool Entity::hasRenderable() {

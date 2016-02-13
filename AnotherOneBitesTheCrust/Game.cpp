@@ -2,6 +2,8 @@
 #include "DrivingInput.h"
 #include "DynamicEntity.h"
 
+using namespace std;
+
 void fatalError(string errorString)
 {
 	cout << errorString << endl;
@@ -38,8 +40,6 @@ void Game::run()
 	mainLoop();
 }
 
-
-
 void Game::initSystems()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);		//Initialize SDL
@@ -49,8 +49,6 @@ void Game::initSystems()
 	{
 		fatalError("SDL Window could not be created");
 	}
-
-
 
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	if(glContext == nullptr)
@@ -68,84 +66,86 @@ void Game::initSystems()
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);		//enable double buffering
 	if( SDL_GL_SetSwapInterval( 1 ) < 0 )
 	{
-		printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
+		printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 	}
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
+	glClearColor(0.2f, 0.2f, 0.5f, 1.0f);				//blue background
 
-	renderingEngine = new RenderingEngine();
+	aiEngine = new AIEngine();
+	audioEngine = new AudioEngine();
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
+	renderingEngine = new RenderingEngine();
 }
 
 void Game::setupEntities()
 {
 	Renderable * floor = new Renderable();
-	vector<vec3>floorVerts;
-	vector<vec3>floorNormals;
+	vector<glm::vec3>floorVerts;
+	vector<glm::vec3>floorNormals;
 	bool floorRes = ContentLoading::loadOBJNonIndexed("res\\Models\\FlatFloor.obj", floorVerts, floorNormals);
 	floor->setVerts(floorVerts);
 	floor->setNorms(floorNormals);
+	floor->setColor(glm::vec3(1.0f,1.0f,1.0f));
 	renderables.push_back(floor);
 	renderingEngine->assignBuffers(floor);
 
 	Renderable * box = new Renderable();
-	vector<vec3>boxVerts;
-	vector<vec3>boxNormals;
+	vector<glm::vec3>boxVerts;
+	vector<glm::vec3>boxNormals;
 	bool boxRes = ContentLoading::loadOBJNonIndexed("res\\Models\\PizzaBox.obj", boxVerts, boxNormals);
 	box->setVerts(boxVerts);
 	box->setNorms(boxNormals);
+	box->setColor(glm::vec3(0,1,1));
 	renderables.push_back(box);
 	renderingEngine->assignBuffers(box);
 
 	Renderable* van = new Renderable();
-	vector<vec3>vanVerts;
-	vector<vec3>vanNormals;
+	vector<glm::vec3>vanVerts;
+	vector<glm::vec3>vanNormals;
 	bool res = ContentLoading::loadOBJNonIndexed("res\\Models\\Van.obj", vanVerts, vanNormals);
 	van->setVerts(vanVerts);
 	van->setNorms(vanNormals);
+	van->setColor(glm::vec3(1,0,0));
 	renderables.push_back(van);
 	renderingEngine->assignBuffers(van);
 
 	Entity* ground = new Entity();
 	ground->setRenderable(floor);
-	ground->setColor(vec3(1.0f,1.0f,1.0f));
 	entities.push_back(ground);
 
 	Entity* ground2 = new Entity();
 	ground2->setRenderable(floor);
-	ground2->setDefaultTranslation(vec3(70.0f,0.0f,0.0f));
-	ground2->setColor(vec3(1.0f,1.0f,0.0f));
+	ground2->setDefaultTranslation(glm::vec3(70.0f,0.0f,0.0f));
 	entities.push_back(ground2);
 
 	Entity* ground3 = new Entity();
 	ground3->setRenderable(floor);
-	ground3->setDefaultTranslation(vec3(70.0f,0.0f,70.0f));
-	ground3->setColor(vec3(1.0f,1.0f,1.0f));
+	ground3->setDefaultTranslation(glm::vec3(70.0f,0.0f,70.0f));
 	entities.push_back(ground3);
 
 	Entity* ground4 = new Entity();
 	ground4->setRenderable(floor);
-	ground4->setDefaultTranslation(vec3(0.0f,0.0f,70.0f));
-	ground4->setColor(vec3(1.0f,1.0f,0.0f));
+	ground4->setDefaultTranslation(glm::vec3(0.0f,0.0f,70.0f));
 	entities.push_back(ground4);
 
 	playerVehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
 	playerVehicle->setRenderable(van);
-	playerVehicle->setDefaultRotation(-1.5708f, vec3(0,1,0));
-	playerVehicle->setColor(vec3(1,0,0));
+	playerVehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+
+	// TODO get dimensions working properly for vehicle
 	glm::vec3 d = van->getDimensions();
-	cout << d.x << " " << d.y << " " << d.z << endl;
 	playerVehicle->chassisDims = physx::PxVec3(2, 2, 5);
 	physicsEngine->createVehicle(playerVehicle);
 	entities.push_back(playerVehicle);
 
-	//set camera
-	camera.setPosition(glm::vec3(0,6,8));			//location of camera
-	camera.setLookAtPosition(glm::vec3(0,0,0));		//where camera is pointing
-	camera.setUpVector(glm::vec3(0,1,0));			//orientation on camera
-	renderingEngine->updateView(camera);
+	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
+	{
+		cameraPosBuffer[i] = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+	}
+	cameraPosBufferIndex = 0;
+	camera.setUpVector(glm::vec3(0,1,0));
 }
 
 void Game::connectSignals()
@@ -158,7 +158,6 @@ void Game::mainLoop()
 {
 	unsigned int oldTimeMs = SDL_GetTicks();
 	
-	float x = 0;
 	// Game loop
 	while (gameState!= GameState::EXIT)
 	{
@@ -175,13 +174,15 @@ void Game::mainLoop()
 		physicsEngine->fetchSimulationResults();
 
 		// Point the camera at the car
-		camera.setPosition(playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-20,0)));
+		cameraPosBuffer[cameraPosBufferIndex] = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+		cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
+
+		camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
 		camera.setLookAtPosition(playerVehicle->getPosition());
 		renderingEngine->updateView(camera);
 
 		//display
 		renderingEngine->displayFunc(entities);
-		//renderingEngine.draw();
 
 		//swap buffers
 		SDL_GL_SwapWindow(window);
@@ -218,11 +219,10 @@ void Game::firePizza()
 	DynamicEntity* pizzaBox = new DynamicEntity();
 	pizzaBox->setRenderable(renderables.at(1)); // todo, match names to renderables or something instead of hard-coded
 	glm::vec3 position = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
-	glm::vec3 velocity = glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 40.0, 0.0));
+	glm::vec3 velocity = glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 20.0, 0.0));
 	physx::PxVec3 v = playerVehicle->getDynamicActor()->getLinearVelocity();
 	velocity = velocity + glm::vec3(v.x, v.y, v.z);
 	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);
-	pizzaBox->setColor(vec3(0,1,1));
 	entities.push_back(pizzaBox);
 }
 

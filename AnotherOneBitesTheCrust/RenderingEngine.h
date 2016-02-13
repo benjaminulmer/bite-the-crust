@@ -11,8 +11,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 
-
-
 #include <GL\glew.h>
 
 #include "res_path.h"
@@ -20,20 +18,14 @@
 #include "Renderable.h"
 #include "Camera.h"
 
-using namespace std;
-using glm::vec3;
-using glm::vec4;
-using glm::mat4;
-using glm::perspective;
-
 class RenderingEngine
 {
 public:
 	RenderingEngine(void);
 	~RenderingEngine(void);	
 
-	void displayFunc(vector<Entity*> entities);
-	mat4 calculateDefaultModel(mat4 model, Entity * entity);
+	void displayFunc(std::vector<Entity*> entities);
+	glm::mat4 calculateDefaultModel(glm::mat4 model, Entity * entity);
 
 	void generateIDs();
 	void deleteIDs();
@@ -45,8 +37,6 @@ public:
 
 	void testOBJLoading();
 
-
-
 	GLuint basicProgramID;		//shader program 
 
 	GLuint vanVAO;
@@ -55,20 +45,20 @@ public:
 	GLuint vanNormals;
 	GLuint vanIndexBuffer;
 
-	vector <vec3> colors;
-	//vector <vec3> vertices;
-	vector <GLuint> faces;
+	std::vector <glm::vec3> colors;
+	//std::vector <glm::vec3> vertices;
+	std::vector <GLuint> faces;
 
-	mat4 MV;
-	mat4 M;
-	mat4 V;
-	mat4 P;
+	glm::mat4 MV;
+	glm::mat4 M;
+	glm::mat4 V;
+	glm::mat4 P;
 
 	//phong testing
 	GLuint phongProgramID;
-	vector <vec3> phongVerts;
-	vector <vec3> phongNorms;
-	vector <GLuint> phongFaces;
-	vector <glm::vec2> phongUVs;
+	std::vector <glm::vec3> phongVerts;
+	std::vector <glm::vec3> phongNorms;
+	std::vector <GLuint> phongFaces;
+	std::vector <glm::vec2> phongUVs;
 };
 

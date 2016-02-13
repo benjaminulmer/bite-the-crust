@@ -3,6 +3,9 @@
 #include <math.h>
 #include <iostream>
 
+using namespace std;
+using namespace glm;
+
 RenderingEngine::RenderingEngine()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -61,7 +64,9 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 
 		
 		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 0, 400, 0);
-		glUniform3f(glGetUniformLocation(phongProgramID, "MaterialColor"), entities[i]->getColor().x, entities[i]->getColor().y, entities[i]->getColor().z);
+		glUniform3f(glGetUniformLocation(phongProgramID, "MaterialColor"), entities[i]->getRenderable()->getColor().x, 
+			                                                               entities[i]->getRenderable()->getColor().y, 
+																		   entities[i]->getRenderable()->getColor().z);
 		glBindVertexArray(entities[i]->getRenderable()->getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertices().size());
 		//glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->getFaces().size(), GL_UNSIGNED_INT, (void*)0);

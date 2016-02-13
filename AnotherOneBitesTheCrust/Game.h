@@ -20,10 +20,6 @@
 #include <GL\glew.h>
 #include <sigslot.h>
 
-
-
-using namespace std;
-
 enum class GameState
 {
 	MENU,
@@ -39,12 +35,12 @@ public:
 	Game(void);
 	~Game(void);
 
-	RenderingEngine *renderingEngine;
-	PhysicsEngine *physicsEngine;
-	InputEngine *inputEngine;
 	AIEngine *aiEngine;
 	AudioEngine *audioEngine;
-
+	InputEngine *inputEngine;
+	PhysicsEngine *physicsEngine;
+	RenderingEngine *renderingEngine;
+	
 	void run();
 
 private:
@@ -68,5 +64,10 @@ private:
 	Vehicle* playerVehicle;
 	std::vector<Entity*> entities;
 	std::vector<Renderable*> renderables;
+
+	// vehicle location for past 5 frames 
+	static const int CAMERA_POS_BUFFER_SIZE = 10;
+	glm::vec3 cameraPosBuffer[CAMERA_POS_BUFFER_SIZE];
+	int cameraPosBufferIndex;
 };
 

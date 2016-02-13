@@ -5,10 +5,22 @@
 using namespace physx;
 
 PhysicsEngine::PhysicsEngine(void) {
+	defaultErrorCallback = nullptr;
+	defaultAllocator = nullptr;
+	foundation = nullptr;
+	physics = nullptr;
+	cooking = nullptr;
+	cpuDispatcher = nullptr;
+	scene = nullptr;
+	vehicleSceneQueryData = nullptr;
+	batchQuery = nullptr;
+	frictionPairs = nullptr;
+	testChassisMat = nullptr;
+	testWheelMat = nullptr;
+	groundPlane = nullptr;
 	initSimulationData();
 	initPhysXSDK();
 	initVehicleSDK();
-
 }
 
 void PhysicsEngine::initSimulationData() {

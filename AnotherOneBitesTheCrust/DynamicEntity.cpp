@@ -12,13 +12,12 @@ DynamicEntity::~DynamicEntity(void)
 
 void DynamicEntity::setActor(physx::PxRigidDynamic* a) {
 	actor = a;
-	dynamicActor = a;
 }
 
 physx::PxRigidActor* DynamicEntity::getActor() {
-	return dynamicActor;
+	return actor;
 }
 
 physx::PxRigidDynamic* DynamicEntity::getDynamicActor() {
-	return dynamicActor;
+	return (physx::PxRigidDynamic*)(actor);
 }

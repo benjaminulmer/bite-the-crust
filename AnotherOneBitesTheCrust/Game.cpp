@@ -14,10 +14,17 @@ void fatalError(string errorString)
 
 Game::Game(void)
 {
-		window = nullptr;
-		screenWidth = 1024;		//pro csgo resolution
-		screenHeight = 768;
-		gameState = GameState::PLAY;
+	window = nullptr;
+	screenWidth = 1024;		//pro csgo resolution
+	screenHeight = 768;
+	gameState = GameState::PLAY;
+	renderingEngine = nullptr;
+	physicsEngine = nullptr;
+	inputEngine = nullptr;
+	aiEngine = nullptr;
+	audioEngine = nullptr;
+	screen = nullptr;
+	playerVehicle = nullptr;
 }
 
 // The entry point of the game
@@ -36,7 +43,7 @@ void Game::run()
 void Game::initSystems()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);		//Initialize SDL
-	window = SDL_CreateWindow("Another Bites The Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Another One Bites The Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 
 	if(window == nullptr)
 	{
@@ -69,8 +76,6 @@ void Game::initSystems()
 	renderingEngine = new RenderingEngine();
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
-
-	//renderingEngine.testOBJLoading();
 }
 
 void Game::setupEntities()
@@ -93,7 +98,6 @@ void Game::setupEntities()
 	renderables.push_back(box);
 	renderingEngine->assignBuffers(box);
 
-	// Renderable for the actual van model, not used right now
 	Renderable* van = new Renderable();
 	vector<vec3>vanVerts;
 	vector<vec3>vanNormals;

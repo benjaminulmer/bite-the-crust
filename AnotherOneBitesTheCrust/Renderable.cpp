@@ -3,6 +3,9 @@
 
 Renderable::Renderable(void)
 {
+	vao = 0;
+	vertexVBO = colourVBO = 0;
+	indexBuffer = 0;
 }
 
 

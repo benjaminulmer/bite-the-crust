@@ -30,11 +30,7 @@ class RenderingEngine
 {
 public:
 	RenderingEngine(void);
-	~RenderingEngine(void);
-
-	void pushEntities();
-	void draw();
-	
+	~RenderingEngine(void);	
 
 	void displayFunc(vector<Entity*> entities);
 	mat4 calculateDefaultModel(mat4 model, Entity * entity);

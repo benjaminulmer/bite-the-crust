@@ -13,58 +13,9 @@ RenderingEngine::RenderingEngine()
 }
 
 RenderingEngine::~RenderingEngine(void) {}
-// Push all the entity data to the renderer.
-
-
-void RenderingEngine::pushEntities()
-{
-}
-
-void RenderingEngine::draw()
-{
-	// Draw all our entities
-
-	glClearDepth(1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glUseProgram(phongProgramID);
-	GLuint mvpID = glGetUniformLocation(phongProgramID, "MVP");
-	GLuint vID = glGetUniformLocation(phongProgramID, "V");
-	GLuint mID = glGetUniformLocation(phongProgramID, "M");
-
-	M = mat4(1.0f);
-	M = glm::rotate(M, 1.5f, vec3(0,1,0));
-	mat4 MVP = P * V * M;
-
-	glUniformMatrix4fv( mvpID,
-					1,
-					GL_FALSE,
-					value_ptr(MVP)
-					);
-
-	//GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
-		glUniformMatrix4fv( vID,
-					1,
-					GL_FALSE,
-					value_ptr(V)
-					);
-		glUniformMatrix4fv( mID,
-					1,
-					GL_FALSE,
-					value_ptr(M)
-					);
-
-		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 100, 100, 0);
-
-	glBindVertexArray(vanVAO);
-	glDrawArrays(GL_TRIANGLES, 0, phongVerts.size());
-
-	//glDrawElements(GL_TRIANGLES, phongFaces.size(), GL_UNSIGNED_INT, (void*)0);
-}
 
 //vehicle dimensions
 //x: 2.5, y:2, z:5
-
-
 void RenderingEngine::displayFunc(vector<Entity*> entities)
 {
 	glClearDepth(1.0);

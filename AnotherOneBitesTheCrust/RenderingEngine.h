@@ -22,6 +22,7 @@
 
 using namespace std;
 using glm::vec3;
+using glm::vec4;
 using glm::mat4;
 using glm::perspective;
 
@@ -33,6 +34,7 @@ public:
 
 	void pushEntities();
 	void draw();
+	
 
 	void displayFunc(vector<Entity*> entities);
 	mat4 calculateDefaultModel(mat4 model, Entity * entity);
@@ -47,26 +49,30 @@ public:
 
 	void testOBJLoading();
 
-bool loadOBJ(
-	const char * path, 
-	std::vector<glm::vec3> & out_vertices, 
-	std::vector<glm::vec3> & out_normals,
-	std::vector<GLuint> & out_faces
-);
+
+
 	GLuint basicProgramID;		//shader program 
 
 	GLuint vanVAO;
 	GLuint vanVerts;
 	GLuint vanColors;
+	GLuint vanNormals;
 	GLuint vanIndexBuffer;
 
 	vector <vec3> colors;
-	vector <vec3> vertices;
+	//vector <vec3> vertices;
 	vector <GLuint> faces;
 
-	mat4 MVP;
+	mat4 MV;
 	mat4 M;
 	mat4 V;
 	mat4 P;
+
+	//phong testing
+	GLuint phongProgramID;
+	vector <vec3> phongVerts;
+	vector <vec3> phongNorms;
+	vector <GLuint> phongFaces;
+	vector <glm::vec2> phongUVs;
 };
 

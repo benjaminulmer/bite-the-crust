@@ -20,6 +20,8 @@
 #include <GL\glew.h>
 #include <sigslot.h>
 
+
+
 using namespace std;
 
 enum class GameState
@@ -55,9 +57,12 @@ private:
 	void firePizza();
 
 	SDL_Window* window;
+	SDL_Surface* screen;
 	int screenWidth;
 	int screenHeight;
 
+	SDL_Surface *text;
+	
 	GameState gameState;
 	Camera camera;
 	Vehicle* playerVehicle;

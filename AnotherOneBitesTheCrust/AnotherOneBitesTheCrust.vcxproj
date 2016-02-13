@@ -201,6 +201,8 @@
     <ClInclude Include="VehicleSceneQueryData.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\Shaders\StandardShading.fragmentshader" />
+    <None Include="res\Shaders\StandardShading.vertexshader" />
     <None Include="glew32.dll" />
     <None Include="nvToolsExt32_1.dll" />
     <None Include="PhysX3CHECKED_x86.dll" />

@@ -23,13 +23,15 @@ public:
 	void addPoint(glm::vec3 vertex, glm::vec3 colour);
 	void createFace(GLuint face);
 
-	void setPoints(std::vector <glm::vec3> vertices);
+	void setVerts(std::vector <glm::vec3> vertices);
+	void setNorms(std::vector <glm::vec3> normals);
 	void setFaces(std::vector <GLuint> faces);
-	void setColors(std::vector <glm::vec3> colors);
+	//void setColors(std::vector <glm::vec3> colors);
 
 
 	std::vector<glm::vec3> getVertices();
-	std::vector<glm::vec3> getColours();
+	std::vector<glm::vec3> getNormals();
+	//std::vector<glm::vec3> getColours();
 	std::vector<GLuint> getFaces();
 	std::vector<GLPoint> getPoints();
 	void setVAO(GLuint v);
@@ -41,7 +43,8 @@ public:
 	int getVertexCount();
 	glm::vec3 getDimensions();
 private:
-	std::vector<GLPoint> points;
+	std::vector<glm::vec3> verts;
+	std::vector<glm::vec3> norms;
 	std::vector<GLuint> faces;
 	GLuint vertexVBO, colourVBO;
 	GLuint vao;

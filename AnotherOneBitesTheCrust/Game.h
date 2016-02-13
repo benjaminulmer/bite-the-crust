@@ -35,12 +35,12 @@ public:
 	Game(void);
 	~Game(void);
 
-	RenderingEngine *renderingEngine;
-	PhysicsEngine *physicsEngine;
-	InputEngine *inputEngine;
 	AIEngine *aiEngine;
 	AudioEngine *audioEngine;
-
+	InputEngine *inputEngine;
+	PhysicsEngine *physicsEngine;
+	RenderingEngine *renderingEngine;
+	
 	void run();
 
 private:

@@ -64,11 +64,11 @@ void Game::initSystems()
 
 	glClearColor(0.2f, 0.2f, 0.5f, 1.0f);				//blue background
 
-	renderingEngine = new RenderingEngine();
+	aiEngine = new AIEngine();
+	audioEngine = new AudioEngine();
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
-
-	//renderingEngine.testOBJLoading();
+	renderingEngine = new RenderingEngine();
 }
 
 void Game::setupEntities()
@@ -79,6 +79,7 @@ void Game::setupEntities()
 	bool floorRes = ContentLoading::loadOBJNonIndexed("res\\Models\\FlatFloor.obj", floorVerts, floorNormals);
 	floor->setVerts(floorVerts);
 	floor->setNorms(floorNormals);
+	floor->setColor(glm::vec3(1.0f,1.0f,1.0f));
 	renderables.push_back(floor);
 	renderingEngine->assignBuffers(floor);
 
@@ -88,6 +89,7 @@ void Game::setupEntities()
 	bool boxRes = ContentLoading::loadOBJNonIndexed("res\\Models\\PizzaBox.obj", boxVerts, boxNormals);
 	box->setVerts(boxVerts);
 	box->setNorms(boxNormals);
+	box->setColor(glm::vec3(0,1,1));
 	renderables.push_back(box);
 	renderingEngine->assignBuffers(box);
 
@@ -98,37 +100,33 @@ void Game::setupEntities()
 	bool res = ContentLoading::loadOBJNonIndexed("res\\Models\\Van.obj", vanVerts, vanNormals);
 	van->setVerts(vanVerts);
 	van->setNorms(vanNormals);
+	van->setColor(glm::vec3(1,0,0));
 	renderables.push_back(van);
 	renderingEngine->assignBuffers(van);
 
 	Entity* ground = new Entity();
 	ground->setRenderable(floor);
-	ground->setColor(glm::vec3(1.0f,1.0f,1.0f));
 	entities.push_back(ground);
 
 	Entity* ground2 = new Entity();
 	ground2->setRenderable(floor);
 	ground2->setDefaultTranslation(glm::vec3(70.0f,0.0f,0.0f));
-	ground2->setColor(glm::vec3(1.0f,1.0f,0.0f));
 	entities.push_back(ground2);
 
 	Entity* ground3 = new Entity();
 	ground3->setRenderable(floor);
 	ground3->setDefaultTranslation(glm::vec3(70.0f,0.0f,70.0f));
-	ground3->setColor(glm::vec3(1.0f,1.0f,1.0f));
 	entities.push_back(ground3);
 
 	Entity* ground4 = new Entity();
 	ground4->setRenderable(floor);
 	ground4->setDefaultTranslation(glm::vec3(0.0f,0.0f,70.0f));
-	ground4->setColor(glm::vec3(1.0f,1.0f,0.0f));
 	entities.push_back(ground4);
 
 	playerVehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
 	playerVehicle->setRenderable(van);
 	playerVehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
-	playerVehicle->setColor(glm::vec3(1,0,0));
 	glm::vec3 d = van->getDimensions();
 	cout << d.x << " " << d.y << " " << d.z << endl;
 	playerVehicle->chassisDims = physx::PxVec3(2, 2, 5);
@@ -216,7 +214,6 @@ void Game::firePizza()
 	physx::PxVec3 v = playerVehicle->getDynamicActor()->getLinearVelocity();
 	velocity = velocity + glm::vec3(v.x, v.y, v.z);
 	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);
-	pizzaBox->setColor(glm::vec3(0,1,1));
 	entities.push_back(pizzaBox);
 }
 

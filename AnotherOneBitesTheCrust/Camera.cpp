@@ -10,6 +10,14 @@ Camera::~Camera(void)
 {
 }
 
+void Camera::setPosition(glm::vec3 v) {
+	position = v;
+}
+
+glm::vec3 Camera::getPosition() {
+	return position;
+}
+
 void Camera::setUpVector(glm::vec3 v) {
 	upVector = v;
 }

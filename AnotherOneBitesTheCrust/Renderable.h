@@ -34,6 +34,7 @@ public:
 	//std::vector<glm::vec3> getColours();
 	std::vector<GLuint> getFaces();
 	std::vector<GLPoint> getPoints();
+
 	void setVAO(GLuint v);
 	GLuint getVAO();
 	void setVertexVBO(GLuint v);
@@ -42,6 +43,11 @@ public:
 	GLuint getColourVBO();
 	int getVertexCount();
 	glm::vec3 getDimensions();
+
+	void setColor(glm::vec3 c);
+	glm::vec3 getColor();
+	glm::vec3 getAmbient();
+
 private:
 	std::vector<glm::vec3> verts;
 	std::vector<glm::vec3> norms;
@@ -49,6 +55,9 @@ private:
 	GLuint vertexVBO, colourVBO;
 	GLuint vao;
 	GLuint indexBuffer;
+
+	glm::vec3 color;
+	glm::vec3 ambient_color;
 	// Model
 	// Texture
 };

@@ -107,3 +107,19 @@ glm::vec3 Renderable::getDimensions() {
 	}
 	return glm::vec3(glm::abs(maxX-minX), glm::abs(maxY-minY), glm::abs(maxZ-minZ));
 }
+
+glm::vec3 Renderable::getColor()
+{
+	return color;
+}
+
+glm::vec3 Renderable::getAmbient()
+{
+	return ambient_color;
+}
+
+void Renderable::setColor(glm::vec3 c)
+{
+	color = c;
+	ambient_color = c/glm::vec3(10.0f);
+}

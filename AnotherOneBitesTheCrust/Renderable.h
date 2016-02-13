@@ -23,15 +23,18 @@ public:
 	void addPoint(glm::vec3 vertex, glm::vec3 colour);
 	void createFace(GLuint face);
 
-	void setPoints(std::vector <glm::vec3> vertices);
+	void setVerts(std::vector <glm::vec3> vertices);
+	void setNorms(std::vector <glm::vec3> normals);
 	void setFaces(std::vector <GLuint> faces);
-	void setColors(std::vector <glm::vec3> colors);
+	//void setColors(std::vector <glm::vec3> colors);
 
 
 	std::vector<glm::vec3> getVertices();
-	std::vector<glm::vec3> getColours();
+	std::vector<glm::vec3> getNormals();
+	//std::vector<glm::vec3> getColours();
 	std::vector<GLuint> getFaces();
 	std::vector<GLPoint> getPoints();
+
 	void setVAO(GLuint v);
 	GLuint getVAO();
 	void setVertexVBO(GLuint v);
@@ -40,12 +43,21 @@ public:
 	GLuint getColourVBO();
 	int getVertexCount();
 	glm::vec3 getDimensions();
+
+	void setColor(glm::vec3 c);
+	glm::vec3 getColor();
+	glm::vec3 getAmbient();
+
 private:
-	std::vector<GLPoint> points;
+	std::vector<glm::vec3> verts;
+	std::vector<glm::vec3> norms;
 	std::vector<GLuint> faces;
 	GLuint vertexVBO, colourVBO;
 	GLuint vao;
 	GLuint indexBuffer;
+
+	glm::vec3 color;
+	glm::vec3 ambient_color;
 	// Model
 	// Texture
 };

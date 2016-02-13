@@ -8,7 +8,7 @@ InputEngine::InputEngine(void) {
 
 // Opens up to 4 currently connected controllers
 void InputEngine::openControllers() {
-	for(int i = 0; i < SDL_NumJoysticks() && i < MAX_NUM_CONTROLLERS; i++) {
+	for (int i = 0; i < SDL_NumJoysticks() && i < MAX_NUM_CONTROLLERS; i++) {
 		controllers[i] = SDL_GameControllerOpen(i);
 		inputs[i].accel = 0;
 		inputs[i].brake = 0;
@@ -16,14 +16,13 @@ void InputEngine::openControllers() {
 		inputs[i].rightSteer = 0;
 	}
 	std::cout << "NUM CONTROLLERS: " << SDL_NumJoysticks() << std::endl;
-	deadzoneSize = 6553;
+	deadzoneSize = 8192;
 }
 
 void InputEngine::processControllerEvent(SDL_Event event) {
 	// Controller button events
 	if (event.type == SDL_CONTROLLERBUTTONDOWN) {
 		if (event.cbutton.button == SDL_CONTROLLER_BUTTON_A) {
-			std::cout << "a" << std::endl;
 			FireSignal();
 		}
 	}

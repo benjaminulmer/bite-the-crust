@@ -10,7 +10,5 @@ public:
 	void setActor(physx::PxRigidDynamic* a);
 	physx::PxRigidActor* getActor();
 	physx::PxRigidDynamic* getDynamicActor();
-private:
-	physx::PxRigidDynamic* dynamicActor;
 };
 

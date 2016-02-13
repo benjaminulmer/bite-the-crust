@@ -102,6 +102,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;PhysX3VehicleCHECKED.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)res\dlls\*" "$(OutDir)" /d /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -194,6 +197,16 @@
     <ClInclude Include="ShaderTools.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\Shaders\StandardShading.fragmentshader" />
+    <None Include="res\Shaders\StandardShading.vertexshader" />
+    <None Include="glew32.dll" />
+    <None Include="nvToolsExt32_1.dll" />
+    <None Include="PhysX3CHECKED_x86.dll" />
+    <None Include="PhysX3CommonCHECKED_x86.dll" />
+    <None Include="PhysX3CookingCHECKED_x86.dll" />
+    <None Include="SDL2.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

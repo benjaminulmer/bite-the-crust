@@ -3,6 +3,9 @@
 
 Renderable::Renderable(void)
 {
+	vao = 0;
+	vertexVBO = colourVBO = 0;
+	indexBuffer = 0;
 }
 
 
@@ -12,7 +15,7 @@ Renderable::~Renderable(void)
 
 void Renderable::addPoint(glm::vec3 vertex, glm::vec3 colour) {
 	GLPoint point(vertex, colour);
-	points.push_back(point);
+	//points.push_back(point);
 }
 
 void Renderable::createFace(GLuint face)
@@ -20,13 +23,14 @@ void Renderable::createFace(GLuint face)
 	faces.push_back(face);
 }
 
-void Renderable::setPoints(std::vector<glm::vec3> vertices)
+void Renderable::setVerts(std::vector<glm::vec3> vertices)
 {
-	for(unsigned int i = 0; i<vertices.size(); i++)
-	{
-		GLPoint point(vertices.at(i), glm::vec3(1,1,1));
-		points.push_back(point);
-	}
+	verts = vertices;
+}
+
+void Renderable::setNorms(std::vector <glm::vec3> normals)
+{
+	norms = normals;
 }
 
 void Renderable::setFaces(std::vector<GLuint> face)
@@ -36,28 +40,29 @@ void Renderable::setFaces(std::vector<GLuint> face)
 
 
 std::vector<glm::vec3> Renderable::getVertices() {
-	std::vector<glm::vec3> vertices;
-	for (int i = 0; i < (int)points.size(); i++) {
-		vertices.push_back(points[i].vertex);
-	}
-	return vertices;
+	return verts;
 }
 
-std::vector<glm::vec3> Renderable::getColours() {
-	std::vector<glm::vec3> vertices;
-	for (int i = 0; i < (int)points.size(); i++) {
-		vertices.push_back(points[i].colour);
-	}
-	return vertices;
+//std::vector<glm::vec3> Renderable::getColours() {
+//	std::vector<glm::vec3> vertices;
+//	for (int i = 0; i < (int)points.size(); i++) {
+//		vertices.push_back(points[i].colour);
+//	}
+//	return vertices;
+//}
+
+std::vector<glm::vec3> Renderable::getNormals()
+{
+	return norms;
 }
 
 std::vector<GLuint> Renderable::getFaces(){
 	return faces;
 }
 
-std::vector<GLPoint> Renderable::getPoints() {
-	return points;
-}
+//std::vector<GLPoint> Renderable::getPoints() {
+//	return points;
+//}
 
 void Renderable::setVAO(GLuint v) {
 	vao = v;
@@ -84,18 +89,18 @@ GLuint Renderable::getColourVBO() {
 }
 
 int Renderable::getVertexCount() {
-	return points.size();
+	return verts.size();
 }
 
 glm::vec3 Renderable::getDimensions() {
 	float minX, maxX;
 	float minY, maxY;
 	float minZ, maxZ;
-	minX = maxX = points.at(0).vertex.x;
-	minY = maxY = points.at(0).vertex.y;
-	minZ = maxZ = points.at(0).vertex.z;
-	for (int i = 1; i < points.size(); i++) {
-		glm::vec3 v = points.at(i).vertex;
+	minX = maxX = verts.at(0).x;
+	minY = maxY = verts.at(0).y;
+	minZ = maxZ = verts.at(0).z;
+	for (unsigned int i = 1; i < verts.size(); i++) {
+		glm::vec3 v = verts.at(i);
 		minX = glm::min(minX, v.x);
 		maxX = glm::max(maxX, v.x);
 		minY = glm::min(minY, v.y);
@@ -104,4 +109,20 @@ glm::vec3 Renderable::getDimensions() {
 		maxZ = glm::max(maxZ, v.z);
 	}
 	return glm::vec3(glm::abs(maxX-minX), glm::abs(maxY-minY), glm::abs(maxZ-minZ));
+}
+
+glm::vec3 Renderable::getColor()
+{
+	return color;
+}
+
+glm::vec3 Renderable::getAmbient()
+{
+	return ambient_color;
+}
+
+void Renderable::setColor(glm::vec3 c)
+{
+	color = c;
+	ambient_color = c/glm::vec3(10.0f);
 }

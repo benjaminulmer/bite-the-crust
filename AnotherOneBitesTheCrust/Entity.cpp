@@ -7,6 +7,7 @@ Entity::Entity(void)
 	defaultRotationAxis = glm::vec3(0,1,0);
 	defaultTranslation = glm::vec3(0,0,0);
 	defaultScale = glm::vec3(1,1,1);
+	renderable = nullptr;
 }
 
 
@@ -49,11 +50,9 @@ glm::vec3 Entity::getDefaultScale()
 {
 	return defaultScale;
 }
-	
-
 
 glm::vec3 Entity::getPosition() {
-	return position;
+	return glm::vec3(0, 0, 0);
 }
 
 glm::mat4 Entity::getModelMatrix() {
@@ -61,7 +60,7 @@ glm::mat4 Entity::getModelMatrix() {
 }
 
 void Entity::setPosition(glm::vec3 pos) {
-	position = pos;
+	return;
 }
 
 bool Entity::hasRenderable() {

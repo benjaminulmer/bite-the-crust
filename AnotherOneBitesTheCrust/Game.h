@@ -20,10 +20,6 @@
 #include <GL\glew.h>
 #include <sigslot.h>
 
-
-
-using namespace std;
-
 enum class GameState
 {
 	MENU,

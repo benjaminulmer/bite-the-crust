@@ -3,6 +3,9 @@
 #include <math.h>
 #include <iostream>
 
+using namespace std;
+using namespace glm;
+
 RenderingEngine::RenderingEngine()
 {
 	glEnable(GL_DEPTH_TEST);

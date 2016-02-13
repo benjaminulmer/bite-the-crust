@@ -2,6 +2,8 @@
 #include "DrivingInput.h"
 #include "DynamicEntity.h"
 
+using namespace std;
+
 void fatalError(string errorString)
 {
 	cout << errorString << endl;
@@ -31,8 +33,6 @@ void Game::run()
 	mainLoop();
 }
 
-
-
 void Game::initSystems()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);		//Initialize SDL
@@ -59,7 +59,7 @@ void Game::initSystems()
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);		//enable double buffering
 	if( SDL_GL_SetSwapInterval( 1 ) < 0 )
 	{
-		printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
+		printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 	}
 
 	glClearColor(0.2f, 0.2f, 0.5f, 1.0f);				//blue background
@@ -74,8 +74,8 @@ void Game::initSystems()
 void Game::setupEntities()
 {
 	Renderable * floor = new Renderable();
-	vector<vec3>floorVerts;
-	vector<vec3>floorNormals;
+	vector<glm::vec3>floorVerts;
+	vector<glm::vec3>floorNormals;
 	bool floorRes = ContentLoading::loadOBJNonIndexed("res\\Models\\FlatFloor.obj", floorVerts, floorNormals);
 	floor->setVerts(floorVerts);
 	floor->setNorms(floorNormals);
@@ -83,8 +83,8 @@ void Game::setupEntities()
 	renderingEngine->assignBuffers(floor);
 
 	Renderable * box = new Renderable();
-	vector<vec3>boxVerts;
-	vector<vec3>boxNormals;
+	vector<glm::vec3>boxVerts;
+	vector<glm::vec3>boxNormals;
 	bool boxRes = ContentLoading::loadOBJNonIndexed("res\\Models\\PizzaBox.obj", boxVerts, boxNormals);
 	box->setVerts(boxVerts);
 	box->setNorms(boxNormals);
@@ -93,8 +93,8 @@ void Game::setupEntities()
 
 	// Renderable for the actual van model, not used right now
 	Renderable* van = new Renderable();
-	vector<vec3>vanVerts;
-	vector<vec3>vanNormals;
+	vector<glm::vec3>vanVerts;
+	vector<glm::vec3>vanNormals;
 	bool res = ContentLoading::loadOBJNonIndexed("res\\Models\\Van.obj", vanVerts, vanNormals);
 	van->setVerts(vanVerts);
 	van->setNorms(vanNormals);
@@ -103,32 +103,32 @@ void Game::setupEntities()
 
 	Entity* ground = new Entity();
 	ground->setRenderable(floor);
-	ground->setColor(vec3(1.0f,1.0f,1.0f));
+	ground->setColor(glm::vec3(1.0f,1.0f,1.0f));
 	entities.push_back(ground);
 
 	Entity* ground2 = new Entity();
 	ground2->setRenderable(floor);
-	ground2->setDefaultTranslation(vec3(70.0f,0.0f,0.0f));
-	ground2->setColor(vec3(1.0f,1.0f,0.0f));
+	ground2->setDefaultTranslation(glm::vec3(70.0f,0.0f,0.0f));
+	ground2->setColor(glm::vec3(1.0f,1.0f,0.0f));
 	entities.push_back(ground2);
 
 	Entity* ground3 = new Entity();
 	ground3->setRenderable(floor);
-	ground3->setDefaultTranslation(vec3(70.0f,0.0f,70.0f));
-	ground3->setColor(vec3(1.0f,1.0f,1.0f));
+	ground3->setDefaultTranslation(glm::vec3(70.0f,0.0f,70.0f));
+	ground3->setColor(glm::vec3(1.0f,1.0f,1.0f));
 	entities.push_back(ground3);
 
 	Entity* ground4 = new Entity();
 	ground4->setRenderable(floor);
-	ground4->setDefaultTranslation(vec3(0.0f,0.0f,70.0f));
-	ground4->setColor(vec3(1.0f,1.0f,0.0f));
+	ground4->setDefaultTranslation(glm::vec3(0.0f,0.0f,70.0f));
+	ground4->setColor(glm::vec3(1.0f,1.0f,0.0f));
 	entities.push_back(ground4);
 
 	playerVehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
 	playerVehicle->setRenderable(van);
-	playerVehicle->setDefaultRotation(-1.5708f, vec3(0,1,0));
-	playerVehicle->setColor(vec3(1,0,0));
+	playerVehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+	playerVehicle->setColor(glm::vec3(1,0,0));
 	glm::vec3 d = van->getDimensions();
 	cout << d.x << " " << d.y << " " << d.z << endl;
 	playerVehicle->chassisDims = physx::PxVec3(2, 2, 5);
@@ -216,7 +216,7 @@ void Game::firePizza()
 	physx::PxVec3 v = playerVehicle->getDynamicActor()->getLinearVelocity();
 	velocity = velocity + glm::vec3(v.x, v.y, v.z);
 	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);
-	pizzaBox->setColor(vec3(0,1,1));
+	pizzaBox->setColor(glm::vec3(0,1,1));
 	entities.push_back(pizzaBox);
 }
 

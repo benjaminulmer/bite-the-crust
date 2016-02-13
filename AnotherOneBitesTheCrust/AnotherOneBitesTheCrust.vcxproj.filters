@@ -20,7 +20,6 @@
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="ContentLoading.cpp" />
     <ClCompile Include="DynamicEntity.cpp" />
-    <ClCompile Include="objModel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
@@ -43,7 +42,6 @@
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="ContentLoading.h" />
     <ClInclude Include="DynamicEntity.h" />
-    <ClInclude Include="objModel.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />

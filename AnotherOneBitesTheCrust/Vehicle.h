@@ -1,10 +1,12 @@
 #pragma once
-#include "physicsentity.h"
+#include "PhysicsEntity.h"
 #include <PxPhysicsAPI.h>
 #include "DrivingInput.h"
+#include "DynamicEntity.h"
+#include <sigslot.h>
 
 class Vehicle :
-	public PhysicsEntity
+	public DynamicEntity, public sigslot::has_slots<>
 {
 public:
 	Vehicle(void);
@@ -29,6 +31,7 @@ public:
 	physx::PxReal wheelRestitution;
 	physx::PxVehicleDrive4W* physicsVehicle;
 
+	physx::PxVehicleDrive4W* getPhysicsVehicle();
 	void handleInput(DrivingInput* input);
 	void updateTuning();
 private: 

@@ -41,6 +41,7 @@ public:
 	void setColourVBO(GLuint v);
 	GLuint getColourVBO();
 	int getVertexCount();
+	glm::vec3 getDimensions();
 private:
 	std::vector<glm::vec3> verts;
 	std::vector<glm::vec3> norms;

@@ -3,7 +3,14 @@
 #include <math.h>
 #include <iostream>
 
-RenderingEngine::RenderingEngine() {}
+RenderingEngine::RenderingEngine()
+{
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	generateIDs();
+	loadProjectionMatrix();
+}
 
 RenderingEngine::~RenderingEngine(void) {}
 // Push all the entity data to the renderer.
@@ -29,7 +36,6 @@ bool RenderingEngine::loadOBJNonIndexed(
 		getchar();
 		return false;
 	}
-
 	while( 1 ){
 
 		char lineHeader[128];
@@ -102,11 +108,11 @@ bool RenderingEngine::loadOBJNonIndexed(
 }
 
 
-void RenderingEngine::pushEntities() {
+void RenderingEngine::pushEntities()
+{
 }
 
-
-void RenderingEngine::draw() 
+void RenderingEngine::draw()
 {
 	// Draw all our entities
 
@@ -230,25 +236,12 @@ void RenderingEngine::loadProjectionMatrix()
 }
 
 
-void RenderingEngine::updateView(Camera& c) 
+
+void RenderingEngine::updateView(Camera& c)
 {
 	V = glm::lookAt(c.getPosition(), c.getLookAtPosition(), c.getUpVector());
 }
 
-void RenderingEngine::init()
-{
-	cout << "Initialize" << endl;
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	//glViewport(0,0,1024,768);
-	//glMatrixMode(GL_PROJECTION);
-	//glLoadIdentity();
-	//glMatrixMode(GL_MODELVIEW);
-	//glLoadIdentity();
-
-	generateIDs();
-	loadProjectionMatrix();
-}
 
 void RenderingEngine::assignBuffers(Renderable* r) 
 {
@@ -304,7 +297,8 @@ void RenderingEngine::assignBuffers(Renderable* r)
 	
 }
 
-void RenderingEngine::deleteBuffers(Renderable *r) 
+
+void RenderingEngine::deleteBuffers(Renderable *r)
 {
 	GLuint vao = r->getVAO();
 	GLuint vbuf = r->getVertexVBO();

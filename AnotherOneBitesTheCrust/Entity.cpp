@@ -3,6 +3,10 @@
 
 Entity::Entity(void)
 {
+	defaultRotation = 0;
+	defaultRotationAxis = glm::vec3(0,1,0);
+	defaultTranslation = glm::vec3(0,0,0);
+	defaultScale = glm::vec3(1,1,1);
 }
 
 

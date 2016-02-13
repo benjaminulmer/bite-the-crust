@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h>
 #include "DrivingInput.h"
+#include <sigslot.h>
 
 class InputEngine
 {
@@ -14,6 +15,8 @@ public:
 
 	void processControllerEvent(SDL_Event event);
 	DrivingInput* getInput();
+	sigslot::signal1<DrivingInput*> DrivingSignal;
+	sigslot::signal0<> FireSignal;
 
 private:
 	SDL_GameController* controllers[MAX_NUM_CONTROLLERS];

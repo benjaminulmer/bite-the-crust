@@ -34,9 +34,8 @@ public:
 
 	void pushEntities();
 	void draw();
-	//void RenderText(string message, SDL_Color color, int x, int y, int size);
+	
 
-	void init();
 	void displayFunc(vector<Entity*> entities);
 	mat4 calculateDefaultModel(mat4 model, Entity * entity);
 
@@ -49,8 +48,6 @@ public:
 	void deleteBuffers(Renderable* r);
 
 	void testOBJLoading();
-
-	
 
 bool loadOBJ(
 	const char * path, 

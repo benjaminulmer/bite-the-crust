@@ -12,12 +12,10 @@ public:
 	PhysicsEngine(void);
 	~PhysicsEngine(void);
 
-	void simulate(unsigned int deltaTimeMs, DrivingInput* playerInput);
+	void simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();
-	double getPosX();
-	double getPosY();
-	double getPosZ();
-	void initVehicle(Vehicle* vehicle);
+	void createDynamicEntity(PhysicsEntity* entity, glm::vec3 position, glm::vec3 velocity = glm::vec3(0,0,0));
+	void createVehicle(Vehicle* vehicle);
 
 private:
 	physx::PxTolerancesScale scale;
@@ -41,18 +39,15 @@ private:
 
 	physx::PxMaterial* testChassisMat;
 	physx::PxMaterial* testWheelMat;
-	physx::PxVehicleDrive4W* testVehicle;
 
 	physx::PxRigidStatic* groundPlane;
 
 	physx::PxF32 deltaTimeSAcc;
 	
+	std::vector<physx::PxVehicleWheels*> vehicles;
+	std::vector<physx::PxRigidDynamic*> entities;
 
 	void initSimulationData();
-	void initPhysX();
-	void initVehicles();
-
-	void testScene(); // Test method
-
-
+	void initPhysXSDK();
+	void initVehicleSDK();
 };

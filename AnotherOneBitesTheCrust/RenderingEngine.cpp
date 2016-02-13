@@ -2,7 +2,6 @@
 #include "Game.h"
 #include <math.h>
 #include <iostream>
-#include <ft2build.h>
 
 RenderingEngine::RenderingEngine() {}
 

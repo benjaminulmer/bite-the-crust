@@ -19,7 +19,6 @@
 #include <string>
 #include <GL\glew.h>
 
-#include <SDL_ttf\SDL_ttf.h>
 
 
 using namespace std;
@@ -58,7 +57,6 @@ private:
 	int screenWidth;
 	int screenHeight;
 
-	TTF_Font * font;
 	SDL_Surface *text;
 	
 	GameState gameState;

@@ -8,8 +8,6 @@ PhysicsEngine::PhysicsEngine(void) {
 	initSimulationData();
 	initPhysXSDK();
 	initVehicleSDK();
-
-	testScene();
 }
 
 void PhysicsEngine::initSimulationData() {

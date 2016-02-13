@@ -201,7 +201,7 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 					);
 
 		
-		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 0, 100, 0);
+		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 0, 400, 0);
 		glUniform3f(glGetUniformLocation(phongProgramID, "MaterialColor"), entities[i]->getColor().x, entities[i]->getColor().y, entities[i]->getColor().z);
 		glBindVertexArray(entities[i]->getRenderable()->getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertices().size());

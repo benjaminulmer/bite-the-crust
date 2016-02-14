@@ -40,7 +40,8 @@ physx::PxVehicleDrive4W* Vehicle::getPhysicsVehicle() {
 	return physicsVehicle;
 }
 
-void Vehicle::updateTuning() {
+void Vehicle::updateTuning()
+{
 	// Recalculate variables which are based off of other variables, if some of them have been changed.
 	chassisMOI = PxVec3
 	((chassisDims.y*chassisDims.y + chassisDims.z*chassisDims.z)*chassisMass/12.0f,
@@ -50,9 +51,33 @@ void Vehicle::updateTuning() {
 	wheelMOI = 0.5f*wheelMass*wheelRadius*wheelRadius;
 }
 
-void Vehicle::handleInput(DrivingInput* input) {
-	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->accel);
-	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->brake);
+#include <iostream>
+
+void Vehicle::handleInput(DrivingInput* input)
+{
+	float handBrake = 0;
+	(input->handBrake) ? handBrake = 1: handBrake = 0;
+
+	if (physicsVehicle->computeForwardSpeed() == 0 && input->backward > 0 && physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eFIRST) 
+	{
+		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+	}
+	else if (physicsVehicle->computeForwardSpeed() == 0 && input->forward > 0 && physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE)
+	{
+		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	}
+
+	if (physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE)
+	{
+		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->backward);
+		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
+	} 
+	else 
+	{
+		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
+		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
+	}
 	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->leftSteer);
 	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->rightSteer);
+	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, handBrake);
 }

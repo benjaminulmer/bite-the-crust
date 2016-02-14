@@ -151,7 +151,6 @@ void Game::setupEntities()
 void Game::connectSignals()
 {
 	inputEngine->DrivingSignal.connect(playerVehicle, &Vehicle::handleInput);
-	inputEngine->FireSignal.connect(this, &Game::firePizza);
 }
 
 void Game::mainLoop()
@@ -163,6 +162,7 @@ void Game::mainLoop()
 	{
 		// Update the player and AI cars
 		processSDLEvents();
+		playerVehicle->handleInput(inputEngine->getInput());
 		aiEngine->updateAI();
 
 		// Figure out timestep and run physics
@@ -199,7 +199,7 @@ void Game::processSDLEvents()
 			gameState = GameState::EXIT;
 		}
 		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN ||
-			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
+			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED || SDL_CONTROLLERBUTTONUP)
 		{
 			inputEngine->processControllerEvent(event);
 		}

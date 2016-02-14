@@ -15,8 +15,26 @@ DrivingInput AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 	glm::vec3 desiredDirection = glm::normalize(desiredPos - driver->getPosition());
 	glm::vec3 forward(glm::normalize(driver->getModelMatrix() * glm::vec4(0,0,1,0)));
 
-	glm::acos(glm::dot(desiredDirection, desiredPos));
+	float ratio = glm::acos(glm::dot(desiredDirection, forward)) / glm::pi<float>();
 
+	if(ratio > 0.1)
+	{
+		if(desiredPos.x < driver->getPosition().x)
+		{
+			input.rightSteer = ratio;
+			input.leftSteer = 0;
+		}
+		else
+		{
+			input.leftSteer = ratio;
+			input.rightSteer = 0;
+		}
+	}
+	else
+	{
+		input.rightSteer = 0;
+		input.leftSteer = 0;
+	}
 
 	return input;
 }
@@ -24,11 +42,10 @@ DrivingInput AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 void AIEngine::updatePath(Vehicle* toUpdate)
 {
 
-	for(int i = 0; i < 10; i++)
-	{
-		glm::vec3 randPoint((rand()%Map::MAP_SIZE) - Map::MAP_SIZE/2, 0, (rand()%Map::MAP_SIZE) - Map::MAP_SIZE/2);
-		toUpdate->currentPath.push_back(randPoint);
-	}
+	toUpdate->currentPath.push_back(glm::vec3(-Map::MAP_SIZE/2, 0, Map::MAP_SIZE/2));
+	toUpdate->currentPath.push_back(glm::vec3(Map::MAP_SIZE/2, 0, Map::MAP_SIZE/2));
+	toUpdate->currentPath.push_back(glm::vec3(-Map::MAP_SIZE/2, 0, -Map::MAP_SIZE/2));
+	toUpdate->currentPath.push_back(glm::vec3(Map::MAP_SIZE/2, 0, -Map::MAP_SIZE/2));
 
 }
 
@@ -42,11 +59,15 @@ DrivingInput AIEngine::updateAI(Vehicle* toUpdate)
 	// May want to consider something more efficient, uses square root in here
 	float distanceToNext = glm::length(toUpdate->currentPath.at(0) - toUpdate->getPosition());
 
-	if(distanceToNext < 5)
+	if(distanceToNext < 10)
+	{
 		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
+		std::cout << "Waypoint get!" << std::endl;
+		if(toUpdate->currentPath.empty())
+			return DrivingInput();
+	}
 
-
-	return goToPoint(toUpdate->getPosition(), toUpdate->currentPath.at(0));
+	return goToPoint(toUpdate, toUpdate->currentPath.at(0));
 }
 
 AIEngine::~AIEngine(void)

@@ -58,11 +58,13 @@ void Vehicle::handleInput(DrivingInput* input)
 	float handBrake = 0;
 	(input->handBrake) ? handBrake = 1: handBrake = 0;
 
-	if (physicsVehicle->computeForwardSpeed() == 0 && input->backward > 0 && physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eFIRST) 
+	if (physicsVehicle->computeForwardSpeed() == 0 && input->backward > 0 && 
+	   (physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eFIRST || physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eNEUTRAL))
 	{
 		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 	}
-	else if (physicsVehicle->computeForwardSpeed() == 0 && input->forward > 0 && physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE)
+	else if (physicsVehicle->computeForwardSpeed() == 0 && input->forward > 0 && 
+		    (physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE || physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eNEUTRAL))
 	{
 		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	}

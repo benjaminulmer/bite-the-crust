@@ -12,7 +12,7 @@ public:
 	PhysicsEngine(void);
 	~PhysicsEngine(void);
 
-	void simulate(unsigned int deltaTimeMs);
+	bool simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();
 	void createDynamicEntity(PhysicsEntity* entity, glm::vec3 position, glm::vec3 velocity = glm::vec3(0,0,0));
 	void createVehicle(Vehicle* vehicle);

@@ -170,13 +170,16 @@ void Game::mainLoop()
 		unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 		oldTimeMs = newTimeMs;
 
-		physicsEngine->simulate(deltaTimeMs);
+		bool didPhysics = physicsEngine->simulate(deltaTimeMs);
 		physicsEngine->fetchSimulationResults();
 
 		// Point the camera at the car
-		cameraPosBuffer[cameraPosBufferIndex] = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
-		cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
-
+		if (didPhysics)
+		{
+			cameraPosBuffer[cameraPosBufferIndex] = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+			cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
+		}
+		
 		camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
 		camera.setLookAtPosition(playerVehicle->getPosition());
 		renderingEngine->updateView(camera);
@@ -198,14 +201,14 @@ void Game::processSDLEvents()
 		{
 			gameState = GameState::EXIT;
 		}
-		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN ||
-			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED || SDL_CONTROLLERBUTTONUP)
-		{
-			inputEngine->processControllerEvent(event);
-		}
 		else if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 		{
 			gameState = GameState::EXIT;
+		}
+		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN || SDL_CONTROLLERBUTTONUP ||
+			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
+		{
+			inputEngine->processControllerEvent(event);
 		}
 		else
 		{

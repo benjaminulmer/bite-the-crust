@@ -106,7 +106,7 @@ void PhysicsEngine::createVehicle(Vehicle* vehicle) {
 	vehicles.push_back(testVehicle);
 }
 
-void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
+bool PhysicsEngine::simulate(unsigned int deltaTimeMs) {
 	PxF32 deltaTimeS = deltaTimeMs/1000.0f;
 	deltaTimeSAcc += deltaTimeS;
 
@@ -127,8 +127,9 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
 		PxVehicleUpdates(stepSizeS, grav, *frictionPairs, 1, vehiclesPointer, vehicleQueryResults);
 
 		scene->simulate(stepSizeS);
+		return true;
 	}
-	//std::cout << testVehicle->getRigidDynamicActor()->getGlobalPose().p.x << " : " << testVehicle->getRigidDynamicActor()->getGlobalPose().p.y << " : " << testVehicle->getRigidDynamicActor()->getGlobalPose().p.z << std::endl;
+	return false;
 }
 
 void PhysicsEngine::fetchSimulationResults() {

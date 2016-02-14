@@ -61,7 +61,7 @@ private:
 	
 	GameState gameState;
 	Camera camera;
-	Vehicle* playerVehicle;
+	Vehicle* p1Vehicle, *p2Vehicle;
 	std::vector<Entity*> entities;
 	std::vector<Renderable*> renderables;
 

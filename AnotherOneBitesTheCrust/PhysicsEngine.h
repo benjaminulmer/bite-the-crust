@@ -50,4 +50,6 @@ private:
 	void initSimulationData();
 	void initPhysXSDK();
 	void initVehicleSDK();
+
+	static const int MAX_VEHICLES = 4;
 };

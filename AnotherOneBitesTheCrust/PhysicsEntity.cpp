@@ -24,6 +24,11 @@ glm::vec3 PhysicsEntity::getPosition() {
 	return glm::vec3(position.x, position.y, position.z);
 }
 
+void PhysicsEntity::setPosition(glm::vec3 pos)
+{
+	actor->setGlobalPose(physx::PxTransform(physx::PxVec3(pos.x, pos.y, pos.z),physx::PxQuat(physx::PxIdentity)));
+}
+
 glm::mat4 PhysicsEntity::getModelMatrix() {
 	physx::PxMat44 oldM(actor->getGlobalPose());
 	glm::mat4 newM;

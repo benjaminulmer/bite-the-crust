@@ -29,6 +29,8 @@ Vehicle::Vehicle(void)
 	wheelStaticFriction = 0.5f;
 	wheelDynamicFriction = 0.5f;
 	wheelRestitution = 0.5f;
+
+	currentPath = std::vector<glm::vec3>();
 }
 
 

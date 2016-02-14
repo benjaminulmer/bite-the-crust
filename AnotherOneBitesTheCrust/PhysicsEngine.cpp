@@ -64,7 +64,7 @@ void PhysicsEngine::initVehicleSDK() {
 	PxVehicleSetBasisVectors(PxVec3(0,1,0), PxVec3(0,0,1)); 
 	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
-	vehicleSceneQueryData = VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, *defaultAllocator);
+	vehicleSceneQueryData = VehicleSceneQueryData::allocate(MAX_VEHICLES, PX_MAX_NB_WHEELS, MAX_VEHICLES, *defaultAllocator);
 	batchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *vehicleSceneQueryData, scene);
 
 	drivingSurfaces[0] = physics->createMaterial(0.8f, 0.8f, 0.6f);
@@ -118,13 +118,12 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs) {
 		PxVehicleWheels** vehiclesPointer = vehicles.data();
 		PxRaycastQueryResult* raycastResults = vehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 		const PxU32 raycastResultsSize = vehicleSceneQueryData->getRaycastQueryResultBufferSize();
-		PxVehicleSuspensionRaycasts(batchQuery, 1, vehiclesPointer, raycastResultsSize, raycastResults);
+		PxVehicleSuspensionRaycasts(batchQuery, vehicles.size(), vehiclesPointer, raycastResultsSize, raycastResults);
 
 		//Vehicle update.
 		const PxVec3 grav = scene->getGravity();
-		PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-		PxVehicleWheelQueryResult vehicleQueryResults[1] = {{wheelQueryResults, vehicles.at(0)->mWheelsSimData.getNbWheels()}};
-		PxVehicleUpdates(stepSizeS, grav, *frictionPairs, 1, vehiclesPointer, vehicleQueryResults);
+		
+		PxVehicleUpdates(stepSizeS, grav, *frictionPairs, vehicles.size(), vehiclesPointer, nullptr);
 
 		scene->simulate(stepSizeS);
 	}

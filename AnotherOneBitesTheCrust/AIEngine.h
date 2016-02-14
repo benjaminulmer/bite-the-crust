@@ -1,8 +1,12 @@
 #pragma once
 
 #include <vector>
+#include <ctime>
 #include <glm\glm.hpp>
 #include "DrivingInput.h"
+#include "Vehicle.h"
+
+#include <iostream>
 
 using std::vector;
 using glm::vec3;
@@ -14,13 +18,10 @@ struct Player
 	// TODO: Need a way to store current path + how long since last updated
 };
 
-struct ControllerInput
-{
-	// TODO: Need to store currently pressed buttons, triggers, and analog sticks
-};
-
 struct Tile
 {
+	static const int SIZE = 10;
+
 	// Should these coordinates be relative to the tile or the map?
 	// If it's relative to the tile, need a method to get player space -> tile space
 	vec3 entrance, exit;
@@ -28,8 +29,13 @@ struct Tile
 
 struct Map
 {
+	
+	static const int MAP_SIZE = 70;
+	static const int WIDTH = MAP_SIZE/Tile::SIZE;
+	static const int DEPTH = MAP_SIZE/Tile::SIZE;
+
 	// Vectors for ease of use, could just as easily be fixed size arrays
-	vector<vector<Tile>> tiles;
+	Tile tiles[WIDTH][DEPTH];
 
 };
 
@@ -39,7 +45,10 @@ public:
 	AIEngine(void);
 	~AIEngine(void);
 
-	// Returns the ControllerInput for the AI player pointed to by Player
-	DrivingInput updateAI();
+	DrivingInput updateAI(Vehicle*);
+
+private:
+	void updatePath(Vehicle*);
+	DrivingInput goToPoint(Vehicle*, glm::vec3);
 };
 

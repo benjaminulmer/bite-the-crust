@@ -26,7 +26,7 @@ Game::Game(void)
 	aiEngine = nullptr;
 	audioEngine = nullptr;
 	screen = nullptr;
-	playerVehicle = nullptr;
+	p1Vehicle = nullptr;
 }
 
 // The entry point of the game
@@ -129,20 +129,35 @@ void Game::setupEntities()
 	ground4->setDefaultTranslation(glm::vec3(0.0f,0.0f,70.0f));
 	entities.push_back(ground4);
 
-	playerVehicle = new Vehicle();
-	ContentLoading::loadVehicleData("res\\JSON\\car.json", playerVehicle);
-	playerVehicle->setRenderable(van);
-	playerVehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+	/**********************************************************
+						Creating Vechicles
+	**********************************************************/
+	p1Vehicle = new Vehicle();
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
+	p1Vehicle->setRenderable(van);
+	p1Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 
 	// TODO get dimensions working properly for vehicle
 	glm::vec3 d = van->getDimensions();
-	playerVehicle->chassisDims = physx::PxVec3(2, 2, 5);
-	physicsEngine->createVehicle(playerVehicle);
-	entities.push_back(playerVehicle);
+	p1Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
+	physicsEngine->createVehicle(p1Vehicle);
+	entities.push_back(p1Vehicle);
+
+	//// Player 2 (ie. AI)
+	p2Vehicle = new Vehicle();
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", p2Vehicle);
+	p2Vehicle->setRenderable(van);
+	p2Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+
+	// TODO get dimensions working properly for vehicle
+	p2Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
+	physicsEngine->createVehicle(p2Vehicle);
+	p2Vehicle->setPosition(glm::vec3(10, 3, 0));
+	entities.push_back(p2Vehicle);
 
 	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
 	{
-		cameraPosBuffer[i] = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
 	}
 	cameraPosBufferIndex = 0;
 	camera.setUpVector(glm::vec3(0,1,0));
@@ -150,7 +165,7 @@ void Game::setupEntities()
 
 void Game::connectSignals()
 {
-	inputEngine->DrivingSignal.connect(playerVehicle, &Vehicle::handleInput);
+	inputEngine->DrivingSignal.connect(p1Vehicle, &Vehicle::handleInput);
 	inputEngine->FireSignal.connect(this, &Game::firePizza);
 }
 
@@ -164,7 +179,7 @@ void Game::mainLoop()
 		// Update the player and AI cars
 
 		processSDLEvents();
-		aiEngine->updateAI();
+		p2Vehicle->handleInput(&aiEngine->updateAI(p2Vehicle));
 
 
 		// Figure out timestep and run physics
@@ -175,12 +190,12 @@ void Game::mainLoop()
 		physicsEngine->simulate(deltaTimeMs);
 		physicsEngine->fetchSimulationResults();
 
-		// Point the camera at the car
-		cameraPosBuffer[cameraPosBufferIndex] = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+		// Point the camera at the car (TODO: Currently hardcoded for p1, might have to revisit if we plan to add multiplayer) 
+		cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
 		cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
 
 		camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
-		camera.setLookAtPosition(playerVehicle->getPosition());
+		camera.setLookAtPosition(p1Vehicle->getPosition());
 		renderingEngine->updateView(camera);
 
 		//display
@@ -216,13 +231,14 @@ void Game::processSDLEvents()
 	}
 }
 
+// TODO: This is hardcoded for P1. Should take in a player or something.
 void Game::firePizza()
 {
 	DynamicEntity* pizzaBox = new DynamicEntity();
 	pizzaBox->setRenderable(renderables.at(1)); // todo, match names to renderables or something instead of hard-coded
-	glm::vec3 position = playerVehicle->getPosition() + glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
-	glm::vec3 velocity = glm::vec3(playerVehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 20.0, 0.0));
-	physx::PxVec3 v = playerVehicle->getDynamicActor()->getLinearVelocity();
+	glm::vec3 position = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
+	glm::vec3 velocity = glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 20.0, 0.0));
+	physx::PxVec3 v = p1Vehicle->getDynamicActor()->getLinearVelocity();
 	velocity = velocity + glm::vec3(v.x, v.y, v.z);
 	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);
 	entities.push_back(pizzaBox);

@@ -31,6 +31,9 @@ public:
 	physx::PxReal wheelRestitution;
 	physx::PxVehicleDrive4W* physicsVehicle;
 
+	// AI stuff; might be moved into 'Player' class
+	std::vector<glm::vec3> currentPath;
+
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
 	void handleInput(DrivingInput* input);
 	void updateTuning();

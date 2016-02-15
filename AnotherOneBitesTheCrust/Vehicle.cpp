@@ -58,19 +58,20 @@ void Vehicle::updateTuning()
 void Vehicle::handleInput(DrivingInput* input)
 {
 	float handBrake = 0;
+	float forwardSpeed = physicsVehicle->computeForwardSpeed();
 	(input->handBrake) ? handBrake = 1: handBrake = 0;
 
-	if (physicsVehicle->computeForwardSpeed() == 0 && input->backward > 0 && 
-	   (physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eFIRST || physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eNEUTRAL))
+	// Check if gear should switch from reverse to forward or vise versa
+	if (forwardSpeed == 0 && input->backward > 0)
 	{
 		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 	}
-	else if (physicsVehicle->computeForwardSpeed() == 0 && input->forward > 0 && 
-		    (physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE || physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eNEUTRAL))
+	else if (forwardSpeed == 0 && input->forward > 0)
 	{
 		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	}
 
+	// Determine how to apply controller input depending on current gear
 	if (physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE)
 	{
 		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->backward);
@@ -81,6 +82,8 @@ void Vehicle::handleInput(DrivingInput* input)
 		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
 		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
 	}
+
+	// Steer and handbrake
 	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->leftSteer);
 	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->rightSteer);
 	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, handBrake);

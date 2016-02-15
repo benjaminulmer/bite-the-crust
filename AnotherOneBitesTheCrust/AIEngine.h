@@ -7,8 +7,6 @@
 #include "DrivingInput.h"
 #include "Vehicle.h"
 
-#include <iostream>
-
 using std::vector;
 using glm::vec3;
 

@@ -175,9 +175,10 @@ void Game::setupEntities()
 	camera.setUpVector(glm::vec3(0,1,0));
 }
 
+// TODO decide how signals will be used and set them up
 void Game::connectSignals()
 {
-	inputEngine->DrivingSignal.connect(p1Vehicle, &Vehicle::handleInput);
+	//inputEngine->DrivingSignal.connect(p1Vehicle, &Vehicle::handleInput);
 	inputEngine->FireSignal.connect(this, &Game::firePizza);
 }
 
@@ -191,6 +192,7 @@ void Game::mainLoop()
 		// Update the player and AI cars
 
 		processSDLEvents();
+		p1Vehicle->handleInput(inputEngine->getInput());
 		p2Vehicle->handleInput(&aiEngine->updateAI(p2Vehicle));
 
 		// Figure out timestep and run physics

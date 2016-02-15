@@ -78,7 +78,6 @@ void InputEngine::processControllerEvent(SDL_Event e)
 		{
 			inputs[e.cdevice.which].forward = (float)e.caxis.value/MAX_AXIS_VALUE;
 		}
-		DrivingSignal(&inputs[0]);
 	}
 	// Controller added or removed
 	else if (e.type == SDL_CONTROLLERDEVICEREMOVED || e.type == SDL_CONTROLLERDEVICEADDED)

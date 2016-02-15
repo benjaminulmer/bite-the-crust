@@ -92,7 +92,8 @@ int Renderable::getVertexCount() {
 	return verts.size();
 }
 
-glm::vec3 Renderable::getDimensions() {
+glm::vec3 Renderable::getDimensions()
+{
 	float minX, maxX;
 	float minY, maxY;
 	float minZ, maxZ;
@@ -110,6 +111,39 @@ glm::vec3 Renderable::getDimensions() {
 	}
 	return glm::vec3(glm::abs(maxX-minX), glm::abs(maxY-minY), glm::abs(maxZ-minZ));
 }
+
+
+glm::vec3 Renderable::getCenter()
+{
+	float minX, maxX;
+	float minY, maxY;
+	float minZ, maxZ;
+	minX = maxX = verts.at(0).x;
+	minY = maxY = verts.at(0).y;
+	minZ = maxZ = verts.at(0).z;
+	for (unsigned int i = 1; i < verts.size(); i++) {
+		glm::vec3 v = verts.at(i);
+		minX = glm::min(minX, v.x);
+		maxX = glm::max(maxX, v.x);
+		minY = glm::min(minY, v.y);
+		maxY = glm::max(maxY, v.y);
+		minZ = glm::min(minZ, v.z);
+		maxZ = glm::max(maxZ, v.z);
+	}
+
+	glm::vec3 max(maxX, maxY, maxZ);
+	glm::vec3 min(minX, minY, minZ);
+
+	glm::vec3 center = max + min;
+	center.x /= 2;
+	center.y /= 2;
+	center.z /= 2;
+
+	center = -center;
+
+	return center;
+}
+
 
 glm::vec3 Renderable::getColor()
 {

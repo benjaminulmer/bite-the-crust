@@ -107,6 +107,7 @@ void Game::setupEntities()
 	van->setVerts(vanVerts);
 	van->setNorms(vanNormals);
 	van->setColor(glm::vec3(1,0,0));
+	cout << van->getCenter().x << " " <<  van->getCenter().y << " " <<  van->getCenter().z << " " << endl; 
 	renderables.push_back(van);
 	renderingEngine->assignBuffers(van);
 
@@ -136,6 +137,7 @@ void Game::setupEntities()
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
 	p1Vehicle->setRenderable(van);
 	p1Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+	p1Vehicle->setDefaultTranslation(van->getCenter());
 
 	// TODO get dimensions working properly for vehicle
 	glm::vec3 d = van->getDimensions();
@@ -148,6 +150,7 @@ void Game::setupEntities()
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", p2Vehicle);
 	p2Vehicle->setRenderable(van);
 	p2Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+	p2Vehicle->setDefaultTranslation(van->getCenter());
 
 	// TODO get dimensions working properly for vehicle
 	p2Vehicle->chassisDims = physx::PxVec3(2, 2, 5);

@@ -31,6 +31,7 @@ void InputEngine::processControllerEvent(SDL_Event e)
 		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_X)
 		{
 			inputs[e.cdevice.which].shootPizza = true;
+			FireSignal();
 		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 		{
@@ -39,7 +40,6 @@ void InputEngine::processControllerEvent(SDL_Event e)
 	}
 	else if (e.type == SDL_CONTROLLERBUTTONUP) 
 	{
-		std::cout << "here" << std::endl;
 		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_X)
 		{
 			inputs[e.cdevice.which].shootPizza = false;

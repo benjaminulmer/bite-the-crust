@@ -1,5 +1,5 @@
 #include "AIEngine.h"
-
+#include <iostream>
 
 AIEngine::AIEngine(void)
 {
@@ -9,8 +9,9 @@ AIEngine::AIEngine(void)
 DrivingInput AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 {
 	DrivingInput input;
-	input.accel = 1.0;
-	input.brake = 0.0;
+	input.forward = 1.0;
+	input.backward = 0.0;
+	input.handBrake = false;
 	
 	glm::vec3 desiredDirection = glm::normalize(desiredPos - driver->getPosition());
 	glm::vec3 forward(glm::normalize(driver->getModelMatrix() * glm::vec4(0,0,1,0)));
@@ -35,18 +36,16 @@ DrivingInput AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 		input.rightSteer = 0;
 		input.leftSteer = 0;
 	}
-
+	
 	return input;
 }
 
 void AIEngine::updatePath(Vehicle* toUpdate)
 {
-
 	toUpdate->currentPath.push_back(glm::vec3(-Map::MAP_SIZE/2, 0, Map::MAP_SIZE/2));
 	toUpdate->currentPath.push_back(glm::vec3(Map::MAP_SIZE/2, 0, Map::MAP_SIZE/2));
 	toUpdate->currentPath.push_back(glm::vec3(-Map::MAP_SIZE/2, 0, -Map::MAP_SIZE/2));
 	toUpdate->currentPath.push_back(glm::vec3(Map::MAP_SIZE/2, 0, -Map::MAP_SIZE/2));
-
 }
 
 DrivingInput AIEngine::updateAI(Vehicle* toUpdate) 
@@ -66,7 +65,6 @@ DrivingInput AIEngine::updateAI(Vehicle* toUpdate)
 		if(toUpdate->currentPath.empty())
 			return DrivingInput();
 	}
-
 	return goToPoint(toUpdate, toUpdate->currentPath.at(0));
 }
 

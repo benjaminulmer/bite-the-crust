@@ -18,7 +18,7 @@ PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physi
 	actor->getShapes(shapes, 1);
 
 	//Set the query filter data of the ground plane so that the vehicle raycasts can hit the ground.
-	physx::PxFilterData qryFilterData;
+	PxFilterData qryFilterData;
 	setupDrivableSurface(qryFilterData);
 	shapes[0]->setQueryFilterData(qryFilterData);
 

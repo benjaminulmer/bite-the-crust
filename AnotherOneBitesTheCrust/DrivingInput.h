@@ -4,6 +4,8 @@ struct DrivingInput
 {
 	float leftSteer;
 	float rightSteer;
-	float accel;
-	float brake;
+	float forward;
+	float backward;
+	bool handBrake;
+	bool shootPizza;
 };

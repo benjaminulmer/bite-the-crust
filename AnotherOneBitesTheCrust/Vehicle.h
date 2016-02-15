@@ -37,6 +37,5 @@ public:
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
 	void handleInput(DrivingInput* input);
 	void updateTuning();
-private: 
 };
 

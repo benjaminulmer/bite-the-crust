@@ -90,6 +90,16 @@ void Game::setupEntities()
 	renderables.push_back(floor);
 	renderingEngine->assignBuffers(floor);
 
+	Renderable * floor2 = new Renderable();
+	vector<glm::vec3>floor2Verts;
+	vector<glm::vec3>floor2Normals;
+	bool floor2Res = ContentLoading::loadOBJNonIndexed("res\\Models\\FlatFloor.obj", floor2Verts, floor2Normals);
+	floor2->setVerts(floor2Verts);
+	floor2->setNorms(floor2Normals);
+	floor2->setColor(glm::vec3(1.0f,1.0f,0.0f));
+	renderables.push_back(floor2);
+	renderingEngine->assignBuffers(floor2);
+
 	Renderable * box = new Renderable();
 	vector<glm::vec3>boxVerts;
 	vector<glm::vec3>boxNormals;
@@ -116,7 +126,7 @@ void Game::setupEntities()
 	entities.push_back(ground);
 
 	Entity* ground2 = new Entity();
-	ground2->setRenderable(floor);
+	ground2->setRenderable(floor2);
 	ground2->setDefaultTranslation(glm::vec3(70.0f,0.0f,0.0f));
 	entities.push_back(ground2);
 
@@ -126,7 +136,7 @@ void Game::setupEntities()
 	entities.push_back(ground3);
 
 	Entity* ground4 = new Entity();
-	ground4->setRenderable(floor);
+	ground4->setRenderable(floor2);
 	ground4->setDefaultTranslation(glm::vec3(0.0f,0.0f,70.0f));
 	entities.push_back(ground4);
 
@@ -140,7 +150,6 @@ void Game::setupEntities()
 	p1Vehicle->setDefaultTranslation(van->getCenter());
 
 	// TODO get dimensions working properly for vehicle
-	glm::vec3 d = van->getDimensions();
 	p1Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
 	physicsEngine->createVehicle(p1Vehicle);
 	entities.push_back(p1Vehicle);
@@ -184,19 +193,19 @@ void Game::mainLoop()
 		processSDLEvents();
 		p2Vehicle->handleInput(&aiEngine->updateAI(p2Vehicle));
 
-
 		// Figure out timestep and run physics
 		unsigned int newTimeMs = SDL_GetTicks();
 		unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 		oldTimeMs = newTimeMs;
+		bool didPhysics = physicsEngine->simulate(deltaTimeMs);
 
-		physicsEngine->simulate(deltaTimeMs);
-		physicsEngine->fetchSimulationResults();
-
-		// Point the camera at the car (TODO: Currently hardcoded for p1, might have to revisit if we plan to add multiplayer) 
-		cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
-		cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
-
+		// If a physics simulation ran, update the camera position buffer with new location
+		if (didPhysics)
+		{
+			cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+			cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
+		}
+		// Set camera to look at player with a positional delay
 		camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
 		camera.setLookAtPosition(p1Vehicle->getPosition());
 		renderingEngine->updateView(camera);
@@ -206,6 +215,7 @@ void Game::mainLoop()
 
 		//swap buffers
 		SDL_GL_SwapWindow(window);
+		physicsEngine->fetchSimulationResults();
 	}
 }
 
@@ -218,14 +228,14 @@ void Game::processSDLEvents()
 		{
 			gameState = GameState::EXIT;
 		}
-		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN ||
-			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
-		{
-			inputEngine->processControllerEvent(event);
-		}
 		else if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 		{
 			gameState = GameState::EXIT;
+		}
+		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN || SDL_CONTROLLERBUTTONUP ||
+			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
+		{
+			inputEngine->processControllerEvent(event);
 		}
 		else
 		{
@@ -234,11 +244,11 @@ void Game::processSDLEvents()
 	}
 }
 
-// TODO: This is hardcoded for P1. Should take in a player or something.
+// TODO possible move this to a different file and make it work for different players
 void Game::firePizza()
 {
 	DynamicEntity* pizzaBox = new DynamicEntity();
-	pizzaBox->setRenderable(renderables.at(1)); // todo, match names to renderables or something instead of hard-coded
+	pizzaBox->setRenderable(renderables.at(2)); // TODO, match names to renderables or something instead of hard-coded
 	glm::vec3 position = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
 	glm::vec3 velocity = glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 20.0, 0.0));
 	physx::PxVec3 v = p1Vehicle->getDynamicActor()->getLinearVelocity();

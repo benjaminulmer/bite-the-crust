@@ -25,8 +25,10 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glUseProgram(phongProgramID);
 	GLuint mvpID = glGetUniformLocation(phongProgramID, "MVP");
+	GLuint mvID = glGetUniformLocation(phongProgramID, "MV");
 	GLuint vID = glGetUniformLocation(phongProgramID, "V");
 	GLuint mID = glGetUniformLocation(phongProgramID, "M");
+
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
@@ -44,10 +46,16 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 		M = calculateDefaultModel(M, entities[i]);
 
 		mat4 MVP = P * V * M;
+		mat4 MV = V * M;
 		glUniformMatrix4fv( mvpID,
 					1,
 					GL_FALSE,
 					value_ptr(MVP)
+					);
+		glUniformMatrix4fv( mvID,
+					1,
+					GL_FALSE,
+					value_ptr(MV)
 					);
 
 	//GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
@@ -63,7 +71,7 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 					);
 
 		
-		glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 0, 400, 0);
+
 		glUniform3f(glGetUniformLocation(phongProgramID, "MaterialColor"), entities[i]->getRenderable()->getColor().x, 
 			                                                               entities[i]->getRenderable()->getColor().y, 
 																		   entities[i]->getRenderable()->getColor().z);
@@ -79,8 +87,8 @@ mat4 RenderingEngine::calculateDefaultModel(mat4 model, Entity * entity)
 	//Translations done here. Order of translations is scale, rotate, translate
 	
 	model = glm::scale(model,entity->getDefaultScale());
-	model = glm::translate(model, entity->getDefaultTranslation());
 	model = glm::rotate(model, entity->getDefaultRotationAngle(), entity->getDefaultRotationAxis());
+	model = glm::translate(model, entity->getDefaultTranslation());
 	return model;
 }
 
@@ -92,6 +100,8 @@ void RenderingEngine::generateIDs()
 	string vsSource = loadShaderStringfromFile(vsShader);
 	string fsSource = loadShaderStringfromFile(fsShader);
 	phongProgramID = CreateShaderProgram(vsSource, fsSource);
+	glUseProgram(phongProgramID);
+	glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 35, 100, 35);
 }
 
 void RenderingEngine::loadProjectionMatrix()

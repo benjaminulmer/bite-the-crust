@@ -43,6 +43,8 @@ public:
 	GLuint getColourVBO();
 	int getVertexCount();
 	glm::vec3 getDimensions();
+	glm::vec3 getCenter();
+
 
 	void setColor(glm::vec3 c);
 	glm::vec3 getColor();

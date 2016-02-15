@@ -3,7 +3,7 @@
 
 AIEngine::AIEngine(void)
 {
-	srand(time(0));
+	srand((int)time(0));
 }
 
 DrivingInput AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)

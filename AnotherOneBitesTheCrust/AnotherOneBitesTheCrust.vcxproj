@@ -72,7 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)\Include\glm;$(SolutionDir)\Include\rapidjson;$(SolutionDir)\Include\SDL;$(SolutionDir)\Include\PhysX;$(SolutionDir)\Include\glew-1.13.0;$(SolutionDir)\Include\sigslot;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\Lib\PhysX;$(SolutionDir)\Lib\SDL;$(SolutionDir)\Lib\glew-1.13.0\glewRelease\Win32;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\Lib\PhysX;$(SolutionDir)\Lib\SDL;$(SolutionDir)\Lib\glew-1.13.0;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>

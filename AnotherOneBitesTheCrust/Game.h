@@ -17,7 +17,7 @@
 #include <SDL.h>
 #include <iostream>
 #include <string>
-#include <GL\glew.h>
+#include <glew.h>
 #include <sigslot.h>
 
 enum class GameState

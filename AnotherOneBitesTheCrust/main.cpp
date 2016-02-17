@@ -3,8 +3,8 @@
 #include "Game.h"
 #include <SDL.h>
 #include <iostream>
-#include <rapidjson\filereadstream.h>
-#include <rapidjson\document.h>
+#include <filereadstream.h>
+#include <document.h>
 
 int main(int argc, char *argv[]) {
 	Game game;

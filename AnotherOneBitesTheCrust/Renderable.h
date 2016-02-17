@@ -1,8 +1,8 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <glm.hpp>
 #include <vector>
-#include <GL\glew.h>
+#include <glew.h>
 
 struct GLPoint
 {

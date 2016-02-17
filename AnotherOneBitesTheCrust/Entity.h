@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderable.h"
-#include <glm/glm.hpp>
+#include <glm.hpp>
 
 class Entity
 {

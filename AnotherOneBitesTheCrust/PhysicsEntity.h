@@ -1,7 +1,7 @@
 #pragma once
 #include "Entity.h"
 #include <PxPhysicsAPI.h>
-#include <glm\glm.hpp>
+#include <glm.hpp>
 
 class PhysicsEntity :
 	public Entity

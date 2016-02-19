@@ -178,8 +178,10 @@ void Game::setupEntities()
 // TODO decide how signals will be used and set them up
 void Game::connectSignals()
 {
+	inputEngine->setInputStruct(p1Vehicle->getInputStruct(), 0);
 	//inputEngine->DrivingSignal.connect(p1Vehicle, &Vehicle::handleInput);
-	inputEngine->FireSignal.connect(this, &Game::firePizza);
+	//inputEngine->FireSignal.connect(this, &Game::firePizza);
+	p1Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
 }
 
 void Game::mainLoop()
@@ -192,8 +194,9 @@ void Game::mainLoop()
 		// Update the player and AI cars
 
 		processSDLEvents();
-		p1Vehicle->handleInput(inputEngine->getInput());
-		p2Vehicle->handleInput(&aiEngine->updateAI(p2Vehicle));
+		aiEngine->updateAI(p2Vehicle);
+		p1Vehicle->handleInput();
+		p2Vehicle->handleInput();
 
 		// Figure out timestep and run physics
 		unsigned int newTimeMs = SDL_GetTicks();
@@ -247,7 +250,7 @@ void Game::processSDLEvents()
 }
 
 // TODO possible move this to a different file and make it work for different players
-void Game::firePizza()
+void Game::shootPizza(Vehicle* vehicle)
 {
 	DynamicEntity* pizzaBox = new DynamicEntity();
 	pizzaBox->setRenderable(renderables.at(2)); // TODO, match names to renderables or something instead of hard-coded
@@ -263,10 +266,10 @@ Game::~Game(void)
 {
 	for (unsigned int i = 0; i < entities.size(); i++)
 	{
-		delete entities[i];
+		//delete entities[i];
 	}
 	for (unsigned int i = 0; i < renderables.size(); i++)
 	{
-		delete renderables[i];
+		//delete renderables[i];
 	}
 }

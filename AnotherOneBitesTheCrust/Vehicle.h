@@ -35,7 +35,14 @@ public:
 	std::vector<glm::vec3> currentPath;
 
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
-	void handleInput(DrivingInput* input);
 	void updateTuning();
+
+	void handleInput();
+	DrivingInput* getInputStruct();
+
+	sigslot::signal1<Vehicle*> ShootPizzaSignal;
+
+private:
+	DrivingInput input;
 };
 

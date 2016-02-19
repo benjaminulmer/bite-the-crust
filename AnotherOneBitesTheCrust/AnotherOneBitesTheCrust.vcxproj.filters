@@ -44,14 +44,6 @@
     <ClInclude Include="DynamicEntity.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SDL2.dll" />
-    <None Include="glew32.dll" />
-    <None Include="nvToolsExt32_1.dll" />
-    <None Include="PhysX3CHECKED_x86.dll" />
-    <None Include="PhysX3CommonCHECKED_x86.dll" />
-    <None Include="PhysX3CookingCHECKED_x86.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="res\Shaders\StandardShading.fragmentshader" />
     <None Include="res\Shaders\StandardShading.vertexshader" />
   </ItemGroup>

@@ -13,16 +13,13 @@ public:
 	static const int MAX_AXIS_VALUE = 32767; // -2^15
 	static const int MIN_AXIS_VALUE = -32768; // 2^15 - 1
 
+	void setInputStruct(DrivingInput* input, int controllerNum);
 	void processControllerEvent(SDL_Event event);
-	DrivingInput* getInput();
-
-	// not working, need revisiting
-	sigslot::signal1<DrivingInput*> DrivingSignal;
-	sigslot::signal0<> FireSignal;
 
 private:
 	SDL_GameController* controllers[MAX_NUM_CONTROLLERS];
-	DrivingInput inputs[MAX_NUM_CONTROLLERS];
+	DrivingInput* inputs[MAX_NUM_CONTROLLERS];
+	DrivingInput dummyInput; // default for each controller until an input has been set
 	float deadzonePercent;
 	int deadzoneSize;
 

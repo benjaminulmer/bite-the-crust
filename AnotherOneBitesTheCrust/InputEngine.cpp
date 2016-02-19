@@ -4,6 +4,12 @@
 
 InputEngine::InputEngine(void) {
 	openControllers();
+	for (unsigned int i = 0; i < MAX_NUM_CONTROLLERS; i++)
+	{
+		inputs[i] = & dummyInput;
+	}
+	deadzonePercent = 0.25f;
+	deadzoneSize = (int) (MAX_AXIS_VALUE * deadzonePercent);
 }
 
 // Opens up to 4 currently connected controllers
@@ -12,15 +18,8 @@ void InputEngine::openControllers()
 	for (int i = 0; i < SDL_NumJoysticks() && i < MAX_NUM_CONTROLLERS; i++)
 	{
 		controllers[i] = SDL_GameControllerOpen(i);
-		inputs[i].forward = 0;
-		inputs[i].backward = 0;
-		inputs[i].leftSteer = 0;
-		inputs[i].rightSteer = 0;
-		inputs[i].handBrake = false;
-		inputs[i].shootPizza = false;
 	}
 	std::cout << "NUM CONTROLLERS: " << SDL_NumJoysticks() << std::endl;
-	deadzoneSize = 8192;
 }
 
 void InputEngine::processControllerEvent(SDL_Event e)
@@ -30,23 +29,22 @@ void InputEngine::processControllerEvent(SDL_Event e)
 	{
 		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_X)
 		{
-			inputs[e.cdevice.which].shootPizza = true;
-			FireSignal();
+			inputs[e.cdevice.which]->shootPizza = true;
 		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 		{
-			inputs[e.cdevice.which].handBrake = true;
+			inputs[e.cdevice.which]->handBrake = true;
 		}
 	}
 	else if (e.type == SDL_CONTROLLERBUTTONUP) 
 	{
-		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_X)
+		/*if (e.cbutton.button == SDL_CONTROLLER_BUTTON_X)
 		{
-			inputs[e.cdevice.which].shootPizza = false;
-		}
-		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+			inputs[e.cdevice.which]->shootPizza = false;
+		}*/
+		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 		{
-			inputs[e.cdevice.which].handBrake = false;
+			inputs[e.cdevice.which]->handBrake = false;
 		}
 	}
 	// Controller axis events
@@ -56,27 +54,27 @@ void InputEngine::processControllerEvent(SDL_Event e)
 		{
 			if (e.caxis.value < -deadzoneSize)
 			{
-				inputs[e.cdevice.which].rightSteer = (float)(e.caxis.value + deadzoneSize)/(MIN_AXIS_VALUE + deadzoneSize);
-				inputs[e.cdevice.which].leftSteer = 0;
+				inputs[e.cdevice.which]->rightSteer = (float)(e.caxis.value + deadzoneSize)/(MIN_AXIS_VALUE + deadzoneSize);
+				inputs[e.cdevice.which]->leftSteer = 0;
 			} 
 			else if (e.caxis.value > deadzoneSize)
 			{
-				inputs[e.cdevice.which].leftSteer = (float)(e.caxis.value - deadzoneSize)/(MAX_AXIS_VALUE - deadzoneSize);
-				inputs[e.cdevice.which].rightSteer = 0;
+				inputs[e.cdevice.which]->leftSteer = (float)(e.caxis.value - deadzoneSize)/(MAX_AXIS_VALUE - deadzoneSize);
+				inputs[e.cdevice.which]->rightSteer = 0;
 			}
 			else
 			{
-				inputs[e.cdevice.which].rightSteer = 0;
-				inputs[e.cdevice.which].leftSteer = 0;
+				inputs[e.cdevice.which]->rightSteer = 0;
+				inputs[e.cdevice.which]->leftSteer = 0;
 			}
 		}
 		else if (e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT)
 		{
-			inputs[e.cdevice.which].backward = (float)e.caxis.value/MAX_AXIS_VALUE;
+			inputs[e.cdevice.which]->backward = (float)e.caxis.value/MAX_AXIS_VALUE;
 		}
 		else if (e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT)
 		{
-			inputs[e.cdevice.which].forward = (float)e.caxis.value/MAX_AXIS_VALUE;
+			inputs[e.cdevice.which]->forward = (float)e.caxis.value/MAX_AXIS_VALUE;
 		}
 	}
 	// Controller added or removed
@@ -86,9 +84,12 @@ void InputEngine::processControllerEvent(SDL_Event e)
 	}
 }
 
-DrivingInput* InputEngine::getInput()
-{
-	return &inputs[0];
+void InputEngine::setInputStruct(DrivingInput* input, int controllerNum) {
+	if (controllerNum > MAX_NUM_CONTROLLERS)
+	{
+		return;
+	}
+	inputs[controllerNum] = input;
 }
 
 InputEngine::~InputEngine(void)

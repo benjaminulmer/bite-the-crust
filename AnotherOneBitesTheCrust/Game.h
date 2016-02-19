@@ -50,7 +50,7 @@ private:
 	void mainLoop();
 	void processSDLEvents();
 	void quitGame();
-	void firePizza();
+	void shootPizza(Vehicle* vehicle);
 
 	SDL_Window* window;
 	SDL_Surface* screen;

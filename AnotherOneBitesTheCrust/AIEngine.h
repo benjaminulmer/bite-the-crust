@@ -44,10 +44,10 @@ public:
 	AIEngine(void);
 	~AIEngine(void);
 
-	DrivingInput updateAI(Vehicle*);
+	void updateAI(Vehicle*);
 
 private:
 	void updatePath(Vehicle*);
-	DrivingInput goToPoint(Vehicle*, glm::vec3);
+	void goToPoint(Vehicle*, glm::vec3);
 };
 

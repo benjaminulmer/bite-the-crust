@@ -179,9 +179,9 @@ void Game::setupEntities()
 void Game::connectSignals()
 {
 	inputEngine->setInputStruct(p1Vehicle->getInputStruct(), 0);
-	//inputEngine->DrivingSignal.connect(p1Vehicle, &Vehicle::handleInput);
-	//inputEngine->FireSignal.connect(this, &Game::firePizza);
+
 	p1Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
+	p2Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
 }
 
 void Game::mainLoop()
@@ -192,7 +192,6 @@ void Game::mainLoop()
 	while (gameState!= GameState::EXIT)
 	{
 		// Update the player and AI cars
-
 		processSDLEvents();
 		aiEngine->updateAI(p2Vehicle);
 		p1Vehicle->handleInput();
@@ -254,9 +253,9 @@ void Game::shootPizza(Vehicle* vehicle)
 {
 	DynamicEntity* pizzaBox = new DynamicEntity();
 	pizzaBox->setRenderable(renderables.at(2)); // TODO, match names to renderables or something instead of hard-coded
-	glm::vec3 position = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
-	glm::vec3 velocity = glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 20.0, 0.0));
-	physx::PxVec3 v = p1Vehicle->getDynamicActor()->getLinearVelocity();
+	glm::vec3 position = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
+	glm::vec3 velocity = glm::vec3(vehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 20.0, 0.0));
+	physx::PxVec3 v = vehicle->getDynamicActor()->getLinearVelocity();
 	velocity = velocity + glm::vec3(v.x, v.y, v.z);
 	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);
 	entities.push_back(pizzaBox);
@@ -264,12 +263,14 @@ void Game::shootPizza(Vehicle* vehicle)
 
 Game::~Game(void)
 {
+	p1Vehicle->ShootPizzaSignal.disconnect_all();
+	p2Vehicle->ShootPizzaSignal.disconnect_all();
 	for (unsigned int i = 0; i < entities.size(); i++)
 	{
-		//delete entities[i];
+		delete entities[i];
 	}
 	for (unsigned int i = 0; i < renderables.size(); i++)
 	{
-		//delete renderables[i];
+		delete renderables[i];
 	}
 }

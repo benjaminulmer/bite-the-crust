@@ -1,5 +1,6 @@
 #include "AIEngine.h"
 #include <iostream>
+#include <stdlib.h>
 
 AIEngine::AIEngine(void)
 {
@@ -12,6 +13,13 @@ void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 	input->forward = 1.0;
 	input->backward = 0.0;
 	input->handBrake = false;
+
+	// Pizza shooting proof of concept
+	int pizzaRand = rand() % 10;
+	if (pizzaRand == 0)
+	{
+		input->shootPizza = true;
+	}
 	
 	glm::vec3 desiredDirection = glm::normalize(desiredPos - driver->getPosition());
 	glm::vec3 forward(glm::normalize(driver->getModelMatrix() * glm::vec4(0,0,1,0)));

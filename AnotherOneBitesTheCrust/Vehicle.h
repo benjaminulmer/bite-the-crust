@@ -6,7 +6,7 @@
 #include <sigslot.h>
 
 class Vehicle :
-	public DynamicEntity, public sigslot::has_slots<>
+	public DynamicEntity
 {
 public:
 	Vehicle(void);

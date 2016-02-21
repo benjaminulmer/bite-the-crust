@@ -3,10 +3,15 @@
 #include <iostream>
 #include <filereadstream.h>
 #include <document.h>
+#include <map>
+#include <vector>
+#include "glm.hpp"
+#include <string>
 
 namespace ContentLoading
 {
 	bool loadVehicleData(char* filename, Vehicle* vehicle);
+	bool loadRenderables(char* filename, std::map<std::string, Renderable*> &map);
 
 	bool loadOBJNonIndexed(
 	const char * path, 

@@ -16,6 +16,7 @@
 
 #include <SDL.h>
 #include <iostream>
+#include <map>
 #include <string>
 #include <glew.h>
 #include <sigslot.h>
@@ -64,7 +65,7 @@ private:
 	Vehicle* p1Vehicle, *p2Vehicle;
 
 	std::vector<Entity*> entities;
-	std::vector<Renderable*> renderables;
+	std::map<std::string, Renderable*> renderablesMap;
 
 	// vehicle location for past 5 frames 
 	static const int CAMERA_POS_BUFFER_SIZE = 10;

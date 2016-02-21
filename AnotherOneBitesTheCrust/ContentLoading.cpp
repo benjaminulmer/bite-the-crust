@@ -7,7 +7,7 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	errno_t err = fopen_s(&filePointer, filename, "rb");
 	if (err != 0) {
 		printf("Error, vehicle file couldn't load.");
-		return 0;
+		return false;
 	}
 	char readBuffer[10000];
 	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
@@ -20,6 +20,38 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 
 	fclose(filePointer);
 
+	return true;
+}
+
+bool loadRenderables(char* filename, std::map<std::string, Renderable*> &map) {
+	FILE* filePointer;
+	errno_t err = fopen_s(&filePointer, filename, "rb");
+	if (err != 0) {
+		printf("Error, renderables file couldn't load.");
+		return false;
+	}
+	char readBuffer[10000];
+	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
+	rapidjson::Document d;
+	d.ParseStream(reader);
+	const rapidjson::Value& renderableArray = d["renderables"];
+	if (!renderableArray.IsArray()) {
+		printf("Error, renderables file improperly defined.");
+		return false;
+	}
+	for (rapidjson::SizeType i = 0; i < renderableArray.Size(); i++) {
+		std::string renderableName = renderableArray[i]["name"].GetString();
+		std::string renderableModelFile = renderableArray[i]["model"].GetString();
+		renderableModelFile.insert(0, "res\\Models\\");
+		Renderable * r = new Renderable();
+		std::vector<glm::vec3> verts;
+		std::vector<glm::vec3> normals;
+		bool floorRes = ContentLoading::loadOBJNonIndexed(renderableModelFile.c_str(), verts, normals);
+		r->setVerts(verts);
+		r->setNorms(normals);
+		r->setColor(glm::vec3(1.0f,1.0f,1.0f));
+		map[renderableName] = r;
+	}
 	return true;
 }
 

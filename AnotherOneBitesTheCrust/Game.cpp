@@ -1,6 +1,11 @@
 #include "Game.h"
-#include "DrivingInput.h"
 #include "DynamicEntity.h"
+#include "Camera.h"
+#include "ContentLoading.h"
+
+#include <iostream>
+#include <string>
+#include <sigslot.h>
 
 using namespace std;
 
@@ -144,27 +149,27 @@ void Game::setupEntities()
 						Creating Vechicles
 	**********************************************************/
 	p1Vehicle = new Vehicle();
-	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle->getTuningStruct());
 	p1Vehicle->setRenderable(van);
 	p1Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 	p1Vehicle->setDefaultTranslation(van->getCenter());
 
 	// TODO get dimensions working properly for vehicle
-	p1Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
+	//p1Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
 	physicsEngine->createVehicle(p1Vehicle);
 	entities.push_back(p1Vehicle);
 
 	//// Player 2 (ie. AI)
 	p2Vehicle = new Vehicle();
-	ContentLoading::loadVehicleData("res\\JSON\\car.json", p2Vehicle);
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", p2Vehicle->getTuningStruct());
 	p2Vehicle->setRenderable(van);
 	p2Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 	p2Vehicle->setDefaultTranslation(van->getCenter());
 
 	// TODO get dimensions working properly for vehicle
-	p2Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
+	//p2Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
 	physicsEngine->createVehicle(p2Vehicle);
-	p2Vehicle->setPosition(glm::vec3(10, 3, 0));
+	p2Vehicle->setPosition(p2Vehicle->getPosition() + glm::vec3(10, 0, 0));
 	entities.push_back(p2Vehicle);
 
 	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)

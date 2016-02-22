@@ -4,7 +4,6 @@
 #include <ctime>
 #include <glm.hpp>
 #include <gtc\constants.hpp>
-#include "DrivingInput.h"
 #include "Vehicle.h"
 
 using std::vector;

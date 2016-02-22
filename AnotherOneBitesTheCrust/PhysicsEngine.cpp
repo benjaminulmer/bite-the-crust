@@ -93,14 +93,16 @@ void PhysicsEngine::createDynamicEntity(PhysicsEntity* entity, glm::vec3 positio
 
 void PhysicsEngine::createVehicle(Vehicle* vehicle)
 {
+	VehicleTuning* tuning = vehicle->getTuningStruct();
+
 	PxMaterial* chassisMaterial;
 	PxMaterial* wheelMaterial;
-	chassisMaterial = physics->createMaterial(vehicle->chassisStaticFriction, vehicle->chassisDynamicFriction, vehicle->chassisRestitution);
-	wheelMaterial = physics->createMaterial(vehicle->wheelStaticFriction, vehicle->wheelDynamicFriction, vehicle->wheelRestitution);
-	vehicle->chassisMaterial = chassisMaterial;
-	vehicle->wheelMaterial = wheelMaterial;
+	chassisMaterial = physics->createMaterial(tuning->chassisStaticFriction, tuning->chassisDynamicFriction, tuning->chassisRestitution);
+	wheelMaterial = physics->createMaterial(tuning->wheelStaticFriction, tuning->wheelDynamicFriction, tuning->wheelRestitution);
+	tuning->chassisMaterial = chassisMaterial;
+	tuning->wheelMaterial = wheelMaterial;
 	PxVehicleDrive4W* testVehicle = PhysicsCreator::createVehicle4W(vehicle, physics, cooking);
-	PxTransform startTransform(PxVec3(0, (vehicle->chassisDims.y*0.5f + vehicle->wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
+	PxTransform startTransform(PxVec3(0, (tuning->chassisDims.y*0.5f + tuning->wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
 	PxRigidDynamic* actor = testVehicle->getRigidDynamicActor();
 	actor->setGlobalPose(startTransform);
 	scene->addActor(*actor);

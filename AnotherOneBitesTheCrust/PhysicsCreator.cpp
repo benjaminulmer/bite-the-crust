@@ -146,13 +146,11 @@ PxRigidDynamic* PhysicsCreator::createVehicleActor(const PxVehicleChassisData& c
 	//Add the chassis shapes to the actor.
 	for(PxU32 i = 0; i < numChassisMeshes; i++)
 	{
-		PxShape* chassisShape=vehActor->createShape
-			(PxConvexMeshGeometry(chassisConvexMeshes[i]),*chassisMaterials[i]);
+		PxShape* chassisShape=vehActor->createShape(PxConvexMeshGeometry(chassisConvexMeshes[i]),*chassisMaterials[i]);
 		chassisShape->setQueryFilterData(chassisQryFilterData);
 		chassisShape->setSimulationFilterData(chassisSimFilterData);
 		chassisShape->setLocalPose(PxTransform(PxIdentity));
 	}
-
 	vehActor->setMass(chassisData.mMass);
 	vehActor->setMassSpaceInertiaTensor(chassisData.mMOI);
 	vehActor->setCMassLocalPose(PxTransform(chassisData.mCMOffset,PxQuat(PxIdentity)));
@@ -301,12 +299,14 @@ void PhysicsCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 	}
 }
 
-PxVehicleDrive4W* PhysicsCreator::createVehicle4W(const Vehicle* vehicle, PxPhysics* physics, PxCooking* cooking) 
+PxVehicleDrive4W* PhysicsCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* physics, PxCooking* cooking) 
 {
-	const PxVec3 chassisDims = vehicle->chassisDims;
-	const PxF32 wheelWidth = vehicle->wheelWidth;
-	const PxF32 wheelRadius = vehicle->wheelRadius;
-	const PxU32 numWheels = vehicle->numWheels;
+	VehicleTuning* tuning = vehicle->getTuningStruct();
+
+	const PxVec3 chassisDims = tuning->chassisDims;
+	const PxF32 wheelWidth = tuning->wheelWidth;
+	const PxF32 wheelRadius = tuning->wheelRadius;
+	const PxU32 numWheels = tuning->numWheels;
 
 	//Construct a physx actor with shapes for the chassis and wheels.
 	//Set the rigid body mass, moment of inertia, and center of mass offset.
@@ -322,25 +322,25 @@ PxVehicleDrive4W* PhysicsCreator::createVehicle4W(const Vehicle* vehicle, PxPhys
 		for(PxU32 i = PxVehicleDrive4WWheelOrder::eFRONT_LEFT; i <= PxVehicleDrive4WWheelOrder::eREAR_RIGHT; i++)
 		{
 			wheelConvexMeshes[i] = wheelMesh;
-			wheelMaterials[i] = vehicle->wheelMaterial;
+			wheelMaterials[i] = tuning->wheelMaterial;
 		}
 		//Set the meshes and materials for the non-driven wheels
 		for(PxU32 i = PxVehicleDrive4WWheelOrder::eREAR_RIGHT + 1; i < numWheels; i++)
 		{
 			wheelConvexMeshes[i] = wheelMesh;
-			wheelMaterials[i] = vehicle->wheelMaterial;
+			wheelMaterials[i] = tuning->wheelMaterial;
 		}
 
 		//Chassis just has a single convex shape for simplicity.
 		PxConvexMesh* chassisConvexMesh = createChassisMesh(chassisDims, *physics, *cooking);
 		PxConvexMesh* chassisConvexMeshes[1] = {chassisConvexMesh};
-		PxMaterial* chassisMaterials[1] = {vehicle->chassisMaterial};
+		PxMaterial* chassisMaterials[1] = {tuning->chassisMaterial};
 
 		//Rigid body data.
 		PxVehicleChassisData rigidBodyData;
-		rigidBodyData.mMOI = vehicle->chassisMOI;
-		rigidBodyData.mMass = vehicle->chassisMass;
-		rigidBodyData.mCMOffset = vehicle->chassisCMOffset;
+		rigidBodyData.mMOI = tuning->chassisMOI;
+		rigidBodyData.mMass = tuning->chassisMass;
+		rigidBodyData.mCMOffset = tuning->chassisCMOffset;
 
 		veh4WActor = createVehicleActor
 			(rigidBodyData,
@@ -360,9 +360,9 @@ PxVehicleDrive4W* PhysicsCreator::createVehicle4W(const Vehicle* vehicle, PxPhys
 
 		//Set up the simulation data for all wheels.
 		setupWheelsSimulationData
-			(vehicle->wheelMass, vehicle->wheelMOI, wheelRadius, wheelWidth, 
+			(tuning->wheelMass, tuning->wheelMOI, wheelRadius, wheelWidth, 
 			 numWheels, wheelCenterActorOffsets,
-			 vehicle->chassisCMOffset, vehicle->chassisMass,
+			 tuning->chassisCMOffset, tuning->chassisMass,
 			 wheelsSimData);
 	}
 

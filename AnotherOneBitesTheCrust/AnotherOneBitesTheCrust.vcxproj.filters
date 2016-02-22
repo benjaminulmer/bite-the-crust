@@ -37,7 +37,6 @@
     <ClInclude Include="res_path.h" />
     <ClInclude Include="ShaderTools.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
-    <ClInclude Include="DrivingInput.h" />
     <ClInclude Include="PhysicsEntity.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="ContentLoading.h" />

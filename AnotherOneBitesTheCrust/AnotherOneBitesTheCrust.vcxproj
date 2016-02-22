@@ -186,7 +186,6 @@
     <ClInclude Include="FilterShader.h" />
     <ClInclude Include="FrictionPairs.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="DrivingInput.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="PhysicsCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />

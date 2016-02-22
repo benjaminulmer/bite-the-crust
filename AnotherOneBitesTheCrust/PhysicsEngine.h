@@ -3,7 +3,6 @@
 #include "VehicleSceneQueryData.h"
 #include "FrictionPairs.h"
 #include "PhysicsCreator.h"
-#include "DrivingInput.h"
 #include "Vehicle.h"
 
 class PhysicsEngine

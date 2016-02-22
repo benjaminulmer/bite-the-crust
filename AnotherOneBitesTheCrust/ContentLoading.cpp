@@ -2,7 +2,7 @@
 
 namespace ContentLoading {
 
-bool loadVehicleData(char* filename, Vehicle* vehicle) {
+bool loadVehicleData(char* filename, VehicleTuning* vehicle) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
 	if (err != 0) {
@@ -16,7 +16,7 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	if (d.HasMember("mass")) {
 		vehicle->chassisMass = (float)d["mass"].GetDouble();
 	}
-	vehicle->updateTuning();
+	//vehicle->updateTuning();
 
 	fclose(filePointer);
 

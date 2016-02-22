@@ -84,7 +84,7 @@ void InputEngine::processControllerEvent(SDL_Event e)
 	}
 }
 
-void InputEngine::setInputStruct(DrivingInput* input, int controllerNum) {
+void InputEngine::setInputStruct(VehicleInput* input, int controllerNum) {
 	if (controllerNum > MAX_NUM_CONTROLLERS)
 	{
 		return;

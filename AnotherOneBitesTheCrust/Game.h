@@ -11,14 +11,10 @@
 #include "AudioEngine.h"
 #include "Renderable.h"
 #include "Entity.h"
-#include "Camera.h"
-#include "ContentLoading.h"
 
 #include <SDL.h>
-#include <iostream>
-#include <string>
 #include <glew.h>
-#include <sigslot.h>
+
 
 enum class GameState
 {

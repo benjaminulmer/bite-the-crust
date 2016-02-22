@@ -19,7 +19,7 @@ public:
 		                                             physx::PxConvexMesh** wheelConvexMeshes, const physx::PxU32 numWheels, physx::PxMaterial** chassisMaterials, 
 													 physx::PxConvexMesh** chassisConvexMeshes, const physx::PxU32 numChassisMeshes, physx::PxPhysics& physics);
 
-	static physx::PxVehicleDrive4W* createVehicle4W(const Vehicle* vehDesc, physx::PxPhysics* physics, physx::PxCooking* cooking);
+	static physx::PxVehicleDrive4W* createVehicle4W(Vehicle* vehDesc, physx::PxPhysics* physics, physx::PxCooking* cooking);
 
 private:
 	static void computeWheelCenterActorOffsets4W(const physx::PxF32 wheelFrontZ, const physx::PxF32 wheelRearZ, const physx::PxVec3& chassisDims, 

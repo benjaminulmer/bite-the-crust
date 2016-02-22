@@ -5,27 +5,28 @@
 
 using namespace physx;
 
-PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physics, PxVec3 dimensions) {
+PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physics, PxVec3 dimensions)
+{
 	PxBoxGeometry geometry(dimensions);
 	PxTransform tranform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
 	PxReal density = 1.0f;
 	PxRigidDynamic *actor = PxCreateDynamic(*physics, tranform, geometry, *material, density);
-	actor->setAngularDamping(0.75);
+	actor->setAngularDamping(0);
 	actor->setLinearVelocity(PxVec3(0, 0, 0));
 
-	//Get the plane shape so we can set query and simulation filter data.
+	//Get the box shape so we can set query and simulation filter data.
 	PxShape* shapes[1];
 	actor->getShapes(shapes, 1);
 
-	//Set the query filter data of the ground plane so that the vehicle raycasts can hit the ground.
+	//Set the query filter data of the box so that the vehicle raycasts cannot hit the ground.
 	PxFilterData qryFilterData;
-	setupDrivableSurface(qryFilterData);
+	setupNonDrivableSurface(qryFilterData);
 	shapes[0]->setQueryFilterData(qryFilterData);
 
-	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
+	//Set the simulation filter data of the box so that it collides with the chassis of a vehicle but not the wheels.
 	PxFilterData simFilterData;
-	simFilterData.word0 = COLLISION_FLAG_OBSTACLE;
-	simFilterData.word1 = COLLISION_FLAG_OBSTACLE_AGAINST;
+	simFilterData.word0 = COLLISION_FLAG_DRIVABLE_OBSTACLE;
+	simFilterData.word1 = COLLISION_FLAG_DRIVABLE_OBSTACLE_AGAINST;
 	shapes[0]->setSimulationFilterData(simFilterData);
 
 	return actor;
@@ -109,11 +110,9 @@ PxConvexMesh* PhysicsCreator::createWheelMesh(const PxF32 width, const PxF32 rad
 	return createConvexMesh(points,32,physics,cooking);
 }
 
-PxRigidDynamic* PhysicsCreator::createVehicleActor
-(const PxVehicleChassisData& chassisData,
- PxMaterial** wheelMaterials, PxConvexMesh** wheelConvexMeshes, const PxU32 numWheels, 
- PxMaterial** chassisMaterials, PxConvexMesh** chassisConvexMeshes, const PxU32 numChassisMeshes, 
- PxPhysics& physics)
+PxRigidDynamic* PhysicsCreator::createVehicleActor(const PxVehicleChassisData& chassisData, PxMaterial** wheelMaterials, 
+												   PxConvexMesh** wheelConvexMeshes, const PxU32 numWheels,PxMaterial** chassisMaterials, 
+												   PxConvexMesh** chassisConvexMeshes, const PxU32 numChassisMeshes, PxPhysics& physics)
 {
 	//We need a rigid body actor for the vehicle.
 	//Don't forget to add the actor to the scene after setting up the associated vehicle.
@@ -161,7 +160,8 @@ PxRigidDynamic* PhysicsCreator::createVehicleActor
 	return vehActor;
 }
 
-void PhysicsCreator::computeWheelCenterActorOffsets4W(const PxF32 wheelFrontZ, const PxF32 wheelRearZ, const PxVec3& chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 numWheels, PxVec3* wheelCentreOffsets)
+void PhysicsCreator::computeWheelCenterActorOffsets4W(const PxF32 wheelFrontZ, const PxF32 wheelRearZ, const PxVec3& chassisDims, 
+													  const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 numWheels, PxVec3* wheelCentreOffsets)
 {
 	//chassisDims.z is the distance from the rear of the chassis to the front of the chassis.
 	//The front has z = 0.5*chassisDims.z and the rear has z = -0.5*chassisDims.z.
@@ -184,11 +184,9 @@ void PhysicsCreator::computeWheelCenterActorOffsets4W(const PxF32 wheelFrontZ, c
 	}
 }
 
-void PhysicsCreator::setupWheelsSimulationData
-(const PxF32 wheelMass, const PxF32 wheelMOI, const PxF32 wheelRadius, const PxF32 wheelWidth, 
- const PxU32 numWheels, const PxVec3* wheelCenterActorOffsets,
- const PxVec3& chassisCMOffset, const PxF32 chassisMass,
- PxVehicleWheelsSimData* wheelsSimData)
+void PhysicsCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF32 wheelMOI, const PxF32 wheelRadius, const PxF32 wheelWidth, 
+											   const PxU32 numWheels, const PxVec3* wheelCenterActorOffsets, const PxVec3& chassisCMOffset,
+											   const PxF32 chassisMass,PxVehicleWheelsSimData* wheelsSimData)
 {
 	//Set up the wheels.
 	PxVehicleWheelData wheels[PX_MAX_NB_WHEELS];

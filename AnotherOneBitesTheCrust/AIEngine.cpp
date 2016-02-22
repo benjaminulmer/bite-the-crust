@@ -15,7 +15,7 @@ void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 	input->handBrake = false;
 
 	// Pizza shooting proof of concept
-	int pizzaRand = rand() % 10;
+	int pizzaRand = rand() % 100;
 	if (pizzaRand == 0)
 	{
 		input->shootPizza = true;

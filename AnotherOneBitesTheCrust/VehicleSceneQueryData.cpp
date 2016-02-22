@@ -13,10 +13,7 @@ void setupNonDrivableSurface(PxFilterData& filterData)
 	filterData.word3 = UNDRIVABLE_SURFACE;
 }
 
-PxQueryHitType::Enum WheelRaycastPreFilter
-(PxFilterData filterData0, PxFilterData filterData1,
- const void* constantBlock, PxU32 constantBlockSize,
- PxHitFlags& queryFlags)
+PxQueryHitType::Enum WheelRaycastPreFilter(PxFilterData filterData0, PxFilterData filterData1, const void* constantBlock, PxU32 constantBlockSize, PxHitFlags& queryFlags)
 {
 	//filterData0 is the vehicle suspension raycast.
 	//filterData1 is the shape potentially hit by the raycast.

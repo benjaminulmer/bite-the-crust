@@ -91,6 +91,24 @@ void Game::setupEntities()
 	renderablesMap["box"]->setColor(glm::vec3(0,1,1));
 	renderablesMap["van"]->setColor(glm::vec3(1,0,0));
 
+	ContentLoading::loadMap("res\\JSON\\map.json", map);
+	// Create all the entities loaded in the map
+	for (int i = 0; i < map.tiles.size(); i++) {
+		for (int j = 0; j < map.tiles[i].size(); j++) {
+			Tile tile = map.tiles[i][j];
+			for (int k = 0; k < tile.entities.size(); k++) {
+				TileEntity tileEntity = tile.entities[k];
+				PhysicsEntity* e = new PhysicsEntity();
+				// todo, error check that these models do exist, instead of just break
+				e->setRenderable(renderablesMap[tileEntity.model]);
+				// Offset position based on what tile we're in
+				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize, 0, j * map.tileSize);
+				physicsEngine->createDynamicEntity(e, pos, glm::vec3(0,0,0));
+				entities.push_back(e);
+			}
+		}
+	}
+
 	Entity* ground = new Entity();
 	ground->setRenderable(renderablesMap["floor"]);
 	entities.push_back(ground);
@@ -109,16 +127,6 @@ void Game::setupEntities()
 	ground4->setRenderable(renderablesMap["floor2"]);
 	ground4->setDefaultTranslation(glm::vec3(0.0f,0.0f,70.0f));
 	entities.push_back(ground4);
-
-	DynamicEntity* cube = new DynamicEntity();
-	cube->setRenderable(renderablesMap["cube"]);
-	physicsEngine->createDynamicEntity(cube, glm::vec3(10,0,5), glm::vec3(0,0,0));
-	entities.push_back(cube);
-
-	/*DynamicEntity* barrier = new DynamicEntity();
-	barrier->setRenderable(renderablesMap["barrier"]);
-	physicsEngine->createDynamicEntity(barrier, glm::vec3(-10,0,15), glm::vec3(0,0,0));
-	entities.push_back(barrier);*/
 
 	/**********************************************************
 						Creating Vechicles

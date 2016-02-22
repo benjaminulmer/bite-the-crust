@@ -13,6 +13,7 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "ContentLoading.h"
+#include "Map.h"
 
 #include <SDL.h>
 #include <iostream>
@@ -66,6 +67,7 @@ private:
 
 	std::vector<Entity*> entities;
 	std::map<std::string, Renderable*> renderablesMap;
+	Map map;
 
 	// vehicle location for past 5 frames 
 	static const int CAMERA_POS_BUFFER_SIZE = 10;

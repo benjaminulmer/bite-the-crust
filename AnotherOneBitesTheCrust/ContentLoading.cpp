@@ -23,6 +23,7 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	return true;
 }
 
+//todo, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
 bool loadRenderables(char* filename, std::map<std::string, Renderable*> &map) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
@@ -52,6 +53,59 @@ bool loadRenderables(char* filename, std::map<std::string, Renderable*> &map) {
 		r->setColor(glm::vec3(1.0f,1.0f,1.0f));
 		map[renderableName] = r;
 	}
+	return true;
+}
+
+//todo, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
+bool ContentLoading::loadMap(char* filename, Map &map) {
+	FILE* filePointer;
+	errno_t err = fopen_s(&filePointer, filename, "rb");
+	if (err != 0) {
+		printf("Error, map file couldn't load.");
+		return false;
+	}
+	char readBuffer[10000];
+	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
+	rapidjson::Document d;
+	d.ParseStream(reader);
+
+	// Read in the tiles array
+	std::map<int, Tile> tiles;
+	const rapidjson::Value& tileArray = d["tiles"];
+	if (!tileArray.IsArray()) {
+		printf("Error, map file is improperly defined.");
+		return false;
+	}
+	for (rapidjson::SizeType i = 0; i < tileArray.Size(); i++) {
+		int id = tileArray[i]["id"].GetInt();
+		Tile t;
+		const rapidjson::Value& entityArray = tileArray[i]["entities"];
+		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
+			std::string model = entityArray[j]["model"].GetString();
+			double x = entityArray[j]["x"].GetDouble();
+			double z = entityArray[j]["z"].GetDouble();
+			TileEntity e;
+			e.model = model;
+			e.position = glm::vec3(x, 0, z);
+			t.entities.push_back(e);
+		}
+		tiles[id] = t;
+	}
+
+	// Construct the map
+	int tileSize = d["map"]["tile size"].GetInt();
+	map.tileSize = tileSize;
+	const rapidjson::Value& mapTilesArray = d["map"]["tiles"];
+	for (rapidjson::SizeType i = 0; i < mapTilesArray.Size(); i++) {
+		const rapidjson::Value& row = mapTilesArray[i];
+		std::vector<Tile> rowTiles;
+		for (rapidjson::SizeType j = 0; j < row.Size(); j++) {
+			int id = row[j].GetInt();
+			rowTiles.push_back(tiles[id]);
+		}
+		map.tiles.push_back(rowTiles);
+	}
+
 	return true;
 }
 

@@ -1,22 +1,25 @@
 {
-    "tile": {
-        "name": "Test tile",
-        "id": 1,
-        "entities": [
-            {"name": "cube", "x": 20, "z": 10},
-            {"name": "cube", "x": 30, "z": 30}
-        ] 
-    },
+    "tiles": [
+        {
+            "id": 1,
+            "entities": [
+                {"model": "cube", "x": 0, "z": 0},
+                {"model": "barrier", "x": 35, "z": 35},
+                {"model": "barrier", "x": 35, "z": 0}
+            ]
+        },
+        {
+            "id": 2,
+            "entities": [
+            ]
+        } 
+    ],
 
     "map": {
-        "size": 5,
-        "tile size": 64,
+        "tile size": 70,
         "tiles": [
-		  [1,1,1,1,1],
-		  [1,1,1,1,1],
-		  [1,1,1,1,1],
-		  [1,1,1,1,1],
-		  [1,1,1,1,1]
+		  [2,1],
+		  [1,1]
 	   ]
     }
 }

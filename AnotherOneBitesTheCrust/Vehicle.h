@@ -15,6 +15,7 @@ struct VehicleInput
 
 struct VehicleTuning
 {
+	// Vehicle geometry
 	physx::PxF32 chassisMass;
 	physx::PxVec3 chassisDims;
 	physx::PxVec3 chassisMOI;
@@ -32,6 +33,8 @@ struct VehicleTuning
 	physx::PxReal wheelStaticFriction;
 	physx::PxReal wheelDynamicFriction;
 	physx::PxReal wheelRestitution;
+
+	// Other properties
 };
 
 class Vehicle :

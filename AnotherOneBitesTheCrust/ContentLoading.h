@@ -6,7 +6,7 @@
 
 namespace ContentLoading
 {
-	bool loadVehicleData(char* filename, VehicleTuning* vehicle);
+	bool loadVehicleData(char* filename, Vehicle* vehicle);
 
 	bool loadOBJNonIndexed(
 	const char * path, 

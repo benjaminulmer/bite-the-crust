@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.h"
-#include "glm/glm.hpp"
+#include "glm.hpp"
 
 
 class Camera : public Entity

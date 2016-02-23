@@ -17,7 +17,7 @@
 #include <SDL.h>
 #include <iostream>
 #include <string>
-#include <GL\glew.h>
+#include <glew.h>
 #include <sigslot.h>
 
 enum class GameState
@@ -50,7 +50,7 @@ private:
 	void mainLoop();
 	void processSDLEvents();
 	void quitGame();
-	void firePizza();
+	void shootPizza(Vehicle* vehicle);
 
 	SDL_Window* window;
 	SDL_Surface* screen;
@@ -62,6 +62,7 @@ private:
 	GameState gameState;
 	Camera camera;
 	Vehicle* p1Vehicle, *p2Vehicle;
+
 	std::vector<Entity*> entities;
 	std::vector<Renderable*> renderables;
 

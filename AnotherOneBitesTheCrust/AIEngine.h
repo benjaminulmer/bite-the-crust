@@ -2,12 +2,10 @@
 
 #include <vector>
 #include <ctime>
-#include <glm\glm.hpp>
-#include <glm\gtc\constants.hpp>
+#include <glm.hpp>
+#include <gtc\constants.hpp>
 #include "DrivingInput.h"
 #include "Vehicle.h"
-
-#include <iostream>
 
 using std::vector;
 using glm::vec3;
@@ -46,10 +44,10 @@ public:
 	AIEngine(void);
 	~AIEngine(void);
 
-	DrivingInput updateAI(Vehicle*);
+	void updateAI(Vehicle*);
 
 private:
 	void updatePath(Vehicle*);
-	DrivingInput goToPoint(Vehicle*, glm::vec3);
+	void goToPoint(Vehicle*, glm::vec3);
 };
 

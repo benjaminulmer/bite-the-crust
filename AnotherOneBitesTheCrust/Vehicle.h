@@ -6,7 +6,7 @@
 #include <sigslot.h>
 
 class Vehicle :
-	public DynamicEntity, public sigslot::has_slots<>
+	public DynamicEntity
 {
 public:
 	Vehicle(void);
@@ -35,8 +35,14 @@ public:
 	std::vector<glm::vec3> currentPath;
 
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
-	void handleInput(DrivingInput* input);
 	void updateTuning();
-private: 
+
+	void handleInput();
+	DrivingInput* getInputStruct();
+
+	sigslot::signal1<Vehicle*> ShootPizzaSignal;
+
+private:
+	DrivingInput input;
 };
 

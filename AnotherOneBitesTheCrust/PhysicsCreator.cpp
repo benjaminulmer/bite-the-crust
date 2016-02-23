@@ -196,14 +196,15 @@ void PhysicsCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 			wheels[i].mMOI = wheelMOI;
 			wheels[i].mRadius = wheelRadius;
 			wheels[i].mWidth = wheelWidth;
+			wheels[i].mDampingRate = 0.25f;
 		}
 
 		//Enable the handbrake for the rear wheels only.
 		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque=4000.0f;
 		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque=4000.0f;
 		//Enable steering for the front wheels only.
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer=PxPi*0.3333f;
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer=PxPi*0.3333f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer=PxPi*0.25f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer=PxPi*0.25f;
 	}
 
 	//Set up the tires.
@@ -221,9 +222,7 @@ void PhysicsCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 	{
 		//Compute the mass supported by each suspension spring.
 		PxF32 suspSprungMasses[PX_MAX_NB_WHEELS];
-		PxVehicleComputeSprungMasses
-			(numWheels, wheelCenterActorOffsets, 
-			 chassisCMOffset, chassisMass, 1, suspSprungMasses);
+		PxVehicleComputeSprungMasses(numWheels, wheelCenterActorOffsets, chassisCMOffset, chassisMass, 1, suspSprungMasses);
 
 		//Set the suspension data.
 		for(PxU32 i = 0; i < numWheels; i++)
@@ -371,22 +370,27 @@ PxVehicleDrive4W* PhysicsCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* p
 	{
 		//Diff
 		PxVehicleDifferential4WData diff;
-		diff.mType=PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
+		diff.mType=PxVehicleDifferential4WData::eDIFF_TYPE_OPEN_FRONTWD;
+		diff.mFrontBias = 1.6f;
+		diff.mRearBias = 1.6f;
+		diff.mCentreBias = 1.6f;
 		driveSimData.setDiffData(diff);
 
 		//Engine
 		PxVehicleEngineData engine;
-		engine.mPeakTorque=500.0f;
+		engine.mPeakTorque=12000.0f;
 		engine.mMaxOmega=600.0f;//approx 6000 rpm
+		engine.mMOI = 0.25f;
 		driveSimData.setEngineData(engine);
 
 		//Gears
 		PxVehicleGearsData gears;
-		gears.mSwitchTime=0.5f;
+		gears.mSwitchTime=0.2f;
 		driveSimData.setGearsData(gears);
 
 		//Clutch
 		PxVehicleClutchData clutch;
+		clutch.mAccuracyMode = PxVehicleClutchAccuracyMode::eBEST_POSSIBLE;
 		clutch.mStrength=10.0f;
 		driveSimData.setClutchData(clutch);
 

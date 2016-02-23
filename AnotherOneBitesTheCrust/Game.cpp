@@ -149,7 +149,7 @@ void Game::setupEntities()
 						Creating Vechicles
 	**********************************************************/
 	p1Vehicle = new Vehicle();
-	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
+	//ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
 	p1Vehicle->setRenderable(van);
 	p1Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 	p1Vehicle->setDefaultTranslation(van->getCenter());

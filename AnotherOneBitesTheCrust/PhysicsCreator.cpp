@@ -1,6 +1,6 @@
 #include "PhysicsCreator.h"
 #include "VehicleSceneQueryData.h"
-#include "FilterShader.h"
+#include "Filtering.h"
 #include "FrictionPairs.h"
 
 using namespace physx;

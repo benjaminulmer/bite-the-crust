@@ -162,7 +162,7 @@
     <ClCompile Include="ContentLoading.cpp" />
     <ClCompile Include="DynamicEntity.cpp" />
     <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="FilterShader.cpp" />
+    <ClCompile Include="Filtering.cpp" />
     <ClCompile Include="FrictionPairs.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputEngine.cpp" />
@@ -183,7 +183,7 @@
     <ClInclude Include="ContentLoading.h" />
     <ClInclude Include="DynamicEntity.h" />
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="FilterShader.h" />
+    <ClInclude Include="Filtering.h" />
     <ClInclude Include="FrictionPairs.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputEngine.h" />

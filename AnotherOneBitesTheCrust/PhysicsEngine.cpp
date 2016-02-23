@@ -1,5 +1,5 @@
 #include "PhysicsEngine.h"
-#include "FilterShader.h"
+#include "Filtering.h"
 #include <iostream>
 
 using namespace physx;
@@ -58,6 +58,8 @@ void PhysicsEngine::initPhysXSDK()
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher = cpuDispatcher;
 	sceneDesc.filterShader = FilterShader;
+	FilterCallback* filterCallback = new FilterCallback();
+	sceneDesc.filterCallback = filterCallback;
 	scene = physics->createScene(sceneDesc);
 }
 

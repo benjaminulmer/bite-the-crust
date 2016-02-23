@@ -64,7 +64,7 @@ void Vehicle::handleInput()
 {
 	float handBrake = 0;
 	float forwardSpeed = physicsVehicle->computeForwardSpeed();
-	(input.handBrake) ? handBrake = 1: handBrake = 0;
+	(input.handBrake) ? handBrake = 1.0f: handBrake = 0.0f;
 
 	// Check if gear should switch from reverse to forward or vise versa
 	if (forwardSpeed == 0 && input.backward > 0)

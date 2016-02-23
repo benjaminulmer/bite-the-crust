@@ -241,10 +241,21 @@ void Game::processSDLEvents()
 		{
 			gameState = GameState::EXIT;
 		}
-		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN || SDL_CONTROLLERBUTTONUP ||
-			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
+		else if (event.type == SDL_CONTROLLERAXISMOTION) 
 		{
-			inputEngine->processControllerEvent(event);
+			inputEngine->controllerAxisMotion(event);
+		}
+		else if (event.type == SDL_CONTROLLERBUTTONDOWN)
+		{
+			inputEngine->controllerButtonDown(event);
+		}
+		else if (event.type == SDL_CONTROLLERBUTTONUP)
+		{
+			inputEngine->controllerButtonUp(event);
+		}
+		else if (event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
+		{
+			inputEngine->openControllers();
 		}
 		else
 		{

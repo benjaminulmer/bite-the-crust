@@ -14,7 +14,11 @@ public:
 	static const int MIN_AXIS_VALUE = -32768; // 2^15 - 1
 
 	void setInputStruct(VehicleInput* input, int controllerNum);
-	void processControllerEvent(SDL_Event event);
+
+	void controllerAxisMotion(SDL_Event e);
+	void controllerButtonDown(SDL_Event e);
+	void controllerButtonUp(SDL_Event e);
+	void openControllers();
 
 private:
 	SDL_GameController* controllers[MAX_NUM_CONTROLLERS];
@@ -22,7 +26,5 @@ private:
 	VehicleInput dummyInput; // default for each controller until an input has been set
 	float deadzonePercent;
 	int deadzoneSize;
-
-	void openControllers();
 };
 

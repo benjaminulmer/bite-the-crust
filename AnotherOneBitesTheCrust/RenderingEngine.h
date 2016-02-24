@@ -17,6 +17,7 @@
 #include "ShaderTools.h"
 #include "Renderable.h"
 #include "Camera.h"
+#include "ContentLoading.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -40,9 +41,18 @@ public:
 
 	void testOBJLoading();
 
-	int init_resourses();
-	void render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy);
-	void displayText();
+	//int init_resourses();
+	//void render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy);
+	//void displayText();
+
+	void initText2D(const char * texturePath);
+	void printText2D(const char * text, int x, int y, int size);
+	void cleanupText2D();
+
+	GLuint textProgramID;			//shader
+	GLuint textTextureID;			//texture
+	GLuint Text2DVertexBufferID;	//vertex buffer
+	GLuint Text2DUVBufferID;		//UV buffer
 
 	GLuint basicProgramID;		//shader program 
 
@@ -70,7 +80,7 @@ public:
 	std::vector <GLuint> phongFaces;
 	std::vector <glm::vec2> phongUVs;
 
-	GLuint textProgramID;
+
 	GLuint textVBO;
 	GLuint textVAO;
 	GLuint texture;

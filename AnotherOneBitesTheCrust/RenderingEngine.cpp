@@ -9,6 +9,7 @@ using namespace glm;
 RenderingEngine::RenderingEngine()
 {
 	glEnable(GL_DEPTH_TEST);
+
 	glDepthFunc(GL_LESS);
 
 	generateIDs();
@@ -23,6 +24,7 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 {
 	glClearDepth(1.0);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glDisable(GL_BLEND);
 	glUseProgram(phongProgramID);
 	GLuint mvpID = glGetUniformLocation(phongProgramID, "MVP");
 	GLuint mvID = glGetUniformLocation(phongProgramID, "MV");
@@ -74,6 +76,12 @@ void RenderingEngine::generateIDs()
 	phongProgramID = CreateShaderProgram(vsSource, fsSource);
 	glUseProgram(phongProgramID);
 	glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 35, 100, 35);
+
+	string textVsShader = "res\\Shaders\\text_vs.glsl";
+	string textFsShader = "res\\Shaders\\text_fs.glsl";
+	string textVsSource = loadShaderStringfromFile(textVsShader);
+	string textFsSource = loadShaderStringfromFile(textFsShader);
+	textProgramID = CreateShaderProgram(textVsSource, textFsSource);
 }
 
 void RenderingEngine::loadProjectionMatrix()
@@ -219,3 +227,107 @@ void RenderingEngine::deleteBuffers(Renderable *r)
 //	
 //		glBindVertexArray(0);
 //}
+
+
+
+int RenderingEngine::init_resourses()
+{
+
+	cout << "Initializing text resourses " << endl;
+
+	if(FT_Init_FreeType(&ft))
+	{
+		cout << "Could not init freetype library " << endl;
+		return 0;
+	}
+
+	if(FT_New_Face(ft, "res\\Fonts\\CodePredators-Regular.ttf", 0, &face))
+	{
+		cout << "Could not open font" << endl;
+		return 0;
+	}
+
+	
+	GLuint attribute_coord = glGetUniformLocation(textProgramID, "coord");
+	GLuint uniform_tex = glGetUniformLocation(textProgramID, "tex");
+	GLuint uniform_color = glGetUniformLocation(textProgramID, "color");
+
+	glGenBuffers(1, &textVBO);
+	glGenVertexArrays(1, &textVAO);
+    glGenTextures(1, &texture);
+    glGenSamplers(1, &sampler);
+    glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	cout << "Finished initializing text resourses" << endl;
+	return 1;
+}
+
+void RenderingEngine::render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy) {
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    const FT_GlyphSlot glyph = face->glyph;
+
+    for(auto c : str) {
+        if(FT_Load_Char(face, c, FT_LOAD_RENDER) != 0)
+            continue;
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
+                     glyph->bitmap.width, glyph->bitmap.rows,
+                     0, GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
+
+        const float vx = x + glyph->bitmap_left * sx;
+        const float vy = y + glyph->bitmap_top * sy;
+        const float w = glyph->bitmap.width * sx;
+        const float h = glyph->bitmap.rows * sy;
+
+        struct {
+            float x, y, s, t;
+        } data[6] = {
+            {vx    , vy    , 0, 0},
+            {vx    , vy - h, 0, 1},
+            {vx + w, vy    , 1, 0},
+            {vx + w, vy    , 1, 0},
+            {vx    , vy - h, 0, 1},
+            {vx + w, vy - h, 1, 1}
+        };
+
+        glBufferData(GL_ARRAY_BUFFER, 24*sizeof(float), data, GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        x += (glyph->advance.x >> 6) * sx;
+        y += (glyph->advance.y >> 6) * sy;
+    }
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+}
+
+void RenderingEngine::displayText() {
+
+	//glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	float sx = 2.0 / 1024;
+	float sy = 2.0 / 768;
+	glUseProgram(textProgramID);
+    glBindAttribLocation(textProgramID, 0, "in_Position");
+    GLuint texUniform = glGetUniformLocation(textProgramID, "tex");
+    GLuint colorUniform = glGetUniformLocation(textProgramID, "color");
+	
+	glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindSampler(0, sampler);
+    glBindVertexArray(textVAO);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, textVBO);
+    glUseProgram(textProgramID);
+    glUniform4f(colorUniform, 0, 0, 0, 1);
+    glUniform1i(texUniform, 0);
+
+    FT_Set_Pixel_Sizes(face, 0, 30);
+    render_text("Another One Bites The Crust", face, -1, 0.93, sx, sy);
+	//render_text("Speed:", face, 0.6, -1, sx, sy);
+	
+}

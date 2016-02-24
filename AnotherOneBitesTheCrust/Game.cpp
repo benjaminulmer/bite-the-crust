@@ -76,6 +76,7 @@ void Game::initSystems()
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
 	renderingEngine = new RenderingEngine();
+	renderingEngine->init_resourses();
 }
 
 void Game::setupEntities()
@@ -216,7 +217,7 @@ void Game::mainLoop()
 
 		//display
 		renderingEngine->displayFunc(entities);
-
+		renderingEngine->displayText();
 		//swap buffers
 		SDL_GL_SwapWindow(window);
 		physicsEngine->fetchSimulationResults();

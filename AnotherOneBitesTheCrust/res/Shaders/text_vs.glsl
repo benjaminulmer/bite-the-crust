@@ -1,9 +1,9 @@
-#version 120
+#version 410 core
 
-attribute vec4 coord;
-varying vec2 texcoord;
+in vec4 position;
+out vec2 texCoords;
 
 void main(void) {
-  gl_Position = vec4(coord.xy, 0, 1);
-  texcoord = coord.zw;
+	gl_Position = vec4(position.xy, 0, 1);
+	texCoords = position.zw;
 }

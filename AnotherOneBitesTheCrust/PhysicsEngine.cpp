@@ -79,38 +79,38 @@ void PhysicsEngine::initVehicleSDK()
 	scene->addActor(*groundPlane);
 }
 
-void PhysicsEngine::createDynamicEntity(DynamicEntity* entity, glm::vec3 position, glm::vec3 velocity)
+void PhysicsEngine::createDynamicEntity(DynamicEntity* entity, PxTransform transform)
 {
 	PxMaterial* defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
 	glm::vec3 d = entity->getRenderable()->getDimensions();
 	PxRigidDynamic* object = PhysicsCreator::createBox(defaultMaterial, physics, PxVec3(d.x * 0.5f, d.y * 0.5f, d.z * 0.5f));
-	PxTransform startTransform(PxVec3(position.x, position.y, position.z), PxQuat(PxIdentity));
-	object->setGlobalPose(startTransform);
-	//entities.push_back(object);
+
+	object->setGlobalPose(transform);
 	scene->addActor(*object);
 	entity->setActor(object);
-	object->setLinearVelocity(PxVec3(velocity.x, velocity.y, velocity.z));
 }
 
-void PhysicsEngine::createVehicle(Vehicle* vehicle)
+void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 {
 	VehicleTuning* tuning = vehicle->getTuningStruct();
 
-	PxMaterial* chassisMaterial;
-	PxMaterial* wheelMaterial;
-	chassisMaterial = physics->createMaterial(tuning->chassisStaticFriction, tuning->chassisDynamicFriction, tuning->chassisRestitution);
-	wheelMaterial = physics->createMaterial(tuning->wheelStaticFriction, tuning->wheelDynamicFriction, tuning->wheelRestitution);
+	PxMaterial* chassisMaterial = physics->createMaterial(tuning->chassisStaticFriction, tuning->chassisDynamicFriction, tuning->chassisRestitution);
+	PxMaterial* wheelMaterial = physics->createMaterial(tuning->wheelStaticFriction, tuning->wheelDynamicFriction, tuning->wheelRestitution);
 	tuning->chassisMaterial = chassisMaterial;
 	tuning->wheelMaterial = wheelMaterial;
+
 	PxVehicleDrive4W* testVehicle = PhysicsCreator::createVehicle4W(vehicle, physics, cooking);
-	PxTransform startTransform(PxVec3(0, (tuning->chassisDims.y*0.5f + tuning->wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
+	//PxTransform startTransform(PxVec3(0, (tuning->chassisDims.y*0.5f + tuning->wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
 	PxRigidDynamic* actor = testVehicle->getRigidDynamicActor();
-	actor->setGlobalPose(startTransform);
+
+	actor->setGlobalPose(transform);
 	scene->addActor(*actor);
 	vehicle->setActor(actor);
+
 	testVehicle->setToRestState();
 	testVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	testVehicle->mDriveDynData.setUseAutoGears(true);
+
 	vehicle->physicsVehicle = testVehicle;
 	vehicles.push_back(testVehicle);
 }

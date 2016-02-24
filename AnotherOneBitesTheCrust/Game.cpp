@@ -151,14 +151,14 @@ void Game::setupEntities()
 						Creating Vechicles
 	**********************************************************/
 	p1Vehicle = new Vehicle();
-	//ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
 	p1Vehicle->setRenderable(van);
 	p1Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 	p1Vehicle->setDefaultTranslation(van->getCenter());
 
 	// TODO get dimensions working properly for vehicle
 	//p1Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
-	physicsEngine->createVehicle(p1Vehicle);
+	physicsEngine->createVehicle(p1Vehicle, physx::PxTransform(physx::PxVec3(0, 2, 0), physx::PxQuat(physx::PxIdentity)));
 	entities.push_back(p1Vehicle);
 
 	//// Player 2 (ie. AI)
@@ -170,8 +170,7 @@ void Game::setupEntities()
 
 	// TODO get dimensions working properly for vehicle
 	//p2Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
-	physicsEngine->createVehicle(p2Vehicle);
-	p2Vehicle->setPosition(p2Vehicle->getPosition() + glm::vec3(10, 0, 0));
+	physicsEngine->createVehicle(p2Vehicle, physx::PxTransform(physx::PxVec3(10, 2, 0), physx::PxQuat(physx::PxIdentity)));
 	entities.push_back(p2Vehicle);
 
 	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
@@ -278,11 +277,17 @@ void Game::shootPizza(Vehicle* vehicle)
 {
 	DynamicEntity* pizzaBox = new DynamicEntity();
 	pizzaBox->setRenderable(renderables.at(2)); // TODO, match names to renderables or something instead of hard-coded
-	glm::vec3 position = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
-	glm::vec3 velocity = glm::vec3(vehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 20.0, 0.0));
-	physx::PxVec3 v = vehicle->getDynamicActor()->getLinearVelocity();
-	velocity = velocity + glm::vec3(v.x, v.y, v.z);
-	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);
+
+	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();
+	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.2f, 1.0f));
+	transform.p += posOffset;
+
+	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 0.0f, 20.0f));
+	physx::PxVec3 vehicleVelocity = vehicle->getDynamicActor()->getLinearVelocity();
+	velocity += vehicleVelocity;
+
+	physicsEngine->createDynamicEntity(pizzaBox, transform);
+	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
 	entities.push_back(pizzaBox);
 }
 

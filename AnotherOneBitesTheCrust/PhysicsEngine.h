@@ -13,9 +13,9 @@ public:
 
 	void simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();
-	//void createStaticEntity(StaticEntity* entity);
-	void createDynamicEntity(DynamicEntity* entity, glm::vec3 position, glm::vec3 velocity);
-	void createVehicle(Vehicle* vehicle);
+	//void createStaticEntity(StaticEntity* entity, physx::PxTransform transform);
+	void createDynamicEntity(DynamicEntity* entity, physx::PxTransform transform);
+	void createVehicle(Vehicle* vehicle, physx::PxTransform transform);
 
 private:
 	physx::PxTolerancesScale scale;

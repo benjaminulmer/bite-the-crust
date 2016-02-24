@@ -3,6 +3,8 @@
 #include "Camera.h"
 #include "ContentLoading.h"
 
+#include <foundation/PxTransform.h> 
+
 #include <iostream>
 #include <string>
 #include <sigslot.h>

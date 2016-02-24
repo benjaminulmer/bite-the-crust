@@ -80,14 +80,14 @@ void PhysicsEngine::initVehicleSDK()
 	scene->addActor(*groundPlane);
 }
 
-void PhysicsEngine::createDynamicEntity(PhysicsEntity* entity, glm::vec3 position, glm::vec3 velocity)
+void PhysicsEngine::createDynamicEntity(DynamicEntity* entity, glm::vec3 position, glm::vec3 velocity)
 {
 	PxMaterial* defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
 	glm::vec3 d = entity->getRenderable()->getDimensions();
 	PxRigidDynamic* object = PhysicsCreator::createBox(defaultMaterial, physics, PxVec3(d.x * 0.5f, d.y * 0.5f, d.z * 0.5f));
 	PxTransform startTransform(PxVec3(position.x, position.y, position.z), PxQuat(PxIdentity));
 	object->setGlobalPose(startTransform);
-	entities.push_back(object);
+	//entities.push_back(object);
 	scene->addActor(*object);
 	entity->setActor(object);
 	object->setLinearVelocity(PxVec3(velocity.x, velocity.y, velocity.z));

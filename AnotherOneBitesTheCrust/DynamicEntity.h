@@ -1,5 +1,6 @@
 #pragma once
-#include "physicsentity.h"
+#include "PhysicsEntity.h"
+
 class DynamicEntity :
 	public PhysicsEntity
 {

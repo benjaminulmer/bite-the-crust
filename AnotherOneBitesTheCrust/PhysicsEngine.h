@@ -13,7 +13,8 @@ public:
 
 	bool simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();
-	void createDynamicEntity(PhysicsEntity* entity, glm::vec3 position, glm::vec3 velocity = glm::vec3(0,0,0));
+	//void createStaticEntity(StaticEntity* entity);
+	void createDynamicEntity(DynamicEntity* entity, glm::vec3 position, glm::vec3 velocity);
 	void createVehicle(Vehicle* vehicle);
 
 private:
@@ -44,7 +45,7 @@ private:
 	physx::PxF32 deltaTimeSAcc;
 	
 	std::vector<physx::PxVehicleWheels*> vehicles;
-	std::vector<physx::PxRigidDynamic*> entities;
+	//std::vector<physx::PxRigidDynamic*> entities;
 
 	void initSimulationData();
 	void initPhysXSDK();

@@ -15,11 +15,11 @@ void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 	input->handBrake = false;
 
 	// Pizza shooting proof of concept
-	int pizzaRand = rand() % 100;
-	if (pizzaRand == 0)
-	{
-		input->shootPizza = true;
-	}
+	//int pizzaRand = rand() % 100;
+	//if (pizzaRand == 0)
+	//{
+	//	input->shootPizza = true;
+	//}
 	
 	glm::vec3 desiredDirection = glm::normalize(desiredPos - driver->getPosition());
 	glm::vec3 forward(glm::normalize(driver->getModelMatrix() * glm::vec4(0,0,1,0)));
@@ -46,6 +46,10 @@ void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 	{
 		input->rightSteer = 0;
 		input->leftSteer = 0;
+		if (rand()%100 < 10)
+		{
+			input->shootPizza = true;
+		}
 	}
 }
 

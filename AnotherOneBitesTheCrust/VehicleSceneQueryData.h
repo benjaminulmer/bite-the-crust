@@ -11,10 +11,8 @@ void setupDrivableSurface(physx::PxFilterData& filterData);
 
 void setupNonDrivableSurface(physx::PxFilterData& filterData);
 
-physx::PxQueryHitType::Enum WheelRaycastPreFilter
-(physx::PxFilterData filterData0, physx::PxFilterData filterData1,
- const void* constantBlock, physx::PxU32 constantBlockSize,
- physx::PxHitFlags& queryFlags);
+physx::PxQueryHitType::Enum WheelRaycastPreFilter(physx::PxFilterData filterData0, physx::PxFilterData filterData1, 
+												  const void* constantBlock, physx::PxU32 constantBlockSize, physx::PxHitFlags& queryFlags);
 
 //Data structure for quick setup of scene queries for suspension raycasts.
 class VehicleSceneQueryData

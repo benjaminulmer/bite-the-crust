@@ -3,6 +3,8 @@
 namespace ContentLoading {
 
 bool loadVehicleData(char* filename, Vehicle* vehicle) {
+	VehicleTuning* tuning = vehicle->getTuningStruct();
+
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
 	if (err != 0) {
@@ -14,7 +16,7 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	rapidjson::Document d;
 	d.ParseStream(reader);
 	if (d.HasMember("mass")) {
-		vehicle->chassisMass = (float)d["mass"].GetDouble();
+		tuning->chassisMass = (float)d["mass"].GetDouble();
 	}
 	vehicle->updateTuning();
 

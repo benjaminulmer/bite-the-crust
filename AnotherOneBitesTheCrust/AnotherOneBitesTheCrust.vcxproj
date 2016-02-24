@@ -186,7 +186,6 @@
     <ClInclude Include="FilterShader.h" />
     <ClInclude Include="FrictionPairs.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="DrivingInput.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="PhysicsCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />
@@ -201,12 +200,6 @@
   <ItemGroup>
     <None Include="res\Shaders\StandardShading.fragmentshader" />
     <None Include="res\Shaders\StandardShading.vertexshader" />
-    <None Include="glew32.dll" />
-    <None Include="nvToolsExt32_1.dll" />
-    <None Include="PhysX3CHECKED_x86.dll" />
-    <None Include="PhysX3CommonCHECKED_x86.dll" />
-    <None Include="PhysX3CookingCHECKED_x86.dll" />
-    <None Include="SDL2.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

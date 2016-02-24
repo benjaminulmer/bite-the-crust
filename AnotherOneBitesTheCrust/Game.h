@@ -11,14 +11,10 @@
 #include "AudioEngine.h"
 #include "Renderable.h"
 #include "Entity.h"
-#include "Camera.h"
-#include "ContentLoading.h"
 
 #include <SDL.h>
-#include <iostream>
-#include <string>
 #include <glew.h>
-#include <sigslot.h>
+
 
 enum class GameState
 {
@@ -50,7 +46,7 @@ private:
 	void mainLoop();
 	void processSDLEvents();
 	void quitGame();
-	void firePizza();
+	void shootPizza(Vehicle* vehicle);
 
 	SDL_Window* window;
 	SDL_Surface* screen;
@@ -66,7 +62,7 @@ private:
 	std::vector<Entity*> entities;
 	std::vector<Renderable*> renderables;
 
-	// vehicle location for past 5 frames 
+	// vehicle location for previous frames 
 	static const int CAMERA_POS_BUFFER_SIZE = 10;
 	glm::vec3 cameraPosBuffer[CAMERA_POS_BUFFER_SIZE];
 	int cameraPosBufferIndex;

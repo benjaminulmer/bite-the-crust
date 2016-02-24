@@ -15,19 +15,19 @@ PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physi
 	actor->setLinearVelocity(PxVec3(0, 0, 0));
 
 	//Get the box shape so we can set query and simulation filter data.
-	PxShape* shapes[1];
-	actor->getShapes(shapes, 1);
+	PxShape* shape;
+	actor->getShapes(&shape, 1);
 
 	//Set the query filter data of the box so that the vehicle raycasts cannot hit the ground.
 	PxFilterData qryFilterData;
 	setupNonDrivableSurface(qryFilterData);
-	shapes[0]->setQueryFilterData(qryFilterData);
+	shape->setQueryFilterData(qryFilterData);
 
 	//Set the simulation filter data of the box so that it collides with the chassis of a vehicle but not the wheels.
 	PxFilterData simFilterData;
 	simFilterData.word0 = COLLISION_FLAG_DRIVABLE_OBSTACLE;
 	simFilterData.word1 = COLLISION_FLAG_DRIVABLE_OBSTACLE_AGAINST;
-	shapes[0]->setSimulationFilterData(simFilterData);
+	shape->setSimulationFilterData(simFilterData);
 
 	return actor;
 }
@@ -38,19 +38,19 @@ PxRigidStatic* PhysicsCreator::createDrivablePlane(physx::PxMaterial* material, 
 	PxRigidStatic* groundPlane = PxCreatePlane(*physics, PxPlane(0,1,0,0), *material);
 
 	//Get the plane shape so we can set query and simulation filter data.
-	PxShape* shapes[1];
-	groundPlane->getShapes(shapes, 1);
+	PxShape* shape;
+	groundPlane->getShapes(&shape, 1);
 
 	//Set the query filter data of the ground plane so that the vehicle raycasts can hit the ground.
 	physx::PxFilterData qryFilterData;
 	setupDrivableSurface(qryFilterData);
-	shapes[0]->setQueryFilterData(qryFilterData);
+	shape->setQueryFilterData(qryFilterData);
 
 	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
 	PxFilterData simFilterData;
 	simFilterData.word0 = COLLISION_FLAG_GROUND;
 	simFilterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
-	shapes[0]->setSimulationFilterData(simFilterData);
+	shape->setSimulationFilterData(simFilterData);
 
 	return groundPlane;
 }

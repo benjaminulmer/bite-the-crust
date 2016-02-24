@@ -40,7 +40,7 @@ void PhysicsEngine::initPhysXSDK()
 	profileZoneManager = &PxProfileZoneManager::createProfileZoneManager(foundation);
 
 	// Create main physics object 
-	physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, scale, true, profileZoneManager );
+	physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, scale, true, profileZoneManager);
 	
 	// Create cooking object
 	PxCookingParams params(scale);

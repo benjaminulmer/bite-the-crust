@@ -42,7 +42,7 @@ void Game::run()
 	// Preload data, initialize subsystems, anything to do before entering the main loop
 	initSystems();
 	setupEntities();
-	connectSignals();
+	connectSystems();
 
 	mainLoop();
 }
@@ -183,7 +183,7 @@ void Game::setupEntities()
 }
 
 // TODO decide how signals will be used and set them up
-void Game::connectSignals()
+void Game::connectSystems()
 {
 	inputEngine->setInputStruct(p1Vehicle->getInputStruct(), 0);
 
@@ -194,37 +194,44 @@ void Game::connectSignals()
 void Game::mainLoop()
 {
 	unsigned int oldTimeMs = SDL_GetTicks();
+	unsigned int deltaTimeAccMs = 0;
+	unsigned int physicsStepSize = 16;
 	
 	// Game loop
 	while (gameState!= GameState::EXIT)
 	{
-		// Update the player and AI cars
 		processSDLEvents();
-		aiEngine->updateAI(p2Vehicle);
-		p1Vehicle->handleInput();
-		p2Vehicle->handleInput();
 
 		// Figure out timestep and run physics
 		unsigned int newTimeMs = SDL_GetTicks();
 		unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 		oldTimeMs = newTimeMs;
-		bool didPhysics = physicsEngine->simulate(deltaTimeMs);
 
-		// If a physics simulation ran, update the camera position buffer with new location
-		if (didPhysics)
+		deltaTimeAccMs += deltaTimeMs;
+		if (deltaTimeAccMs >= physicsStepSize) 
 		{
+			deltaTimeAccMs -= physicsStepSize;
+
+			// Update the player and AI cars
+			aiEngine->updateAI(p2Vehicle);
+			p1Vehicle->handleInput();
+			p2Vehicle->handleInput();
+		
+			physicsEngine->simulate(physicsStepSize);
+
+			// Update the camera position buffer with new location
 			cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
 			cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
-		}
-		// Set camera to look at player with a positional delay
-		camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
-		camera.setLookAtPosition(p1Vehicle->getPosition());
-		renderingEngine->updateView(camera);
 
-		//display
+			// Set camera to look at player with a positional delay
+			camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
+			camera.setLookAtPosition(p1Vehicle->getPosition());
+			renderingEngine->updateView(camera);
+		}
+		// Display
 		renderingEngine->displayFunc(entities);
 
-		//swap buffers
+		// Swap buffers
 		SDL_GL_SwapWindow(window);
 		physicsEngine->fetchSimulationResults();
 	}

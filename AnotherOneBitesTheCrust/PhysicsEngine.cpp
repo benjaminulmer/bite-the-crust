@@ -30,7 +30,6 @@ void PhysicsEngine::initSimulationData()
 	defaultErrorCallback = new PxDefaultErrorCallback();
 	defaultAllocator = new PxDefaultAllocator();
 
-	stepSizeS = 1.0f/60.0f;
 	numWorkers = 8;
 }
 
@@ -116,29 +115,21 @@ void PhysicsEngine::createVehicle(Vehicle* vehicle)
 	vehicles.push_back(testVehicle);
 }
 
-bool PhysicsEngine::simulate(unsigned int deltaTimeMs)
+void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 {
 	PxF32 deltaTimeS = deltaTimeMs/1000.0f;
-	deltaTimeSAcc += deltaTimeS;
 
-	if (deltaTimeSAcc >= stepSizeS)
-	{
-		deltaTimeSAcc -= stepSizeS;
+	// Wheel raycasts
+	PxVehicleWheels** vehiclesPointer = vehicles.data();
+	PxRaycastQueryResult* raycastResults = vehicleSceneQueryData->getRaycastQueryResultBuffer(0);
+	const PxU32 raycastResultsSize = vehicleSceneQueryData->getRaycastQueryResultBufferSize();
+	PxVehicleSuspensionRaycasts(batchQuery, vehicles.size(), vehiclesPointer, raycastResultsSize, raycastResults);
 
-		// Wheel raycasts
-		PxVehicleWheels** vehiclesPointer = vehicles.data();
-		PxRaycastQueryResult* raycastResults = vehicleSceneQueryData->getRaycastQueryResultBuffer(0);
-		const PxU32 raycastResultsSize = vehicleSceneQueryData->getRaycastQueryResultBufferSize();
-		PxVehicleSuspensionRaycasts(batchQuery, vehicles.size(), vehiclesPointer, raycastResultsSize, raycastResults);
+	//Vehicle update.
+	const PxVec3 grav = scene->getGravity();
+	PxVehicleUpdates(deltaTimeS, grav, *frictionPairs, vehicles.size(), vehiclesPointer, nullptr);
 
-		//Vehicle update.
-		const PxVec3 grav = scene->getGravity();
-		PxVehicleUpdates(stepSizeS, grav, *frictionPairs, vehicles.size(), vehiclesPointer, nullptr);
-
-		scene->simulate(stepSizeS);
-		return true;
-	}
-	return false;
+	scene->simulate(deltaTimeS);
 }
 
 void PhysicsEngine::fetchSimulationResults()

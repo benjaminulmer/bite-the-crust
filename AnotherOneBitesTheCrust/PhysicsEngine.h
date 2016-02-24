@@ -11,7 +11,7 @@ public:
 	PhysicsEngine(void);
 	~PhysicsEngine(void);
 
-	bool simulate(unsigned int deltaTimeMs);
+	void simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();
 	//void createStaticEntity(StaticEntity* entity);
 	void createDynamicEntity(DynamicEntity* entity, glm::vec3 position, glm::vec3 velocity);
@@ -21,7 +21,6 @@ private:
 	physx::PxTolerancesScale scale;
 	physx::PxDefaultErrorCallback* defaultErrorCallback;
 	physx::PxDefaultAllocator* defaultAllocator;
-	physx::PxF32 stepSizeS;
 	physx::PxU32 numWorkers;
 	
 	physx::PxFoundation* foundation;
@@ -41,8 +40,6 @@ private:
 	physx::PxMaterial* testWheelMat;
 
 	physx::PxRigidStatic* groundPlane;
-
-	physx::PxF32 deltaTimeSAcc;
 	
 	std::vector<physx::PxVehicleWheels*> vehicles;
 	//std::vector<physx::PxRigidDynamic*> entities;

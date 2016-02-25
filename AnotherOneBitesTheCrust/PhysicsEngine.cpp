@@ -1,24 +1,12 @@
 #include "PhysicsEngine.h"
 #include "Filtering.h"
+#include "PhysicsCreator.h"
 #include <iostream>
 
 using namespace physx;
 
 PhysicsEngine::PhysicsEngine(void)
 {
-	defaultErrorCallback = nullptr;
-	defaultAllocator = nullptr;
-	foundation = nullptr;
-	physics = nullptr;
-	cooking = nullptr;
-	cpuDispatcher = nullptr;
-	scene = nullptr;
-	vehicleSceneQueryData = nullptr;
-	batchQuery = nullptr;
-	frictionPairs = nullptr;
-	testChassisMat = nullptr;
-	testWheelMat = nullptr;
-	groundPlane = nullptr;
 	initSimulationData();
 	initPhysXSDK();
 	initVehicleSDK();
@@ -99,7 +87,7 @@ void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 	tuning->chassisMaterial = chassisMaterial;
 	tuning->wheelMaterial = wheelMaterial;
 
-	PxVehicleDrive4W* testVehicle = PhysicsCreator::createVehicle4W(vehicle, physics, cooking);
+	PxVehicleDrive4W* testVehicle = VehicleCreator::createVehicle4W(vehicle, physics, cooking);
 	//PxTransform startTransform(PxVec3(0, (tuning->chassisDims.y*0.5f + tuning->wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
 	PxRigidDynamic* actor = testVehicle->getRigidDynamicActor();
 

@@ -2,7 +2,7 @@
 #include <PxPhysicsAPI.h>
 #include "VehicleSceneQueryData.h"
 #include "FrictionPairs.h"
-#include "PhysicsCreator.h"
+#include "VehicleCreator.h"
 #include "Vehicle.h"
 
 class PhysicsEngine

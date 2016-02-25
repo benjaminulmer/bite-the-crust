@@ -9,7 +9,6 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PhysicsCreator.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="Renderable.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
@@ -20,6 +19,8 @@
     <ClCompile Include="ContentLoading.cpp" />
     <ClCompile Include="DynamicEntity.cpp" />
     <ClCompile Include="Filtering.cpp" />
+    <ClCompile Include="VehicleCreator.cpp" />
+    <ClCompile Include="PhysicsCreator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
@@ -29,7 +30,6 @@
     <ClInclude Include="FrictionPairs.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputEngine.h" />
-    <ClInclude Include="PhysicsCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="Renderable.h" />
     <ClInclude Include="RenderingEngine.h" />
@@ -41,6 +41,8 @@
     <ClInclude Include="ContentLoading.h" />
     <ClInclude Include="DynamicEntity.h" />
     <ClInclude Include="Filtering.h" />
+    <ClInclude Include="VehicleCreator.h" />
+    <ClInclude Include="PhysicsCreator.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\StandardShading.fragmentshader" />

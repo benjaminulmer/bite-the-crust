@@ -168,6 +168,7 @@
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PhysicsCreator.cpp" />
+    <ClCompile Include="VehicleCreator.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="PhysicsEntity.cpp" />
     <ClCompile Include="Renderable.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="PhysicsCreator.h" />
+    <ClInclude Include="VehicleCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="PhysicsEntity.h" />
     <ClInclude Include="Renderable.h" />

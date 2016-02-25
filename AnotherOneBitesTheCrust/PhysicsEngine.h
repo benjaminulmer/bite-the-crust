@@ -35,7 +35,7 @@ private:
 	VehicleSceneQueryData* vehicleSceneQueryData;
 	physx::PxBatchQuery* batchQuery;
 
-	physx::PxMaterial* drivingSurfaces[FrictionPairs::MAX_NUM_SURFACE_TYPES];
+	physx::PxMaterial* drivingSurfaces[TireType::MAX];
 	physx::PxVehicleDrivableSurfaceToTireFrictionPairs* frictionPairs;
 
 	physx::PxMaterial* testChassisMat;

@@ -51,18 +51,18 @@ PxRigidDynamic* VehicleCreator::createVehicleActor(const PxVehicleChassisData& c
 
 	//Wheel and chassis simulation filter data.
 	PxFilterData wheelSimFilterData;
-	wheelSimFilterData.word0 = COLLISION_FLAG_WHEEL;
-	wheelSimFilterData.word1 = COLLISION_FLAG_WHEEL_AGAINST;
+	wheelSimFilterData.word0 = (PxU32)CollisionFlag::WHEEL;
+	wheelSimFilterData.word1 = (PxU32)CollisionFlag::WHEEL_AGAINST;
 	PxFilterData chassisSimFilterData;
-	chassisSimFilterData.word0 = COLLISION_FLAG_CHASSIS;
-	chassisSimFilterData.word1 = COLLISION_FLAG_CHASSIS_AGAINST;
+	chassisSimFilterData.word0 = (PxU32)CollisionFlag::CHASSIS;
+	chassisSimFilterData.word1 = (PxU32)CollisionFlag::CHASSIS_AGAINST;
 
 	//Wheel and chassis query filter data.
 	//Optional: cars don't drive on other cars.
 	PxFilterData wheelQryFilterData;
-	setupNonDrivableSurface(wheelQryFilterData);
+	wheelQryFilterData.word3 = (PxU32)Surface::UNDRIVABLE;
 	PxFilterData chassisQryFilterData;
-	setupNonDrivableSurface(chassisQryFilterData);
+	chassisQryFilterData.word3 = (PxU32)Surface::UNDRIVABLE;
 
 	//Add all the wheel shapes to the actor.
 	for(PxU32 i = 0; i < numWheels; i++)
@@ -144,7 +144,7 @@ void VehicleCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 		//Set up the tires.
 		for(PxU32 i = 0; i < numWheels; i++)
 		{
-			tires[i].mType = FrictionPairs::TIRE_TYPE_NORMAL;
+			tires[i].mType = (PxU32)TireType::NORMAL;
 		}
 	}
 
@@ -210,7 +210,7 @@ void VehicleCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 
 	//Set up the filter data of the raycast that will be issued by each suspension.
 	PxFilterData qryFilterData;
-	setupNonDrivableSurface(qryFilterData);
+	qryFilterData.word3 = (PxU32)Surface::UNDRIVABLE;
 
 	//Set the wheel, tire and suspension data.
 	//Set the geometry data.

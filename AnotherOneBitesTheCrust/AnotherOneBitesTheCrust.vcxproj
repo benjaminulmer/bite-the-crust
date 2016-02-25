@@ -169,6 +169,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="PhysicsCreator.cpp" />
+    <ClCompile Include="PhysicsEntityInfo.cpp" />
     <ClCompile Include="VehicleCreator.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="PhysicsEntity.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="PhysicsCreator.h" />
+    <ClInclude Include="PhysicsEntityInfo.h" />
     <ClInclude Include="VehicleCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="PhysicsEntity.h" />

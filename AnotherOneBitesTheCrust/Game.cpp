@@ -196,6 +196,8 @@ void Game::mainLoop()
 	unsigned int deltaTimeAccMs = 0;
 	unsigned int physicsStepSize = 16;
 	
+	physicsEngine->createTrigger();
+
 	// Game loop
 	while (gameState!= GameState::EXIT)
 	{

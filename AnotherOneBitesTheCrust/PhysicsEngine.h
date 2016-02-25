@@ -17,6 +17,8 @@ public:
 	void createDynamicEntity(DynamicEntity* entity, physx::PxTransform transform);
 	void createVehicle(Vehicle* vehicle, physx::PxTransform transform);
 
+	void createTrigger();
+
 private:
 	physx::PxTolerancesScale scale;
 	physx::PxDefaultErrorCallback* defaultErrorCallback;

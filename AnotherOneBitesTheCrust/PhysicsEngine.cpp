@@ -78,6 +78,12 @@ void PhysicsEngine::createDynamicEntity(DynamicEntity* entity, PxTransform trans
 	entity->setActor(object);
 }
 
+void PhysicsEngine::createTrigger()
+{
+	PxActor* object = PhysicsCreator::createTriggerVolume(physics);
+	scene->addActor(*object);
+}
+
 void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 {
 	VehicleTuning* tuning = vehicle->getTuningStruct();
@@ -87,20 +93,21 @@ void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 	tuning->chassisMaterial = chassisMaterial;
 	tuning->wheelMaterial = wheelMaterial;
 
-	PxVehicleDrive4W* testVehicle = VehicleCreator::createVehicle4W(vehicle, physics, cooking);
+	PxVehicleDrive4W* physVehicle = VehicleCreator::createVehicle4W(vehicle, physics, cooking);
 	//PxTransform startTransform(PxVec3(0, (tuning->chassisDims.y*0.5f + tuning->wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
-	PxRigidDynamic* actor = testVehicle->getRigidDynamicActor();
+	PxRigidDynamic* actor = physVehicle->getRigidDynamicActor();
 
 	actor->setGlobalPose(transform);
+	physVehicle->setToRestState();
+	physVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	physVehicle->mDriveDynData.setUseAutoGears(true);
+
 	scene->addActor(*actor);
 	vehicle->setActor(actor);
+	vehicle->physicsVehicle = physVehicle;
+	actor->userData = vehicle;
 
-	testVehicle->setToRestState();
-	testVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-	testVehicle->mDriveDynData.setUseAutoGears(true);
-
-	vehicle->physicsVehicle = testVehicle;
-	vehicles.push_back(testVehicle);
+	vehicles.push_back(physVehicle);
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs)

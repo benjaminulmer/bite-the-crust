@@ -113,3 +113,10 @@ VehicleTuning* Vehicle::getTuningStruct()
 Vehicle::~Vehicle(void)
 {
 }
+
+#include <iostream>
+
+const void Vehicle::test()
+{
+	std::cout << "test" << std::endl;
+}

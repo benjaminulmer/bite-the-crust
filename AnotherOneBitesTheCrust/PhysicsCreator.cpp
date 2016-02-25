@@ -9,7 +9,7 @@ PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physi
 	PxBoxGeometry geometry(dimensions);
 	PxTransform tranform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
 	PxReal density = 1.0f;
-	PxRigidDynamic *actor = PxCreateDynamic(*physics, tranform, geometry, *material, density);
+	PxRigidDynamic* actor = PxCreateDynamic(*physics, tranform, geometry, *material, density);
 
 	//Get the box shape so we can set query and simulation filter data.
 	PxShape* shape;
@@ -25,6 +25,22 @@ PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physi
 	simFilterData.word0 = COLLISION_FLAG_DRIVABLE_OBSTACLE;
 	simFilterData.word1 = COLLISION_FLAG_DRIVABLE_OBSTACLE_AGAINST;
 	shape->setSimulationFilterData(simFilterData);
+
+	return actor;
+}
+
+PxActor* PhysicsCreator::createTriggerVolume(PxPhysics* physics)
+{
+	PxSphereGeometry geometry(10.0f); 
+	PxTransform tranform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
+	PxMaterial* material = physics->createMaterial(0.5f, 0.5f, 0.5f);
+
+	PxRigidStatic* actor = PxCreateStatic(*physics, tranform, geometry, *material);
+	PxShape* shape;
+	actor->getShapes(&shape, 1);
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+	shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
 
 	return actor;
 }

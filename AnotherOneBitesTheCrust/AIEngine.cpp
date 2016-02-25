@@ -67,7 +67,7 @@ void AIEngine::updateAI(Vehicle* toUpdate)
 	if(distanceToNext < 10)
 	{
 		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
-		std::cout << "Waypoint get!" << std::endl;
+		//std::cout << "Waypoint get!" << std::endl;
 		if(toUpdate->currentPath.empty())
 		{
 			// return DrivingInput();

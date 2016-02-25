@@ -1,4 +1,5 @@
 #include "Filtering.h"
+#include "Vehicle.h"
 #include <iostream>
 
 using namespace physx;
@@ -7,18 +8,21 @@ PxFilterFlags FilterShader(PxFilterObjectAttributes attributes0, PxFilterData fi
 						   PxFilterObjectAttributes attributes1, PxFilterData filterData1,
 						   PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 {
-	PX_UNUSED(attributes0);
-	PX_UNUSED(attributes1);
 	PX_UNUSED(constantBlock);
 	PX_UNUSED(constantBlockSize);
+
+	if(PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
+    {
+        pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
+        return PxFilterFlag::eCALLBACK;
+    }
 
 	if(((filterData0.word0 & filterData1.word1) == 0) && ((filterData1.word0 & filterData0.word1) == 0))
 		return PxFilterFlag::eSUPPRESS;
 
 	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
 
-	//return PxFilterFlags();
-	return PxFilterFlag::eCALLBACK;
+	return PxFilterFlags();
 }
 
 PxFilterFlags FilterCallback::pairFound(PxU32 pairID, PxFilterObjectAttributes attributes0, PxFilterData filterData0,
@@ -26,6 +30,9 @@ PxFilterFlags FilterCallback::pairFound(PxU32 pairID, PxFilterObjectAttributes a
 									    PxFilterData filterData1, const PxActor *a1, const PxShape *s1, PxPairFlags &pairFlags)
 {
 	std::cout << "callback" << std::endl;
+	Vehicle* vehicle = (Vehicle*)(a0->userData);
+	vehicle->test();
+
 	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
 	return PxFilterFlags();
 }

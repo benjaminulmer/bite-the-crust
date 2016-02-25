@@ -21,6 +21,7 @@
     <ClCompile Include="Filtering.cpp" />
     <ClCompile Include="VehicleCreator.cpp" />
     <ClCompile Include="PhysicsCreator.cpp" />
+    <ClCompile Include="Map.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
@@ -40,9 +41,13 @@
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="ContentLoading.h" />
     <ClInclude Include="DynamicEntity.h" />
+<<<<<<< HEAD
     <ClInclude Include="Filtering.h" />
     <ClInclude Include="VehicleCreator.h" />
     <ClInclude Include="PhysicsCreator.h" />
+=======
+    <ClInclude Include="Map.h" />
+>>>>>>> master
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\StandardShading.fragmentshader" />

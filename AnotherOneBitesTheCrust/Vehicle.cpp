@@ -100,16 +100,6 @@ void Vehicle::handleInput()
 	}
 }
 
-VehicleInput* Vehicle::getInputStruct()
-{
-	return &input;
-}
-
-VehicleTuning* Vehicle::getTuningStruct()
-{
-	return &tuning;
-}
-
 Vehicle::~Vehicle(void)
 {
 }

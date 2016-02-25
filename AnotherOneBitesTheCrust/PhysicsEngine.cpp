@@ -86,7 +86,7 @@ void PhysicsEngine::createTrigger()
 
 void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 {
-	VehicleTuning* tuning = vehicle->getTuningStruct();
+	VehicleTuning* tuning = &vehicle->tuning;
 
 	PxMaterial* chassisMaterial = physics->createMaterial(tuning->chassisStaticFriction, tuning->chassisDynamicFriction, tuning->chassisRestitution);
 	PxMaterial* wheelMaterial = physics->createMaterial(tuning->wheelStaticFriction, tuning->wheelDynamicFriction, tuning->wheelRestitution);

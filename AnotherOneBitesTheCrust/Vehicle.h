@@ -45,24 +45,21 @@ public:
 	~Vehicle(void);
 
 	physx::PxVehicleDrive4W* physicsVehicle;
+	VehicleInput input;
+	VehicleTuning tuning;
 
 	// AI stuff; might be moved into 'Player' class
 	std::vector<glm::vec3> currentPath;
 
 	void updateTuning();
 	void handleInput();
-	VehicleInput* getInputStruct();
-	VehicleTuning* getTuningStruct();
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
 
-	sigslot::signal1<Vehicle*> ShootPizzaSignal;
+	sigslot::signal1<Vehicle*> ShootPizzaSignal;	
 
 	const void test();
 
 private:
-	VehicleInput input;
-	VehicleTuning tuning;
-
 	void defaultTuning();
 };
 

@@ -5,6 +5,6 @@
         {"name": "box", "model": "PizzaBox.obj"},
         {"name": "van", "model": "Van.obj"},
         {"name": "cube", "model": "cube.obj"},
-        {"name": "barrier", "model": "construction Barrier.obj"}
+        {"name": "barrier", "model": "constructionBarrier.obj"}
     ]
 }

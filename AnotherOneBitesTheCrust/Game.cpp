@@ -85,63 +85,51 @@ void Game::initSystems()
 
 void Game::setupEntities()
 {
-	Renderable * floor = new Renderable();
-	vector<glm::vec3>floorVerts;
-	vector<glm::vec3>floorNormals;
-	bool floorRes = ContentLoading::loadOBJNonIndexed("res\\Models\\FlatFloor.obj", floorVerts, floorNormals);
-	floor->setVerts(floorVerts);
-	floor->setNorms(floorNormals);
-	floor->setColor(glm::vec3(1.0f,1.0f,1.0f));
-	renderables.push_back(floor);
-	renderingEngine->assignBuffers(floor);
+	ContentLoading::loadRenderables("res\\JSON\\renderables.json", renderablesMap);
+	// Assign the buffers for all the renderables
+	std::map<std::string, Renderable*>::iterator it;
+	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
+		renderingEngine->assignBuffers(it->second);
+	}
+	// Set up the colours, since we don't have textures yet
+	renderablesMap["floor2"]->setColor(glm::vec3(1,1,0));
+	renderablesMap["box"]->setColor(glm::vec3(0,1,1));
+	renderablesMap["van"]->setColor(glm::vec3(1,0,0));
 
-	Renderable * floor2 = new Renderable();
-	vector<glm::vec3>floor2Verts;
-	vector<glm::vec3>floor2Normals;
-	bool floor2Res = ContentLoading::loadOBJNonIndexed("res\\Models\\FlatFloor.obj", floor2Verts, floor2Normals);
-	floor2->setVerts(floor2Verts);
-	floor2->setNorms(floor2Normals);
-	floor2->setColor(glm::vec3(1.0f,1.0f,0.0f));
-	renderables.push_back(floor2);
-	renderingEngine->assignBuffers(floor2);
-
-	Renderable * box = new Renderable();
-	vector<glm::vec3>boxVerts;
-	vector<glm::vec3>boxNormals;
-	bool boxRes = ContentLoading::loadOBJNonIndexed("res\\Models\\PizzaBox.obj", boxVerts, boxNormals);
-	box->setVerts(boxVerts);
-	box->setNorms(boxNormals);
-	box->setColor(glm::vec3(0,1,1));
-	renderables.push_back(box);
-	renderingEngine->assignBuffers(box);
-
-	Renderable* van = new Renderable();
-	vector<glm::vec3>vanVerts;
-	vector<glm::vec3>vanNormals;
-	bool res = ContentLoading::loadOBJNonIndexed("res\\Models\\Van.obj", vanVerts, vanNormals);
-	van->setVerts(vanVerts);
-	van->setNorms(vanNormals);
-	van->setColor(glm::vec3(1,0,0));
-	cout << van->getCenter().x << " " <<  van->getCenter().y << " " <<  van->getCenter().z << " " << endl; 
-	renderables.push_back(van);
-	renderingEngine->assignBuffers(van);
+	ContentLoading::loadMap("res\\JSON\\map.json", map);
+	// Create all the entities loaded in the map
+	for (int i = 0; i < map.tiles.size(); i++) {
+		for (int j = 0; j < map.tiles[i].size(); j++) {
+			Tile tile = map.tiles[i][j];
+			for (int k = 0; k < tile.entities.size(); k++) {
+				TileEntity tileEntity = tile.entities[k];
+				PhysicsEntity* e = new PhysicsEntity();
+				// todo, error check that these models do exist, instead of just break
+				e->setRenderable(renderablesMap[tileEntity.model]);
+				// Offset position based on what tile we're in
+				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize, 0, j * map.tileSize);
+				physicsEngine->createDynamicEntity(e, pos, glm::vec3(0,0,0));
+				entities.push_back(e);
+			}
+		}
+	}
 
 	Entity* ground = new Entity();
-	ground->setRenderable(floor);
+	ground->setRenderable(renderablesMap["floor"]);
 	entities.push_back(ground);
 
 	Entity* ground2 = new Entity();
-	ground2->setRenderable(floor2);
+	ground2->setRenderable(renderablesMap["floor2"]);
 	ground2->setDefaultTranslation(glm::vec3(70.0f,0.0f,0.0f));
 	entities.push_back(ground2);
 
 	Entity* ground3 = new Entity();
-	ground3->setRenderable(floor);
+	ground3->setRenderable(renderablesMap["floor"]);
 	ground3->setDefaultTranslation(glm::vec3(70.0f,0.0f,70.0f));
 	entities.push_back(ground3);
 
 	Entity* ground4 = new Entity();
-	ground4->setRenderable(floor2);
+	ground4->setRenderable(renderablesMap["floor2"]);
 	ground4->setDefaultTranslation(glm::vec3(0.0f,0.0f,70.0f));
 	entities.push_back(ground4);
 
@@ -149,10 +137,11 @@ void Game::setupEntities()
 						Creating Vechicles
 	**********************************************************/
 	p1Vehicle = new Vehicle();
+
 	//ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
-	p1Vehicle->setRenderable(van);
+	p1Vehicle->setRenderable(renderablesMap["van"]);
 	p1Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
-	p1Vehicle->setDefaultTranslation(van->getCenter());
+	p1Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
 
 	// TODO get dimensions working properly for vehicle
 	//p1Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
@@ -162,9 +151,9 @@ void Game::setupEntities()
 	//// Player 2 (ie. AI)
 	p2Vehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", p2Vehicle);
-	p2Vehicle->setRenderable(van);
+	p2Vehicle->setRenderable(renderablesMap["van"]);
 	p2Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
-	p2Vehicle->setDefaultTranslation(van->getCenter());
+	p2Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
 
 	// TODO get dimensions working properly for vehicle
 	//p2Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
@@ -268,7 +257,7 @@ void Game::processSDLEvents()
 void Game::shootPizza(Vehicle* vehicle)
 {
 	DynamicEntity* pizzaBox = new DynamicEntity();
-	pizzaBox->setRenderable(renderables.at(2)); // TODO, match names to renderables or something instead of hard-coded
+	pizzaBox->setRenderable(renderablesMap["box"]);
 	glm::vec3 position = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
 	glm::vec3 velocity = glm::vec3(vehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 20.0, 0.0));
 	physx::PxVec3 v = vehicle->getDynamicActor()->getLinearVelocity();
@@ -285,8 +274,8 @@ Game::~Game(void)
 	{
 		delete entities[i];
 	}
-	for (unsigned int i = 0; i < renderables.size(); i++)
-	{
-		delete renderables[i];
+	std::map<std::string, Renderable*>::iterator it;
+	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
+		delete it->second;
 	}
 }

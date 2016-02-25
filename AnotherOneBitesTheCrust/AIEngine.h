@@ -16,7 +16,7 @@ struct Player
 	// TODO: Need a way to store current path + how long since last updated
 };
 
-struct Tile
+struct TileAI
 {
 	static const int SIZE = 10;
 
@@ -25,15 +25,15 @@ struct Tile
 	vec3 entrance, exit;
 };
 
-struct Map
+struct MapAI
 {
 	
 	static const int MAP_SIZE = 70;
-	static const int WIDTH = MAP_SIZE/Tile::SIZE;
-	static const int DEPTH = MAP_SIZE/Tile::SIZE;
+	static const int WIDTH = MAP_SIZE/TileAI::SIZE;
+	static const int DEPTH = MAP_SIZE/TileAI::SIZE;
 
 	// Vectors for ease of use, could just as easily be fixed size arrays
-	Tile tiles[WIDTH][DEPTH];
+	TileAI tiles[WIDTH][DEPTH];
 
 };
 

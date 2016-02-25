@@ -11,10 +11,10 @@
 #include "AudioEngine.h"
 #include "Renderable.h"
 #include "Entity.h"
-
 #include <SDL.h>
 #include <glew.h>
-
+#include <map>
+#include "Map.h"
 
 enum class GameState
 {
@@ -60,7 +60,8 @@ private:
 	Vehicle* p1Vehicle, *p2Vehicle;
 
 	std::vector<Entity*> entities;
-	std::vector<Renderable*> renderables;
+	std::map<std::string, Renderable*> renderablesMap;
+	Map map;
 
 	// vehicle location for previous frames 
 	static const int CAMERA_POS_BUFFER_SIZE = 10;

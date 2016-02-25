@@ -1,0 +1,25 @@
+{
+    "tiles": [
+        {
+            "id": 1,
+            "entities": [
+                {"model": "cube", "x": 0, "z": 0},
+                {"model": "barrier", "x": 35, "z": 35},
+                {"model": "barrier", "x": 35, "z": 0}
+            ]
+        },
+        {
+            "id": 2,
+            "entities": [
+            ]
+        } 
+    ],
+
+    "map": {
+        "tile size": 70,
+        "tiles": [
+		  [2,1],
+		  [1,1]
+	   ]
+    }
+}

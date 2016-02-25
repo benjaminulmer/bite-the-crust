@@ -48,10 +48,10 @@ void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 
 void AIEngine::updatePath(Vehicle* toUpdate)
 {
-	toUpdate->currentPath.push_back(glm::vec3(-Map::MAP_SIZE/2, 0, Map::MAP_SIZE/2));
-	toUpdate->currentPath.push_back(glm::vec3(Map::MAP_SIZE/2, 0, Map::MAP_SIZE/2));
-	toUpdate->currentPath.push_back(glm::vec3(-Map::MAP_SIZE/2, 0, -Map::MAP_SIZE/2));
-	toUpdate->currentPath.push_back(glm::vec3(Map::MAP_SIZE/2, 0, -Map::MAP_SIZE/2));
+	toUpdate->currentPath.push_back(glm::vec3(-MapAI::MAP_SIZE/2, 0, MapAI::MAP_SIZE/2));
+	toUpdate->currentPath.push_back(glm::vec3(MapAI::MAP_SIZE/2, 0, MapAI::MAP_SIZE/2));
+	toUpdate->currentPath.push_back(glm::vec3(-MapAI::MAP_SIZE/2, 0, -MapAI::MAP_SIZE/2));
+	toUpdate->currentPath.push_back(glm::vec3(MapAI::MAP_SIZE/2, 0, -MapAI::MAP_SIZE/2));
 }
 
 void AIEngine::updateAI(Vehicle* toUpdate) 

@@ -9,7 +9,7 @@ AIEngine::AIEngine(void)
 
 void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 {
-	VehicleInput* input = driver->getInputStruct();
+	VehicleInput* input = &driver->input;
 	input->forward = 1.0;
 	input->backward = 0.0;
 	input->handBrake = false;

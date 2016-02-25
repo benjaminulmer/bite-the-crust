@@ -144,7 +144,7 @@ void Game::setupEntities()
 	p1Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
 
 	// TODO get dimensions working properly for vehicle
-	//p1Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
+	p1Vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
 	physicsEngine->createVehicle(p1Vehicle);
 	entities.push_back(p1Vehicle);
 
@@ -156,7 +156,7 @@ void Game::setupEntities()
 	p2Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
 
 	// TODO get dimensions working properly for vehicle
-	//p2Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
+	p2Vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
 	physicsEngine->createVehicle(p2Vehicle);
 	p2Vehicle->setPosition(p2Vehicle->getPosition() + glm::vec3(10, 0, 0));
 	entities.push_back(p2Vehicle);
@@ -172,7 +172,7 @@ void Game::setupEntities()
 // TODO decide how signals will be used and set them up
 void Game::connectSignals()
 {
-	inputEngine->setInputStruct(p1Vehicle->getInputStruct(), 0);
+	inputEngine->setInputStruct(&p1Vehicle->input, 0);
 
 	p1Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
 	p2Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);

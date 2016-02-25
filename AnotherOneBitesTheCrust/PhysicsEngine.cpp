@@ -93,7 +93,7 @@ void PhysicsEngine::createDynamicEntity(PhysicsEntity* entity, glm::vec3 positio
 
 void PhysicsEngine::createVehicle(Vehicle* vehicle)
 {
-	VehicleTuning* tuning = vehicle->getTuningStruct();
+	VehicleTuning* tuning = &vehicle->tuning;
 
 	PxMaterial* chassisMaterial;
 	PxMaterial* wheelMaterial;

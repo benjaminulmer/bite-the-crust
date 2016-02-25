@@ -300,7 +300,7 @@ void PhysicsCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 
 PxVehicleDrive4W* PhysicsCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* physics, PxCooking* cooking) 
 {
-	VehicleTuning* tuning = vehicle->getTuningStruct();
+	VehicleTuning* tuning = &vehicle->tuning;
 
 	const PxVec3 chassisDims = tuning->chassisDims;
 	const PxF32 wheelWidth = tuning->wheelWidth;

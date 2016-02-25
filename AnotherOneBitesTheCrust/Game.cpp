@@ -108,10 +108,14 @@ void Game::setupEntities()
 				DynamicEntity* e = new DynamicEntity();
 				// todo, error check that these models do exist, instead of just break
 				e->setRenderable(renderablesMap[tileEntity.model]);
+				e->setDefaultTranslation(e->getRenderable()->getCenter());
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize, 0, j * map.tileSize);
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y + 5, pos.z), physx::PxQuat(physx::PxIdentity));
+
+				std::cout << tileEntity.model << " : " << e->getRenderable()->getDimensions().x << " " << e->getRenderable()->getDimensions().y << " " << e->getRenderable()->getDimensions().z  << std::endl;
+
 				physicsEngine->createDynamicEntity(e, transform);
 				entities.push_back(e);
 			}

@@ -29,7 +29,7 @@ PxFilterFlags FilterCallback::pairFound(PxU32 pairID, PxFilterObjectAttributes a
 									    const PxActor *a0, const PxShape *s0, PxFilterObjectAttributes attributes1,
 									    PxFilterData filterData1, const PxActor *a1, const PxShape *s1, PxPairFlags &pairFlags)
 {
-	std::cout << "callback" << std::endl;
+	//std::cout << "callback" << std::endl;
 	Vehicle* vehicle = (Vehicle*)(a0->userData);
 	vehicle->test();
 

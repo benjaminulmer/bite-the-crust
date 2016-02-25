@@ -98,11 +98,12 @@ void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 	PxRigidDynamic* actor = physVehicle->getRigidDynamicActor();
 
 	actor->setGlobalPose(transform);
+	scene->addActor(*actor);
+
 	physVehicle->setToRestState();
 	physVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	physVehicle->mDriveDynData.setUseAutoGears(true);
-
-	scene->addActor(*actor);
+	
 	vehicle->setActor(actor);
 	vehicle->physicsVehicle = physVehicle;
 	actor->userData = vehicle;

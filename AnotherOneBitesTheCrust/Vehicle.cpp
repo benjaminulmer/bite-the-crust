@@ -104,9 +104,11 @@ Vehicle::~Vehicle(void)
 {
 }
 
+// test stuff
+
 #include <iostream>
 
 const void Vehicle::test()
 {
-	std::cout << "test" << std::endl;
+	//std::cout << "test" << std::endl;
 }

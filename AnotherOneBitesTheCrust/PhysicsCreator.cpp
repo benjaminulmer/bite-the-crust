@@ -7,9 +7,9 @@ using namespace physx;
 PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physics, PxVec3 dimensions)
 {
 	PxBoxGeometry geometry(dimensions);
-	PxTransform tranform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
+	PxTransform transform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
 	PxReal density = 1.0f;
-	PxRigidDynamic* actor = PxCreateDynamic(*physics, tranform, geometry, *material, density);
+	PxRigidDynamic* actor = PxCreateDynamic(*physics, transform, geometry, *material, density);
 
 	//Get the box shape so we can set query and simulation filter data.
 	PxShape* shape;
@@ -32,10 +32,10 @@ PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physi
 PxActor* PhysicsCreator::createTriggerVolume(PxPhysics* physics)
 {
 	PxSphereGeometry geometry(10.0f); 
-	PxTransform tranform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
+	PxTransform transform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
 	PxMaterial* material = physics->createMaterial(0.5f, 0.5f, 0.5f);
 
-	PxRigidStatic* actor = PxCreateStatic(*physics, tranform, geometry, *material);
+	PxRigidStatic* actor = PxCreateStatic(*physics, transform, geometry, *material);
 	PxShape* shape;
 	actor->getShapes(&shape, 1);
 	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);

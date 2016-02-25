@@ -98,10 +98,10 @@ void Game::setupEntities()
 
 	ContentLoading::loadMap("res\\JSON\\map.json", map);
 	// Create all the entities loaded in the map
-	for (int i = 0; i < map.tiles.size(); i++) {
-		for (int j = 0; j < map.tiles[i].size(); j++) {
+	for (unsigned int i = 0; i < map.tiles.size(); i++) {
+		for (unsigned int j = 0; j < map.tiles[i].size(); j++) {
 			Tile tile = map.tiles[i][j];
-			for (int k = 0; k < tile.entities.size(); k++) {
+			for (unsigned int k = 0; k < tile.entities.size(); k++) {
 				TileEntity tileEntity = tile.entities[k];
 				PhysicsEntity* e = new PhysicsEntity();
 				// todo, error check that these models do exist, instead of just break

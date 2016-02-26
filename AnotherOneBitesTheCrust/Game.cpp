@@ -185,6 +185,9 @@ void Game::mainLoop()
 	// Game loop
 	while (gameState!= GameState::EXIT)
 	{
+		// Update Sound
+		audioEngine->update();
+
 		// Update the player and AI cars
 		processSDLEvents();
 		aiEngine->updateAI(p2Vehicle);

@@ -71,8 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\Include\glm;$(SolutionDir)\Include\rapidjson;$(SolutionDir)\Include\SDL;$(SolutionDir)\Include\PhysX;$(SolutionDir)\Include\glew-1.13.0;$(SolutionDir)\Include\sigslot;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\Lib\PhysX;$(SolutionDir)\Lib\SDL;$(SolutionDir)\Lib\glew-1.13.0;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\Include\glm;$(SolutionDir)\Include\rapidjson;$(SolutionDir)\Include\SDL;$(SolutionDir)\Include\PhysX;$(SolutionDir)\Include\glew-1.13.0;$(SolutionDir)\Include\sigslot;$(SolutionDir)\Include\fmod;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Lib\PhysX;$(SolutionDir)\Lib\SDL;$(SolutionDir)\Lib\glew-1.13.0;$(SolutionDir)\Lib\fmod;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -100,7 +100,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;PhysX3VehicleCHECKED.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;PhysX3VehicleCHECKED.lib;glew32.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)\dlls\*" "$(OutDir)" /d /y</Command>

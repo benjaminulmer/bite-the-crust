@@ -15,8 +15,8 @@ public:
 
 private:
 	FMOD::System *fmodSystem;
-	FMOD::Sound *backgroundMusic;
-	FMOD::Channel *backgroundChannel;
+	FMOD::Sound *backgroundMusic, *cannonSound;
+	FMOD::Channel *backgroundChannel, *cannonChannel;
 	FMOD_RESULT result;
 
 	inline void	errorCheck();

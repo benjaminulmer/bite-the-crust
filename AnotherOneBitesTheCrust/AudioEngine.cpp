@@ -35,13 +35,19 @@ void AudioEngine::errorCheck()
 
 void AudioEngine::startBackgroundMusic()
 {
-    result = fmodSystem->createStream("res\\Audio\\8BitIntro.wav", FMOD_LOOP_NORMAL | FMOD_2D, 0, &backgroundMusic);
-    errorCheck();
-
     /*
         Play the sound.
     */
     result = fmodSystem->playSound(backgroundMusic, 0, false, &backgroundChannel);
+    errorCheck();
+}
+
+void AudioEngine::initStreams()
+{
+	result = fmodSystem->createStream("res\\Audio\\8BitIntro.wav", FMOD_LOOP_NORMAL | FMOD_2D, 0, &backgroundMusic);
+    errorCheck();
+
+	result = fmodSystem->createStream("res\\Audio\\cannon.wav", FMOD_3D, 0, &cannonSound);
     errorCheck();
 }
 

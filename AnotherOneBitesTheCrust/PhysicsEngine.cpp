@@ -69,6 +69,16 @@ void PhysicsEngine::initVehicleSDK()
 
 void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info, PxTransform transform)
 {
+	if (info->type == PhysicsType::DYNAMIC) 
+	{
+		createDynamic(entity, info, transform);
+	}
+	else if (info->type == PhysicsType::STATIC)
+	{
+		createDynamic(entity, info, transform);
+	}
+
+
 	PxMaterial* defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
 	glm::vec3 d = entity->getRenderable()->getDimensions();
 	PxRigidDynamic* object = PhysicsCreator::createBox(defaultMaterial, physics, PxVec3(d.x * 0.5f, d.y * 0.5f, d.z * 0.5f));
@@ -76,6 +86,16 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 	object->setGlobalPose(transform);
 	scene->addActor(*object);
 	entity->setActor(object);
+}
+
+void PhysicsEngine::createDynamic(PhysicsEntity* entity, PhysicsEntityInfo* info, PxTransform transform)
+{
+	PxRigidDynamic* actor = physics->createRigidDynamic(transform);
+}
+
+void PhysicsEngine::createStatic(PhysicsEntity* entity, PhysicsEntityInfo* info, PxTransform transform)
+{
+	PxRigidStatic* actor = physics->createRigidStatic(transform);
 }
 
 void PhysicsEngine::createTrigger()

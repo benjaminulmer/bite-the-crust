@@ -4,7 +4,7 @@
 #include <PxShape.h>
 #include <glm.hpp>
 
-enum class Geometry
+enum class Shape
 {
 	SPHERE,
 	BOX,
@@ -27,7 +27,7 @@ struct DynamicInfo
 	float maxAngularVelocity;
 };
 
-struct GeometryInfo 
+struct ShapeInfo 
 {
 	physx::PxTransform transform;
 	
@@ -44,7 +44,7 @@ struct GeometryInfo
 };
 
 struct BoxInfo
-	: public GeometryInfo
+	: public ShapeInfo
 {
 	float halfX;
 	float halfY;
@@ -52,28 +52,28 @@ struct BoxInfo
 };
 
 struct SphereInfo
-	: public GeometryInfo
+	: public ShapeInfo
 {
 	float radius;
 };
 
 struct CapsuleInfo
-	: public GeometryInfo
+	: public ShapeInfo
 {
 	float raidus;
 	float halfHeight;
 };
 
 struct ConvexMeshInfo
-	: public GeometryInfo
+	: public ShapeInfo
 {
 	std::vector<glm::vec3> verts;
 };
 
 struct PhysicsEntityInfo
 {
-	std::vector<Geometry> geometry;
-	std::vector<GeometryInfo*> geometryInfo;
+	std::vector<Shape> shapes;
+	std::vector<ShapeInfo*> ShapeInfo;
 	PhysicsType type;
 	DynamicInfo* dynamicInfo;
 };

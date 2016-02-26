@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <foundation/PxTransform.h> 
+#include <PxShape.h>
 #include <glm.hpp>
 
 enum class Geometry
@@ -17,12 +19,19 @@ enum class PhysicsType
 	STATIC
 };
 
-struct PhysicsEntityInfo
+struct DynamicInfo
 {
-	Geometry geometry;
-	GeometryInfo* geometryInfo;
-	PhysicsType type;
-	DynamicInfo* dynamicInfo;
+	float density;
+	float linearDamping;
+	float angularDamping;
+	float maxAngularVelocity;
+};
+
+struct GeometryInfo 
+{
+	physx::PxTransform transform;
+	
+	std::vector<physx::PxShapeFlag> shapeFlags;
 
 	float staticFriction;
 	float dynamicFriction;
@@ -33,16 +42,6 @@ struct PhysicsEntityInfo
 	unsigned int filterFlag3;
 	unsigned int filterFlag4;
 };
-
-struct DynamicInfo
-{
-	float density;
-	float linearDamping;
-	float angularDamping;
-	float maxAngularVelocity;
-};
-
-struct GeometryInfo {};
 
 struct BoxInfo
 	: public GeometryInfo
@@ -69,4 +68,12 @@ struct ConvexMeshInfo
 	: public GeometryInfo
 {
 	std::vector<glm::vec3> verts;
+};
+
+struct PhysicsEntityInfo
+{
+	std::vector<Geometry> geometry;
+	std::vector<GeometryInfo*> geometryInfo;
+	PhysicsType type;
+	DynamicInfo* dynamicInfo;
 };

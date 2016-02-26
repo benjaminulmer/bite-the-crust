@@ -22,7 +22,6 @@
     <ClCompile Include="ShaderTools.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
-    <ClCompile Include="PhysicsEntityInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />

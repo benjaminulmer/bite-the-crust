@@ -2,6 +2,7 @@
 #include "DynamicEntity.h"
 #include "Camera.h"
 #include "ContentLoading.h"
+#include "PhysicsEntityInfo.h"
 
 #include <foundation/PxTransform.h> 
 
@@ -105,6 +106,9 @@ void Game::setupEntities()
 			Tile tile = map.tiles[i][j];
 			for (unsigned int k = 0; k < tile.entities.size(); k++) {
 				TileEntity tileEntity = tile.entities[k];
+
+				PhysicsEntityInfo* physicsInfo = new PhysicsEntityInfo();
+
 				DynamicEntity* e = new DynamicEntity();
 				// todo, error check that these models do exist, instead of just break
 				e->setRenderable(renderablesMap[tileEntity.model]);
@@ -114,9 +118,7 @@ void Game::setupEntities()
 				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize, 0, j * map.tileSize);
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y + 5, pos.z), physx::PxQuat(physx::PxIdentity));
 
-				std::cout << tileEntity.model << " : " << e->getRenderable()->getDimensions().x << " " << e->getRenderable()->getDimensions().y << " " << e->getRenderable()->getDimensions().z  << std::endl;
-
-				physicsEngine->createDynamicEntity(e, transform);
+				physicsEngine->createEntity(e, physicsInfo, transform);
 				entities.push_back(e);
 			}
 		}
@@ -282,7 +284,9 @@ void Game::shootPizza(Vehicle* vehicle)
 	physx::PxVec3 vehicleVelocity = vehicle->getDynamicActor()->getLinearVelocity();
 	velocity += vehicleVelocity;
 
-	physicsEngine->createDynamicEntity(pizzaBox, transform);
+	PhysicsEntityInfo* physicsInfo = new PhysicsEntityInfo();
+
+	physicsEngine->createEntity(pizzaBox, physicsInfo, transform);
 	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
 	entities.push_back(pizzaBox);
 }

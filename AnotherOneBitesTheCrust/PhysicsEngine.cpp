@@ -1,7 +1,7 @@
 #include "PhysicsEngine.h"
 #include "Filtering.h"
 #include "PhysicsCreator.h"
-#include <iostream>
+#include "VehicleCreator.h"
 
 using namespace physx;
 
@@ -67,7 +67,7 @@ void PhysicsEngine::initVehicleSDK()
 	scene->addActor(*groundPlane);
 }
 
-void PhysicsEngine::createDynamicEntity(DynamicEntity* entity, PxTransform transform)
+void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info, PxTransform transform)
 {
 	PxMaterial* defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
 	glm::vec3 d = entity->getRenderable()->getDimensions();

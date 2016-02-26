@@ -61,6 +61,7 @@ private:
 
 	std::vector<Entity*> entities;
 	std::map<std::string, Renderable*> renderablesMap;
+	std::map<std::string, PhysicsEntityInfo*> physicsEntityInfoMap;
 	Map map;
 
 	// vehicle location for previous frames 

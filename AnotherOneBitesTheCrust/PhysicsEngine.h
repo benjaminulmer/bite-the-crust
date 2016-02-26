@@ -2,8 +2,8 @@
 #include <PxPhysicsAPI.h>
 #include "VehicleSceneQueryData.h"
 #include "FrictionPairs.h"
-#include "VehicleCreator.h"
 #include "Vehicle.h"
+#include "PhysicsEntityInfo.h"
 
 class PhysicsEngine
 {
@@ -13,13 +13,15 @@ public:
 
 	void simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();
-	//void createStaticEntity(StaticEntity* entity, physx::PxTransform transform);
-	void createDynamicEntity(DynamicEntity* entity, physx::PxTransform transform);
+	
+	void createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info, physx::PxTransform transform);
 	void createVehicle(Vehicle* vehicle, physx::PxTransform transform);
-
+	//TODO make this not suck
 	void createTrigger();
 
 private:
+	static const int MAX_VEHICLES = 4;
+
 	physx::PxTolerancesScale scale;
 	physx::PxDefaultErrorCallback* defaultErrorCallback;
 	physx::PxDefaultAllocator* defaultAllocator;
@@ -35,7 +37,7 @@ private:
 	VehicleSceneQueryData* vehicleSceneQueryData;
 	physx::PxBatchQuery* batchQuery;
 
-	physx::PxMaterial* drivingSurfaces[TireType::MAX];
+	physx::PxMaterial* drivingSurfaces[SurfaceType::MAX];
 	physx::PxVehicleDrivableSurfaceToTireFrictionPairs* frictionPairs;
 
 	physx::PxMaterial* testChassisMat;
@@ -44,11 +46,8 @@ private:
 	physx::PxRigidStatic* groundPlane;
 	
 	std::vector<physx::PxVehicleWheels*> vehicles;
-	//std::vector<physx::PxRigidDynamic*> entities;
 
 	void initSimulationData();
 	void initPhysXSDK();
 	void initVehicleSDK();
-
-	static const int MAX_VEHICLES = 4;
 };

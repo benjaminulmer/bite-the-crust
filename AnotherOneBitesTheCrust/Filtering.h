@@ -1,7 +1,7 @@
 #pragma once
 #include <PxPhysicsAPI.h>
 
-enum class CollisionFlag
+enum class FilterFlag
 {
 	GROUND            = 1 << 0,
 	WHEEL             = 1 << 1,
@@ -13,7 +13,9 @@ enum class CollisionFlag
 	WHEEL_AGAINST             =	         WHEEL | CHASSIS | OBSTACLE,
 	CHASSIS_AGAINST	          = GROUND | WHEEL | CHASSIS | OBSTACLE | DRIVABLE_OBSTACLE,
 	OBSTACLE_AGAINST          = GROUND | WHEEL | CHASSIS | OBSTACLE | DRIVABLE_OBSTACLE,
-	DRIVABLE_OBSTACLE_AGAINST =	GROUND         | CHASSIS | OBSTACLE | DRIVABLE_OBSTACLE
+	DRIVABLE_OBSTACLE_AGAINST =	GROUND         | CHASSIS | OBSTACLE | DRIVABLE_OBSTACLE,
+
+	DEFAULT
 };
 
 physx::PxFilterFlags FilterShader(physx::PxFilterObjectAttributes attributes0, physx::PxFilterData filterData0,

@@ -72,9 +72,13 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 	PxRigidActor* actor;
 	if (info->type == PhysicsType::DYNAMIC) 
 	{
+		DynamicInfo* dInfo = info->dynamicInfo;
 		PxRigidDynamic* dynamicActor = physics->createRigidDynamic(transform);
-		
-		// set dynamic properties and defaults
+		/*dynamicActor->setMass(dInfo->mass);
+		dynamicActor->setCMassLocalPose(dInfo->comOffset);
+		dynamicActor->setLinearDamping(dInfo->linearDamping);
+		dynamicActor->setAngularDamping(dInfo->angularDamping);
+		dynamicActor->setMaxAngularVelocity(dInfo->maxAngularVelocity);*/
 
 		actor = dynamicActor;
 	}
@@ -84,45 +88,59 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		actor = staticActor;
 	}
 
-	for (auto shapeInfo : info->shapeInfo)
+	for (auto sInfo : info->shapeInfo)
 	{
+		PxMaterial* material = physics->createMaterial(sInfo->dynamicFriction, sInfo->staticFriction, sInfo->restitution);
 		PxGeometry* geometry;
-		PxMaterial* material;
-		if (shapeInfo->geometry == Geometry::SPHERE)
+		if (sInfo->geometry == Geometry::SPHERE)
 		{
-			SphereInfo* sphereInfo = (SphereInfo*)shapeInfo;
-			geometry = new PxSphereGeometry(sphereInfo->radius);
+			SphereInfo* sphInfo = (SphereInfo*)sInfo;
+			geometry = new PxSphereGeometry(sphInfo->radius);
 		}
-		else if (shapeInfo->geometry == Geometry::BOX)
+		else if (sInfo->geometry == Geometry::BOX)
 		{
-			BoxInfo* boxInfo = (BoxInfo*)shapeInfo;
+			BoxInfo* boxInfo = (BoxInfo*)sInfo;
 			geometry = new PxBoxGeometry(boxInfo->halfX, boxInfo->halfY, boxInfo->halfZ);
 		}
-		else if (shapeInfo->geometry == Geometry::CAPSULE)
+		else if (sInfo->geometry == Geometry::CAPSULE)
 		{
-			CapsuleInfo* capsuleInfo = (CapsuleInfo*)shapeInfo;
-			geometry = new PxCapsuleGeometry(capsuleInfo->raidus, capsuleInfo->halfHeight);
+			CapsuleInfo* capInfo = (CapsuleInfo*)sInfo;
+			geometry = new PxCapsuleGeometry(capInfo->raidus, capInfo->halfHeight);
 		}
-		else if (shapeInfo->geometry == Geometry::CONVEX_MESH)
+		else if (sInfo->geometry == Geometry::CONVEX_MESH)
 		{
-			(ConvexMeshInfo*)shapeInfo;
+			ConvexMeshInfo* cmInfo = (ConvexMeshInfo*)sInfo;
 			// other stuff here, meshes are more complicated.
 			//PhysicsCreator::createConvexMesh(verts, numVerts, physics, cooking);
 		}
 		else 
 		{
-			// default? JSON should probably at least specify a geometry type
+			// default? should probably at least specify a geometry type and dimensions
 		}
+		PxShape* shape = actor->createShape(*geometry, *material, sInfo->shapeFlags);
+		shape->setLocalPose(sInfo->transform);
+
+		PxFilterData qryFilterData;
+		if (sInfo->isDrivable)
+		{
+			qryFilterData.word3 = (PxU32)Surface::DRIVABLE;
+		}
+		else
+		{
+			qryFilterData.word3 = (PxU32)Surface::UNDRIVABLE;
+		}
+		shape->setQueryFilterData(qryFilterData);
+
+		PxFilterData simFilterData;
+		simFilterData.word0 = (PxU32)sInfo->filterFlag0;
+		simFilterData.word1 = (PxU32)sInfo->filterFlag1;
+		shape->setSimulationFilterData(simFilterData);
+
+		actor->attachShape(*shape);
 	}
 
-
-	PxMaterial* defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
-	glm::vec3 d = entity->getRenderable()->getDimensions();
-	PxRigidDynamic* object = PhysicsCreator::createBox(defaultMaterial, physics, PxVec3(d.x * 0.5f, d.y * 0.5f, d.z * 0.5f));
-
-	object->setGlobalPose(transform);
-	scene->addActor(*object);
-	entity->setActor(object);
+	scene->addActor(*actor);
+	entity->setActor(actor);
 }
 
 void PhysicsEngine::createTrigger()

@@ -108,6 +108,7 @@ void Game::setupEntities()
 				TileEntity tileEntity = tile.entities[k];
 
 				PhysicsEntityInfo* physicsInfo = new PhysicsEntityInfo();
+				physicsInfo->type = PhysicsType::DYNAMIC;
 
 				DynamicEntity* e = new DynamicEntity();
 				// todo, error check that these models do exist, instead of just break
@@ -285,6 +286,7 @@ void Game::shootPizza(Vehicle* vehicle)
 	velocity += vehicleVelocity;
 
 	PhysicsEntityInfo* physicsInfo = new PhysicsEntityInfo();
+	physicsInfo->type = PhysicsType::DYNAMIC;
 
 	physicsEngine->createEntity(pizzaBox, physicsInfo, transform);
 	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);

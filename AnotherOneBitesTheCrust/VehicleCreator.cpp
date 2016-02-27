@@ -51,11 +51,11 @@ PxRigidDynamic* VehicleCreator::createVehicleActor(const PxVehicleChassisData& c
 
 	//Wheel and chassis simulation filter data.
 	PxFilterData wheelSimFilterData;
-	wheelSimFilterData.word0 = (PxU32)CollisionFlag::WHEEL;
-	wheelSimFilterData.word1 = (PxU32)CollisionFlag::WHEEL_AGAINST;
+	wheelSimFilterData.word0 = (PxU32)FilterFlag::WHEEL;
+	wheelSimFilterData.word1 = (PxU32)FilterFlag::WHEEL_AGAINST;
 	PxFilterData chassisSimFilterData;
-	chassisSimFilterData.word0 = (PxU32)CollisionFlag::CHASSIS;
-	chassisSimFilterData.word1 = (PxU32)CollisionFlag::CHASSIS_AGAINST;
+	chassisSimFilterData.word0 = (PxU32)FilterFlag::CHASSIS;
+	chassisSimFilterData.word1 = (PxU32)FilterFlag::CHASSIS_AGAINST;
 
 	//Wheel and chassis query filter data.
 	//Optional: cars don't drive on other cars.

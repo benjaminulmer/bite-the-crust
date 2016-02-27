@@ -22,8 +22,8 @@ PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physi
 
 	//Set the simulation filter data of the box so that it collides with the chassis of a vehicle but not the wheels.
 	PxFilterData simFilterData;
-	simFilterData.word0 = (PxU32)CollisionFlag::DRIVABLE_OBSTACLE;
-	simFilterData.word1 = (PxU32)CollisionFlag::DRIVABLE_OBSTACLE_AGAINST;
+	simFilterData.word0 = (PxU32)FilterFlag::DRIVABLE_OBSTACLE;
+	simFilterData.word1 = (PxU32)FilterFlag::DRIVABLE_OBSTACLE_AGAINST;
 	shape->setSimulationFilterData(simFilterData);
 
 	return actor;
@@ -61,8 +61,8 @@ PxRigidStatic* PhysicsCreator::createDrivablePlane(PxMaterial* material, PxPhysi
 
 	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
 	PxFilterData simFilterData;
-	simFilterData.word0 = (PxU32)CollisionFlag::GROUND;
-	simFilterData.word1 = (PxU32)CollisionFlag::GROUND_AGAINST;
+	simFilterData.word0 = (PxU32)FilterFlag::GROUND;
+	simFilterData.word1 = (PxU32)FilterFlag::GROUND_AGAINST;
 	shape->setSimulationFilterData(simFilterData);
 
 	return groundPlane;

@@ -1,7 +1,8 @@
 #pragma once
+#include "Filtering.h"
+
 #include <vector>
 #include <foundation/PxTransform.h> 
-#include <PxShape.h>
 #include <glm.hpp>
 
 enum class Geometry
@@ -21,27 +22,38 @@ enum class PhysicsType
 
 struct DynamicInfo
 {
-	float density;
+	DynamicInfo() : mass(1.0f), linearDamping(0.0f), angularDamping(0.0f), maxAngularVelocity(100.0f),
+	                comOffset(0.0f, 0.0f, 0.0f){}
+
+	float mass;
 	float linearDamping;
 	float angularDamping;
 	float maxAngularVelocity;
+
+	physx::PxTransform comOffset;
 };
 
 struct ShapeInfo 
 {
+	ShapeInfo() : transform(0.0f, 0.0f, 0.0f),
+		          staticFriction(0.5f), dynamicFriction(0.5f), restitution(0.5f), isDrivable(true),
+		          filterFlag0(FilterFlag::OBSTACLE), filterFlag1(FilterFlag::OBSTACLE_AGAINST), 
+				  filterFlag2(FilterFlag::DEFAULT), filterFlag3(FilterFlag::DEFAULT) {}
+
 	Geometry geometry;
 	physx::PxTransform transform;
-	
-	std::vector<physx::PxShapeFlag> shapeFlags;
+	physx::PxShapeFlags shapeFlags;
+
+	bool isDrivable;
 
 	float staticFriction;
 	float dynamicFriction;
 	float restitution;
 
-	unsigned int filterFlag1;
-	unsigned int filterFlag2;
-	unsigned int filterFlag3;
-	unsigned int filterFlag4;
+	FilterFlag filterFlag0;
+	FilterFlag filterFlag1;
+	FilterFlag filterFlag2;
+	FilterFlag filterFlag3;
 };
 
 struct BoxInfo

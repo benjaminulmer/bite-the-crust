@@ -87,8 +87,9 @@ void Game::initSystems()
 
 void Game::setupEntities()
 {
-	ContentLoading::loadEntityList("res\\JSON\\entityList.json", renderablesMap, physicsEntityInfoMap);
-	//ContentLoading::loadRenderables("res\\JSON\\renderables.json", renderablesMap);
+	if (!ContentLoading::loadEntityList("res\\JSON\\entityList.json", renderablesMap, physicsEntityInfoMap))
+		fatalError("Could not load entities list.");
+
 	// Assign the buffers for all the renderables
 	std::map<std::string, Renderable*>::iterator it;
 	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
@@ -99,7 +100,8 @@ void Game::setupEntities()
 	renderablesMap["box"]->setColor(glm::vec3(0,1,1));
 	renderablesMap["van"]->setColor(glm::vec3(1,0,0));
 
-	ContentLoading::loadMap("res\\JSON\\map.json", map);
+	if (!ContentLoading::loadMap("res\\JSON\\map.json", map))
+		fatalError("Could not load map file.");
 	// Create all the entities loaded in the map
 	for (unsigned int i = 0; i < map.tiles.size(); i++) {
 		for (unsigned int j = 0; j < map.tiles[i].size(); j++) {

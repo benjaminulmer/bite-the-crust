@@ -115,9 +115,9 @@ void Game::setupEntities()
 				BoxInfo* shape = new BoxInfo();
 				shape->geometry = Geometry::BOX;
 				glm::vec3 d = renderablesMap[tileEntity.model]->getDimensions();
-				shape->halfX = d.x * 0.5;
-				shape->halfY = d.y * 0.5;
-				shape->halfZ = d.z * 0.5;
+				shape->halfX = d.x * 0.5f;
+				shape->halfY = d.y * 0.5f;
+				shape->halfZ = d.z * 0.5f;
 				shape->filterFlag0 = FilterFlag::OBSTACLE;
 				shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
 				physicsInfo->shapeInfo.push_back(shape);
@@ -197,9 +197,9 @@ void Game::setupEntities()
 	BoxInfo* shape = new BoxInfo();
 	shape->geometry = Geometry::BOX;
 	glm::vec3 d = renderablesMap["box"]->getDimensions();
-	shape->halfX = d.x * 0.5;
-	shape->halfY = d.y * 0.5;
-	shape->halfZ = d.z * 0.5;
+	shape->halfX = d.x * 0.5f;
+	shape->halfY = d.y * 0.5f;
+	shape->halfZ = d.z * 0.5f;
 	shape->filterFlag0 = FilterFlag::DRIVABLE_OBSTACLE;
 	shape->filterFlag1 = FilterFlag::DRIVABLE_OBSTACLE_AGAINST;
 	pizzaInfo->shapeInfo.push_back(shape);
@@ -225,6 +225,9 @@ void Game::mainLoop()
 	// Game loop
 	while (gameState!= GameState::EXIT)
 	{
+		// Update Sound
+		audioEngine->update();
+
 		processSDLEvents();
 
 		// Figure out timestep and run physics

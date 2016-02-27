@@ -69,13 +69,46 @@ void PhysicsEngine::initVehicleSDK()
 
 void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info, PxTransform transform)
 {
+	PxRigidActor* actor;
 	if (info->type == PhysicsType::DYNAMIC) 
 	{
-		createDynamic(entity, info, transform);
+		PxRigidDynamic* dynamicActor = physics->createRigidDynamic(transform);
+		
+		// set dynamic properties and defaults
+
+		actor = dynamicActor;
 	}
 	else if (info->type == PhysicsType::STATIC)
 	{
-		createDynamic(entity, info, transform);
+		PxRigidStatic* staticActor = physics->createRigidStatic(transform);
+		actor = staticActor;
+	}
+
+	for (auto shapeInfo : info->shapeInfo)
+	{
+		PxGeometry* geometry;
+		PxMaterial* material;
+		if (shapeInfo->geometry == Geometry::SPHERE)
+		{
+			PhysicsCreator::createSphere(shapeInfo, physics);
+		}
+		else if (shapeInfo->geometry == Geometry::BOX)
+		{
+			PhysicsCreator::createBox(shapeInfo, physics);
+		}
+		else if (shapeInfo->geometry == Geometry::CAPSULE)
+		{
+			PhysicsCreator::createCapsule(shapeInfo, physics);
+		}
+		else if (shapeInfo->geometry == Geometry::CONVEX_MESH)
+		{
+			// other stuff here, meshes are more complicated.
+			//PhysicsCreator::createConvexMesh(verts, numVerts, physics, cooking);
+		}
+		else 
+		{
+			// default? JSON should probably at least specify a geometry type
+		}
 	}
 
 
@@ -86,16 +119,6 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 	object->setGlobalPose(transform);
 	scene->addActor(*object);
 	entity->setActor(object);
-}
-
-void PhysicsEngine::createDynamic(PhysicsEntity* entity, PhysicsEntityInfo* info, PxTransform transform)
-{
-	PxRigidDynamic* actor = physics->createRigidDynamic(transform);
-}
-
-void PhysicsEngine::createStatic(PhysicsEntity* entity, PhysicsEntityInfo* info, PxTransform transform)
-{
-	PxRigidStatic* actor = physics->createRigidStatic(transform);
 }
 
 void PhysicsEngine::createTrigger()

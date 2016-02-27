@@ -4,7 +4,7 @@
 #include <PxShape.h>
 #include <glm.hpp>
 
-enum class Shape
+enum class Geometry
 {
 	SPHERE,
 	BOX,
@@ -29,6 +29,7 @@ struct DynamicInfo
 
 struct ShapeInfo 
 {
+	Geometry geometry;
 	physx::PxTransform transform;
 	
 	std::vector<physx::PxShapeFlag> shapeFlags;
@@ -72,8 +73,7 @@ struct ConvexMeshInfo
 
 struct PhysicsEntityInfo
 {
-	std::vector<Shape> shapes;
-	std::vector<ShapeInfo*> ShapeInfo;
+	std::vector<ShapeInfo*> shapeInfo;
 	PhysicsType type;
 	DynamicInfo* dynamicInfo;
 };

@@ -1,10 +1,17 @@
 #pragma once
 #include <PxPhysicsAPI.h>
+#include "PhysicsEntityInfo.h"
 
 class PhysicsCreator
 {
 public:
 	static physx::PxRigidDynamic* createBox(physx::PxMaterial* material, physx::PxPhysics* physics, physx::PxVec3 dimensions);
+
+	static physx::PxGeometry* createSphere(ShapeInfo* shapeInfo, physx::PxPhysics* physics);
+
+	static physx::PxGeometry* createBox(ShapeInfo* shapeInfo, physx::PxPhysics* physics);
+
+	static physx::PxGeometry* createCapsule(ShapeInfo* shapeInfo, physx::PxPhysics* physics);
 
 	static physx::PxActor* createTriggerVolume(physx::PxPhysics* physics);
 

@@ -15,8 +15,6 @@ public:
 	void fetchSimulationResults();
 	
 	void createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info, physx::PxTransform transform);
-	void createDynamic(PhysicsEntity* entity, PhysicsEntityInfo* info, physx::PxTransform transform);
-	void createStatic(PhysicsEntity* entity, PhysicsEntityInfo* info, physx::PxTransform transform);
 	void createVehicle(Vehicle* vehicle, physx::PxTransform transform);
 	//TODO make this not suck
 	void createTrigger();

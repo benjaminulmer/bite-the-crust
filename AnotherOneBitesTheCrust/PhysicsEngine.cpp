@@ -3,6 +3,8 @@
 #include "PhysicsCreator.h"
 #include "VehicleCreator.h"
 
+#include <iostream>
+
 using namespace physx;
 
 PhysicsEngine::PhysicsEngine(void)
@@ -74,11 +76,11 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 	{
 		DynamicInfo* dInfo = info->dynamicInfo;
 		PxRigidDynamic* dynamicActor = physics->createRigidDynamic(transform);
-		/*dynamicActor->setMass(dInfo->mass);
+		dynamicActor->setMass(dInfo->mass);
 		dynamicActor->setCMassLocalPose(dInfo->comOffset);
 		dynamicActor->setLinearDamping(dInfo->linearDamping);
 		dynamicActor->setAngularDamping(dInfo->angularDamping);
-		dynamicActor->setMaxAngularVelocity(dInfo->maxAngularVelocity);*/
+		dynamicActor->setMaxAngularVelocity(dInfo->maxAngularVelocity);
 
 		actor = dynamicActor;
 	}
@@ -99,7 +101,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		}
 		else if (sInfo->geometry == Geometry::BOX)
 		{
-			BoxInfo* boxInfo = (BoxInfo*)sInfo;
+			BoxInfo* boxInfo = (BoxInfo*)sInfo;		
 			geometry = new PxBoxGeometry(boxInfo->halfX, boxInfo->halfY, boxInfo->halfZ);
 		}
 		else if (sInfo->geometry == Geometry::CAPSULE)
@@ -117,7 +119,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		{
 			// default? should probably at least specify a geometry type and dimensions
 		}
-		PxShape* shape = actor->createShape(*geometry, *material, sInfo->shapeFlags);
+		PxShape* shape = actor->createShape(*geometry, *material);
 		shape->setLocalPose(sInfo->transform);
 
 		PxFilterData qryFilterData;
@@ -136,7 +138,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		simFilterData.word1 = (PxU32)sInfo->filterFlag1;
 		shape->setSimulationFilterData(simFilterData);
 
-		actor->attachShape(*shape);
+		//PxRigidBodyExt::updateMassAndInertia(actor) // TODO this thing otherwise mass wont work 
 	}
 
 	scene->addActor(*actor);

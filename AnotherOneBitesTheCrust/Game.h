@@ -11,10 +11,11 @@
 #include "AudioEngine.h"
 #include "Renderable.h"
 #include "Entity.h"
+#include "PhysicsEntityInfo.h"
+#include "Map.h"
 #include <SDL.h>
 #include <glew.h>
 #include <map>
-#include "Map.h"
 
 enum class GameState
 {
@@ -58,6 +59,8 @@ private:
 	GameState gameState;
 	Camera camera;
 	Vehicle* p1Vehicle, *p2Vehicle;
+
+	PhysicsEntityInfo* pizzaInfo;
 
 	std::vector<Entity*> entities;
 	std::map<std::string, Renderable*> renderablesMap;

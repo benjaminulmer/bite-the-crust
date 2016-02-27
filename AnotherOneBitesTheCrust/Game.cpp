@@ -2,7 +2,6 @@
 #include "DynamicEntity.h"
 #include "Camera.h"
 #include "ContentLoading.h"
-#include "PhysicsEntityInfo.h"
 
 #include <foundation/PxTransform.h> 
 
@@ -107,8 +106,21 @@ void Game::setupEntities()
 			for (unsigned int k = 0; k < tile.entities.size(); k++) {
 				TileEntity tileEntity = tile.entities[k];
 
+				// ******** Hardcoded for now - Should be data driven *********** //
 				PhysicsEntityInfo* physicsInfo = new PhysicsEntityInfo();
+
+				physicsInfo = new PhysicsEntityInfo();
 				physicsInfo->type = PhysicsType::DYNAMIC;
+				physicsInfo->dynamicInfo = new DynamicInfo();
+				BoxInfo* shape = new BoxInfo();
+				shape->geometry = Geometry::BOX;
+				glm::vec3 d = renderablesMap[tileEntity.model]->getDimensions();
+				shape->halfX = d.x * 0.5;
+				shape->halfY = d.y * 0.5;
+				shape->halfZ = d.z * 0.5;
+				shape->filterFlag0 = FilterFlag::OBSTACLE;
+				shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
+				physicsInfo->shapeInfo.push_back(shape);
 
 				DynamicEntity* e = new DynamicEntity();
 				// todo, error check that these models do exist, instead of just break
@@ -176,6 +188,21 @@ void Game::setupEntities()
 	}
 	cameraPosBufferIndex = 0;
 	camera.setUpVector(glm::vec3(0,1,0));
+
+
+	// ******** Hardcoded for now - Should be data driven *********** //
+	pizzaInfo = new PhysicsEntityInfo();
+	pizzaInfo->type = PhysicsType::DYNAMIC;
+	pizzaInfo->dynamicInfo = new DynamicInfo();
+	BoxInfo* shape = new BoxInfo();
+	shape->geometry = Geometry::BOX;
+	glm::vec3 d = renderablesMap["box"]->getDimensions();
+	shape->halfX = d.x * 0.5;
+	shape->halfY = d.y * 0.5;
+	shape->halfZ = d.z * 0.5;
+	shape->filterFlag0 = FilterFlag::DRIVABLE_OBSTACLE;
+	shape->filterFlag1 = FilterFlag::DRIVABLE_OBSTACLE_AGAINST;
+	pizzaInfo->shapeInfo.push_back(shape);
 }
 
 // TODO decide how signals will be used and set them up
@@ -285,10 +312,7 @@ void Game::shootPizza(Vehicle* vehicle)
 	physx::PxVec3 vehicleVelocity = vehicle->getDynamicActor()->getLinearVelocity();
 	velocity += vehicleVelocity;
 
-	PhysicsEntityInfo* physicsInfo = new PhysicsEntityInfo();
-	physicsInfo->type = PhysicsType::DYNAMIC;
-
-	physicsEngine->createEntity(pizzaBox, physicsInfo, transform);
+	physicsEngine->createEntity(pizzaBox, pizzaInfo, transform);
 	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
 	entities.push_back(pizzaBox);
 }

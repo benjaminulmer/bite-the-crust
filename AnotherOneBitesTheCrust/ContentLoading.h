@@ -12,7 +12,11 @@
 
 namespace ContentLoading
 {
+	Renderable* createRenderable(std::string modelFile);
+	PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model);
+
 	bool loadVehicleData(char* filename, Vehicle* vehicle);
+	bool loadEntityList(char* filename, std::map<std::string, Renderable*> &modelMap, std::map<std::string, PhysicsEntityInfo*> &physicsMap);
 	bool loadRenderables(char* filename, std::map<std::string, Renderable*> &map);
 	bool loadMap(char* filename, Map &map);
 

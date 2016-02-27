@@ -87,7 +87,8 @@ void Game::initSystems()
 
 void Game::setupEntities()
 {
-	ContentLoading::loadRenderables("res\\JSON\\renderables.json", renderablesMap);
+	ContentLoading::loadEntityList("res\\JSON\\entityList.json", renderablesMap, physicsEntityInfoMap);
+	//ContentLoading::loadRenderables("res\\JSON\\renderables.json", renderablesMap);
 	// Assign the buffers for all the renderables
 	std::map<std::string, Renderable*>::iterator it;
 	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
@@ -106,22 +107,6 @@ void Game::setupEntities()
 			for (unsigned int k = 0; k < tile.entities.size(); k++) {
 				TileEntity tileEntity = tile.entities[k];
 
-				// ******** Hardcoded for now - Should be data driven *********** //
-				PhysicsEntityInfo* physicsInfo = new PhysicsEntityInfo();
-
-				physicsInfo = new PhysicsEntityInfo();
-				physicsInfo->type = PhysicsType::DYNAMIC;
-				physicsInfo->dynamicInfo = new DynamicInfo();
-				BoxInfo* shape = new BoxInfo();
-				shape->geometry = Geometry::BOX;
-				glm::vec3 d = renderablesMap[tileEntity.model]->getDimensions();
-				shape->halfX = d.x * 0.5f;
-				shape->halfY = d.y * 0.5f;
-				shape->halfZ = d.z * 0.5f;
-				shape->filterFlag0 = FilterFlag::OBSTACLE;
-				shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
-				physicsInfo->shapeInfo.push_back(shape);
-
 				DynamicEntity* e = new DynamicEntity();
 				// todo, error check that these models do exist, instead of just break
 				e->setRenderable(renderablesMap[tileEntity.model]);
@@ -131,7 +116,7 @@ void Game::setupEntities()
 				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize, 0, j * map.tileSize);
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y + 5, pos.z), physx::PxQuat(physx::PxIdentity));
 
-				physicsEngine->createEntity(e, physicsInfo, transform);
+				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
 				entities.push_back(e);
 			}
 		}

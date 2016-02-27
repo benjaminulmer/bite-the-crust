@@ -23,37 +23,119 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	return true;
 }
 
-//todo, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
-bool loadRenderables(char* filename, std::map<std::string, Renderable*> &map) {
+bool loadEntityList(char* filename, std::map<std::string, Renderable*> &modelMap, std::map<std::string, PhysicsEntityInfo*> &physicsMap) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
 	if (err != 0) {
-		printf("Error, renderables file couldn't load.");
+		printf("Error, entity list file couldn't load.");
 		return false;
 	}
 	char readBuffer[10000];
 	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
 	rapidjson::Document d;
 	d.ParseStream(reader);
-	const rapidjson::Value& renderableArray = d["renderables"];
-	if (!renderableArray.IsArray()) {
-		printf("Error, renderables file improperly defined.");
-		return false;
-	}
-	for (rapidjson::SizeType i = 0; i < renderableArray.Size(); i++) {
-		std::string renderableName = renderableArray[i]["name"].GetString();
-		std::string renderableModelFile = renderableArray[i]["model"].GetString();
+	const rapidjson::Value& entitiesArray = d["entities"];
+	for (rapidjson::SizeType i = 0; i < entitiesArray.Size(); i++) {
+		std::string name = entitiesArray[i]["name"].GetString();
+		std::string renderableModelFile = entitiesArray[i]["model"].GetString();
 		renderableModelFile.insert(0, "res\\Models\\");
-		Renderable * r = new Renderable();
-		std::vector<glm::vec3> verts;
-		std::vector<glm::vec3> normals;
-		bool floorRes = ContentLoading::loadOBJNonIndexed(renderableModelFile.c_str(), verts, normals);
-		r->setVerts(verts);
-		r->setNorms(normals);
-		r->setColor(glm::vec3(1.0f,1.0f,1.0f));
-		map[renderableName] = r;
+		Renderable* r = createRenderable(renderableModelFile);
+		modelMap[name] = r;
+		std::string physicsDataName = entitiesArray[i]["physics"].GetString();
+		physicsDataName.insert(0, "res\\JSON\\Physics\\");
+		PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
+		physicsMap[name] = info;
 	}
 	return true;
+}
+
+Renderable* createRenderable(std::string modelFile) {
+	Renderable * r = new Renderable();
+	std::vector<glm::vec3> verts;
+	std::vector<glm::vec3> normals;
+	bool floorRes = ContentLoading::loadOBJNonIndexed(modelFile.c_str(), verts, normals);
+	r->setVerts(verts);
+	r->setNorms(normals);
+	r->setColor(glm::vec3(1.0f,1.0f,1.0f));
+	return r;
+}
+
+PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
+	FILE* filePointer;
+	errno_t err = fopen_s(&filePointer, filename, "rb");
+	if (err != 0) {
+		printf("Error, physics info file couldn't load.");
+		return nullptr;
+	}
+	char readBuffer[10000];
+	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
+	rapidjson::Document d;
+	d.ParseStream(reader);
+
+	PhysicsEntityInfo* info = new PhysicsEntityInfo();
+	if (d.HasMember("type")) {
+		std::string type = d["type"].GetString();
+		if (type.compare("dynamic") == 0) {
+			info->type = PhysicsType::DYNAMIC;
+		} else if (type.compare("static") == 0) {
+			info->type = PhysicsType::STATIC;
+		} else {
+			// Static by default
+			info->type = PhysicsType::STATIC;
+		}
+	}
+	if (d.HasMember("dynamicInfo")) {
+		const rapidjson::Value& dynamicInfo = d["dynamicInfo"];
+		info->dynamicInfo = new DynamicInfo();
+		if (dynamicInfo.HasMember("mass")) {
+			info->dynamicInfo->mass = dynamicInfo["mass"].GetDouble();
+		}
+		if (dynamicInfo.HasMember("linearDamping")) {
+			info->dynamicInfo->linearDamping = dynamicInfo["linearDamping"].GetDouble();
+		}
+		if (dynamicInfo.HasMember("angularDamping")) {
+			info->dynamicInfo->angularDamping = dynamicInfo["angularDamping"].GetDouble();
+		}
+	}
+	if (d.HasMember("geometry")) {
+		const rapidjson::Value& geometry = d["geometry"];
+		for (rapidjson::SizeType i = 0; i < geometry.Size(); i++) {
+			std::string shapeName = geometry[i]["shape"].GetString();
+			ShapeInfo* shape;
+			if (shapeName.compare("box") == 0) {
+				BoxInfo* box = new BoxInfo();
+				box->geometry = Geometry::BOX;
+				// Use the model dimensions by default
+				glm::vec3 d = model->getDimensions();
+				box->halfX = d.x * 0.5f;
+				box->halfY = d.y * 0.5f;
+				box->halfZ = d.z * 0.5f;
+				// Overwrite with specifics if they're there
+				if (geometry[i].HasMember("halfX"))
+					box->halfX = geometry[i]["halfX"].GetDouble();
+				if (geometry[i].HasMember("halfY"))
+					box->halfY = geometry[i]["halfY"].GetDouble();
+				if (geometry[i].HasMember("halfZ"))
+					box->halfZ = geometry[i]["halfZ"].GetDouble();
+				shape = box;
+			}
+			shape->filterFlag0 = FilterFlag::OBSTACLE;
+			shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
+			info->shapeInfo.push_back(shape);
+		}
+	} else {
+		// Give a default box around the model
+		BoxInfo* box = new BoxInfo();
+		box->geometry = Geometry::BOX;
+		glm::vec3 d = model->getDimensions();
+		box->halfX = d.x * 0.5f;
+		box->halfY = d.y * 0.5f;
+		box->halfZ = d.z * 0.5f;
+		box->filterFlag0 = FilterFlag::OBSTACLE;
+		box->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
+		info->shapeInfo.push_back(box);
+	}
+	return info;
 }
 
 //todo, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong

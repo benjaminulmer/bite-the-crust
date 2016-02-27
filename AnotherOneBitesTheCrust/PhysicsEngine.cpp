@@ -90,18 +90,22 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		PxMaterial* material;
 		if (shapeInfo->geometry == Geometry::SPHERE)
 		{
-			PhysicsCreator::createSphere(shapeInfo, physics);
+			SphereInfo* sphereInfo = (SphereInfo*)shapeInfo;
+			geometry = new PxSphereGeometry(sphereInfo->radius);
 		}
 		else if (shapeInfo->geometry == Geometry::BOX)
 		{
-			PhysicsCreator::createBox(shapeInfo, physics);
+			BoxInfo* boxInfo = (BoxInfo*)shapeInfo;
+			geometry = new PxBoxGeometry(boxInfo->halfX, boxInfo->halfY, boxInfo->halfZ);
 		}
 		else if (shapeInfo->geometry == Geometry::CAPSULE)
 		{
-			PhysicsCreator::createCapsule(shapeInfo, physics);
+			CapsuleInfo* capsuleInfo = (CapsuleInfo*)shapeInfo;
+			geometry = new PxCapsuleGeometry(capsuleInfo->raidus, capsuleInfo->halfHeight);
 		}
 		else if (shapeInfo->geometry == Geometry::CONVEX_MESH)
 		{
+			(ConvexMeshInfo*)shapeInfo;
 			// other stuff here, meshes are more complicated.
 			//PhysicsCreator::createConvexMesh(verts, numVerts, physics, cooking);
 		}

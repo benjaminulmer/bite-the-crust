@@ -29,21 +29,6 @@ PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physi
 	return actor;
 }
 
-PxGeometry* PhysicsCreator::createSphere(ShapeInfo* shapeInfo, physx::PxPhysics* physics)
-{
-	return new PxSphereGeometry(1);
-}
-
-PxGeometry* PhysicsCreator::createBox(ShapeInfo* shapeInfo, physx::PxPhysics* physics)
-{
-	return new PxBoxGeometry(1, 1, 1);
-}
-
-PxGeometry* PhysicsCreator::createCapsule(ShapeInfo* shapeInfo, physx::PxPhysics* physics)
-{
-	return new PxCapsuleGeometry(1, 1);
-}
-
 PxActor* PhysicsCreator::createTriggerVolume(PxPhysics* physics)
 {
 	PxSphereGeometry geometry(10.0f); 

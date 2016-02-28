@@ -8,6 +8,7 @@
 struct TileEntity 
 {
 	std::string model;
+	std::string physicsInfo;
 	glm::vec3 position;
 };
 

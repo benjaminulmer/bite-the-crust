@@ -2,13 +2,11 @@
 
 #include "Game.h"
 #include <SDL.h>
-#include <iostream>
-#include <filereadstream.h>
-#include <document.h>
 
 int main(int argc, char *argv[]) {
 	Game game;
 	game.run();
 
+	SDL_Quit();
 	return 0;
 } 

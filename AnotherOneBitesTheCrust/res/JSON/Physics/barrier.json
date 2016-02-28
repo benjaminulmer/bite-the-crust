@@ -1,0 +1,8 @@
+{
+    "type": "dynamic",
+    "dynamicInfo": {
+        "mass": 10.0,
+        "linearDamping": 0.5,
+        "angularDamping": 5.0
+    }
+}

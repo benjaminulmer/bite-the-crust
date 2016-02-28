@@ -1,20 +1,14 @@
 #pragma once
 #include <PxPhysicsAPI.h>
 
-enum
+enum class Surface
 {
-	DRIVABLE_SURFACE = 0xffff0000,
-	UNDRIVABLE_SURFACE = 0x0000ffff
+	DRIVABLE   = 1 << 0,
+	UNDRIVABLE = 1 << 1
 };
 
-void setupDrivableSurface(physx::PxFilterData& filterData);
-
-void setupNonDrivableSurface(physx::PxFilterData& filterData);
-
-physx::PxQueryHitType::Enum WheelRaycastPreFilter
-(physx::PxFilterData filterData0, physx::PxFilterData filterData1,
- const void* constantBlock, physx::PxU32 constantBlockSize,
- physx::PxHitFlags& queryFlags);
+physx::PxQueryHitType::Enum WheelRaycastPreFilter(physx::PxFilterData filterData0, physx::PxFilterData filterData1, 
+												  const void* constantBlock, physx::PxU32 constantBlockSize, physx::PxHitFlags& queryFlags);
 
 //Data structure for quick setup of scene queries for suspension raycasts.
 class VehicleSceneQueryData

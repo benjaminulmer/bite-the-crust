@@ -1,6 +1,13 @@
 #include "Game.h"
-#include "DrivingInput.h"
 #include "DynamicEntity.h"
+#include "Camera.h"
+#include "ContentLoading.h"
+
+#include <foundation/PxTransform.h> 
+
+#include <iostream>
+#include <string>
+#include <sigslot.h>
 
 using namespace std;
 
@@ -35,7 +42,7 @@ void Game::run()
 	// Preload data, initialize subsystems, anything to do before entering the main loop
 	initSystems();
 	setupEntities();
-	connectSignals();
+	connectSystems();
 
 	mainLoop();
 }
@@ -80,7 +87,9 @@ void Game::initSystems()
 
 void Game::setupEntities()
 {
-	ContentLoading::loadRenderables("res\\JSON\\renderables.json", renderablesMap);
+	if (!ContentLoading::loadEntityList("res\\JSON\\entityList.json", renderablesMap, physicsEntityInfoMap))
+		fatalError("Could not load entities list.");
+
 	// Assign the buffers for all the renderables
 	std::map<std::string, Renderable*>::iterator it;
 	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
@@ -91,19 +100,25 @@ void Game::setupEntities()
 	renderablesMap["box"]->setColor(glm::vec3(0,1,1));
 	renderablesMap["van"]->setColor(glm::vec3(1,0,0));
 
-	ContentLoading::loadMap("res\\JSON\\map.json", map);
+	if (!ContentLoading::loadMap("res\\JSON\\map.json", map))
+		fatalError("Could not load map file.");
 	// Create all the entities loaded in the map
-	for (int i = 0; i < map.tiles.size(); i++) {
-		for (int j = 0; j < map.tiles[i].size(); j++) {
+	for (unsigned int i = 0; i < map.tiles.size(); i++) {
+		for (unsigned int j = 0; j < map.tiles[i].size(); j++) {
 			Tile tile = map.tiles[i][j];
-			for (int k = 0; k < tile.entities.size(); k++) {
+			for (unsigned int k = 0; k < tile.entities.size(); k++) {
 				TileEntity tileEntity = tile.entities[k];
-				PhysicsEntity* e = new PhysicsEntity();
+
+				DynamicEntity* e = new DynamicEntity();
 				// todo, error check that these models do exist, instead of just break
 				e->setRenderable(renderablesMap[tileEntity.model]);
+				e->setDefaultTranslation(e->getRenderable()->getCenter());
+
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize, 0, j * map.tileSize);
-				physicsEngine->createDynamicEntity(e, pos, glm::vec3(0,0,0));
+				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y + 5, pos.z), physx::PxQuat(physx::PxIdentity));
+
+				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
 				entities.push_back(e);
 			}
 		}
@@ -138,8 +153,8 @@ void Game::setupEntities()
 	p1Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
 
 	// TODO get dimensions working properly for vehicle
-	p1Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
-	physicsEngine->createVehicle(p1Vehicle);
+	p1Vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
+	physicsEngine->createVehicle(p1Vehicle, physx::PxTransform(physx::PxVec3(0, 2, 0), physx::PxQuat(physx::PxIdentity)));
 	entities.push_back(p1Vehicle);
 
 	//// Player 2 (ie. AI)
@@ -150,9 +165,8 @@ void Game::setupEntities()
 	p2Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
 
 	// TODO get dimensions working properly for vehicle
-	p2Vehicle->chassisDims = physx::PxVec3(2, 2, 5);
-	physicsEngine->createVehicle(p2Vehicle);
-	p2Vehicle->setPosition(glm::vec3(10, 3, 0));
+	p2Vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
+	physicsEngine->createVehicle(p2Vehicle, physx::PxTransform(physx::PxVec3(10, 2, 0), physx::PxQuat(physx::PxIdentity)));
 	entities.push_back(p2Vehicle);
 
 	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
@@ -161,49 +175,78 @@ void Game::setupEntities()
 	}
 	cameraPosBufferIndex = 0;
 	camera.setUpVector(glm::vec3(0,1,0));
+
+
+	// ******** Hardcoded for now - Should be data driven *********** //
+	pizzaInfo = new PhysicsEntityInfo();
+	pizzaInfo->type = PhysicsType::DYNAMIC;
+	pizzaInfo->dynamicInfo = new DynamicInfo();
+	BoxInfo* shape = new BoxInfo();
+	shape->geometry = Geometry::BOX;
+	glm::vec3 d = renderablesMap["box"]->getDimensions();
+	shape->halfX = d.x * 0.5f;
+	shape->halfY = d.y * 0.5f;
+	shape->halfZ = d.z * 0.5f;
+	shape->filterFlag0 = FilterFlag::DRIVABLE_OBSTACLE;
+	shape->filterFlag1 = FilterFlag::DRIVABLE_OBSTACLE_AGAINST;
+	pizzaInfo->shapeInfo.push_back(shape);
 }
 
 // TODO decide how signals will be used and set them up
-void Game::connectSignals()
+void Game::connectSystems()
 {
-	//inputEngine->DrivingSignal.connect(p1Vehicle, &Vehicle::handleInput);
-	inputEngine->FireSignal.connect(this, &Game::firePizza);
+	inputEngine->setInputStruct(&p1Vehicle->input, 0);
+
+	p1Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
+	p2Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
 }
 
 void Game::mainLoop()
 {
 	unsigned int oldTimeMs = SDL_GetTicks();
+	unsigned int deltaTimeAccMs = 0;
+	unsigned int physicsStepSize = 16;
 	
+	physicsEngine->createTrigger();
+
 	// Game loop
 	while (gameState!= GameState::EXIT)
 	{
-		// Update the player and AI cars
+		// Update Sound
+		audioEngine->update();
 
 		processSDLEvents();
-		p1Vehicle->handleInput(inputEngine->getInput());
-		p2Vehicle->handleInput(&aiEngine->updateAI(p2Vehicle));
 
 		// Figure out timestep and run physics
 		unsigned int newTimeMs = SDL_GetTicks();
 		unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 		oldTimeMs = newTimeMs;
-		bool didPhysics = physicsEngine->simulate(deltaTimeMs);
 
-		// If a physics simulation ran, update the camera position buffer with new location
-		if (didPhysics)
+		deltaTimeAccMs += deltaTimeMs;
+		if (deltaTimeAccMs >= physicsStepSize) 
 		{
+			deltaTimeAccMs -= physicsStepSize;
+
+			// Update the player and AI cars
+			aiEngine->updateAI(p2Vehicle);
+			p1Vehicle->handleInput();
+			p2Vehicle->handleInput();
+		
+			physicsEngine->simulate(physicsStepSize);
+
+			// Update the camera position buffer with new location
 			cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
 			cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
-		}
-		// Set camera to look at player with a positional delay
-		camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
-		camera.setLookAtPosition(p1Vehicle->getPosition());
-		renderingEngine->updateView(camera);
 
-		//display
+			// Set camera to look at player with a positional delay
+			camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
+			camera.setLookAtPosition(p1Vehicle->getPosition());
+			renderingEngine->updateView(camera);
+		}
+		// Display
 		renderingEngine->displayFunc(entities);
 
-		//swap buffers
+		// Swap buffers
 		SDL_GL_SwapWindow(window);
 		physicsEngine->fetchSimulationResults();
 	}
@@ -222,10 +265,21 @@ void Game::processSDLEvents()
 		{
 			gameState = GameState::EXIT;
 		}
-		else if (event.type == SDL_CONTROLLERAXISMOTION || event.type == SDL_CONTROLLERBUTTONDOWN || SDL_CONTROLLERBUTTONUP ||
-			     event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
+		else if (event.type == SDL_CONTROLLERAXISMOTION) 
 		{
-			inputEngine->processControllerEvent(event);
+			inputEngine->controllerAxisMotion(event);
+		}
+		else if (event.type == SDL_CONTROLLERBUTTONDOWN)
+		{
+			inputEngine->controllerButtonDown(event);
+		}
+		else if (event.type == SDL_CONTROLLERBUTTONUP)
+		{
+			inputEngine->controllerButtonUp(event);
+		}
+		else if (event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
+		{
+			inputEngine->openControllers();
 		}
 		else
 		{
@@ -234,21 +288,29 @@ void Game::processSDLEvents()
 	}
 }
 
-// TODO possible move this to a different file and make it work for different players
-void Game::firePizza()
+// TODO move this to a different file
+void Game::shootPizza(Vehicle* vehicle)
 {
 	DynamicEntity* pizzaBox = new DynamicEntity();
-	pizzaBox->setRenderable(renderablesMap["box"]);
-	glm::vec3 position = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0, 1.0, 1.0, 0));
-	glm::vec3 velocity = glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0.0, 0.0, 20.0, 0.0));
-	physx::PxVec3 v = p1Vehicle->getDynamicActor()->getLinearVelocity();
-	velocity = velocity + glm::vec3(v.x, v.y, v.z);
-	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);
+	pizzaBox->setRenderable(renderablesMap["box"]); // TODO, match names to renderables or something instead of hard-coded
+
+	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();
+	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.2f, 1.0f));
+	transform.p += posOffset;
+
+	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 0.0f, 20.0f));
+	physx::PxVec3 vehicleVelocity = vehicle->getDynamicActor()->getLinearVelocity();
+	velocity += vehicleVelocity;
+
+	physicsEngine->createEntity(pizzaBox, pizzaInfo, transform);
+	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
 	entities.push_back(pizzaBox);
 }
 
 Game::~Game(void)
 {
+	p1Vehicle->ShootPizzaSignal.disconnect_all();
+	p2Vehicle->ShootPizzaSignal.disconnect_all();
 	for (unsigned int i = 0; i < entities.size(); i++)
 	{
 		delete entities[i];

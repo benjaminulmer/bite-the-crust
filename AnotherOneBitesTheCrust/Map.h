@@ -17,6 +17,7 @@ struct Tile
 	// Should these coordinates be relative to the tile or the map?
 	// If it's relative to the tile, need a method to get player space -> tile space
 	glm::vec3 entrance, exit;
+	std::string groundModel;
 	std::vector<TileEntity> entities;
 };
 

@@ -106,6 +106,10 @@ void Game::setupEntities()
 	for (unsigned int i = 0; i < map.tiles.size(); i++) {
 		for (unsigned int j = 0; j < map.tiles[i].size(); j++) {
 			Tile tile = map.tiles[i][j];
+			Entity* ground = new Entity();
+			ground->setRenderable(renderablesMap[tile.groundModel]);
+			ground->setDefaultTranslation(glm::vec3(i*map.tileSize, 0, j*map.tileSize));
+			entities.push_back(ground);
 			for (unsigned int k = 0; k < tile.entities.size(); k++) {
 				TileEntity tileEntity = tile.entities[k];
 
@@ -123,25 +127,6 @@ void Game::setupEntities()
 			}
 		}
 	}
-
-	Entity* ground = new Entity();
-	ground->setRenderable(renderablesMap["floor"]);
-	entities.push_back(ground);
-
-	Entity* ground2 = new Entity();
-	ground2->setRenderable(renderablesMap["floor2"]);
-	ground2->setDefaultTranslation(glm::vec3(70.0f,0.0f,0.0f));
-	entities.push_back(ground2);
-
-	Entity* ground3 = new Entity();
-	ground3->setRenderable(renderablesMap["floor"]);
-	ground3->setDefaultTranslation(glm::vec3(70.0f,0.0f,70.0f));
-	entities.push_back(ground3);
-
-	Entity* ground4 = new Entity();
-	ground4->setRenderable(renderablesMap["floor2"]);
-	ground4->setDefaultTranslation(glm::vec3(0.0f,0.0f,70.0f));
-	entities.push_back(ground4);
 
 	/**********************************************************
 						Creating Vechicles
@@ -175,21 +160,6 @@ void Game::setupEntities()
 	}
 	cameraPosBufferIndex = 0;
 	camera.setUpVector(glm::vec3(0,1,0));
-
-
-	// ******** Hardcoded for now - Should be data driven *********** //
-	pizzaInfo = new PhysicsEntityInfo();
-	pizzaInfo->type = PhysicsType::DYNAMIC;
-	pizzaInfo->dynamicInfo = new DynamicInfo();
-	BoxInfo* shape = new BoxInfo();
-	shape->geometry = Geometry::BOX;
-	glm::vec3 d = renderablesMap["box"]->getDimensions();
-	shape->halfX = d.x * 0.5f;
-	shape->halfY = d.y * 0.5f;
-	shape->halfZ = d.z * 0.5f;
-	shape->filterFlag0 = FilterFlag::DRIVABLE_OBSTACLE;
-	shape->filterFlag1 = FilterFlag::DRIVABLE_OBSTACLE_AGAINST;
-	pizzaInfo->shapeInfo.push_back(shape);
 }
 
 // TODO decide how signals will be used and set them up
@@ -292,7 +262,7 @@ void Game::processSDLEvents()
 void Game::shootPizza(Vehicle* vehicle)
 {
 	DynamicEntity* pizzaBox = new DynamicEntity();
-	pizzaBox->setRenderable(renderablesMap["box"]); // TODO, match names to renderables or something instead of hard-coded
+	pizzaBox->setRenderable(renderablesMap["box"]);
 
 	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();
 	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.2f, 1.0f));
@@ -302,7 +272,7 @@ void Game::shootPizza(Vehicle* vehicle)
 	physx::PxVec3 vehicleVelocity = vehicle->getDynamicActor()->getLinearVelocity();
 	velocity += vehicleVelocity;
 
-	physicsEngine->createEntity(pizzaBox, pizzaInfo, transform);
+	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["box"], transform);
 	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
 	entities.push_back(pizzaBox);
 }

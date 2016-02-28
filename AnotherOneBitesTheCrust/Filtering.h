@@ -1,5 +1,6 @@
 #pragma once
 #include <PxPhysicsAPI.h>
+#include <string>
 
 enum class FilterFlag
 {
@@ -17,6 +18,8 @@ enum class FilterFlag
 
 	DEFAULT
 };
+
+FilterFlag stringToFlag(std::string string);
 
 physx::PxFilterFlags FilterShader(physx::PxFilterObjectAttributes attributes0, physx::PxFilterData filterData0,
 								  physx::PxFilterObjectAttributes attributes1, physx::PxFilterData filterData1,

@@ -2,7 +2,7 @@
     "entities": [
         {"name": "floor", "model": "FlatFloor.obj", "physics": "default.json"},
         {"name": "floor2", "model": "FlatFloor.obj", "physics": "default.json"},
-        {"name": "box", "model": "PizzaBox.obj", "physics": "default.json"},
+        {"name": "box", "model": "PizzaBox.obj", "physics": "box.json"},
         {"name": "van", "model": "Van.obj", "physics": "default.json"},
         {"name": "cube", "model": "cube.obj", "physics": "default.json"},
         {"name": "barrier", "model": "constructionBarrier.obj", "physics": "barrier.json"}

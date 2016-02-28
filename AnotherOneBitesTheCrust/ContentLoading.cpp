@@ -101,9 +101,10 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 	PhysicsEntityInfo* info = new PhysicsEntityInfo();
 	if (d.HasMember("type")) {
 		std::string type = d["type"].GetString();
-		if (type.compare("dynamic") == 0) {
+		if (type == "dynamic") {
 			info->type = PhysicsType::DYNAMIC;
-		} else if (type.compare("static") == 0) {
+			info->dynamicInfo = new DynamicInfo();
+		} else if (type == "static") {
 			info->type = PhysicsType::STATIC;
 		} else {
 			// Static by default
@@ -112,7 +113,6 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 	}
 	if (d.HasMember("dynamicInfo")) {
 		const rapidjson::Value& dynamicInfo = d["dynamicInfo"];
-		info->dynamicInfo = new DynamicInfo();
 		if (dynamicInfo.HasMember("mass")) {
 			info->dynamicInfo->mass = (float)dynamicInfo["mass"].GetDouble();
 		}
@@ -128,7 +128,7 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 		for (rapidjson::SizeType i = 0; i < geometry.Size(); i++) {
 			std::string shapeName = geometry[i]["shape"].GetString();
 			ShapeInfo* shape;
-			if (shapeName.compare("box") == 0) {
+			if (shapeName == "box") {
 				BoxInfo* box = new BoxInfo();
 				box->geometry = Geometry::BOX;
 				// Use the model dimensions by default
@@ -145,8 +145,16 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 					box->halfZ = (float)geometry[i]["halfZ"].GetDouble();
 				shape = box;
 			}
-			shape->filterFlag0 = FilterFlag::OBSTACLE;
-			shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
+			if (geometry[i].HasMember("flag0")) {
+				shape->filterFlag0 = stringToFlag(geometry[i]["flag0"].GetString());
+			} else {
+				shape->filterFlag0 = FilterFlag::OBSTACLE;
+			}
+			if (geometry[i].HasMember("flag1")) {
+				shape->filterFlag1 = stringToFlag(geometry[i]["flag1"].GetString());
+			} else {
+				shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
+			}
 			info->shapeInfo.push_back(shape);
 		}
 	} else {
@@ -173,6 +181,10 @@ bool validateMap(rapidjson::Document &d) {
 		rapidjson::Value& entry = d["tiles"][i];
 		if (!entry.HasMember("id")) {
 			printf("Tile %d missing id.", i);
+			return false;
+		}
+		if (!entry.HasMember("ground")) {
+			printf("Tile %d missing ground.", i);
 			return false;
 		}
 		if (!entry.HasMember("entities")) {
@@ -226,7 +238,9 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 	}
 	for (rapidjson::SizeType i = 0; i < tileArray.Size(); i++) {
 		int id = tileArray[i]["id"].GetInt();
+		std::string ground = tileArray[i]["ground"].GetString();
 		Tile t;
+		t.groundModel = ground;
 		const rapidjson::Value& entityArray = tileArray[i]["entities"];
 		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
 			std::string model = entityArray[j]["model"].GetString();

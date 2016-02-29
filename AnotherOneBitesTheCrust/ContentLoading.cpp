@@ -7,18 +7,273 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	errno_t err = fopen_s(&filePointer, filename, "rb");
 	if (err != 0) {
 		printf("Error, vehicle file couldn't load.");
-		return 0;
+		return false;
 	}
 	char readBuffer[10000];
 	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
 	rapidjson::Document d;
 	d.ParseStream(reader);
 	if (d.HasMember("mass")) {
-		vehicle->chassisMass = (float)d["mass"].GetDouble();
+		vehicle->tuning.chassisMass = (float)d["mass"].GetDouble();
 	}
 	vehicle->updateTuning();
 
 	fclose(filePointer);
+
+	return true;
+}
+
+bool verifyEntityList(const rapidjson::Document &d) {
+	if (!d.HasMember("entities")) {
+		printf("Missing entities array.");
+		return false;
+	}
+	for (rapidjson::SizeType i = 0; i < d["entities"].Size(); i++) {
+		const rapidjson::Value& entry = d["entities"][i];
+		if (!entry.HasMember("name")) {
+			printf("Entry %d is missing a name.", i);
+			return false;
+		}
+		if (!entry.HasMember("model")) {
+			printf("Entry %d is missing a model.", i);
+			return false;
+		}
+		if (!entry.HasMember("physics")) {
+			printf("Entry %d is missing a physics file.", i);
+			return false;
+		}
+	}
+	return true;
+}
+
+bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Renderable*> &modelMap, std::map<std::string, PhysicsEntityInfo*> &physicsMap) {
+	FILE* filePointer;
+	errno_t err = fopen_s(&filePointer, filename, "rb");
+	if (err != 0) {
+		printf("Error, entity list file couldn't load.");
+		return false;
+	}
+	char readBuffer[10000];
+	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
+	rapidjson::Document d;
+	d.ParseStream(reader);
+	if (!verifyEntityList(d)) {
+		return false;
+	}
+	const rapidjson::Value& entitiesArray = d["entities"];
+	for (rapidjson::SizeType i = 0; i < entitiesArray.Size(); i++) {
+		std::string name = entitiesArray[i]["name"].GetString();
+		std::string renderableModelFile = entitiesArray[i]["model"].GetString();
+		renderableModelFile.insert(0, "res\\Models\\");
+		Renderable* r = createRenderable(renderableModelFile);
+		modelMap[name] = r;
+		std::string physicsDataName = entitiesArray[i]["physics"].GetString();
+		physicsDataName.insert(0, "res\\JSON\\Physics\\");
+		PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
+		physicsMap[name] = info;
+	}
+	return true;
+}
+
+Renderable* createRenderable(std::string modelFile) {
+	Renderable * r = new Renderable();
+	std::vector<glm::vec3> verts;
+	std::vector<glm::vec3> normals;
+	bool floorRes = ContentLoading::loadOBJNonIndexed(modelFile.c_str(), verts, normals);
+	r->setVerts(verts);
+	r->setNorms(normals);
+	r->setColor(glm::vec3(1.0f,1.0f,1.0f));
+	return r;
+}
+
+PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
+	FILE* filePointer;
+	errno_t err = fopen_s(&filePointer, filename, "rb");
+	if (err != 0) {
+		printf("Error, physics info file %s couldn't load.", filename);
+		return nullptr;
+	}
+	char readBuffer[10000];
+	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
+	rapidjson::Document d;
+	d.ParseStream(reader);
+
+	PhysicsEntityInfo* info = new PhysicsEntityInfo();
+	if (d.HasMember("type")) {
+		std::string type = d["type"].GetString();
+		if (type == "dynamic") {
+			info->type = PhysicsType::DYNAMIC;
+			info->dynamicInfo = new DynamicInfo();
+		} else if (type == "static") {
+			info->type = PhysicsType::STATIC;
+		} else {
+			// Static by default
+			info->type = PhysicsType::STATIC;
+		}
+	}
+	if (d.HasMember("dynamicInfo")) {
+		const rapidjson::Value& dynamicInfo = d["dynamicInfo"];
+		if (dynamicInfo.HasMember("mass")) {
+			info->dynamicInfo->mass = (float)dynamicInfo["mass"].GetDouble();
+		}
+		if (dynamicInfo.HasMember("linearDamping")) {
+			info->dynamicInfo->linearDamping = (float)dynamicInfo["linearDamping"].GetDouble();
+		}
+		if (dynamicInfo.HasMember("angularDamping")) {
+			info->dynamicInfo->angularDamping = (float)dynamicInfo["angularDamping"].GetDouble();
+		}
+	}
+	if (d.HasMember("geometry")) {
+		const rapidjson::Value& geometry = d["geometry"];
+		for (rapidjson::SizeType i = 0; i < geometry.Size(); i++) {
+			std::string shapeName = geometry[i]["shape"].GetString();
+			ShapeInfo* shape;
+			if (shapeName == "box") {
+				BoxInfo* box = new BoxInfo();
+				box->geometry = Geometry::BOX;
+				// Use the model dimensions by default
+				glm::vec3 d = model->getDimensions();
+				box->halfX = d.x * 0.5f;
+				box->halfY = d.y * 0.5f;
+				box->halfZ = d.z * 0.5f;
+				// Overwrite with specifics if they're there
+				if (geometry[i].HasMember("halfX"))
+					box->halfX = (float)geometry[i]["halfX"].GetDouble();
+				if (geometry[i].HasMember("halfY"))
+					box->halfY = (float)geometry[i]["halfY"].GetDouble();
+				if (geometry[i].HasMember("halfZ"))
+					box->halfZ = (float)geometry[i]["halfZ"].GetDouble();
+				shape = box;
+			}
+			if (geometry[i].HasMember("flag0")) {
+				shape->filterFlag0 = stringToFlag(geometry[i]["flag0"].GetString());
+			} else {
+				shape->filterFlag0 = FilterFlag::OBSTACLE;
+			}
+			if (geometry[i].HasMember("flag1")) {
+				shape->filterFlag1 = stringToFlag(geometry[i]["flag1"].GetString());
+			} else {
+				shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
+			}
+			info->shapeInfo.push_back(shape);
+		}
+	} else {
+		// Give a default box around the model
+		BoxInfo* box = new BoxInfo();
+		box->geometry = Geometry::BOX;
+		glm::vec3 d = model->getDimensions();
+		box->halfX = d.x * 0.5f;
+		box->halfY = d.y * 0.5f;
+		box->halfZ = d.z * 0.5f;
+		box->filterFlag0 = FilterFlag::OBSTACLE;
+		box->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
+		info->shapeInfo.push_back(box);
+	}
+	return info;
+}
+
+bool validateMap(rapidjson::Document &d) {
+	if (!d.HasMember("tiles")) {
+		printf("Map file missing tiles array.");
+		return false;
+	}
+	for (rapidjson::SizeType i = 0; i < d["tiles"].Size(); i++) {
+		rapidjson::Value& entry = d["tiles"][i];
+		if (!entry.HasMember("id")) {
+			printf("Tile %d missing id.", i);
+			return false;
+		}
+		if (!entry.HasMember("ground")) {
+			printf("Tile %d missing ground.", i);
+			return false;
+		}
+		if (!entry.HasMember("entities")) {
+			printf("Tile id %d is missing its entities array.", entry["id"]);
+			return false;
+		}
+		for (rapidjson::SizeType j = 0; j < entry["entities"].Size(); j++) {
+			if (!entry["entities"][j].HasMember("model")) {
+				printf("Entity %d in tile %d is missing a model.", j, entry["id"]);
+				return false;
+			}
+		}
+
+	}
+	if (!d.HasMember("map")) {
+		printf("Map file missing map member.");
+		return false;
+	}
+	if (!d["map"].HasMember("tile size")) {
+		printf("Map file missing tile size");
+		return false;
+	}
+	if (!d["map"].HasMember("tiles")) {
+		printf("Map file missing map tiles array");
+		return false;
+	}
+	return true;
+}
+
+//todo, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
+bool ContentLoading::loadMap(char* filename, Map &map) {
+	FILE* filePointer;
+	errno_t err = fopen_s(&filePointer, filename, "rb");
+	if (err != 0) {
+		printf("Error, map file couldn't load.");
+		return false;
+	}
+	char readBuffer[10000];
+	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
+	rapidjson::Document d;
+	d.ParseStream(reader);
+	if (!validateMap(d))
+		return false;
+
+	// Read in the tiles array
+	std::map<int, Tile> tiles;
+	const rapidjson::Value& tileArray = d["tiles"];
+	if (!tileArray.IsArray()) {
+		printf("Error, map file is improperly defined.");
+		return false;
+	}
+	for (rapidjson::SizeType i = 0; i < tileArray.Size(); i++) {
+		int id = tileArray[i]["id"].GetInt();
+		std::string ground = tileArray[i]["ground"].GetString();
+		Tile t;
+		t.groundModel = ground;
+		const rapidjson::Value& entityArray = tileArray[i]["entities"];
+		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
+			std::string model = entityArray[j]["model"].GetString();
+			double x = 0;
+			double y = 0;
+			double z = 0;
+			if (entityArray[j].HasMember("x"))
+				x = entityArray[j]["x"].GetDouble();
+			if (entityArray[j].HasMember("y"))
+				y = entityArray[j]["y"].GetDouble();
+			if (entityArray[j].HasMember("z"))
+				z = entityArray[j]["z"].GetDouble();
+			TileEntity e;
+			e.model = model;
+			e.position = glm::vec3(x, y, z);
+			t.entities.push_back(e);
+		}
+		tiles[id] = t;
+	}
+
+	// Construct the map
+	int tileSize = d["map"]["tile size"].GetInt();
+	map.tileSize = tileSize;
+	const rapidjson::Value& mapTilesArray = d["map"]["tiles"];
+	for (rapidjson::SizeType i = 0; i < mapTilesArray.Size(); i++) {
+		const rapidjson::Value& row = mapTilesArray[i];
+		std::vector<Tile> rowTiles;
+		for (rapidjson::SizeType j = 0; j < row.Size(); j++) {
+			int id = row[j].GetInt();
+			rowTiles.push_back(tiles[id]);
+		}
+		map.tiles.push_back(rowTiles);
+	}
 
 	return true;
 }

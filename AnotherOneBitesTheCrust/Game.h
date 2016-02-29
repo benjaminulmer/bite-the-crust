@@ -11,14 +11,12 @@
 #include "AudioEngine.h"
 #include "Renderable.h"
 #include "Entity.h"
-#include "Camera.h"
-#include "ContentLoading.h"
-
+#include "PhysicsEntityInfo.h"
+#include "DeliveryManager.h"
+#include "Map.h"
 #include <SDL.h>
-#include <iostream>
-#include <string>
 #include <glew.h>
-#include <sigslot.h>
+#include <map>
 
 enum class GameState
 {
@@ -40,13 +38,14 @@ public:
 	InputEngine *inputEngine;
 	PhysicsEngine *physicsEngine;
 	RenderingEngine *renderingEngine;
+	DeliveryManager* deliveryManager;
 	
 	void run();
 
 private:
 	void initSystems();
 	void setupEntities();
-	void connectSignals();
+	void connectSystems();
 	void mainLoop();
 	void processSDLEvents();
 	void quitGame();
@@ -63,10 +62,14 @@ private:
 	Camera camera;
 	Vehicle* p1Vehicle, *p2Vehicle;
 
-	std::vector<Entity*> entities;
-	std::vector<Renderable*> renderables;
+	PhysicsEntityInfo* pizzaInfo;
 
-	// vehicle location for past 5 frames 
+	std::vector<Entity*> entities;
+	std::map<std::string, Renderable*> renderablesMap;
+	std::map<std::string, PhysicsEntityInfo*> physicsEntityInfoMap;
+	Map map;
+
+	// vehicle location for previous frames 
 	static const int CAMERA_POS_BUFFER_SIZE = 10;
 	glm::vec3 cameraPosBuffer[CAMERA_POS_BUFFER_SIZE];
 	int cameraPosBufferIndex;

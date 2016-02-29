@@ -5,6 +5,7 @@
 #include <time.h>
 #include <iostream>
 #include <sigslot.h>
+#include <string>
 
 struct Delivery {
 	Tile* location;
@@ -31,6 +32,7 @@ public:
 	void addDeliveryLocation(Tile* location);
 	void addPlayer(Vehicle* player);
 	void assignDeliveries();
+	std::string getDeliveryText(Vehicle* player);
 	int getScore(Vehicle* player);
 	void timePassed(double timeMs);
 	Delivery newDelivery();

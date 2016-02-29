@@ -30,6 +30,15 @@ void DeliveryManager::assignDeliveries() {
 	}
 }
 
+std::string DeliveryManager::getDeliveryText(Vehicle* player) {
+	int seconds = ceil(deliveries[player].time / 1000.0);
+	int minutes = seconds / 60;
+	seconds = seconds % 60;
+    std::string text = std::to_string(minutes);
+	text = text + "M " + std::to_string(seconds) + "S";
+	return text;
+}
+
 int DeliveryManager::getScore(Vehicle* player) {
 	return scores[player];
 }
@@ -52,7 +61,7 @@ Delivery DeliveryManager::newDelivery() {
 	int randomTile = rand() % freeLocations.size();
 	std::cout << "Deliver to tile: " << randomTile << std::endl;
 	d.location = freeLocations[randomTile];
-	d.time = 1000.0 * 5.0; // 5 seconds
+	d.time = 1000.0 * 10.0; // 10 seconds
 	return d;
 }
 

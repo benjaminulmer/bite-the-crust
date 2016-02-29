@@ -112,6 +112,7 @@ void Game::setupEntities()
 			Tile tile = map.tiles[i][j];
 			Entity* ground = new Entity();
 			ground->setRenderable(renderablesMap[tile.groundModel]);
+			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
 			ground->setDefaultTranslation(glm::vec3(i*map.tileSize + map.tileSize/2, 0, j*map.tileSize + map.tileSize/2));
 			entities.push_back(ground);
 			for (unsigned int k = 0; k < tile.entities.size(); k++) {

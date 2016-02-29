@@ -9,6 +9,10 @@
 struct Delivery {
 	Tile* location;
 	tm time;
+
+	Delivery() {
+		location = nullptr;
+	}
 };
 
 class DeliveryManager :
@@ -27,6 +31,7 @@ public:
 	void addDeliveryLocation(Tile* location);
 	void addPlayer(Vehicle* player);
 	void assignDeliveries();
+	Delivery newDelivery();
 	void pizzaShot(Vehicle* player);
 };
 

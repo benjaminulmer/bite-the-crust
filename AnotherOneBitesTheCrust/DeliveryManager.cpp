@@ -45,6 +45,7 @@ void DeliveryManager::pizzaShot(Vehicle* player) {
 	if (tile == deliveries[player].location) {
 		std::cout << "Delivered!" << std::endl;
 		scores[player]++;
+		std::cout << "Score = " << scores[player] << std::endl;
 		deliveries[player] = newDelivery();
 		// Anyone who was delivering to this location needs a new delivery
 		for (int i = 0; i < (int)players.size(); i++) {

@@ -12,6 +12,7 @@
 #include "Renderable.h"
 #include "Entity.h"
 #include "PhysicsEntityInfo.h"
+#include "DeliveryManager.h"
 #include "Map.h"
 #include <SDL.h>
 #include <glew.h>
@@ -37,6 +38,7 @@ public:
 	InputEngine *inputEngine;
 	PhysicsEngine *physicsEngine;
 	RenderingEngine *renderingEngine;
+	DeliveryManager* deliveryManager;
 	
 	void run();
 

@@ -34,6 +34,7 @@ Game::Game(void)
 	audioEngine = nullptr;
 	screen = nullptr;
 	p1Vehicle = nullptr;
+	deliveryManager = nullptr;
 }
 
 // The entry point of the game
@@ -83,6 +84,7 @@ void Game::initSystems()
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
 	renderingEngine = new RenderingEngine();
+	deliveryManager = new DeliveryManager();
 }
 
 void Game::setupEntities()
@@ -102,13 +104,15 @@ void Game::setupEntities()
 
 	if (!ContentLoading::loadMap("res\\JSON\\map.json", map))
 		fatalError("Could not load map file.");
+	deliveryManager->map = &map;
 	// Create all the entities loaded in the map
 	for (unsigned int i = 0; i < map.tiles.size(); i++) {
 		for (unsigned int j = 0; j < map.tiles[i].size(); j++) {
+			deliveryManager->addDeliveryLocation(&map.tiles[i][j]);
 			Tile tile = map.tiles[i][j];
 			Entity* ground = new Entity();
 			ground->setRenderable(renderablesMap[tile.groundModel]);
-			ground->setDefaultTranslation(glm::vec3(i*map.tileSize, 0, j*map.tileSize));
+			ground->setDefaultTranslation(glm::vec3(i*map.tileSize + map.tileSize/2, 0, j*map.tileSize + map.tileSize/2));
 			entities.push_back(ground);
 			for (unsigned int k = 0; k < tile.entities.size(); k++) {
 				TileEntity tileEntity = tile.entities[k];
@@ -119,7 +123,7 @@ void Game::setupEntities()
 				e->setDefaultTranslation(e->getRenderable()->getCenter());
 
 				// Offset position based on what tile we're in
-				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize, 0, j * map.tileSize);
+				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize + map.tileSize/2, 0, j * map.tileSize + map.tileSize/2);
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y + 5, pos.z), physx::PxQuat(physx::PxIdentity));
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
@@ -169,6 +173,10 @@ void Game::connectSystems()
 
 	p1Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
 	p2Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
+
+	deliveryManager->addPlayer(p1Vehicle);
+	deliveryManager->assignDeliveries();
+	p1Vehicle->ShootPizzaSignal.connect(deliveryManager, &DeliveryManager::pizzaShot);
 }
 
 void Game::mainLoop()

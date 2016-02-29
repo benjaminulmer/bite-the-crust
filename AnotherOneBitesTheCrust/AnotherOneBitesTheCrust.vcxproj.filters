@@ -22,6 +22,7 @@
     <ClCompile Include="ShaderTools.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
+    <ClCompile Include="DeliveryManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
@@ -46,6 +47,7 @@
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
     <ClInclude Include="PhysicsEntityInfo.h" />
+    <ClInclude Include="DeliveryManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\StandardShading.fragmentshader" />

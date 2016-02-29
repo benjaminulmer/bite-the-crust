@@ -126,7 +126,10 @@ void Game::setupEntities()
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize + map.tileSize/2, 0, j * map.tileSize + map.tileSize/2);
-				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y + 5, pos.z), physx::PxQuat(physx::PxIdentity));
+
+				// Centre is negated because Gorman sucks at naming things :P
+				glm::vec3 offset = renderablesMap[tileEntity.model]->getCenter();
+				physx::PxTransform transform(physx::PxVec3(pos.x - offset.x, pos.y - offset.y, pos.z - offset.z), physx::PxQuat(physx::PxIdentity));
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
 				entities.push_back(e);

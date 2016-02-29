@@ -46,21 +46,44 @@ PxRigidStatic* PhysicsHelper::createDrivablePlane(PxMaterial* material, PxPhysic
 PxConvexMesh* PhysicsHelper::createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking)
 {
 	// Create descriptor for convex mesh
-	PxConvexMeshDesc convexDesc;
-	convexDesc.points.count			= numVerts;
-	convexDesc.points.stride		= sizeof(PxVec3);
-	convexDesc.points.data			= verts;
-	convexDesc.flags				= PxConvexFlag::eCOMPUTE_CONVEX; // | PxConvexFlag::eINFLATE_CONVEX;
+	PxConvexMeshDesc meshDesc;
+	meshDesc.points.count			= numVerts;
+	meshDesc.points.stride		= sizeof(PxVec3);
+	meshDesc.points.data			= verts;
+	meshDesc.flags				= PxConvexFlag::eCOMPUTE_CONVEX; // | PxConvexFlag::eINFLATE_CONVEX;
 
 	PxConvexMesh* convexMesh = NULL;
 	PxDefaultMemoryOutputStream buf;
-	if(cooking.cookConvexMesh(convexDesc, buf))
+	if(cooking.cookConvexMesh(meshDesc, buf))
 	{
 		PxDefaultMemoryInputData id(buf.getData(), buf.getSize());
 		convexMesh = physics.createConvexMesh(id);
 	}
 
 	return convexMesh;
+}
+
+PxTriangleMesh* PhysicsHelper::createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxU32* faces, const PxU32 numFaces, 
+		                                          PxPhysics& physics, PxCooking& cooking)
+{
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.points.count           = numVerts;
+	meshDesc.points.stride          = sizeof(PxVec3);
+	meshDesc.points.data            = verts;
+
+	meshDesc.triangles.count        = numFaces;
+	meshDesc.triangles.stride       = 3*sizeof(PxU32);
+	meshDesc.triangles.data         = faces;
+
+	PxTriangleMesh* triangleMesh = NULL;
+	PxDefaultMemoryOutputStream buf;
+	if (cooking.cookTriangleMesh(meshDesc, buf))
+	{
+		PxDefaultMemoryInputData id(buf.getData(), buf.getSize());
+		triangleMesh = physics.createTriangleMesh(id);
+	}
+
+	return triangleMesh;
 }
 
 std::vector<PxVec3> PhysicsHelper::glmVertsToPhysXVerts(std::vector<glm::vec3> verts)

@@ -13,6 +13,9 @@ public:
 
 	static physx::PxConvexMesh* createConvexMesh(const physx::PxVec3* verts, const physx::PxU32 numVerts, physx::PxPhysics& physics, physx::PxCooking& cooking);
 
+	static physx::PxTriangleMesh* createTriangleMesh(const physx::PxVec3* verts, const physx::PxU32 numVerts, const physx::PxU32* faces, const physx::PxU32 numFaces, 
+		                                             physx::PxPhysics& physics, physx::PxCooking& cooking);
+
 	static std::vector<physx::PxVec3> glmVertsToPhysXVerts(std::vector<glm::vec3> verts);
 };
 

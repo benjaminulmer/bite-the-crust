@@ -154,6 +154,14 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 				convexMesh->verts = model->getVertices();
 				shape = convexMesh;
 			}
+			else if (shapeName == "triangleMesh")
+			{
+				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
+				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
+				triangleMesh->verts = model->getVertices();
+				triangleMesh->faces = model->getFaces();
+				shape = triangleMesh;
+			}
 			
 			
 			if (geometry[i].HasMember("flag0")) {

@@ -118,10 +118,18 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 			std::vector<PxVec3> verts = PhysicsHelper::glmVertsToPhysXVerts(cmInfo->verts);
 			PxConvexMesh* mesh = PhysicsHelper::createConvexMesh(verts.data(), verts.size(), *physics, *cooking);
 			geometry = new PxConvexMeshGeometry(mesh);
+
+			std::cout << cmInfo->verts.size() << std::endl;
 		}
 		else if (sInfo->geometry == Geometry::TRIANGLE_MESH)
 		{
 			TriangleMeshInfo* tmInfo = (TriangleMeshInfo*)sInfo;
+			std::vector<PxVec3> verts = PhysicsHelper::glmVertsToPhysXVerts(tmInfo->verts);
+			PxTriangleMesh* mesh = PhysicsHelper::createTriangleMesh(verts.data(), verts.size(), tmInfo->faces.data(), tmInfo->faces.size(), *physics, *cooking);
+			geometry = new PxTriangleMeshGeometry(mesh);
+
+			std::cout << "verts: " << tmInfo->verts.size() << std::endl;
+			std::cout << "faces: " << tmInfo->faces.size() << std::endl;
 		}
 		PxShape* shape = actor->createShape(*geometry, *material); // TODO support shape flags
 		shape->setLocalPose(sInfo->transform);

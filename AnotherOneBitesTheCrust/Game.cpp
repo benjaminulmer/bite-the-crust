@@ -185,8 +185,6 @@ void Game::mainLoop()
 	// Game loop
 	while (gameState!= GameState::EXIT)
 	{
-		// Update Sound
-		audioEngine->update();
 
 		// Update the player and AI cars
 		processSDLEvents();
@@ -210,6 +208,9 @@ void Game::mainLoop()
 		camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
 		camera.setLookAtPosition(p1Vehicle->getPosition());
 		renderingEngine->updateView(camera);
+
+		// Update Sound
+		audioEngine->update(p1Vehicle->getModelMatrix());
 
 		//display
 		renderingEngine->displayFunc(entities);
@@ -267,6 +268,8 @@ void Game::shootPizza(Vehicle* vehicle)
 	velocity = velocity + glm::vec3(v.x, v.y, v.z);
 	physicsEngine->createDynamicEntity(pizzaBox, position, velocity);
 	entities.push_back(pizzaBox);
+
+	audioEngine->playCannonSound(vehicle);
 }
 
 Game::~Game(void)

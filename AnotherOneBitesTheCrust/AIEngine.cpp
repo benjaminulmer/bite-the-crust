@@ -46,7 +46,7 @@ void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 	{
 		input->rightSteer = 0;
 		input->leftSteer = 0;
-		if (rand()%100 < 10)
+		if (rand()%100 < 5)
 		{
 			input->shootPizza = true;
 		}

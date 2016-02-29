@@ -72,7 +72,6 @@ bool ContentLoading::loadOBJNonIndexed(
 			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
 			int matches = fscanf_s(file, "%d//%d %d//%d %d//%d\n", &vertexIndex[0], &normalIndex[0], &vertexIndex[1], &normalIndex[1], &vertexIndex[2], &normalIndex[2]);
 			if (matches != 6){
-				printf("File can't be read by our simple parser :-( Try exporting with other options\n");
 				return false;
 			}
 			vertexIndices.push_back(vertexIndex[0]);

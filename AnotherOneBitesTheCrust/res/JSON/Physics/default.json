@@ -1,0 +1,11 @@
+{
+    "geometry": [
+        {"shape":"box"}
+    ],
+    "type": "dynamic",
+    "dynamicInfo": {
+        "mass": 1.0,
+        "linearDamping": 0.0,
+        "angularDamping": 0.0
+    }
+}

@@ -57,6 +57,8 @@ public:
 
 	sigslot::signal1<Vehicle*> ShootPizzaSignal;	
 
+	const void test();
+
 private:
 	void defaultTuning();
 };

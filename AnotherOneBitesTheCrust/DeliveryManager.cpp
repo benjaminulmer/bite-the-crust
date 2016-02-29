@@ -1,0 +1,68 @@
+#include "DeliveryManager.h"
+
+
+DeliveryManager::DeliveryManager(void)
+{
+	srand((unsigned int)time(NULL));
+}
+
+
+DeliveryManager::~DeliveryManager(void)
+{
+}
+
+void DeliveryManager::addDeliveryLocation(Tile* location) {
+	freeLocations.push_back(location);
+}
+
+void DeliveryManager::addPlayer(Vehicle* player) {
+	players.push_back(player);
+	scores[player] = 0;
+}
+
+
+
+void DeliveryManager::assignDeliveries() {
+	if (freeLocations.size() != 0) {
+		for (int i = 0; i < (int)players.size(); i++) {
+			deliveries[players[i]] = newDelivery();
+		}
+	}
+}
+
+void DeliveryManager::timePassed(double timeMs) {
+	for (int i = 0; i < (int)players.size(); i++) {
+		Delivery* d = &deliveries[players[i]];
+		d->time = d->time - timeMs;
+		if (d->time <= 0.0) {
+			std::cout << "Delivery failed!" << std::endl;
+			scores[players[i]]--; // Decrement score for now, while testing things out
+			std::cout << "Score: " << scores[players[i]] << std::endl;
+			deliveries[players[i]] = newDelivery();
+		}
+	}
+}
+
+Delivery DeliveryManager::newDelivery() {
+	Delivery d;
+	int randomTile = rand() % freeLocations.size();
+	std::cout << "Deliver to tile: " << randomTile << std::endl;
+	d.location = freeLocations[randomTile];
+	d.time = 1000.0 * 5.0; // 5 seconds
+	return d;
+}
+
+void DeliveryManager::pizzaShot(Vehicle* player) {
+	Tile* tile = map->getTile(player->getPosition());
+	if (tile == deliveries[player].location) {
+		std::cout << "Delivered!" << std::endl;
+		scores[player]++;
+		std::cout << "Score = " << scores[player] << std::endl;
+		deliveries[player] = newDelivery();
+		// Anyone who was delivering to this location needs a new delivery
+		for (int i = 0; i < (int)players.size(); i++) {
+			if (deliveries[players[i]].location == tile)
+				deliveries[players[i]] = newDelivery();
+		}
+	}
+}

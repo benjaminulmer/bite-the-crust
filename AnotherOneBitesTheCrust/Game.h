@@ -11,10 +11,12 @@
 #include "AudioEngine.h"
 #include "Renderable.h"
 #include "Entity.h"
+#include "PhysicsEntityInfo.h"
+#include "DeliveryManager.h"
+#include "Map.h"
 #include <SDL.h>
 #include <glew.h>
 #include <map>
-#include "Map.h"
 
 enum class GameState
 {
@@ -36,13 +38,14 @@ public:
 	InputEngine *inputEngine;
 	PhysicsEngine *physicsEngine;
 	RenderingEngine *renderingEngine;
+	DeliveryManager* deliveryManager;
 	
 	void run();
 
 private:
 	void initSystems();
 	void setupEntities();
-	void connectSignals();
+	void connectSystems();
 	void mainLoop();
 	void processSDLEvents();
 	void quitGame();
@@ -59,8 +62,11 @@ private:
 	Camera camera;
 	Vehicle* p1Vehicle, *p2Vehicle;
 
+	PhysicsEntityInfo* pizzaInfo;
+
 	std::vector<Entity*> entities;
 	std::map<std::string, Renderable*> renderablesMap;
+	std::map<std::string, PhysicsEntityInfo*> physicsEntityInfoMap;
 	Map map;
 
 	// vehicle location for previous frames 

@@ -2,6 +2,7 @@
     "tiles": [
         {
             "id": 1,
+            "ground": "floor",
             "entities": [
                 {"model": "cube", "x": 0, "z": 0},
                 {"model": "barrier", "x": 35, "z": 35},
@@ -10,6 +11,7 @@
         },
         {
             "id": 2,
+            "ground": "floor2",
             "entities": [
             ]
         } 

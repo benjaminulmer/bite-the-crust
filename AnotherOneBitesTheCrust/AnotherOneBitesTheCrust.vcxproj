@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -169,7 +169,7 @@
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="PhysicsCreator.cpp" />
+    <ClCompile Include="PhysicsHelper.cpp" />
     <ClCompile Include="VehicleCreator.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="PhysicsEntity.cpp" />
@@ -192,7 +192,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="PhysicsCreator.h" />
+    <ClInclude Include="PhysicsHelper.h" />
     <ClInclude Include="PhysicsEntityInfo.h" />
     <ClInclude Include="VehicleCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />

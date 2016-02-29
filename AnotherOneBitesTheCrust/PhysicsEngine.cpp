@@ -1,6 +1,6 @@
 #include "PhysicsEngine.h"
 #include "Filtering.h"
-#include "PhysicsCreator.h"
+#include "PhysicsHelper.h"
 #include "VehicleCreator.h"
 
 #include <iostream>
@@ -65,12 +65,13 @@ void PhysicsEngine::initVehicleSDK()
 	drivingSurfaces[0] = physics->createMaterial(0.8f, 0.8f, 0.6f);
 	frictionPairs = FrictionPairs::createFrictionPairs(drivingSurfaces[0]);
 
-	groundPlane = PhysicsCreator::createDrivablePlane(drivingSurfaces[0], physics);
+	groundPlane = PhysicsHelper::createDrivablePlane(drivingSurfaces[0], physics);
 	scene->addActor(*groundPlane);
 }
 
 void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info, PxTransform transform)
 {
+	// Set static/dynamic info for actor depending on its type
 	PxRigidActor* actor;
 	if (info->type == PhysicsType::DYNAMIC) 
 	{
@@ -90,8 +91,10 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		actor = staticActor;
 	}
 
+	// All shapes in actor
 	for (auto sInfo : info->shapeInfo)
 	{
+		// Create material and geometry for shape and add it to actor
 		PxMaterial* material = physics->createMaterial(sInfo->dynamicFriction, sInfo->staticFriction, sInfo->restitution);
 		PxGeometry* geometry;
 		if (sInfo->geometry == Geometry::SPHERE)
@@ -112,42 +115,42 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		else if (sInfo->geometry == Geometry::CONVEX_MESH)
 		{
 			ConvexMeshInfo* cmInfo = (ConvexMeshInfo*)sInfo;
-			// other stuff here, meshes are more complicated.
-			//PhysicsCreator::createConvexMesh(verts, numVerts, physics, cooking);
+			std::vector<PxVec3> verts = PhysicsHelper::glmVertsToPhysXVerts(cmInfo->verts);
+			PxConvexMesh* mesh = PhysicsHelper::createConvexMesh(verts.data(), verts.size(), *physics, *cooking);
+			geometry = new PxConvexMeshGeometry(mesh);
 		}
-		else 
+		else if (sInfo->geometry == Geometry::TRIANGLE_MESH)
 		{
-			// default? should probably at least specify a geometry type and dimensions
+			TriangleMeshInfo* tmInfo = (TriangleMeshInfo*)sInfo;
 		}
-		PxShape* shape = actor->createShape(*geometry, *material);
+		PxShape* shape = actor->createShape(*geometry, *material); // TODO support shape flags
 		shape->setLocalPose(sInfo->transform);
 
+		// Set up querry filter data for shape
 		PxFilterData qryFilterData;
-		if (sInfo->isDrivable)
-		{
-			qryFilterData.word3 = (PxU32)Surface::DRIVABLE;
-		}
-		else
-		{
-			qryFilterData.word3 = (PxU32)Surface::UNDRIVABLE;
-		}
+		(sInfo->isDrivable) ? qryFilterData.word3 = (PxU32)Surface::DRIVABLE : qryFilterData.word3 = (PxU32)Surface::UNDRIVABLE;
 		shape->setQueryFilterData(qryFilterData);
 
+		// Set up simulation filter data for shape
 		PxFilterData simFilterData;
 		simFilterData.word0 = (PxU32)sInfo->filterFlag0;
 		simFilterData.word1 = (PxU32)sInfo->filterFlag1;
+		simFilterData.word2 = (PxU32)sInfo->filterFlag2;
+		simFilterData.word3 = (PxU32)sInfo->filterFlag3;
 		shape->setSimulationFilterData(simFilterData);
 
 		//PxRigidBodyExt::updateMassAndInertia(actor) // TODO this thing otherwise mass wont work 
 	}
 
+	// Add actor to scene, set actor for entity, and set user data for actor. Creates one to one between entities and phyX
 	scene->addActor(*actor);
 	entity->setActor(actor);
+	actor->userData = entity;
 }
 
 void PhysicsEngine::createTrigger()
 {
-	PxActor* object = PhysicsCreator::createTriggerVolume(physics);
+	PxActor* object = PhysicsHelper::createTriggerVolume(physics);
 	scene->addActor(*object);
 }
 

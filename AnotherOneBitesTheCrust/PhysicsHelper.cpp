@@ -1,35 +1,10 @@
-#include "PhysicsCreator.h"
+#include "PhysicsHelper.h"
 #include "VehicleSceneQueryData.h"
 #include "Filtering.h"
 
 using namespace physx;
 
-PxRigidDynamic* PhysicsCreator::createBox(PxMaterial* material, PxPhysics* physics, PxVec3 dimensions)
-{
-	PxBoxGeometry geometry(dimensions);
-	PxTransform transform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
-	PxReal density = 1.0f;
-	PxRigidDynamic* actor = PxCreateDynamic(*physics, transform, geometry, *material, density);
-
-	//Get the box shape so we can set query and simulation filter data.
-	PxShape* shape;
-	actor->getShapes(&shape, 1);
-
-	//Set the query filter data of the box so that the vehicle raycasts cannot hit the ground.
-	PxFilterData qryFilterData;
-	qryFilterData.word3 = (PxU32)Surface::UNDRIVABLE;
-	shape->setQueryFilterData(qryFilterData);
-
-	//Set the simulation filter data of the box so that it collides with the chassis of a vehicle but not the wheels.
-	PxFilterData simFilterData;
-	simFilterData.word0 = (PxU32)FilterFlag::DRIVABLE_OBSTACLE;
-	simFilterData.word1 = (PxU32)FilterFlag::DRIVABLE_OBSTACLE_AGAINST;
-	shape->setSimulationFilterData(simFilterData);
-
-	return actor;
-}
-
-PxActor* PhysicsCreator::createTriggerVolume(PxPhysics* physics)
+PxActor* PhysicsHelper::createTriggerVolume(PxPhysics* physics)
 {
 	PxSphereGeometry geometry(10.0f); 
 	PxTransform transform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
@@ -45,7 +20,7 @@ PxActor* PhysicsCreator::createTriggerVolume(PxPhysics* physics)
 	return actor;
 }
 
-PxRigidStatic* PhysicsCreator::createDrivablePlane(PxMaterial* material, PxPhysics* physics)
+PxRigidStatic* PhysicsHelper::createDrivablePlane(PxMaterial* material, PxPhysics* physics)
 {
 	//Add a plane to the scene.
 	PxRigidStatic* groundPlane = PxCreatePlane(*physics, PxPlane(0,1,0,0), *material);
@@ -68,14 +43,14 @@ PxRigidStatic* PhysicsCreator::createDrivablePlane(PxMaterial* material, PxPhysi
 	return groundPlane;
 }
 
-PxConvexMesh* PhysicsCreator::createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking)
+PxConvexMesh* PhysicsHelper::createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking)
 {
 	// Create descriptor for convex mesh
 	PxConvexMeshDesc convexDesc;
 	convexDesc.points.count			= numVerts;
 	convexDesc.points.stride		= sizeof(PxVec3);
 	convexDesc.points.data			= verts;
-	convexDesc.flags				= PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eINFLATE_CONVEX;
+	convexDesc.flags				= PxConvexFlag::eCOMPUTE_CONVEX; // | PxConvexFlag::eINFLATE_CONVEX;
 
 	PxConvexMesh* convexMesh = NULL;
 	PxDefaultMemoryOutputStream buf;
@@ -86,5 +61,16 @@ PxConvexMesh* PhysicsCreator::createConvexMesh(const PxVec3* verts, const PxU32 
 	}
 
 	return convexMesh;
+}
+
+std::vector<PxVec3> PhysicsHelper::glmVertsToPhysXVerts(std::vector<glm::vec3> verts)
+{
+	std::vector<PxVec3> toReturn = std::vector<PxVec3>(); 
+	for (auto vert : verts)
+	{
+		toReturn.push_back(PxVec3(vert.x, vert.y, vert.z));
+	}
+
+	return toReturn;
 }
 

@@ -11,6 +11,7 @@ enum class Geometry
 	BOX,
 	CAPSULE,
 	CONVEX_MESH,
+	TRIANGLE_MESH,
 	MAX_TYPES
 };
 
@@ -81,6 +82,13 @@ struct ConvexMeshInfo
 	: public ShapeInfo
 {
 	std::vector<glm::vec3> verts;
+};
+
+struct TriangleMeshInfo
+	: public ShapeInfo
+{
+	std::vector<glm::vec3> verts;
+	std::vector<unsigned int> faces;
 };
 
 struct PhysicsEntityInfo

@@ -2,7 +2,7 @@
 #include "VehicleSceneQueryData.h"
 #include "Filtering.h"
 #include "FrictionPairs.h"
-#include "PhysicsCreator.h"
+#include "PhysicsHelper.h"
 
 using namespace physx;
 
@@ -22,7 +22,7 @@ PxConvexMesh* VehicleCreator::createChassisMesh(const PxVec3 dims, PxPhysics& ph
 		PxVec3(-x,-y,z),
 		PxVec3(-x,-y,-z)
 	};
-	return PhysicsCreator::createConvexMesh(verts,8,physics,cooking);
+	return PhysicsHelper::createConvexMesh(verts,8,physics,cooking);
 }
 
 PxConvexMesh* VehicleCreator::createWheelMesh(const PxF32 width, const PxF32 radius, PxPhysics& physics, PxCooking& cooking)
@@ -38,7 +38,7 @@ PxConvexMesh* VehicleCreator::createWheelMesh(const PxF32 width, const PxF32 rad
 		points[2*i+1] = PxVec3(+width/2.0f, y, z);
 	}
 
-	return PhysicsCreator::createConvexMesh(points,32,physics,cooking);
+	return PhysicsHelper::createConvexMesh(points,32,physics,cooking);
 }
 
 PxRigidDynamic* VehicleCreator::createVehicleActor(const PxVehicleChassisData& chassisData, PxMaterial** wheelMaterials, 

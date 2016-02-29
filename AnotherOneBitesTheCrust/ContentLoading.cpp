@@ -145,6 +145,17 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 					box->halfZ = (float)geometry[i]["halfZ"].GetDouble();
 				shape = box;
 			}
+
+			// Added by Ben for testing
+			else if (shapeName == "convexMesh")
+			{
+				ConvexMeshInfo* convexMesh = new ConvexMeshInfo();
+				convexMesh->geometry = Geometry::CONVEX_MESH;
+				convexMesh->verts = model->getVertices();
+				shape = convexMesh;
+			}
+			
+			
 			if (geometry[i].HasMember("flag0")) {
 				shape->filterFlag0 = stringToFlag(geometry[i]["flag0"].GetString());
 			} else {
@@ -157,6 +168,7 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			}
 			info->shapeInfo.push_back(shape);
 		}
+
 	} else {
 		// Give a default box around the model
 		BoxInfo* box = new BoxInfo();

@@ -30,6 +30,10 @@ void DeliveryManager::assignDeliveries() {
 	}
 }
 
+int DeliveryManager::getScore(Vehicle* player) {
+	return scores[player];
+}
+
 void DeliveryManager::timePassed(double timeMs) {
 	for (int i = 0; i < (int)players.size(); i++) {
 		Delivery* d = &deliveries[players[i]];

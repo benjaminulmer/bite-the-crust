@@ -232,6 +232,10 @@ void Game::mainLoop()
 		string speed = "Speed: ";
 		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
 		renderingEngine->printText2D(speed.data(), 0, 740, 30);
+
+		string score = "Score: ";
+		score.append(to_string(deliveryManager->getScore(p1Vehicle)));
+		renderingEngine->printText2D(score.data(), 800, 740, 24);
 		
 		//swap buffers
 		SDL_GL_SwapWindow(window);

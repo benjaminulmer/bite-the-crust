@@ -31,6 +31,7 @@ public:
 	void addDeliveryLocation(Tile* location);
 	void addPlayer(Vehicle* player);
 	void assignDeliveries();
+	int getScore(Vehicle* player);
 	void timePassed(double timeMs);
 	Delivery newDelivery();
 	void pizzaShot(Vehicle* player);

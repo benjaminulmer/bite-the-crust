@@ -206,6 +206,8 @@ void Game::mainLoop()
 		{
 			deltaTimeAccMs -= physicsStepSize;
 
+			deliveryManager->timePassed(physicsStepSize);
+
 			// Update the player and AI cars
 			aiEngine->updateAI(p2Vehicle);
 			p1Vehicle->handleInput();

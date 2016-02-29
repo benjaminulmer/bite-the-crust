@@ -30,13 +30,25 @@ void DeliveryManager::assignDeliveries() {
 	}
 }
 
+void DeliveryManager::timePassed(double timeMs) {
+	for (int i = 0; i < (int)players.size(); i++) {
+		Delivery* d = &deliveries[players[i]];
+		d->time = d->time - timeMs;
+		if (d->time <= 0.0) {
+			std::cout << "Delivery failed!" << std::endl;
+			scores[players[i]]--; // Decrement score for now, while testing things out
+			std::cout << "Score: " << scores[players[i]] << std::endl;
+			deliveries[players[i]] = newDelivery();
+		}
+	}
+}
+
 Delivery DeliveryManager::newDelivery() {
 	Delivery d;
 	int randomTile = rand() % freeLocations.size();
 	std::cout << "Deliver to tile: " << randomTile << std::endl;
 	d.location = freeLocations[randomTile];
-	d.time.tm_min = 2;
-	d.time.tm_sec = 0;
+	d.time = 1000.0 * 5.0; // 5 seconds
 	return d;
 }
 

@@ -8,7 +8,7 @@
 
 struct Delivery {
 	Tile* location;
-	tm time;
+	double time; // In milliseconds
 
 	Delivery() {
 		location = nullptr;
@@ -31,6 +31,7 @@ public:
 	void addDeliveryLocation(Tile* location);
 	void addPlayer(Vehicle* player);
 	void assignDeliveries();
+	void timePassed(double timeMs);
 	Delivery newDelivery();
 	void pizzaShot(Vehicle* player);
 };

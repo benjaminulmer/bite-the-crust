@@ -85,6 +85,7 @@ void Game::initSystems()
 	physicsEngine = new PhysicsEngine();
 	renderingEngine = new RenderingEngine();
 	deliveryManager = new DeliveryManager();
+	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
 }
 
 void Game::setupEntities()
@@ -228,7 +229,11 @@ void Game::mainLoop()
 		// Display
 		renderingEngine->displayFunc(entities);
 
-		// Swap buffers
+		string speed = "Speed: ";
+		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
+		renderingEngine->printText2D(speed.data(), 0, 740, 30);
+		
+		//swap buffers
 		SDL_GL_SwapWindow(window);
 		physicsEngine->fetchSimulationResults();
 	}

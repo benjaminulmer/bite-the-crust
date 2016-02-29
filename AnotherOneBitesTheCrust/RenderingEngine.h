@@ -17,6 +17,10 @@
 #include "ShaderTools.h"
 #include "Renderable.h"
 #include "Camera.h"
+#include "ContentLoading.h"
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 class RenderingEngine
 {
@@ -37,6 +41,19 @@ public:
 
 	void testOBJLoading();
 
+	//int init_resourses();
+	//void render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy);
+	//void displayText();
+
+	void initText2D(const char * texturePath);
+	void printText2D(const char * text, int x, int y, int size);
+	void cleanupText2D();
+
+	GLuint textProgramID;			//shader
+	GLuint textTextureID;			//texture
+	GLuint Text2DVertexBufferID;	//vertex buffer
+	GLuint Text2DUVBufferID;		//UV buffer
+
 	GLuint basicProgramID;		//shader program 
 
 	GLuint vanVAO;
@@ -54,11 +71,33 @@ public:
 	glm::mat4 V;
 	glm::mat4 P;
 
+	void renderText();
+
 	//phong testing
 	GLuint phongProgramID;
 	std::vector <glm::vec3> phongVerts;
 	std::vector <glm::vec3> phongNorms;
 	std::vector <GLuint> phongFaces;
 	std::vector <glm::vec2> phongUVs;
+
+
+	GLuint textVBO;
+	GLuint textVAO;
+	GLuint texture;
+	GLuint sampler;
+	GLint attribute_coord;
+	GLint uniform_tex;
+	GLint uniform_color;
+
+	FT_Library ft;
+	FT_Face face;
+
+	struct point {
+	GLfloat x;
+	GLfloat y;
+	GLfloat s;
+	GLfloat t;
+	};
+
 };
 

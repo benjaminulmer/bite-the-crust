@@ -21,12 +21,15 @@ struct VehicleTuning
 	physx::PxVec3 chassisMOI;
 	physx::PxVec3 chassisCMOffset;
 	physx::PxMaterial* chassisMaterial;
+
 	physx::PxF32 wheelMass;
 	physx::PxF32 wheelWidth;
 	physx::PxF32 wheelRadius;
 	physx::PxF32 wheelMOI;
+	physx::PxF32 wheelDamping;
 	physx::PxMaterial* wheelMaterial;
 	physx::PxU32 numWheels;
+
 	physx::PxReal chassisStaticFriction;
 	physx::PxReal chassisDynamicFriction;
 	physx::PxReal chassisRestitution;

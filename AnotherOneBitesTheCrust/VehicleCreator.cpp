@@ -2,11 +2,13 @@
 #include "VehicleSceneQueryData.h"
 #include "Filtering.h"
 #include "FrictionPairs.h"
-#include "PhysicsHelper.h"
 
 using namespace physx;
 
-PxConvexMesh* VehicleCreator::createChassisMesh(const PxVec3 dims, PxPhysics& physics, PxCooking& cooking)
+VehicleCreator::VehicleCreator(PxPhysics* physics, PxCooking* cooking, PhysicsHelper* helper)
+	: physics(physics), cooking(cooking), helper(helper) {}
+
+PxConvexMesh* VehicleCreator::createChassisMesh(const PxVec3 dims)
 {
 	const PxF32 x = dims.x*0.5f;
 	const PxF32 y = dims.y*0.5f;
@@ -22,10 +24,10 @@ PxConvexMesh* VehicleCreator::createChassisMesh(const PxVec3 dims, PxPhysics& ph
 		PxVec3(-x,-y,z),
 		PxVec3(-x,-y,-z)
 	};
-	return PhysicsHelper::createConvexMesh(verts,8,physics,cooking);
+	return helper->createConvexMesh(verts, 8);
 }
 
-PxConvexMesh* VehicleCreator::createWheelMesh(const PxF32 width, const PxF32 radius, PxPhysics& physics, PxCooking& cooking)
+PxConvexMesh* VehicleCreator::createWheelMesh(const PxF32 width, const PxF32 radius)
 {
 	PxVec3 points[2*16];
 	for(PxU32 i = 0; i < 16; i++)
@@ -38,7 +40,7 @@ PxConvexMesh* VehicleCreator::createWheelMesh(const PxF32 width, const PxF32 rad
 		points[2*i+1] = PxVec3(+width/2.0f, y, z);
 	}
 
-	return PhysicsHelper::createConvexMesh(points,32,physics,cooking);
+	return helper->createConvexMesh(points, 32);
 }
 
 PxRigidDynamic* VehicleCreator::createVehicleActor(const PxVehicleChassisData& chassisData, PxMaterial** wheelMaterials, 
@@ -127,7 +129,7 @@ void VehicleCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 			wheels[i].mMOI = wheelMOI;
 			wheels[i].mRadius = wheelRadius;
 			wheels[i].mWidth = wheelWidth;
-			//wheels[i].mDampingRate = 0.25f;
+			//wheels[i].mDampingRate = ;
 		}
 
 		//Enable the handbrake for the rear wheels only.
@@ -229,7 +231,7 @@ void VehicleCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 	}
 }
 
-PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* physics, PxCooking* cooking) 
+PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle) 
 {
 	VehicleTuning* tuning = &vehicle->tuning;
 
@@ -243,7 +245,7 @@ PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* p
 	PxRigidDynamic* veh4WActor = NULL;
 	{
 		//Construct a convex mesh for a cylindrical wheel.
-		PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius, *physics, *cooking);
+		PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius);
 		//Assume all wheels are identical for simplicity.
 		PxConvexMesh* wheelConvexMeshes[PX_MAX_NB_WHEELS];
 		PxMaterial* wheelMaterials[PX_MAX_NB_WHEELS];
@@ -262,7 +264,7 @@ PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* p
 		}
 
 		//Chassis just has a single convex shape for simplicity.
-		PxConvexMesh* chassisConvexMesh = createChassisMesh(chassisDims, *physics, *cooking);
+		PxConvexMesh* chassisConvexMesh = createChassisMesh(chassisDims);
 		PxConvexMesh* chassisConvexMeshes[1] = {chassisConvexMesh};
 		PxMaterial* chassisMaterials[1] = {tuning->chassisMaterial};
 

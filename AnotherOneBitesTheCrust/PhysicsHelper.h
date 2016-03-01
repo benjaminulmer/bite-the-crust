@@ -5,17 +5,23 @@
 class PhysicsHelper
 {
 public:
-	static physx::PxRigidDynamic* createBox(physx::PxMaterial* material, physx::PxPhysics* physics, physx::PxVec3 dimensions);
+	PhysicsHelper(physx::PxPhysics* physics, physx::PxCooking* cooking);
+	~PhysicsHelper(void);
 
-	static physx::PxActor* createTriggerVolume(physx::PxPhysics* physics);
+	physx::PxRigidDynamic* createBox(physx::PxMaterial* material);
 
-	static physx::PxRigidStatic* createDrivablePlane(physx::PxMaterial* material, physx::PxPhysics* physics);
+	physx::PxActor* createTriggerVolume();
 
-	static physx::PxConvexMesh* createConvexMesh(const physx::PxVec3* verts, const physx::PxU32 numVerts, physx::PxPhysics& physics, physx::PxCooking& cooking);
+	physx::PxRigidStatic* createDrivablePlane(physx::PxMaterial* material);
 
-	static physx::PxTriangleMesh* createTriangleMesh(const physx::PxVec3* verts, const physx::PxU32 numVerts, const physx::PxU32* faces, const physx::PxU32 numFaces, 
-		                                             physx::PxPhysics& physics, physx::PxCooking& cooking);
+	physx::PxConvexMesh* createConvexMesh(const physx::PxVec3* verts, const physx::PxU32 numVerts);
 
-	static std::vector<physx::PxVec3> glmVertsToPhysXVerts(std::vector<glm::vec3> verts);
+	physx::PxTriangleMesh* createTriangleMesh(const physx::PxVec3* verts, const physx::PxU32 numVerts, const physx::PxU32* faces, const physx::PxU32 numFaces);
+
+	std::vector<physx::PxVec3> glmVertsToPhysXVerts(std::vector<glm::vec3> verts);
+
+private:
+	physx::PxPhysics* physics;
+	physx::PxCooking* cooking;
 };
 

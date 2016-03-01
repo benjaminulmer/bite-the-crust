@@ -4,7 +4,10 @@
 
 using namespace physx;
 
-PxActor* PhysicsHelper::createTriggerVolume(PxPhysics* physics)
+PhysicsHelper::PhysicsHelper(PxPhysics* physics, PxCooking* cooking)
+	: physics(physics), cooking(cooking) {}
+
+PxActor* PhysicsHelper::createTriggerVolume()
 {
 	PxSphereGeometry geometry(10.0f); 
 	PxTransform transform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
@@ -20,7 +23,7 @@ PxActor* PhysicsHelper::createTriggerVolume(PxPhysics* physics)
 	return actor;
 }
 
-PxRigidStatic* PhysicsHelper::createDrivablePlane(PxMaterial* material, PxPhysics* physics)
+PxRigidStatic* PhysicsHelper::createDrivablePlane(PxMaterial* material)
 {
 	//Add a plane to the scene.
 	PxRigidStatic* groundPlane = PxCreatePlane(*physics, PxPlane(0,1,0,0), *material);
@@ -43,7 +46,7 @@ PxRigidStatic* PhysicsHelper::createDrivablePlane(PxMaterial* material, PxPhysic
 	return groundPlane;
 }
 
-PxConvexMesh* PhysicsHelper::createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking)
+PxConvexMesh* PhysicsHelper::createConvexMesh(const PxVec3* verts, const PxU32 numVerts)
 {
 	// Create descriptor for convex mesh
 	PxConvexMeshDesc meshDesc;
@@ -54,17 +57,16 @@ PxConvexMesh* PhysicsHelper::createConvexMesh(const PxVec3* verts, const PxU32 n
 
 	PxConvexMesh* convexMesh = NULL;
 	PxDefaultMemoryOutputStream buf;
-	if(cooking.cookConvexMesh(meshDesc, buf))
+	if(cooking->cookConvexMesh(meshDesc, buf))
 	{
 		PxDefaultMemoryInputData id(buf.getData(), buf.getSize());
-		convexMesh = physics.createConvexMesh(id);
+		convexMesh = physics->createConvexMesh(id);
 	}
 
 	return convexMesh;
 }
 
-PxTriangleMesh* PhysicsHelper::createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxU32* faces, const PxU32 numFaces, 
-		                                          PxPhysics& physics, PxCooking& cooking)
+PxTriangleMesh* PhysicsHelper::createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxU32* faces, const PxU32 numFaces)
 {
 	PxTriangleMeshDesc meshDesc;
 	meshDesc.points.count           = numVerts;
@@ -77,10 +79,10 @@ PxTriangleMesh* PhysicsHelper::createTriangleMesh(const PxVec3* verts, const PxU
 
 	PxTriangleMesh* triangleMesh = NULL;
 	PxDefaultMemoryOutputStream buf;
-	if (cooking.cookTriangleMesh(meshDesc, buf))
+	if (cooking->cookTriangleMesh(meshDesc, buf))
 	{
 		PxDefaultMemoryInputData id(buf.getData(), buf.getSize());
-		triangleMesh = physics.createTriangleMesh(id);
+		triangleMesh = physics->createTriangleMesh(id);
 	}
 
 	return triangleMesh;

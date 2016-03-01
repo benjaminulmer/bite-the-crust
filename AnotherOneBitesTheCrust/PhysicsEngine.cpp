@@ -1,7 +1,5 @@
 #include "PhysicsEngine.h"
 #include "Filtering.h"
-#include "PhysicsHelper.h"
-#include "VehicleCreator.h"
 
 #include <iostream>
 
@@ -11,6 +9,10 @@ PhysicsEngine::PhysicsEngine(void)
 {
 	initSimulationData();
 	initPhysXSDK();
+
+	helper = new PhysicsHelper(physics, cooking);
+	vehCreator = new VehicleCreator(physics, cooking, helper);
+
 	initVehicleSDK();
 }
 
@@ -59,16 +61,19 @@ void PhysicsEngine::initVehicleSDK()
 	PxVehicleSetBasisVectors(PxVec3(0,1,0), PxVec3(0,0,1)); 
 	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
+	// Allocate buffers and stuff? for raycasts
 	vehicleSceneQueryData = VehicleSceneQueryData::allocate(MAX_VEHICLES, PX_MAX_NB_WHEELS, MAX_VEHICLES, *defaultAllocator);
 	batchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *vehicleSceneQueryData, scene);
 
 	drivingSurfaces[0] = physics->createMaterial(0.8f, 0.8f, 0.6f);
 	frictionPairs = FrictionPairs::createFrictionPairs(drivingSurfaces[0]);
 
-	groundPlane = PhysicsHelper::createDrivablePlane(drivingSurfaces[0], physics);
+	// Create a plane and add it to the scene
+	groundPlane = helper->createDrivablePlane(drivingSurfaces[0]);
 	scene->addActor(*groundPlane);
 }
 
+// Creates an physics entity from an entity info structure and a starting transform
 void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info, PxTransform transform)
 {
 	// Set static/dynamic info for actor depending on its type
@@ -115,20 +120,18 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		else if (sInfo->geometry == Geometry::CONVEX_MESH)
 		{
 			ConvexMeshInfo* cmInfo = (ConvexMeshInfo*)sInfo;
-			std::vector<PxVec3> verts = PhysicsHelper::glmVertsToPhysXVerts(cmInfo->verts);
+			std::vector<PxVec3> verts = helper->glmVertsToPhysXVerts(cmInfo->verts);
 
-			PxConvexMesh* mesh = PhysicsHelper::createConvexMesh(verts.data(), verts.size(), *physics, *cooking);
+			PxConvexMesh* mesh = helper->createConvexMesh(verts.data(), verts.size());
 			geometry = new PxConvexMeshGeometry(mesh);
-
-			std::cout << cmInfo->verts.size() << std::endl;
 		}
 		// Not working until index drawing is set up
 		else if (sInfo->geometry == Geometry::TRIANGLE_MESH)
 		{
 			TriangleMeshInfo* tmInfo = (TriangleMeshInfo*)sInfo;
-			std::vector<PxVec3> verts = PhysicsHelper::glmVertsToPhysXVerts(tmInfo->verts);
+			std::vector<PxVec3> verts = helper->glmVertsToPhysXVerts(tmInfo->verts);
 
-			PxTriangleMesh* mesh = PhysicsHelper::createTriangleMesh(verts.data(), verts.size(), tmInfo->faces.data(), tmInfo->faces.size(), *physics, *cooking);
+			PxTriangleMesh* mesh = helper->createTriangleMesh(verts.data(), verts.size(), tmInfo->faces.data(), tmInfo->faces.size());
 			geometry = new PxTriangleMeshGeometry(mesh);
 
 			std::cout << "verts: " << tmInfo->verts.size() << std::endl;
@@ -161,7 +164,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 
 void PhysicsEngine::createTrigger()
 {
-	PxActor* object = PhysicsHelper::createTriggerVolume(physics);
+	PxActor* object = helper->createTriggerVolume();
 	scene->addActor(*object);
 }
 
@@ -174,7 +177,7 @@ void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 	tuning->chassisMaterial = chassisMaterial;
 	tuning->wheelMaterial = wheelMaterial;
 
-	PxVehicleDrive4W* physVehicle = VehicleCreator::createVehicle4W(vehicle, physics, cooking);
+	PxVehicleDrive4W* physVehicle = vehCreator->createVehicle4W(vehicle);
 	//PxTransform startTransform(PxVec3(0, (tuning->chassisDims.y*0.5f + tuning->wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
 	PxRigidDynamic* actor = physVehicle->getRigidDynamicActor();
 

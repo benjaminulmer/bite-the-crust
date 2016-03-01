@@ -291,7 +291,7 @@ void Game::shootPizza(Vehicle* vehicle)
 	pizzaBox->setRenderable(renderablesMap["box"]);
 
 	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();
-	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.2f, 1.0f));
+	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.25f, 1.0f));
 	transform.p += posOffset;
 
 	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 0.0f, 20.0f));

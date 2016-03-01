@@ -305,7 +305,7 @@ PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle)
 
 		//Engine
 		PxVehicleEngineData engine;
-		engine.mPeakTorque=500.0f;
+		engine.mPeakTorque=1500.0f;
 		engine.mMaxOmega=600.0f;//approx 6000 rpm
 		//engine.mMOI = 0.25f;
 		driveSimData.setEngineData(engine);

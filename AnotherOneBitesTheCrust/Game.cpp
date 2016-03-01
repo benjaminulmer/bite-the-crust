@@ -86,6 +86,8 @@ void Game::initSystems()
 	renderingEngine = new RenderingEngine();
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
+
+	renderingEngine->testOBJLoading();
 }
 
 void Game::setupEntities()
@@ -227,7 +229,10 @@ void Game::mainLoop()
 		audioEngine->update(p1Vehicle->getModelMatrix());
 
 		// Display
+		
 		renderingEngine->displayFunc(entities);
+		///test drawing
+		renderingEngine->testDraw();
 
 		string speed = "Speed: ";
 		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));

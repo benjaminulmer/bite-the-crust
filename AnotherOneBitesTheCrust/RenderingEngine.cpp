@@ -8,9 +8,11 @@ using namespace glm;
 
 RenderingEngine::RenderingEngine()
 {
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
-	//glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LESS);
+
+	glEnable(GL_CULL_FACE);
 
 	generateIDs();
 	loadProjectionMatrix();
@@ -154,7 +156,6 @@ void RenderingEngine::assignBuffers(Renderable* r)
 	
 }
 
-
 void RenderingEngine::deleteBuffers(Renderable *r)
 {
 	GLuint vao = r->getVAO();
@@ -166,72 +167,317 @@ void RenderingEngine::deleteBuffers(Renderable *r)
 	glDeleteBuffers(1, &cbuf);
 }
 
-//
-//void RenderingEngine::testOBJLoading()
-//{
-//	string vsShader = "res\\Shaders\\StandardShading.vertexshader";
-//	string fsShader = "res\\Shaders\\StandardShading.fragmentshader";
-//	string vsSource = loadShaderStringfromFile(vsShader);
-//	string fsSource = loadShaderStringfromFile(fsShader);
-//	phongProgramID = CreateShaderProgram(vsSource, fsSource);
-//	glUseProgram(phongProgramID);
-//
-//	//std::vector<glm::vec3> vertices;
-//	//std::vector<glm::vec2> uvs;
-//	//std::vector<glm::vec3> normals; // Won't be used at the moment.
-//	//std::vector<GLuint> faces;
-//	bool res = ContentLoading::loadOBJNonIndexed("res\\Models\\FlatFloor.obj", phongVerts, phongNorms);
-//
-//
-//	cout << "Number of verts " << phongVerts.size() << endl;
-//	//cout << "NUmber of faces " << phongFaces.size()/3 << endl;
-//	cout << "Number of normals " << phongNorms.size() << endl;
-//
-//	glGenVertexArrays(1, &vanVAO);
-//	glGenBuffers(1, &vanVerts);
-//	glGenBuffers(1, &vanNormals);
-//	glGenBuffers(1, &vanIndexBuffer);
-//
-//	glBindVertexArray(vanVAO);
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
-//	glBufferData(GL_ARRAY_BUFFER, phongVerts.size() * sizeof(glm::vec4), phongVerts.data(), GL_STATIC_DRAW);
-//
-//
-//	//for(int i = 0; i < phongVerts.size(); i++)
-//	//{
-//	//	colors.push_back(vec3(1,1,1));
-//	//}
-//
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
-//	glBufferData(GL_ARRAY_BUFFER, phongNorms.size() * sizeof(glm::vec3), phongNorms.data(), GL_STATIC_DRAW);
-//
-//	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vanIndexBuffer);
-//	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, phongFaces.size() * sizeof(GLuint), phongFaces.data(), GL_STATIC_DRAW);
-//
-//	glEnableVertexAttribArray(0);
-//	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
-//	glVertexAttribPointer(
-//		0,
-//		3,
-//		GL_FLOAT,
-//		GL_FALSE,
-//		0,
-//		(void*)0);
-//
-//	glEnableVertexAttribArray(1);
-//	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
-//	glVertexAttribPointer(
-//		1,
-//		3,
-//		GL_FLOAT,
-//		GL_FALSE,
-//		0,
-//		(void*)0);
-//	
-//		glBindVertexArray(0);
-//}
+
+void RenderingEngine::initText2D(const char * texturePath){
+
+	// Initialize texture
+	textTextureID = ContentLoading::loadDDS(texturePath);
+}
+
+void RenderingEngine::printText2D(const char * text, int x, int y, int size){
+
+	unsigned int length = strlen(text);
+
+	// Fill buffers
+	std::vector<glm::vec2> textvertices;
+	std::vector<glm::vec2> textUVs;
+	for ( unsigned int i=0 ; i<length ; i++ ){
+		
+		glm::vec2 vertex_up_left    = glm::vec2( x+i*size     , y+size );
+		glm::vec2 vertex_up_right   = glm::vec2( x+i*size+size, y+size );
+		glm::vec2 vertex_down_right = glm::vec2( x+i*size+size, y      );
+		glm::vec2 vertex_down_left  = glm::vec2( x+i*size     , y      );
+
+		textvertices.push_back(vertex_up_left   );
+		textvertices.push_back(vertex_down_left );
+		textvertices.push_back(vertex_up_right  );
+
+		textvertices.push_back(vertex_down_right);
+		textvertices.push_back(vertex_up_right);
+		textvertices.push_back(vertex_down_left);
+
+		char character = text[i];
+		float uv_x = (character%16)/16.0f;
+		float uv_y = (character/16)/16.0f;
+
+		glm::vec2 uv_up_left    = glm::vec2( uv_x           , uv_y );
+		glm::vec2 uv_up_right   = glm::vec2( uv_x+1.0f/16.0f, uv_y );
+		glm::vec2 uv_down_right = glm::vec2( uv_x+1.0f/16.0f, (uv_y + 1.0f/16.0f) );
+		glm::vec2 uv_down_left  = glm::vec2( uv_x           , (uv_y + 1.0f/16.0f) );
+		textUVs.push_back(uv_up_left   );
+		textUVs.push_back(uv_down_left );
+		textUVs.push_back(uv_up_right  );
+
+		textUVs.push_back(uv_down_right);
+		textUVs.push_back(uv_up_right);
+		textUVs.push_back(uv_down_left);
+	}
+	//GLuint textVAO;
+	glGenVertexArrays(1, &textVAO);	
+	glBindVertexArray(textVAO);
+
+	glGenBuffers(1, &Text2DVertexBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, Text2DVertexBufferID);
+	glBufferData(GL_ARRAY_BUFFER, textvertices.size() * sizeof(glm::vec2), textvertices.data(), GL_STATIC_DRAW);
+	
+	glGenBuffers(1, &Text2DUVBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, Text2DUVBufferID);
+	glBufferData(GL_ARRAY_BUFFER, textUVs.size() * sizeof(glm::vec2), textUVs.data(), GL_STATIC_DRAW);
+
+	// Bind shader
+	glUseProgram(textProgramID);
+
+	// Bind texture
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textTextureID);
+	// Set our "myTextureSampler" sampler to user Texture Unit 0
+	glUniform1i(glGetUniformLocation( textProgramID, "myTextureSampler" ), 0);
+
+	// 1rst attribute buffer : vertices
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, Text2DVertexBufferID);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+
+	// 2nd attribute buffer : UVs
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, Text2DUVBufferID);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glDisable(GL_CULL_FACE);
+   // glDisable(GL_DEPTH_TEST);
+
+	// Draw call
+	glBindVertexArray(textVAO);
+	glDrawArrays(GL_TRIANGLES, 0, textvertices.size() );
+
+	glDisable(GL_BLEND);
+	glBindVertexArray(0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//TESTING STUFF BELOW
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool RenderingEngine::loadOBJ(
+	const char * path, 
+	std::vector<glm::vec3> & out_vertices, 
+	std::vector<glm::vec2> & out_uvs,
+	std::vector<glm::vec3> & out_normals
+){
+	printf("Loading OBJ file %s...\n", path);
+
+	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
+	std::vector<glm::vec3> temp_vertices; 
+	std::vector<glm::vec2> temp_uvs;
+	std::vector<glm::vec3> temp_normals;
+
+
+	FILE * file = fopen(path, "r");
+	if( file == NULL ){
+		printf("Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n");
+		getchar();
+		return false;
+	}
+
+	while( 1 ){
+
+		char lineHeader[128];
+		// read the first word of the line
+		int res = fscanf(file, "%s", lineHeader);
+		if (res == EOF)
+			break; // EOF = End Of File. Quit the loop.
+
+		// else : parse lineHeader
+		
+		if ( strcmp( lineHeader, "v" ) == 0 ){
+			glm::vec3 vertex;
+			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
+			temp_vertices.push_back(vertex);
+		}else if ( strcmp( lineHeader, "vt" ) == 0 ){
+			glm::vec2 uv;
+			fscanf(file, "%f %f\n", &uv.x, &uv.y );
+			uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
+			temp_uvs.push_back(uv);
+		}else if ( strcmp( lineHeader, "vn" ) == 0 ){
+			glm::vec3 normal;
+			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z );
+			temp_normals.push_back(normal);
+		}else if ( strcmp( lineHeader, "f" ) == 0 ){
+			std::string vertex1, vertex2, vertex3;
+			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
+			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
+			if (matches != 9){
+				printf("File can't be read by our simple parser :-( Try exporting with other options\n");
+				return false;
+			}
+			vertexIndices.push_back(vertexIndex[0]);
+			vertexIndices.push_back(vertexIndex[1]);
+			vertexIndices.push_back(vertexIndex[2]);
+			uvIndices    .push_back(uvIndex[0]);
+			uvIndices    .push_back(uvIndex[1]);
+			uvIndices    .push_back(uvIndex[2]);
+			normalIndices.push_back(normalIndex[0]);
+			normalIndices.push_back(normalIndex[1]);
+			normalIndices.push_back(normalIndex[2]);
+		}else{
+			// Probably a comment, eat up the rest of the line
+			char stupidBuffer[1000];
+			fgets(stupidBuffer, 1000, file);
+		}
+
+	}
+
+	// For each vertex of each triangle
+	for( unsigned int i=0; i<vertexIndices.size(); i++ ){
+
+		// Get the indices of its attributes
+		unsigned int vertexIndex = vertexIndices[i];
+		unsigned int uvIndex = uvIndices[i];
+		unsigned int normalIndex = normalIndices[i];
+		
+		// Get the attributes thanks to the index
+		glm::vec3 vertex = temp_vertices[ vertexIndex-1 ];
+		glm::vec2 uv = temp_uvs[ uvIndex-1 ];
+		glm::vec3 normal = temp_normals[ normalIndex-1 ];
+		
+		// Put the attributes in buffers
+		out_vertices.push_back(vertex);
+		out_uvs     .push_back(uv);
+		out_normals .push_back(normal);
+	
+	}
+
+	return true;
+}
+
+
+void RenderingEngine::testDraw() {
+	// Draw all our entities
+
+	//glClearDepth(1.0);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(textureProgramID);
+	GLuint mvpID = glGetUniformLocation(textureProgramID, "MVP");
+
+	GLuint vID = glGetUniformLocation(textureProgramID, "V");
+	GLuint mID = glGetUniformLocation(textureProgramID, "M");
+
+	M = mat4(1.0f);
+	M = glm::rotate(M, -1.5f, vec3(0,1,0));
+	mat4 MVP = P * V * M;
+
+	glUniformMatrix4fv( mvpID,
+					1,
+					GL_FALSE,
+					value_ptr(MVP)
+					);
+
+	//GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
+	glUniformMatrix4fv( vID,
+					1,
+					GL_FALSE,
+					value_ptr(V)
+					);
+
+	glUniformMatrix4fv( mID,
+					1,
+					GL_FALSE,
+					value_ptr(M)
+					);
+
+	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 100, 35);
+
+	glBindVertexArray(vanVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, Texture);
+	// Set our "myTextureSampler" sampler to user Texture Unit 0
+	glUniform1i(TextureID, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, textureVerts.size());
+
+	//glDrawElements(GL_TRIANGLES, phongFaces.size(), GL_UNSIGNED_INT, (void*)0);
+}
+
+void RenderingEngine::testOBJLoading()
+{
+	string vsShader = "res\\Shaders\\textured-StandardShading.vertexshader";
+	string fsShader = "res\\Shaders\\textured-StandardShading.fragmentshader";
+	string vsSource = loadShaderStringfromFile(vsShader);
+	string fsSource = loadShaderStringfromFile(fsShader);
+	textureProgramID = CreateShaderProgram(vsSource, fsSource);
+	glUseProgram(textureProgramID);
+
+	//std::vector<glm::vec3> vertices;
+	//std::vector<glm::vec2> uvs;
+	//std::vector<glm::vec3> normals; // Won't be used at the moment.
+	//std::vector<GLuint> faces;
+	bool res = RenderingEngine::loadOBJ("res\\Models\\Van_textured\\Van-with-uv.obj", textureVerts, textureUVs, textureNorms);
+
+
+	cout << "Number of verts " << textureVerts.size() << endl;
+	cout << "Number of UVs " << textureUVs.size() << endl;
+	cout << "Number of normals " << textureNorms.size() << endl;
+
+	glGenVertexArrays(1, &vanVAO);
+	glBindVertexArray(vanVAO);
+
+
+	glGenBuffers(1, &vanVerts);
+	glGenBuffers(1, &vanUVs);
+	glGenBuffers(1, &vanNormals);
+
+	Texture = ContentLoading::loadDDS("res\\Models\\Van_textured\\Van-uv-colored-test.DDS");
+	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
+	glBufferData(GL_ARRAY_BUFFER, textureVerts.size() * sizeof(glm::vec3), textureVerts.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vanUVs);
+	glBufferData(GL_ARRAY_BUFFER, textureUVs.size() * sizeof(glm::vec2), textureUVs.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
+	glBufferData(GL_ARRAY_BUFFER, textureNorms.size() * sizeof(glm::vec3), textureNorms.data(), GL_STATIC_DRAW);
+
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
+	glVertexAttribPointer(
+		0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, vanUVs);
+	glVertexAttribPointer(
+		1,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+	
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
+	glVertexAttribPointer(
+		2,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+	
+
+	glBindVertexArray(0);
+}
 
 //
 //
@@ -336,94 +582,3 @@ void RenderingEngine::deleteBuffers(Renderable *r)
 //	//render_text("Speed:", face, 0.6, -1, sx, sy);
 //	
 //}
-
-void RenderingEngine::initText2D(const char * texturePath){
-
-	// Initialize texture
-	textTextureID = ContentLoading::loadDDS(texturePath);
-}
-
-void RenderingEngine::printText2D(const char * text, int x, int y, int size){
-
-	unsigned int length = strlen(text);
-
-	// Fill buffers
-	std::vector<glm::vec2> textvertices;
-	std::vector<glm::vec2> textUVs;
-	for ( unsigned int i=0 ; i<length ; i++ ){
-		
-		glm::vec2 vertex_up_left    = glm::vec2( x+i*size     , y+size );
-		glm::vec2 vertex_up_right   = glm::vec2( x+i*size+size, y+size );
-		glm::vec2 vertex_down_right = glm::vec2( x+i*size+size, y      );
-		glm::vec2 vertex_down_left  = glm::vec2( x+i*size     , y      );
-
-		textvertices.push_back(vertex_up_left   );
-		textvertices.push_back(vertex_down_left );
-		textvertices.push_back(vertex_up_right  );
-
-		textvertices.push_back(vertex_down_right);
-		textvertices.push_back(vertex_up_right);
-		textvertices.push_back(vertex_down_left);
-
-		char character = text[i];
-		float uv_x = (character%16)/16.0f;
-		float uv_y = (character/16)/16.0f;
-
-		glm::vec2 uv_up_left    = glm::vec2( uv_x           , uv_y );
-		glm::vec2 uv_up_right   = glm::vec2( uv_x+1.0f/16.0f, uv_y );
-		glm::vec2 uv_down_right = glm::vec2( uv_x+1.0f/16.0f, (uv_y + 1.0f/16.0f) );
-		glm::vec2 uv_down_left  = glm::vec2( uv_x           , (uv_y + 1.0f/16.0f) );
-		textUVs.push_back(uv_up_left   );
-		textUVs.push_back(uv_down_left );
-		textUVs.push_back(uv_up_right  );
-
-		textUVs.push_back(uv_down_right);
-		textUVs.push_back(uv_up_right);
-		textUVs.push_back(uv_down_left);
-	}
-	//GLuint textVAO;
-	glGenVertexArrays(1, &textVAO);	
-	glBindVertexArray(textVAO);
-
-	glGenBuffers(1, &Text2DVertexBufferID);
-	glBindBuffer(GL_ARRAY_BUFFER, Text2DVertexBufferID);
-	glBufferData(GL_ARRAY_BUFFER, textvertices.size() * sizeof(glm::vec2), textvertices.data(), GL_STATIC_DRAW);
-	
-	glGenBuffers(1, &Text2DUVBufferID);
-	glBindBuffer(GL_ARRAY_BUFFER, Text2DUVBufferID);
-	glBufferData(GL_ARRAY_BUFFER, textUVs.size() * sizeof(glm::vec2), textUVs.data(), GL_STATIC_DRAW);
-
-	// Bind shader
-	glUseProgram(textProgramID);
-
-	// Bind texture
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textTextureID);
-	// Set our "myTextureSampler" sampler to user Texture Unit 0
-	glUniform1i(glGetUniformLocation( textProgramID, "myTextureSampler" ), 0);
-
-	// 1rst attribute buffer : vertices
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, Text2DVertexBufferID);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-
-	// 2nd attribute buffer : UVs
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, Text2DUVBufferID);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-
-	// Draw call
-	glBindVertexArray(textVAO);
-	glDrawArrays(GL_TRIANGLES, 0, textvertices.size() );
-
-	glDisable(GL_BLEND);
-	glBindVertexArray(0);
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-
-}

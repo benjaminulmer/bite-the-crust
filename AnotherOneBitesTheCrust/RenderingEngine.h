@@ -39,7 +39,25 @@ public:
 	void assignBuffers(Renderable* r);
 	void deleteBuffers(Renderable* r);
 
+	/////////////////////////////////////////////TEXTURE TESTING//////////////////////////////////////////////////////
+	void testDraw();
 	void testOBJLoading();
+	GLuint textureProgramID;
+	
+	bool loadOBJ(
+	const char * path, 
+	std::vector<glm::vec3> & out_vertices, 
+	std::vector<glm::vec2> & out_uvs,
+	std::vector<glm::vec3> & out_normals
+	);
+
+	std::vector <glm::vec3> textureVerts;
+	std::vector <glm::vec3> textureNorms;
+	std::vector <glm::vec2> textureUVs;
+
+	GLuint Texture;
+	GLuint TextureID;
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//int init_resourses();
 	//void render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy);
@@ -58,9 +76,8 @@ public:
 
 	GLuint vanVAO;
 	GLuint vanVerts;
-	GLuint vanColors;
+	GLuint vanUVs;
 	GLuint vanNormals;
-	GLuint vanIndexBuffer;
 
 	std::vector <glm::vec3> colors;
 	//std::vector <glm::vec3> vertices;
@@ -77,10 +94,9 @@ public:
 	GLuint phongProgramID;
 	std::vector <glm::vec3> phongVerts;
 	std::vector <glm::vec3> phongNorms;
-	std::vector <GLuint> phongFaces;
 	std::vector <glm::vec2> phongUVs;
 
-
+	//stuff for text
 	GLuint textVBO;
 	GLuint textVAO;
 	GLuint texture;

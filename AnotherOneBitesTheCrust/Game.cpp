@@ -3,8 +3,6 @@
 #include "Camera.h"
 #include "ContentLoading.h"
 
-#include <foundation/PxTransform.h> 
-
 #include <iostream>
 #include <string>
 #include <sigslot.h>
@@ -300,6 +298,7 @@ void Game::shootPizza(Vehicle* vehicle)
 
 	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["box"], transform);
 	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
+	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
 
 	audioEngine->playCannonSound(vehicle);

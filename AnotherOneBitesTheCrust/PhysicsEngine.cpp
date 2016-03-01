@@ -1,5 +1,6 @@
 #include "PhysicsEngine.h"
 #include "Filtering.h"
+#include "SimulationCallback.h"
 
 #include <iostream>
 
@@ -48,9 +49,14 @@ void PhysicsEngine::initPhysXSDK()
 	PxSceneDesc sceneDesc(physics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher = cpuDispatcher;
+
 	sceneDesc.filterShader = FilterShader;
 	FilterCallback* filterCallback = new FilterCallback();
 	sceneDesc.filterCallback = filterCallback;
+
+	SimulationCallback* simulationCallback = new SimulationCallback();
+	sceneDesc.simulationEventCallback = simulationCallback;
+
 	scene = physics->createScene(sceneDesc);
 }
 

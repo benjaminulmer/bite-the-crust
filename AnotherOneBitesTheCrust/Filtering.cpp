@@ -38,7 +38,7 @@ PxFilterFlags FilterShader(PxFilterObjectAttributes attributes0, PxFilterData fi
 	if(PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
     {
         pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
-        return PxFilterFlag::eCALLBACK;
+        return PxFilterFlags();
     }
 
 	if(((filterData0.word0 & filterData1.word1) == 0) && ((filterData1.word0 & filterData0.word1) == 0))

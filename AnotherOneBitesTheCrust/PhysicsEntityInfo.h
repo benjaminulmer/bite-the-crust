@@ -24,14 +24,14 @@ enum class PhysicsType
 struct DynamicInfo
 {
 	DynamicInfo() : mass(1.0f), linearDamping(0.0f), angularDamping(0.0f), maxAngularVelocity(100.0f),
-	                comOffset(0.0f, 0.0f, 0.0f){}
+	                cmOffset(0.0f, 0.0f, 0.0f){}
 
 	float mass;
 	float linearDamping;
 	float angularDamping;
 	float maxAngularVelocity;
 
-	physx::PxTransform comOffset;
+	physx::PxTransform cmOffset;
 };
 
 struct ShapeInfo 

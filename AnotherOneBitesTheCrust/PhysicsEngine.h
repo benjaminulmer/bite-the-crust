@@ -51,4 +51,6 @@ private:
 	void initSimulationData();
 	void initPhysXSDK();
 	void initVehicleSDK();
+
+	void tuningFromUserTuning(Vehicle* vehicle);
 };

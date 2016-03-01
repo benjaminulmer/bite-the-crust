@@ -83,7 +83,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		DynamicInfo* dInfo = info->dynamicInfo;
 		PxRigidDynamic* dynamicActor = physics->createRigidDynamic(transform);
 		dynamicActor->setMass(dInfo->mass);
-		dynamicActor->setCMassLocalPose(dInfo->comOffset);
+		dynamicActor->setCMassLocalPose(dInfo->cmOffset);
 		dynamicActor->setLinearDamping(dInfo->linearDamping);
 		dynamicActor->setAngularDamping(dInfo->angularDamping);
 		dynamicActor->setMaxAngularVelocity(dInfo->maxAngularVelocity);
@@ -171,11 +171,8 @@ void PhysicsEngine::createTrigger()
 void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 {
 	VehicleTuning* tuning = &vehicle->tuning;
-
-	PxMaterial* chassisMaterial = physics->createMaterial(tuning->chassisStaticFriction, tuning->chassisDynamicFriction, tuning->chassisRestitution);
-	PxMaterial* wheelMaterial = physics->createMaterial(tuning->wheelStaticFriction, tuning->wheelDynamicFriction, tuning->wheelRestitution);
-	tuning->chassisMaterial = chassisMaterial;
-	tuning->wheelMaterial = wheelMaterial;
+	tuningFromUserTuning(vehicle);
+	
 
 	PxVehicleDrive4W* physVehicle = vehCreator->createVehicle4W(vehicle);
 	//PxTransform startTransform(PxVec3(0, (tuning->chassisDims.y*0.5f + tuning->wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
@@ -193,6 +190,33 @@ void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 	actor->userData = vehicle;
 
 	vehicles.push_back(physVehicle);
+}
+
+void PhysicsEngine::tuningFromUserTuning(Vehicle* vehicle)
+{
+	VehicleTuning* tuning = &vehicle->tuning;
+
+	//Set up the default chassis mass, dimensions, moment of inertia, and center of mass offset.
+	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
+	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
+	tuning->chassisMass = 1500.0f;
+	tuning->chassisDims = PxVec3(2.5f,2.0f,5.0f);
+	tuning->chassisMOI = PxVec3
+		((tuning->chassisDims.y * tuning->chassisDims.y + tuning->chassisDims.z * tuning->chassisDims.z) * tuning->chassisMass/12.0f,
+		 (tuning->chassisDims.x * tuning->chassisDims.x + tuning->chassisDims.z * tuning->chassisDims.z) * 0.8f * tuning->chassisMass/12.0f,
+		 (tuning->chassisDims.x * tuning->chassisDims.x + tuning->chassisDims.y * tuning->chassisDims.y) * tuning->chassisMass/12.0f);
+	tuning->chassisCMOffset = PxVec3(0.0f, -tuning->chassisDims.y * 0.5f + 0.65f, 0.25f);
+
+	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
+	//Moment of inertia is just the moment of inertia of a cylinder.
+	tuning->wheelMass = 20.0f;
+	tuning->wheelRadius = 0.5f;
+	tuning->wheelWidth = 0.4f;
+	tuning->wheelMOI = 0.5f * tuning->wheelMass * tuning->wheelRadius * tuning->wheelRadius;
+	tuning->numWheels = 4;
+
+	tuning->chassisMaterial = physics->createMaterial(tuning->chassisStaticFriction, tuning->chassisDynamicFriction, tuning->chassisRestitution);
+	tuning->wheelMaterial = physics->createMaterial(tuning->wheelStaticFriction, tuning->wheelDynamicFriction, tuning->wheelRestitution);
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs)

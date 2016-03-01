@@ -15,21 +15,23 @@ struct VehicleInput
 
 struct VehicleTuning
 {
-	// Vehicle geometry
+	// Chassis physical properties
 	physx::PxF32 chassisMass;
 	physx::PxVec3 chassisDims;
 	physx::PxVec3 chassisMOI;
 	physx::PxVec3 chassisCMOffset;
 	physx::PxMaterial* chassisMaterial;
 
+	// Wheel physical properties
 	physx::PxF32 wheelMass;
 	physx::PxF32 wheelWidth;
 	physx::PxF32 wheelRadius;
 	physx::PxF32 wheelMOI;
-	physx::PxF32 wheelDamping;
-	physx::PxMaterial* wheelMaterial;
+	physx::PxF32 wheelDamping;	
 	physx::PxU32 numWheels;
+	physx::PxMaterial* wheelMaterial;
 
+	// User only properties
 	physx::PxReal chassisStaticFriction;
 	physx::PxReal chassisDynamicFriction;
 	physx::PxReal chassisRestitution;
@@ -37,7 +39,7 @@ struct VehicleTuning
 	physx::PxReal wheelDynamicFriction;
 	physx::PxReal wheelRestitution;
 
-	// Other properties
+	physx::PxVec3 chassisMOIscalar;
 };
 
 class Vehicle :
@@ -63,6 +65,6 @@ public:
 	const void test();
 
 private:
-	void defaultTuning();
+	void testTuning();
 };
 

@@ -368,7 +368,6 @@ void RenderingEngine::testDraw() {
 	GLuint mID = glGetUniformLocation(textureProgramID, "M");
 
 	M = mat4(1.0f);
-	M = glm::rotate(M, -1.5f, vec3(0,1,0));
 	mat4 MVP = P * V * M;
 
 	glUniformMatrix4fv( mvpID,
@@ -416,7 +415,7 @@ void RenderingEngine::testOBJLoading()
 	//std::vector<glm::vec2> uvs;
 	//std::vector<glm::vec3> normals; // Won't be used at the moment.
 	//std::vector<GLuint> faces;
-	bool res = RenderingEngine::loadOBJ("res\\Models\\Van_textured\\Van-with-uv.obj", textureVerts, textureUVs, textureNorms);
+	bool res = RenderingEngine::loadOBJ("res\\Models\\House_textured\\house.obj", textureVerts, textureUVs, textureNorms);
 
 
 	cout << "Number of verts " << textureVerts.size() << endl;
@@ -431,7 +430,7 @@ void RenderingEngine::testOBJLoading()
 	glGenBuffers(1, &vanUVs);
 	glGenBuffers(1, &vanNormals);
 
-	Texture = ContentLoading::loadDDS("res\\Models\\Van_textured\\Van-uv-colored-test.DDS");
+	Texture = ContentLoading::loadDDS("res\\Models\\House_textured\\house-colored.DDS");
 	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
 
 

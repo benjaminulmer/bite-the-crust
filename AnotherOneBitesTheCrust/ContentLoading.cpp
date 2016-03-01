@@ -79,10 +79,12 @@ Renderable* createRenderable(std::string modelFile) {
 	Renderable * r = new Renderable();
 	std::vector<glm::vec3> verts;
 	std::vector<glm::vec3> normals;
+
 	bool floorRes = ContentLoading::loadOBJNonIndexed(modelFile.c_str(), verts, normals);
 	r->setVerts(verts);
 	r->setNorms(normals);
 	r->setColor(glm::vec3(1.0f,1.0f,1.0f));
+
 	return r;
 }
 

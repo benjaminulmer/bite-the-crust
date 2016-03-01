@@ -116,15 +116,18 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		{
 			ConvexMeshInfo* cmInfo = (ConvexMeshInfo*)sInfo;
 			std::vector<PxVec3> verts = PhysicsHelper::glmVertsToPhysXVerts(cmInfo->verts);
+
 			PxConvexMesh* mesh = PhysicsHelper::createConvexMesh(verts.data(), verts.size(), *physics, *cooking);
 			geometry = new PxConvexMeshGeometry(mesh);
 
 			std::cout << cmInfo->verts.size() << std::endl;
 		}
+		// Not working until index drawing is set up
 		else if (sInfo->geometry == Geometry::TRIANGLE_MESH)
 		{
 			TriangleMeshInfo* tmInfo = (TriangleMeshInfo*)sInfo;
 			std::vector<PxVec3> verts = PhysicsHelper::glmVertsToPhysXVerts(tmInfo->verts);
+
 			PxTriangleMesh* mesh = PhysicsHelper::createTriangleMesh(verts.data(), verts.size(), tmInfo->faces.data(), tmInfo->faces.size(), *physics, *cooking);
 			geometry = new PxTriangleMeshGeometry(mesh);
 

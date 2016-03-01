@@ -122,7 +122,7 @@ void Game::setupEntities()
 				DynamicEntity* e = new DynamicEntity();
 				// todo, error check that these models do exist, instead of just break
 				e->setRenderable(renderablesMap[tileEntity.model]);
-				e->setDefaultTranslation(e->getRenderable()->getCenter());
+				//e->setDefaultTranslation(e->getRenderable()->getCenter());
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize + map.tileSize/2, 0, j * map.tileSize + map.tileSize/2);

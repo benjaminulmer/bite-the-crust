@@ -47,10 +47,10 @@ PxConvexMesh* PhysicsHelper::createConvexMesh(const PxVec3* verts, const PxU32 n
 {
 	// Create descriptor for convex mesh
 	PxConvexMeshDesc meshDesc;
-	meshDesc.points.count			= numVerts;
+	meshDesc.points.count		= numVerts;
 	meshDesc.points.stride		= sizeof(PxVec3);
-	meshDesc.points.data			= verts;
-	meshDesc.flags				= PxConvexFlag::eCOMPUTE_CONVEX; // | PxConvexFlag::eINFLATE_CONVEX;
+	meshDesc.points.data		= verts;
+	meshDesc.flags				= PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eINFLATE_CONVEX;
 
 	PxConvexMesh* convexMesh = NULL;
 	PxDefaultMemoryOutputStream buf;

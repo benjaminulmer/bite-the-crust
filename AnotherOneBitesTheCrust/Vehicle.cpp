@@ -82,6 +82,29 @@ void Vehicle::handleInput()
 	}
 }
 
+glm::mat4 Vehicle::getModelMatrix()
+{
+	PxF32 tipAngle;
+	(input.rightSteer > 0) ? tipAngle = input.rightSteer * 0.001f : tipAngle = input.leftSteer * -0.001f;
+	tipAngle *= physicsVehicle->computeForwardSpeed() * physicsVehicle->computeForwardSpeed();
+
+
+	PxTransform transform(PxQuat(tipAngle, PxVec3(0, 0, 1)));
+	transform = actor->getGlobalPose() * transform;
+
+	physx::PxMat44 oldM(transform);
+	glm::mat4 newM;
+	for(unsigned int i = 0; i < 4; i++)
+	{
+		for(unsigned int f = 0; f < 4; f++)
+		{
+			newM[i][f] = oldM[i][f];
+		}
+	}
+	return newM;
+
+}
+
 Vehicle::~Vehicle(void)
 {
 }

@@ -77,6 +77,7 @@ public:
 	void updateTuning();
 	void handleInput();
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
+	glm::mat4 getModelMatrix();
 
 	sigslot::signal1<Vehicle*> ShootPizzaSignal;	
 

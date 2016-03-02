@@ -1,9 +1,0 @@
-{
-    "renderables": [
-        {"name": "floor", "model": "FlatFloor.obj"},
-        {"name": "floor2", "model": "FlatFloor.obj"},
-        {"name": "van", "model": "Van.obj"},
-        {"name": "cube", "model": "cube.obj"},
-        {"name": "barrier", "model": "constructionBarrier.obj"}
-    ]
-}

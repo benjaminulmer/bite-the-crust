@@ -46,7 +46,8 @@ bool verifyEntityList(const rapidjson::Document &d) {
 	return true;
 }
 
-bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Renderable*> &modelMap, std::map<std::string, PhysicsEntityInfo*> &physicsMap) {
+bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Renderable*> &modelMap, std::map<std::string, PhysicsEntityInfo*> &physicsMap,
+									std::map<std::string, GLuint> &textureMap) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
 	if (err != 0) {
@@ -71,6 +72,11 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 		physicsDataName.insert(0, "res\\JSON\\Physics\\");
 		PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
 		physicsMap[name] = info;
+		if (entitiesArray[i].HasMember("texture")) {
+			std::string textureName = entitiesArray[i]["texture"].GetString();
+			textureName.insert(0, "res\\Textures\\");
+			textureMap[name] = loadDDS(textureName.c_str());
+		}
 	}
 	return true;
 }
@@ -78,14 +84,18 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 Renderable* createRenderable(std::string modelFile) {
 	Renderable * r = new Renderable();
 	std::vector<glm::vec3> verts;
+	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
-	bool floorRes = ContentLoading::loadOBJNonIndexed(modelFile.c_str(), verts, normals);
-	std::cout << "Verts size " << verts.size() << std::endl;
+	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals);
+	//std::cout << "Verts size " << verts.size() << std::endl;
 	r->setVerts(verts);
+	r->setUVs(uvs);
 	r->setNorms(normals);
-	r->setColor(glm::vec3(1.0f,1.0f,1.0f));
+	//r->setColor(glm::vec3(1.0f,1.0f,1.0f));
 	return r;
 }
+
+
 
 PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 	FILE* filePointer;

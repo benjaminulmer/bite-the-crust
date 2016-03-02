@@ -63,10 +63,10 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 
 void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 {
-	//glClearDepth(1.0);
-	//glEnable(GL_DEPTH_TEST);
-	//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	//glDisable(GL_BLEND);
+	glClearDepth(1.0);
+	glEnable(GL_DEPTH_TEST);
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
 	GLuint mvpID = glGetUniformLocation(textureProgramID, "MVP");
 	GLuint mvID = glGetUniformLocation(textureProgramID, "MV");
@@ -383,229 +383,125 @@ void RenderingEngine::printText2D(const char * text, int x, int y, int size){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TESTING STUFF BELOW
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//void RenderingEngine::testDraw() {
-//	// Draw all our entities
-//
-//	//glClearDepth(1.0);
-//	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//	glUseProgram(textureProgramID);
-//	GLuint mvpID = glGetUniformLocation(textureProgramID, "MVP");
-//
-//	GLuint vID = glGetUniformLocation(textureProgramID, "V");
-//	GLuint mID = glGetUniformLocation(textureProgramID, "M");
-//
-//	M = mat4(1.0f);
-//	mat4 MVP = P * V * M;
-//
-//	glUniformMatrix4fv( mvpID,
-//					1,
-//					GL_FALSE,
-//					value_ptr(MVP)
-//					);
-//
-//	//GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
-//	glUniformMatrix4fv( vID,
-//					1,
-//					GL_FALSE,
-//					value_ptr(V)
-//					);
-//
-//	glUniformMatrix4fv( mID,
-//					1,
-//					GL_FALSE,
-//					value_ptr(M)
-//					);
-//
-//	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 100, 35);
-//
-//	glBindVertexArray(vanVAO);
-//	glActiveTexture(GL_TEXTURE0);
-//	glBindTexture(GL_TEXTURE_2D, Texture);
-//	// Set our "myTextureSampler" sampler to user Texture Unit 0
-//	glUniform1i(TextureID, 0);
-//
-//	glDrawArrays(GL_TRIANGLES, 0, textureVerts.size());
-//
-//	//glDrawElements(GL_TRIANGLES, phongFaces.size(), GL_UNSIGNED_INT, (void*)0);
-//}
-//
-//void RenderingEngine::testOBJLoading()
-//{
-//	string vsShader = "res\\Shaders\\textured-StandardShading.vertexshader";
-//	string fsShader = "res\\Shaders\\textured-StandardShading.fragmentshader";
-//	string vsSource = loadShaderStringfromFile(vsShader);
-//	string fsSource = loadShaderStringfromFile(fsShader);
-//	textureProgramID = CreateShaderProgram(vsSource, fsSource);
-//	glUseProgram(textureProgramID);
-//
-//	//std::vector<glm::vec3> vertices;
-//	//std::vector<glm::vec2> uvs;
-//	//std::vector<glm::vec3> normals; // Won't be used at the moment.
-//	//std::vector<GLuint> faces;
-//	bool res = ContentLoading::loadOBJ("res\\Models\\PizzaBox_textured\\PizzaBox-centered.obj", textureVerts, textureUVs, textureNorms);
-//	Texture = ContentLoading::loadDDS("res\\Models\\PizzaBox_textured\\PizzaBox-colored.DDS");
-//
-//	cout << "Number of verts " << textureVerts.size() << endl;
-//	cout << "Number of UVs " << textureUVs.size() << endl;
-//	cout << "Number of normals " << textureNorms.size() << endl;
-//
-//	glGenVertexArrays(1, &vanVAO);
-//	glBindVertexArray(vanVAO);
-//
-//
-//	glGenBuffers(1, &vanVerts);
-//	glGenBuffers(1, &vanUVs);
-//	glGenBuffers(1, &vanNormals);
-//
-//	
-//	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
-//
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
-//	glBufferData(GL_ARRAY_BUFFER, textureVerts.size() * sizeof(glm::vec3), textureVerts.data(), GL_STATIC_DRAW);
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, vanUVs);
-//	glBufferData(GL_ARRAY_BUFFER, textureUVs.size() * sizeof(glm::vec2), textureUVs.data(), GL_STATIC_DRAW);
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
-//	glBufferData(GL_ARRAY_BUFFER, textureNorms.size() * sizeof(glm::vec3), textureNorms.data(), GL_STATIC_DRAW);
-//
-//
-//	glEnableVertexAttribArray(0);
-//	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
-//	glVertexAttribPointer(
-//		0,
-//		3,
-//		GL_FLOAT,
-//		GL_FALSE,
-//		0,
-//		(void*)0);
-//
-//	glEnableVertexAttribArray(1);
-//	glBindBuffer(GL_ARRAY_BUFFER, vanUVs);
-//	glVertexAttribPointer(
-//		1,
-//		2,
-//		GL_FLOAT,
-//		GL_FALSE,
-//		0,
-//		(void*)0);
-//	
-//	glEnableVertexAttribArray(2);
-//	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
-//	glVertexAttribPointer(
-//		2,
-//		3,
-//		GL_FLOAT,
-//		GL_FALSE,
-//		0,
-//		(void*)0);
-//	
-//
-//	glBindVertexArray(0);
-//}
 
-//
-//
-//int RenderingEngine::init_resourses()
-//{
-//
-//	cout << "Initializing text resourses " << endl;
-//
-//	if(FT_Init_FreeType(&ft))
-//	{
-//		cout << "Could not init freetype library " << endl;
-//		return 0;
-//	}
-//
-//	if(FT_New_Face(ft, "res\\Fonts\\CodePredators-Regular.ttf", 0, &face))
-//	{
-//		cout << "Could not open font" << endl;
-//		return 0;
-//	}
-//
-//	
-//	GLuint attribute_coord = glGetUniformLocation(textProgramID, "coord");
-//	GLuint uniform_tex = glGetUniformLocation(textProgramID, "tex");
-//	GLuint uniform_color = glGetUniformLocation(textProgramID, "color");
-//
-//	glGenBuffers(1, &textVBO);
-//	glGenVertexArrays(1, &textVAO);
-//    glGenTextures(1, &texture);
-//    glGenSamplers(1, &sampler);
-//    glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//    glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//    glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//
-//	cout << "Finished initializing text resourses" << endl;
-//	return 1;
-//}
-//
-//void RenderingEngine::render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy) {
-//    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-//    const FT_GlyphSlot glyph = face->glyph;
-//
-//    for(auto c : str) {
-//        if(FT_Load_Char(face, c, FT_LOAD_RENDER) != 0)
-//            continue;
-//
-//        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
-//                     glyph->bitmap.width, glyph->bitmap.rows,
-//                     0, GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
-//
-//        const float vx = x + glyph->bitmap_left * sx;
-//        const float vy = y + glyph->bitmap_top * sy;
-//        const float w = glyph->bitmap.width * sx;
-//        const float h = glyph->bitmap.rows * sy;
-//
-//        struct {
-//            float x, y, s, t;
-//        } data[6] = {
-//            {vx    , vy    , 0, 0},
-//            {vx    , vy - h, 0, 1},
-//            {vx + w, vy    , 1, 0},
-//            {vx + w, vy    , 1, 0},
-//            {vx    , vy - h, 0, 1},
-//            {vx + w, vy - h, 1, 1}
-//        };
-//
-//        glBufferData(GL_ARRAY_BUFFER, sizeof(data)*sizeof(float), data, GL_DYNAMIC_DRAW);
-//        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-//        glDrawArrays(GL_TRIANGLES, 0, sizeof(data));
-//
-//        x += (glyph->advance.x >> 6) * sx;
-//        y += (glyph->advance.y >> 6) * sy;
-//    }
-//
-//    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-//}
-//
-//void RenderingEngine::displayText() {
-//
-//	//glClear(GL_COLOR_BUFFER_BIT);
-//	glEnable(GL_BLEND);
-//	glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-//	float sx = 2.0 / 1024;
-//	float sy = 2.0 / 768;
-//	glUseProgram(textProgramID);
-//    glBindAttribLocation(textProgramID, 0, "in_Position");
-//    GLuint texUniform = glGetUniformLocation(textProgramID, "tex");
-//    GLuint colorUniform = glGetUniformLocation(textProgramID, "color");
-//	
-//	glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, texture);
-//    glBindSampler(0, sampler);
-//    glBindVertexArray(textVAO);
-//    glEnableVertexAttribArray(0);
-//    glBindBuffer(GL_ARRAY_BUFFER, textVBO);
-//    glUseProgram(textProgramID);
-//    glUniform4f(colorUniform, 0, 0, 0, 1);
-//    glUniform1i(texUniform, 0);
-//
-//    FT_Set_Pixel_Sizes(face, 0, 30);
-//    render_text("Another", face, -1, 0.93, sx, sy);
-//	//render_text("Speed:", face, 0.6, -1, sx, sy);
-//	
-//}
+void RenderingEngine::testDraw() {
+	// Draw all our entities
+
+	//glClearDepth(1.0);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(textureProgramID);
+	GLuint mvpID = glGetUniformLocation(textureProgramID, "MVP");
+
+	GLuint vID = glGetUniformLocation(textureProgramID, "V");
+	GLuint mID = glGetUniformLocation(textureProgramID, "M");
+
+	M = mat4(1.0f);
+	mat4 MVP = P * V * M;
+
+	glUniformMatrix4fv( mvpID,
+					1,
+					GL_FALSE,
+					value_ptr(MVP)
+					);
+
+	//GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
+	glUniformMatrix4fv( vID,
+					1,
+					GL_FALSE,
+					value_ptr(V)
+					);
+
+	glUniformMatrix4fv( mID,
+					1,
+					GL_FALSE,
+					value_ptr(M)
+					);
+
+	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 100, 35);
+
+	glBindVertexArray(vanVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, Texture);
+	// Set our "myTextureSampler" sampler to user Texture Unit 0
+	glUniform1i(TextureID, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, textureVerts.size());
+
+	//glDrawElements(GL_TRIANGLES, phongFaces.size(), GL_UNSIGNED_INT, (void*)0);
+}
+
+void RenderingEngine::testOBJLoading()
+{
+	string vsShader = "res\\Shaders\\textured-StandardShading.vertexshader";
+	string fsShader = "res\\Shaders\\textured-StandardShading.fragmentshader";
+	string vsSource = loadShaderStringfromFile(vsShader);
+	string fsSource = loadShaderStringfromFile(fsShader);
+	textureProgramID = CreateShaderProgram(vsSource, fsSource);
+	glUseProgram(textureProgramID);
+
+	//std::vector<glm::vec3> vertices;
+	//std::vector<glm::vec2> uvs;
+	//std::vector<glm::vec3> normals; // Won't be used at the moment.
+	//std::vector<GLuint> faces;
+	bool res = ContentLoading::loadOBJ("res\\Models\\bigramp.obj", textureVerts, textureUVs, textureNorms);
+	Texture = ContentLoading::loadDDS("res\\Textures\\ramp.DDS");
+
+	cout << "Number of verts " << textureVerts.size() << endl;
+	cout << "Number of UVs " << textureUVs.size() << endl;
+	cout << "Number of normals " << textureNorms.size() << endl;
+
+	glGenVertexArrays(1, &vanVAO);
+	glBindVertexArray(vanVAO);
+
+
+	glGenBuffers(1, &vanVerts);
+	glGenBuffers(1, &vanUVs);
+	glGenBuffers(1, &vanNormals);
+
+	
+	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
+	glBufferData(GL_ARRAY_BUFFER, textureVerts.size() * sizeof(glm::vec3), textureVerts.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vanUVs);
+	glBufferData(GL_ARRAY_BUFFER, textureUVs.size() * sizeof(glm::vec2), textureUVs.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
+	glBufferData(GL_ARRAY_BUFFER, textureNorms.size() * sizeof(glm::vec3), textureNorms.data(), GL_STATIC_DRAW);
+
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
+	glVertexAttribPointer(
+		0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, vanUVs);
+	glVertexAttribPointer(
+		1,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+	
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
+	glVertexAttribPointer(
+		2,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+	
+
+	glBindVertexArray(0);
+}

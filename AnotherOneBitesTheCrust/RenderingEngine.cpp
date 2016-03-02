@@ -74,7 +74,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	GLuint mID = glGetUniformLocation(textureProgramID, "M");
 	GLuint tID = glGetUniformLocation(textureProgramID, "myTextureSampler");
 
-	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 100, 35);
+	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 150, 35);
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())

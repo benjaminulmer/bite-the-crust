@@ -85,7 +85,7 @@ void Game::initSystems()
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
 
-	renderingEngine->testOBJLoading();
+	//renderingEngine->testOBJLoading();
 }
 
 void Game::setupEntities()
@@ -251,7 +251,7 @@ void Game::mainLoop()
 		renderingEngine->displayFuncTex(entities);
 		//renderingEngine->displayFuncTex(pizzaEntities);
 		///test drawing
-		renderingEngine->testDraw();
+		//renderingEngine->testDraw();
 
 		string speed = "Speed: ";
 		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));

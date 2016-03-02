@@ -15,23 +15,39 @@ struct VehicleInput
 
 struct VehicleTuning
 {
+	// Should be taken from models
+	physx::PxVec3 chassisDims;
+	physx::PxF32 wheelWidth;
+	physx::PxF32 wheelRadius;
+
 	// Chassis physical properties
 	physx::PxF32 chassisMass;
-	physx::PxVec3 chassisDims;
 	physx::PxVec3 chassisMOI;
 	physx::PxVec3 chassisCMOffset;
 	physx::PxMaterial* chassisMaterial;
 
 	// Wheel physical properties
 	physx::PxF32 wheelMass;
-	physx::PxF32 wheelWidth;
-	physx::PxF32 wheelRadius;
 	physx::PxF32 wheelMOI;
-	physx::PxF32 wheelDamping;	
+	physx::PxF32 wheelDamping;
 	physx::PxU32 numWheels;
 	physx::PxMaterial* wheelMaterial;
 
-	// User only properties
+	// Other
+	physx::PxF32 maxBrakeTorque;
+	physx::PxF32 maxHandBrakeTorque;
+	physx::PxF32 maxSteer;
+
+	physx::PxF32 engineTorque;
+	physx::PxF32 engineRPM;
+	physx::PxF32 engineMOI;
+
+	physx::PxF32 gearSwitchTime;
+	physx::PxF32 gearFinalRatio;
+
+	physx::PxF32 clutchStrength;
+
+	// User only properties (not used directly in vehicle creation)
 	physx::PxReal chassisStaticFriction;
 	physx::PxReal chassisDynamicFriction;
 	physx::PxReal chassisRestitution;
@@ -40,6 +56,8 @@ struct VehicleTuning
 	physx::PxReal wheelRestitution;
 
 	physx::PxVec3 chassisMOIscalar;
+	physx::PxF32 wheelMOIscalar;
+	physx::PxU32 maxSteerDegrees;
 };
 
 class Vehicle :
@@ -61,8 +79,6 @@ public:
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
 
 	sigslot::signal1<Vehicle*> ShootPizzaSignal;	
-
-	const void test();
 
 private:
 	void testTuning();

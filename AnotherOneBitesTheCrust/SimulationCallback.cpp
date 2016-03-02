@@ -1,5 +1,7 @@
 #include "SimulationCallback.h"
-#include "Entity.h"
+#include "PhysicsEntity.h"
+
+#include <iostream>
 
 using namespace physx;
 
@@ -10,15 +12,15 @@ void SimulationCallback::onContact(const physx::PxContactPairHeader &pairHeader,
 
 void SimulationCallback::onTrigger(physx::PxTriggerPair *pairs, physx::PxU32 count)
 {
-
+	std::cout << "trigger" << std::endl;
 }
 
 void SimulationCallback::onSleep(physx::PxActor **actors, physx::PxU32 count)
 {
 	for (PxU32 i = 0; i < count; i ++)
 	{
-		Entity* entity = (Entity*)actors[i]->userData;
-		entity->testPrint();
+		PhysicsEntity* entity = (PhysicsEntity*)actors[i]->userData;
+		//entity->onSleep();
 	}
 }
 

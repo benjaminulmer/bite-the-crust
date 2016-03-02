@@ -26,9 +26,9 @@ void Vehicle::testTuning()
 	tuning.chassisStaticFriction = 0.5f;
 	tuning.chassisDynamicFriction = 0.5f;
 	tuning.chassisRestitution = 0.6f;
-	tuning.wheelStaticFriction = 0.5f;
-	tuning.wheelDynamicFriction = 0.5f;
-	tuning.wheelRestitution = 0.5f;
+	tuning.wheelStaticFriction = 0.9f;
+	tuning.wheelDynamicFriction = 0.9f;
+	tuning.wheelRestitution = 0.6f;
 }
 
 void Vehicle::updateTuning()
@@ -86,11 +86,3 @@ Vehicle::~Vehicle(void)
 {
 }
 
-// test stuff
-
-#include <iostream>
-
-const void Vehicle::test()
-{
-	//std::cout << "test" << std::endl;
-}

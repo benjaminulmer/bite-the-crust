@@ -74,10 +74,3 @@ void Entity::setRenderable(Renderable* r) {
 Renderable* Entity::getRenderable() {
 	return renderable;
 }
-
-#include <iostream>
-
-void Entity::testPrint()
-{
-	std::cout << "!!!!!!!!!!test!!!!!!!!!!!!!" << std::endl;
-}

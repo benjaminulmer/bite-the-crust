@@ -127,15 +127,16 @@ void VehicleCreator::setupWheelsSimulationData(VehicleTuning* tuning, const PxVe
 			wheels[i].mMOI = tuning->wheelMOI;
 			wheels[i].mRadius = tuning->wheelRadius;
 			wheels[i].mWidth = tuning->wheelWidth;
-			//wheels[i].mDampingRate = ;
+			wheels[i].mDampingRate = tuning->wheelDamping;
+			wheels[i].mMaxBrakeTorque = tuning->maxBrakeTorque;
 		}
 
 		//Enable the handbrake for the rear wheels only.
-		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque=4000.0f;
-		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque=4000.0f;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque=tuning->maxHandBrakeTorque;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque=tuning->maxHandBrakeTorque;
 		//Enable steering for the front wheels only.
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer=PxPi*0.3333f;
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer=PxPi*0.3333f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer=tuning->maxSteer;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer=tuning->maxSteer;
 	}
 
 	//Set up the tires.
@@ -305,20 +306,21 @@ PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle)
 
 		//Engine
 		PxVehicleEngineData engine;
-		engine.mPeakTorque=1500.0f;
-		engine.mMaxOmega=600.0f;//approx 6000 rpm
-		//engine.mMOI = 0.25f;
+		engine.mPeakTorque=tuning->engineTorque;
+		engine.mMaxOmega=tuning->engineRPM;//approx 6000 rpm
+		engine.mMOI=tuning->engineMOI;
 		driveSimData.setEngineData(engine);
 
 		//Gears
 		PxVehicleGearsData gears;
-		gears.mSwitchTime=0.2f;
+		gears.mSwitchTime=tuning->gearSwitchTime;
+		gears.mFinalRatio=tuning->gearFinalRatio;
 		driveSimData.setGearsData(gears);
 
 		//Clutch
 		PxVehicleClutchData clutch;
 		clutch.mAccuracyMode = PxVehicleClutchAccuracyMode::eBEST_POSSIBLE;
-		clutch.mStrength=10.0f;
+		clutch.mStrength=tuning->clutchStrength;
 		driveSimData.setClutchData(clutch);
 
 		//Ackermann steer accuracy

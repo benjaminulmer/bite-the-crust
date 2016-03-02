@@ -37,7 +37,7 @@ struct DynamicInfo
 struct ShapeInfo 
 {
 	ShapeInfo() : transform(0.0f, 0.0f, 0.0f),
-		          staticFriction(0.5f), dynamicFriction(0.5f), restitution(0.5f), isDrivable(false),
+		          staticFriction(0.5f), dynamicFriction(0.5f), restitution(0.1f), isDrivable(false),
 		          filterFlag0(FilterFlag::OBSTACLE), filterFlag1(FilterFlag::OBSTACLE_AGAINST), 
 				  filterFlag2(FilterFlag::DEFAULT), filterFlag3(FilterFlag::DEFAULT) {}
 

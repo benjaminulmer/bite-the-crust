@@ -14,4 +14,3 @@ class SimulationCallback
 
 	void onConstraintBreak(physx::PxConstraintInfo *constraints, physx::PxU32 count);
 };
-

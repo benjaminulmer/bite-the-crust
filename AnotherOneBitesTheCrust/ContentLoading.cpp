@@ -13,9 +13,84 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
 	rapidjson::Document d;
 	d.ParseStream(reader);
+
+	// Ben added this. Very ugle, should be done better probably
 	if (d.HasMember("mass")) {
 		vehicle->tuning.chassisMass = (float)d["mass"].GetDouble();
 	}
+	if (d.HasMember("chassisMOIscalarX")) {
+		vehicle->tuning.chassisMOIscalar.x = (float)d["chassisMOIscalarX"].GetDouble();
+	}
+	if (d.HasMember("chassisMOIscalarY")) {
+		vehicle->tuning.chassisMOIscalar.y = (float)d["chassisMOIscalarY"].GetDouble();
+	}
+	if (d.HasMember("chassisMOIscalarZ")) {
+		vehicle->tuning.chassisMOIscalar.z = (float)d["chassisMOIscalarZ"].GetDouble();
+	}
+	if (d.HasMember("chassisCMOffsetX")) {
+		vehicle->tuning.chassisCMOffset.x = (float)d["chassisCMOffsetX"].GetDouble();
+	}
+	if (d.HasMember("chassisCMOffsetY")) {
+		vehicle->tuning.chassisCMOffset.y = (float)d["chassisCMOffsetY"].GetDouble();
+	}
+	if (d.HasMember("chassisCMOffsetZ")) {
+		vehicle->tuning.chassisCMOffset.z = (float)d["chassisCMOffsetZ"].GetDouble();
+	}
+	if (d.HasMember("chassisStaticFriction")) {
+		vehicle->tuning.chassisStaticFriction = (float)d["chassisStaticFriction"].GetDouble();
+	}
+	if (d.HasMember("chassisDynamicFriction")) {
+		vehicle->tuning.chassisDynamicFriction = (float)d["chassisDynamicFriction"].GetDouble();
+	}
+	if (d.HasMember("chassisRestitution")) {
+		vehicle->tuning.chassisRestitution = (float)d["chassisRestitution"].GetDouble();
+	}
+	if (d.HasMember("wheelMass")) {
+		vehicle->tuning.wheelMass = (float)d["wheelMass"].GetDouble();
+	}
+	if (d.HasMember("wheelMOIscalar")) {
+		vehicle->tuning.wheelMOIscalar = (float)d["wheelMOIscalar"].GetDouble();
+	}
+	if (d.HasMember("wheelDamping")) {
+		vehicle->tuning.wheelDamping = (float)d["wheelDamping"].GetDouble();
+	}
+	if (d.HasMember("wheelStaticFriction")) {
+		vehicle->tuning.wheelStaticFriction = (float)d["wheelStaticFriction"].GetDouble();
+	}
+	if (d.HasMember("wheelDynamicFriction")) {
+		vehicle->tuning.wheelDynamicFriction = (float)d["wheelDynamicFriction"].GetDouble();
+	}
+	if (d.HasMember("wheelRestitution")) {
+		vehicle->tuning.wheelRestitution = (float)d["wheelRestitution"].GetDouble();
+	}
+	if (d.HasMember("maxBrakeTorque")) {
+		vehicle->tuning.maxBrakeTorque = (float)d["maxBrakeTorque"].GetDouble();
+	}
+	if (d.HasMember("maxHandBrakeTorque")) {
+		vehicle->tuning.maxHandBrakeTorque = (float)d["maxHandBrakeTorque"].GetDouble();
+	}
+	if (d.HasMember("maxSteerDegrees")) {
+		vehicle->tuning.maxSteerDegrees = (float)d["maxSteerDegrees"].GetDouble();
+	}
+	if (d.HasMember("engineTorque")) {
+		vehicle->tuning.engineTorque = (float)d["engineTorque"].GetDouble();
+	}
+	if (d.HasMember("engineRPM")) {
+		vehicle->tuning.engineRPM = (float)d["engineRPM"].GetDouble();
+	}
+	if (d.HasMember("engineMOI")) {
+		vehicle->tuning.engineMOI = (float)d["engineMOI"].GetDouble();
+	}
+	if (d.HasMember("gearSwitchTime")) {
+		vehicle->tuning.gearSwitchTime = (float)d["gearSwitchTime"].GetDouble();
+	}
+	if (d.HasMember("gearFinalRatio")) {
+		vehicle->tuning.gearFinalRatio = (float)d["gearFinalRatio"].GetDouble();
+	}
+	if (d.HasMember("clutchStrength")) {
+		vehicle->tuning.clutchStrength = (float)d["clutchStrength"].GetDouble();
+	}
+
 	vehicle->updateTuning();
 
 	fclose(filePointer);

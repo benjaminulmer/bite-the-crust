@@ -26,8 +26,6 @@ public:
 	void setRenderable(Renderable* r);
 	Renderable* getRenderable();
 
-	void testPrint();
-
 private:
 	Renderable* renderable;
 

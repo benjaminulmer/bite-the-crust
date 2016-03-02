@@ -87,7 +87,7 @@ void Game::initSystems()
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
 
-	renderingEngine->testOBJLoading();
+	//renderingEngine->testOBJLoading();
 }
 
 void Game::setupEntities()
@@ -102,9 +102,21 @@ void Game::setupEntities()
 	}
 	// Set up the colours, since we don't have textures yet
 	renderablesMap["floor2"]->setColor(glm::vec3(1,1,0));
-	renderablesMap["box"]->setColor(glm::vec3(0,1,1));
+	//renderablesMap["box"]->setColor(glm::vec3(0,1,1));
 	renderablesMap["van"]->setColor(glm::vec3(1,0,0));
 
+	//testing shootings textures for now. Alexei can switch to json
+	pizza = new Renderable();
+	vector<vec3>pizzaVerts;
+	vector<glm::vec2>pizzaUVs;
+	vector<vec3>pizzaNormals;
+	bool pizzaRes = ContentLoading::loadOBJ("res\\Models\\PizzaBox_textured\\PizzaBox-centered.obj", pizzaVerts, pizzaUVs, pizzaNormals);
+	pizza->setVerts(pizzaVerts);
+	pizza->setUVs(pizzaUVs);
+	pizza->setNorms(pizzaNormals);
+	renderingEngine->assignBuffersTex(pizza);
+
+	//
 	if (!ContentLoading::loadMap("res\\JSON\\map.json", map))
 		fatalError("Could not load map file.");
 	deliveryManager->map = &map;
@@ -231,8 +243,9 @@ void Game::mainLoop()
 		// Display
 		
 		renderingEngine->displayFunc(entities);
+		renderingEngine->displayFuncTex(pizzaEntities);
 		///test drawing
-		renderingEngine->testDraw();
+		//renderingEngine->testDraw();
 
 		string speed = "Speed: ";
 		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
@@ -290,8 +303,10 @@ void Game::processSDLEvents()
 void Game::shootPizza(Vehicle* vehicle)
 {
 	DynamicEntity* pizzaBox = new DynamicEntity();
-	pizzaBox->setRenderable(renderablesMap["box"]);
-
+	//pizzaBox->setRenderable(renderablesMap["box"]);
+	pizzaBox->setRenderable(pizza);
+	//pizzaBox->setDefaultTranslation(pizza->getCenter());
+	pizzaBox->setTexture(ContentLoading::loadDDS("res\\Models\\PizzaBox_textured\\PizzaBox-colored.DDS"));
 	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();
 	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.2f, 1.0f));
 	transform.p += posOffset;
@@ -302,7 +317,8 @@ void Game::shootPizza(Vehicle* vehicle)
 
 	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["box"], transform);
 	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
-	entities.push_back(pizzaBox);
+	//entities.push_back(pizzaBox);
+	pizzaEntities.push_back(pizzaBox);
 
 	audioEngine->playCannonSound(vehicle);
 }

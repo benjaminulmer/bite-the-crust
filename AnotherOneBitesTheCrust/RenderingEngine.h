@@ -29,6 +29,7 @@ public:
 	~RenderingEngine(void);	
 
 	void displayFunc(std::vector<Entity*> entities);
+	void displayFuncTex(std::vector<Entity*> entities);
 	glm::mat4 calculateDefaultModel(glm::mat4 model, Entity * entity);
 
 	void generateIDs();
@@ -37,6 +38,7 @@ public:
 	void updateView(Camera& c);
 
 	void assignBuffers(Renderable* r);
+	void assignBuffersTex(Renderable* r);
 	void deleteBuffers(Renderable* r);
 
 	/////////////////////////////////////////////TEXTURE TESTING//////////////////////////////////////////////////////

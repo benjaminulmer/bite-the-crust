@@ -8,11 +8,22 @@ Entity::Entity(void)
 	defaultTranslation = glm::vec3(0,0,0);
 	defaultScale = glm::vec3(1,1,1);
 	renderable = nullptr;
+
 }
 
 
 Entity::~Entity(void)
 {
+}
+
+void Entity::setTexture(GLuint tex)
+{
+	texture = tex;
+}
+
+GLuint Entity::getTexture()
+{
+	return texture;
 }
 
 void Entity::setDefaultRotation(float radians, glm::vec3 axis)

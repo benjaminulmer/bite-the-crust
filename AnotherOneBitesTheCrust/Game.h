@@ -42,6 +42,8 @@ public:
 	
 	void run();
 
+	Renderable * pizza;
+
 private:
 	void initSystems();
 	void setupEntities();
@@ -65,6 +67,7 @@ private:
 	PhysicsEntityInfo* pizzaInfo;
 
 	std::vector<Entity*> entities;
+	std::vector<Entity*> pizzaEntities;
 	std::map<std::string, Renderable*> renderablesMap;
 	std::map<std::string, PhysicsEntityInfo*> physicsEntityInfoMap;
 	Map map;

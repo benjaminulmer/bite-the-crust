@@ -495,9 +495,6 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 	unsigned int linearSize	 = *(unsigned int*)&(header[16]);
 	unsigned int mipMapCount = *(unsigned int*)&(header[24]);
 	unsigned int fourCC      = *(unsigned int*)&(header[80]);
-
-	std::cout << "Height " << height << " Width " << width << std::endl;
-	
  
 	unsigned char * buffer;
 	unsigned int bufsize;
@@ -556,7 +553,6 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 
 	free(buffer); 
 
-	std::cout << "Text loaded correctly" << std::endl;
 
 	return textureID;
 

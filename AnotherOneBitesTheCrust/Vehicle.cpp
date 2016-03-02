@@ -1,5 +1,4 @@
 #include "Vehicle.h"
-#include <iostream>
 
 using namespace physx;
 
@@ -104,8 +103,6 @@ void Vehicle::handleInput()
 
 	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(smoothingData, steerVsSpeedTable, vehicleInput, 16.0f/1000.0f, false, *physicsVehicle);
 
-	std::cout << input.steer << std::endl;
-
 	if (input.shootPizza)
 	{
 		shootPizzaSignal(this);
@@ -115,7 +112,7 @@ void Vehicle::handleInput()
 
 glm::mat4 Vehicle::getModelMatrix()
 {
-	tipAngle = 0.98 * tipAngle + 0.02 * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f;
+	tipAngle = 0.98 * tipAngle + (0.02 * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
 
 	PxTransform transform(PxQuat(tipAngle, PxVec3(0, 0, 1)));
 	transform = actor->getGlobalPose() * transform;

@@ -251,6 +251,10 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			} else {
 				shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
 			}
+			if (geometry[i].HasMember("isDrivable")) {
+				shape->isDrivable = (geometry[i]["isDrivable"].GetInt() != 0);
+				std::cout << "TEST: " << geometry[i]["isDrivable"].GetInt() << std::endl;
+			}
 			info->shapeInfo.push_back(shape);
 		}
 

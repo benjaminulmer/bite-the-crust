@@ -5,6 +5,7 @@
         {"name": "box", "model": "PizzaBox.obj", "physics": "box.json"},
         {"name": "van", "model": "Van.obj", "physics": "default.json"},
         {"name": "cube", "model": "cube.obj", "physics": "default.json"},
-        {"name": "barrier", "model": "constructionBarrier.obj", "physics": "barrier.json"}
+        {"name": "barrier", "model": "constructionBarrier.obj", "physics": "barrier.json"},
+		{"name": "bigramp", "model": "bigramp.obj", "physics": "ramp.json"}
     ]
 }

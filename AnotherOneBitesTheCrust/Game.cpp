@@ -127,7 +127,7 @@ void Game::setupEntities()
 
 				// Centre is negated because Gorman sucks at naming things :P
 				glm::vec3 offset = renderablesMap[tileEntity.model]->getCenter();
-				physx::PxTransform transform(physx::PxVec3(pos.x - offset.x, pos.y - offset.y, pos.z - offset.z), physx::PxQuat(physx::PxIdentity));
+				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(physx::PxIdentity));
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
 				entities.push_back(e);

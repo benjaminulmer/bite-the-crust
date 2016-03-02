@@ -3,8 +3,6 @@
 #include "Camera.h"
 #include "ContentLoading.h"
 
-#include <foundation/PxTransform.h> 
-
 #include <iostream>
 #include <string>
 #include <sigslot.h>
@@ -137,11 +135,16 @@ void Game::setupEntities()
 				DynamicEntity* e = new DynamicEntity();
 				// todo, error check that these models do exist, instead of just break
 				e->setRenderable(renderablesMap[tileEntity.model]);
+
 				e->setDefaultTranslation(e->getRenderable()->getCenter());
 				e->setTexture(textureMap[tileEntity.model]);
+
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize + map.tileSize/2, 0, j * map.tileSize + map.tileSize/2);
-				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y + 5, pos.z), physx::PxQuat(physx::PxIdentity));
+
+				// Centre is negated because Gorman sucks at naming things :P
+				glm::vec3 offset = renderablesMap[tileEntity.model]->getCenter();
+				physx::PxTransform transform(physx::PxVec3(pos.x - offset.x, pos.y - offset.y, pos.z - offset.z), physx::PxQuat(physx::PxIdentity));
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
 				entities.push_back(e);
@@ -190,12 +193,12 @@ void Game::connectSystems()
 {
 	inputEngine->setInputStruct(&p1Vehicle->input, 0);
 
-	p1Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
-	p2Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
+	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
+	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->assignDeliveries();
-	p1Vehicle->ShootPizzaSignal.connect(deliveryManager, &DeliveryManager::pizzaShot);
+	p1Vehicle->shootPizzaSignal.connect(deliveryManager, &DeliveryManager::pizzaShot);
 }
 
 void Game::mainLoop()
@@ -312,7 +315,7 @@ void Game::shootPizza(Vehicle* vehicle)
 	//pizzaBox->setTexture(ContentLoading::loadDDS("res\\Models\\PizzaBox_textured\\PizzaBox-colored.DDS"));
 	pizzaBox->setTexture(textureMap["box"]);
 	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();
-	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.2f, 1.0f));
+	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.25f, 1.0f));
 	transform.p += posOffset;
 
 	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 0.0f, 20.0f));
@@ -321,6 +324,7 @@ void Game::shootPizza(Vehicle* vehicle)
 
 	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["box"], transform);
 	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
+	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
 	//pizzaEntities.push_back(pizzaBox);
 
@@ -329,8 +333,8 @@ void Game::shootPizza(Vehicle* vehicle)
 
 Game::~Game(void)
 {
-	p1Vehicle->ShootPizzaSignal.disconnect_all();
-	p2Vehicle->ShootPizzaSignal.disconnect_all();
+	p1Vehicle->shootPizzaSignal.disconnect_all();
+	p2Vehicle->shootPizzaSignal.disconnect_all();
 	for (unsigned int i = 0; i < entities.size(); i++)
 	{
 		delete entities[i];

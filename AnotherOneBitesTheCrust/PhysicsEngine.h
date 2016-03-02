@@ -1,5 +1,7 @@
 #pragma once
 #include <PxPhysicsAPI.h>
+#include "PhysicsHelper.h"
+#include "VehicleCreator.h"
 #include "VehicleSceneQueryData.h"
 #include "FrictionPairs.h"
 #include "Vehicle.h"
@@ -21,6 +23,8 @@ public:
 
 private:
 	static const int MAX_VEHICLES = 4;
+	PhysicsHelper* helper;
+	VehicleCreator* vehCreator;
 
 	physx::PxTolerancesScale scale;
 	physx::PxDefaultErrorCallback* defaultErrorCallback;
@@ -40,9 +44,6 @@ private:
 	physx::PxMaterial* drivingSurfaces[SurfaceType::MAX];
 	physx::PxVehicleDrivableSurfaceToTireFrictionPairs* frictionPairs;
 
-	physx::PxMaterial* testChassisMat;
-	physx::PxMaterial* testWheelMat;
-
 	physx::PxRigidStatic* groundPlane;
 	
 	std::vector<physx::PxVehicleWheels*> vehicles;
@@ -50,4 +51,6 @@ private:
 	void initSimulationData();
 	void initPhysXSDK();
 	void initVehicleSDK();
+
+	void tuningFromUserTuning(Vehicle* vehicle);
 };

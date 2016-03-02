@@ -174,12 +174,12 @@ void Game::connectSystems()
 {
 	inputEngine->setInputStruct(&p1Vehicle->input, 0);
 
-	p1Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
-	p2Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
+	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
+	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->assignDeliveries();
-	p1Vehicle->ShootPizzaSignal.connect(deliveryManager, &DeliveryManager::pizzaShot);
+	p1Vehicle->shootPizzaSignal.connect(deliveryManager, &DeliveryManager::pizzaShot);
 }
 
 void Game::mainLoop()
@@ -306,8 +306,8 @@ void Game::shootPizza(Vehicle* vehicle)
 
 Game::~Game(void)
 {
-	p1Vehicle->ShootPizzaSignal.disconnect_all();
-	p2Vehicle->ShootPizzaSignal.disconnect_all();
+	p1Vehicle->shootPizzaSignal.disconnect_all();
+	p2Vehicle->shootPizzaSignal.disconnect_all();
 	for (unsigned int i = 0; i < entities.size(); i++)
 	{
 		delete entities[i];

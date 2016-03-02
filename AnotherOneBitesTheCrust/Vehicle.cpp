@@ -1,34 +1,62 @@
 #include "Vehicle.h"
+#include <iostream>
 
 using namespace physx;
 
 Vehicle::Vehicle(void)
 {
-	testTuning();
-
 	currentPath = std::vector<glm::vec3>();
 
 	input.forward = 0;
 	input.backward = 0;
-	input.leftSteer = 0;
-	input.rightSteer = 0;
+	input.steer = 0;
 	input.handBrake = false;
 	input.shootPizza = false;
+
+	tipAngle = 0;
+
+	vehicleInput = PxVehicleDrive4WRawInputData();
+
+	setSmoothingData();
+	setSteerSpeedData();
+}
+
+void Vehicle::setSmoothingData()
+{
+	smoothingData.mRiseRates[0] = 6.0f;
+	smoothingData.mRiseRates[1] = 6.0f;
+	smoothingData.mRiseRates[2] = 12.0f;
+	smoothingData.mRiseRates[3] = 2.5f;
+	smoothingData.mRiseRates[4] = 2.5f;
+
+	smoothingData.mFallRates[0] = 10.0f;
+	smoothingData.mFallRates[1] = 10.0f;
+	smoothingData.mFallRates[2] = 12.0f;
+	smoothingData.mFallRates[3] = 5.0f;
+	smoothingData.mFallRates[4] = 5.0f;
+}
+
+void Vehicle::setSteerSpeedData()
+{
+	steerVsSpeedData[0] = 0.0f;          steerVsSpeedData[1] = 0.75f;
+	steerVsSpeedData[2] = 5.0f;          steerVsSpeedData[3] = 0.75f;
+	steerVsSpeedData[4] = 30.0f;         steerVsSpeedData[5] = 0.125f;
+	steerVsSpeedData[6] = 120.0f;        steerVsSpeedData[7] = 0.1f;
+	steerVsSpeedData[8] = PX_MAX_F32;    steerVsSpeedData[9] = PX_MAX_F32;
+	steerVsSpeedData[10] = PX_MAX_F32;    steerVsSpeedData[11] = PX_MAX_F32;
+	steerVsSpeedData[12] = PX_MAX_F32;    steerVsSpeedData[13] = PX_MAX_F32;
+	steerVsSpeedData[14] = PX_MAX_F32;    steerVsSpeedData[15] = PX_MAX_F32;
+	steerVsSpeedTable = PxFixedSizeLookupTable<8>(steerVsSpeedData, 4); 
+}
+
+void Vehicle::setPhysicsVehicle(physx::PxVehicleDrive4W* vehicle)
+{
+	physicsVehicle = vehicle;
 }
 
 physx::PxVehicleDrive4W* Vehicle::getPhysicsVehicle()
 {
 	return physicsVehicle;
-}
-
-void Vehicle::testTuning()
-{
-	tuning.chassisStaticFriction = 0.5f;
-	tuning.chassisDynamicFriction = 0.5f;
-	tuning.chassisRestitution = 0.6f;
-	tuning.wheelStaticFriction = 0.9f;
-	tuning.wheelDynamicFriction = 0.9f;
-	tuning.wheelRestitution = 0.6f;
 }
 
 void Vehicle::updateTuning()
@@ -61,33 +89,33 @@ void Vehicle::handleInput()
 	// Determine how to apply controller input depending on current gear
 	if (physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE)
 	{
-		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input.backward);
-		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input.forward);
+		vehicleInput.setAnalogAccel(input.backward);
+		vehicleInput.setAnalogBrake(input.forward);
 	} 
 	else 
 	{
-		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input.forward);
-		physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input.backward);
+		vehicleInput.setAnalogAccel(input.forward);
+		vehicleInput.setAnalogBrake(input.backward);
 	}
 
 	// Steer and handbrake
-	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input.leftSteer);
-	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input.rightSteer);
-	physicsVehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, handBrake);
+	vehicleInput.setAnalogSteer(input.steer);
+	vehicleInput.setAnalogHandbrake(handBrake);
+
+	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(smoothingData, steerVsSpeedTable, vehicleInput, 16.0f/1000.0f, false, *physicsVehicle);
+
+	std::cout << input.steer << std::endl;
 
 	if (input.shootPizza)
 	{
-		ShootPizzaSignal(this);
+		shootPizzaSignal(this);
 		input.shootPizza = false;
 	}
 }
 
 glm::mat4 Vehicle::getModelMatrix()
 {
-	PxF32 tipAngle;
-	(input.rightSteer > 0) ? tipAngle = input.rightSteer * 0.001f : tipAngle = input.leftSteer * -0.001f;
-	tipAngle *= physicsVehicle->computeForwardSpeed() * physicsVehicle->computeForwardSpeed();
-
+	tipAngle = 0.98 * tipAngle + 0.02 * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f;
 
 	PxTransform transform(PxQuat(tipAngle, PxVec3(0, 0, 1)));
 	transform = actor->getGlobalPose() * transform;
@@ -102,7 +130,6 @@ glm::mat4 Vehicle::getModelMatrix()
 		}
 	}
 	return newM;
-
 }
 
 Vehicle::~Vehicle(void)

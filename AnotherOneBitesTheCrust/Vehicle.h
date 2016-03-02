@@ -5,8 +5,7 @@
 
 struct VehicleInput
 {
-	float leftSteer;
-	float rightSteer;
+	float steer;
 	float forward;
 	float backward;
 	bool handBrake;
@@ -67,7 +66,6 @@ public:
 	Vehicle(void);
 	~Vehicle(void);
 
-	physx::PxVehicleDrive4W* physicsVehicle;
 	VehicleInput input;
 	VehicleTuning tuning;
 
@@ -79,9 +77,21 @@ public:
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
 	glm::mat4 getModelMatrix();
 
-	sigslot::signal1<Vehicle*> ShootPizzaSignal;	
+	void setPhysicsVehicle(physx::PxVehicleDrive4W* vehicle);
+
+	sigslot::signal1<Vehicle*> shootPizzaSignal;	
 
 private:
-	void testTuning();
+	physx::PxF32 tipAngle;
+
+	physx::PxVehicleDrive4W* physicsVehicle;
+	physx::PxVehicleDrive4WRawInputData vehicleInput;
+
+	physx::PxVehiclePadSmoothingData smoothingData;
+	physx::PxF32 steerVsSpeedData[2*8];
+	physx::PxFixedSizeLookupTable<8> steerVsSpeedTable;
+
+	void setSmoothingData();
+	void setSteerSpeedData();
 };
 

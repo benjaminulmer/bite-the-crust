@@ -192,7 +192,7 @@ void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 	physVehicle->mDriveDynData.setUseAutoGears(true);
 	
 	vehicle->setActor(actor);
-	vehicle->physicsVehicle = physVehicle;
+	vehicle->setPhysicsVehicle(physVehicle);
 	actor->userData = vehicle;
 
 	vehicles.push_back(physVehicle);

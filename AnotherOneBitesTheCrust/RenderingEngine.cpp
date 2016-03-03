@@ -9,7 +9,7 @@ using namespace glm;
 RenderingEngine::RenderingEngine()
 {
 	glEnable(GL_DEPTH_TEST);
-
+	glEnable(GL_MULTISAMPLE);
 	//glDepthFunc(GL_LESS);
 
 	//glEnable(GL_CULL_FACE);
@@ -63,16 +63,16 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 
 void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 {
-	glClearDepth(1.0);
+	//glClearDepth(1.0);
 	glEnable(GL_DEPTH_TEST);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
 	GLuint mvpID = glGetUniformLocation(textureProgramID, "MVP");
-	GLuint mvID = glGetUniformLocation(textureProgramID, "MV");
 	GLuint vID = glGetUniformLocation(textureProgramID, "V");
 	GLuint mID = glGetUniformLocation(textureProgramID, "M");
 	GLuint tID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+	GLuint normalID = glGetUniformLocation(textureProgramID, "normalMatrix");
 
 	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 150, 35);
 
@@ -86,16 +86,20 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 		M = calculateDefaultModel(M, entities[i]);
 
 		mat4 MVP = P * V * M;
-		mat4 MV = V * M;
+		mat4 normal = glm::transpose(glm::inverse(V * M));
+
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
-		glUniformMatrix4fv(mvID, 1, GL_FALSE, value_ptr(MV));
 		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(V));
 		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(M));
+		glUniformMatrix4fv(normalID, 1, GL_FALSE, value_ptr(normal));
+
 
 		glBindVertexArray(entities[i]->getRenderable()->getVAO());
 		GLuint tex = entities[i]->getTexture();
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
+		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
+
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
 		glUniform1i(tID, 0);
 		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertices().size());

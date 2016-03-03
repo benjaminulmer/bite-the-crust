@@ -16,6 +16,7 @@ out vec3 LightDirection_cameraspace;
 uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
+uniform mat4 normalMatrix;
 uniform vec3 LightPosition_worldspace;
 
 void main(){
@@ -36,7 +37,7 @@ void main(){
 	LightDirection_cameraspace = LightPosition_cameraspace + EyeDirection_cameraspace;
 	
 	// Normal of the the vertex, in camera space
-	Normal_cameraspace = ( V * M * vec4(vertexNormal_modelspace,0)).xyz; // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
+	Normal_cameraspace = ( normalMatrix * vec4(vertexNormal_modelspace,0)).xyz; // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
 	
 	// UV of the vertex. No special space for this one.
 	UV = vertexUV;

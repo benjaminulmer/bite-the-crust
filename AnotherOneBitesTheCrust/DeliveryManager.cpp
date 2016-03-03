@@ -65,13 +65,14 @@ Delivery DeliveryManager::newDelivery() {
 	return d;
 }
 
-void DeliveryManager::pizzaShot(Vehicle* player) {
-	Tile* tile = map->getTile(player->getPosition());
-	if (tile == deliveries[player].location) {
+void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
+	Tile* tile = map->getTile(pizza->getPosition());
+	std::cout << "sleep in tile " << tile << std::endl;
+	if (tile == deliveries[pizza->owner].location) {
 		std::cout << "Delivered!" << std::endl;
-		scores[player]++;
-		std::cout << "Score = " << scores[player] << std::endl;
-		deliveries[player] = newDelivery();
+		scores[pizza->owner]++;
+		std::cout << "Score = " << scores[pizza->owner] << std::endl;
+		deliveries[pizza->owner] = newDelivery();
 		// Anyone who was delivering to this location needs a new delivery
 		for (int i = 0; i < (int)players.size(); i++) {
 			if (deliveries[players[i]].location == tile)

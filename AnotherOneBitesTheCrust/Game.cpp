@@ -198,7 +198,7 @@ void Game::connectSystems()
 
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->assignDeliveries();
-	p1Vehicle->shootPizzaSignal.connect(deliveryManager, &DeliveryManager::pizzaShot);
+	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 }
 
 void Game::mainLoop()

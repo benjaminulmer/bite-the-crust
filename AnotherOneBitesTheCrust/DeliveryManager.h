@@ -2,6 +2,7 @@
 #include <map>
 #include "Vehicle.h"
 #include "Map.h"
+#include "PizzaBox.h"
 #include <time.h>
 #include <iostream>
 #include <sigslot.h>
@@ -36,6 +37,6 @@ public:
 	int getScore(Vehicle* player);
 	void timePassed(double timeMs);
 	Delivery newDelivery();
-	void pizzaShot(Vehicle* player);
+	void pizzaLanded(PizzaBox* pizza);
 };
 

@@ -2,6 +2,7 @@
 #include <glm.hpp>
 #include <vector>
 #include "PhysicsEntity.h"
+#include "graphNode.h"
 
 // Representation of the entities in a tile, which will be turned into actual entities by the game engine
 // I think we'll want to add some kind of 'type' field to distinguish between static and dynamic entities later
@@ -19,6 +20,9 @@ struct Tile
 	glm::vec3 entrance, exit;
 	std::string groundModel;
 	std::vector<TileEntity> entities;
+	std::vector<graphNode*> nodes;
+	Entity* ground;
+	GLuint groundTexture;
 };
 
 

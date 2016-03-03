@@ -7,7 +7,7 @@ AIEngine::AIEngine(void)
 	srand((int)time(0));
 }
 
-void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
+void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 {
 	VehicleInput* input = &driver->input;
 	input->forward = 1.0;
@@ -29,23 +29,24 @@ void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
+	// Stuff Ben added
+	ratio *= 2;
+	if (ratio > 1) ratio = 1;
+
 	if(ratio > 0.1)
 	{
 		if(leftCosAngle > 0)
 		{
-			input->rightSteer = ratio;
-			input->leftSteer = 0;
+			input->steer = ratio;
 		}
 		else
 		{
-			input->leftSteer = ratio;
-			input->rightSteer = 0;
+			input->steer = -ratio;
 		}
 	}
 	else
 	{
-		input->rightSteer = 0;
-		input->leftSteer = 0;
+		input->steer = 0;
 		if (rand()%100 < 5)
 		{
 			input->shootPizza = true;
@@ -53,19 +54,41 @@ void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 	}
 }
 
-void AIEngine::updatePath(Vehicle* toUpdate)
+void AIEngine::updatePath(Vehicle* toUpdate, Map & map)
 {
-	toUpdate->currentPath.push_back(glm::vec3(-MapAI::MAP_SIZE/2, 0, MapAI::MAP_SIZE/2));
-	toUpdate->currentPath.push_back(glm::vec3(MapAI::MAP_SIZE/2, 0, MapAI::MAP_SIZE/2));
-	toUpdate->currentPath.push_back(glm::vec3(-MapAI::MAP_SIZE/2, 0, -MapAI::MAP_SIZE/2));
-	toUpdate->currentPath.push_back(glm::vec3(MapAI::MAP_SIZE/2, 0, -MapAI::MAP_SIZE/2));
+	Tile * currentTile = map.getTile(toUpdate->getPosition());
+
+	// Find closest node
+	graphNode * closest = currentTile->nodes.at(0);
+	if(!closest)
+		return;
+	double minDist = -1;
+	for(graphNode * n : currentTile->nodes)
+	{
+		double currentDist = glm::length(toUpdate->getPosition() - closest->getPosition());
+		if(currentDist < minDist)
+		{
+			closest = n;
+			minDist = currentDist;
+		}
+	}
+
+	// TODO: add actual pathfinding logic
+	graphNode * current = closest;
+	do
+	{
+		toUpdate->currentPath.push_back(current->getPosition());
+		current = current->getNeighbours().at(0);
+	}while(current != closest);
 }
 
-void AIEngine::updateAI(Vehicle* toUpdate) 
+void AIEngine::updateAI(Vehicle* toUpdate, Map & map) 
 { 
 	if(toUpdate->currentPath.empty())
 	{
-		updatePath(toUpdate);
+		updatePath(toUpdate, map);
+		if(toUpdate->currentPath.empty())
+			return;
 	}
 
 	// May want to consider something more efficient, uses square root in here

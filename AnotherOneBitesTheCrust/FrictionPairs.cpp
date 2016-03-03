@@ -7,7 +7,7 @@ PxVehicleDrivableSurfaceToTireFrictionPairs* FrictionPairs::createFrictionPairs(
 	PxF32 tireFrictionMultipliers[SurfaceType::MAX][TireType::MAX]=
 	{
 		//NORMAL,	WORN
-		{1.20f,		0.1f}//TARMAC
+		{2.0f,		0.1f}//TARMAC
 	};
 
 	PxVehicleDrivableSurfaceType surfaceTypes[1];

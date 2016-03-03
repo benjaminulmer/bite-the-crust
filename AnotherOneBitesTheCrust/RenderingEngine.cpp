@@ -9,7 +9,7 @@ using namespace glm;
 RenderingEngine::RenderingEngine()
 {
 	glEnable(GL_DEPTH_TEST);
-
+	glEnable(GL_MULTISAMPLE);
 	//glDepthFunc(GL_LESS);
 
 	//glEnable(GL_CULL_FACE);
@@ -22,59 +22,22 @@ RenderingEngine::~RenderingEngine(void) {}
 
 //vehicle dimensions
 //x: 2.5, y:2, z:5
-void RenderingEngine::displayFunc(vector<Entity*> entities)
-{
-	//glClearDepth(1.0);
-	glEnable(GL_DEPTH_TEST);
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glDisable(GL_BLEND);
-	glUseProgram(phongProgramID);
-	GLuint mvpID = glGetUniformLocation(phongProgramID, "MVP");
-	//GLuint mvID = glGetUniformLocation(phongProgramID, "MV");
-	GLuint vID = glGetUniformLocation(phongProgramID, "V");
-	GLuint mID = glGetUniformLocation(phongProgramID, "M");
-
-
-	for (int i = 0; i < (int)entities.size(); i++) {
-		if (!entities[i]->hasRenderable())
-			continue;
-		M = mat4(1.0f);
-
-		//Translations done here. Order of translations is scale, rotate, translate
-		M = entities[i]->getModelMatrix();
-		M = calculateDefaultModel(M, entities[i]);
-
-		mat4 MVP = P * V * M;
-		//mat4 MV = V * M;
-		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
-		//glUniformMatrix4fv(mvID, 1, GL_FALSE, value_ptr(MV));
-		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(V));
-		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(M));
-
-		glUniform3f(glGetUniformLocation(phongProgramID, "MaterialColor"), entities[i]->getRenderable()->getColor().x, 
-			                                                               entities[i]->getRenderable()->getColor().y, 
-																		   entities[i]->getRenderable()->getColor().z);
-		glBindVertexArray(entities[i]->getRenderable()->getVAO());
-		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertices().size());
-		glBindVertexArray(0);
-		//glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->getFaces().size(), GL_UNSIGNED_INT, (void*)0);
-	}
-}
 
 void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 {
-	glClearDepth(1.0);
+	//glClearDepth(1.0);
+
 	glEnable(GL_DEPTH_TEST);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
 	GLuint mvpID = glGetUniformLocation(textureProgramID, "MVP");
-	GLuint mvID = glGetUniformLocation(textureProgramID, "MV");
 	GLuint vID = glGetUniformLocation(textureProgramID, "V");
 	GLuint mID = glGetUniformLocation(textureProgramID, "M");
 	GLuint tID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+	GLuint normalID = glGetUniformLocation(textureProgramID, "normalMatrix");
 
-	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 100, 35);
+	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 150, 35);
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
@@ -86,16 +49,20 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 		M = calculateDefaultModel(M, entities[i]);
 
 		mat4 MVP = P * V * M;
-		mat4 MV = V * M;
+		mat4 normal = glm::transpose(glm::inverse(V * M));
+
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
-		glUniformMatrix4fv(mvID, 1, GL_FALSE, value_ptr(MV));
 		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(V));
 		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(M));
+		glUniformMatrix4fv(normalID, 1, GL_FALSE, value_ptr(normal));
+
 
 		glBindVertexArray(entities[i]->getRenderable()->getVAO());
 		GLuint tex = entities[i]->getTexture();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex);
+		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
+
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
 		glUniform1i(tID, 0);
 		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertices().size());
@@ -115,15 +82,6 @@ mat4 RenderingEngine::calculateDefaultModel(mat4 model, Entity * entity)
 
 void RenderingEngine::generateIDs()
 {
-	cout << "Generating IDs" << endl;
-	string vsShader = "res\\Shaders\\StandardShading.vertexshader";
-	string fsShader = "res\\Shaders\\StandardShading.fragmentshader";
-	string vsSource = loadShaderStringfromFile(vsShader);
-	string fsSource = loadShaderStringfromFile(fsShader);
-	phongProgramID = CreateShaderProgram(vsSource, fsSource);
-	glUseProgram(phongProgramID);
-	glUniform3f(glGetUniformLocation(phongProgramID, "LightPosition_worldspace"), 35, 100, 35);
-
 	string textVsShader = "res\\Shaders\\TextVertexShader.vertexshader";
 	string textFsShader = "res\\Shaders\\TextVertexShader.fragmentshader";
 	string textVsSource = loadShaderStringfromFile(textVsShader);
@@ -151,62 +109,6 @@ void RenderingEngine::updateView(Camera& c)
 {
 	V = glm::lookAt(c.getPosition(), c.getLookAtPosition(), c.getUpVector());
 }
-
-
-void RenderingEngine::assignBuffers(Renderable* r) 
-{
-	glUseProgram(phongProgramID);
-
-	GLuint vertexBuffer;
-	GLuint normalBuffer;
-	//GLuint indexBuffer;
-	GLuint vao;
-
-	glGenVertexArrays(1, &vao);			//vao
-	glGenBuffers(1, &vertexBuffer);		//vertices vbo
-	glGenBuffers(1, &normalBuffer);		//color vbo
-
-	vector<vec3> vertices = r->getVertices();
-	vector<vec3> normals = r->getNormals();
-
-	glBindVertexArray(vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*vertices.size(), vertices.data(), GL_STATIC_DRAW);	//buffering vertex data
-
-	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*normals.size(), normals.data(), GL_STATIC_DRAW);		//buffering color data
-
-	r->setVertexVBO(vertexBuffer);
-	r->setColourVBO(normalBuffer);
-
-	//bind to shaders
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glVertexAttribPointer(
-		0,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0);
-
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-	glVertexAttribPointer(
-		1,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0);
-	r->setVAO(vao);
-	glBindVertexArray(0);
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	
-}
-
 
 void RenderingEngine::assignBuffersTex(Renderable* r) 
 {
@@ -297,6 +199,7 @@ void RenderingEngine::initText2D(const char * texturePath){
 
 void RenderingEngine::printText2D(const char * text, int x, int y, int size){
 
+
 	unsigned int length = strlen(text);
 
 	// Fill buffers
@@ -377,131 +280,134 @@ void RenderingEngine::printText2D(const char * text, int x, int y, int size){
 	glBindVertexArray(0);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+	glDeleteVertexArrays(1, &textVAO);
+	glDeleteBuffers(1, &Text2DVertexBufferID);
+	glDeleteBuffers(1, &Text2DUVBufferID);
 
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TESTING STUFF BELOW
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void RenderingEngine::testDraw() {
-	// Draw all our entities
-
-	//glClearDepth(1.0);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glUseProgram(textureProgramID);
-	GLuint mvpID = glGetUniformLocation(textureProgramID, "MVP");
-
-	GLuint vID = glGetUniformLocation(textureProgramID, "V");
-	GLuint mID = glGetUniformLocation(textureProgramID, "M");
-
-	M = mat4(1.0f);
-	mat4 MVP = P * V * M;
-
-	glUniformMatrix4fv( mvpID,
-					1,
-					GL_FALSE,
-					value_ptr(MVP)
-					);
-
-	//GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
-	glUniformMatrix4fv( vID,
-					1,
-					GL_FALSE,
-					value_ptr(V)
-					);
-
-	glUniformMatrix4fv( mID,
-					1,
-					GL_FALSE,
-					value_ptr(M)
-					);
-
-	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 100, 35);
-
-	glBindVertexArray(vanVAO);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Texture);
-	// Set our "myTextureSampler" sampler to user Texture Unit 0
-	glUniform1i(TextureID, 0);
-
-	glDrawArrays(GL_TRIANGLES, 0, textureVerts.size());
-
-	//glDrawElements(GL_TRIANGLES, phongFaces.size(), GL_UNSIGNED_INT, (void*)0);
-}
-
-void RenderingEngine::testOBJLoading()
-{
-	string vsShader = "res\\Shaders\\textured-StandardShading.vertexshader";
-	string fsShader = "res\\Shaders\\textured-StandardShading.fragmentshader";
-	string vsSource = loadShaderStringfromFile(vsShader);
-	string fsSource = loadShaderStringfromFile(fsShader);
-	textureProgramID = CreateShaderProgram(vsSource, fsSource);
-	glUseProgram(textureProgramID);
-
-	//std::vector<glm::vec3> vertices;
-	//std::vector<glm::vec2> uvs;
-	//std::vector<glm::vec3> normals; // Won't be used at the moment.
-	//std::vector<GLuint> faces;
-	bool res = ContentLoading::loadOBJ("res\\Models\\bigramp.obj", textureVerts, textureUVs, textureNorms);
-	Texture = ContentLoading::loadDDS("res\\Textures\\ramp.DDS");
-
-	cout << "Number of verts " << textureVerts.size() << endl;
-	cout << "Number of UVs " << textureUVs.size() << endl;
-	cout << "Number of normals " << textureNorms.size() << endl;
-
-	glGenVertexArrays(1, &vanVAO);
-	glBindVertexArray(vanVAO);
-
-
-	glGenBuffers(1, &vanVerts);
-	glGenBuffers(1, &vanUVs);
-	glGenBuffers(1, &vanNormals);
-
-	
-	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
-
-
-	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
-	glBufferData(GL_ARRAY_BUFFER, textureVerts.size() * sizeof(glm::vec3), textureVerts.data(), GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vanUVs);
-	glBufferData(GL_ARRAY_BUFFER, textureUVs.size() * sizeof(glm::vec2), textureUVs.data(), GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
-	glBufferData(GL_ARRAY_BUFFER, textureNorms.size() * sizeof(glm::vec3), textureNorms.data(), GL_STATIC_DRAW);
-
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
-	glVertexAttribPointer(
-		0,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0);
-
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, vanUVs);
-	glVertexAttribPointer(
-		1,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0);
-	
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
-	glVertexAttribPointer(
-		2,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0);
-	
-
-	glBindVertexArray(0);
-}
+//
+//void RenderingEngine::testDraw() {
+//	// Draw all our entities
+//
+//	//glClearDepth(1.0);
+//	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	glUseProgram(textureProgramID);
+//	GLuint mvpID = glGetUniformLocation(textureProgramID, "MVP");
+//
+//	GLuint vID = glGetUniformLocation(textureProgramID, "V");
+//	GLuint mID = glGetUniformLocation(textureProgramID, "M");
+//
+//	M = mat4(1.0f);
+//	mat4 MVP = P * V * M;
+//
+//	glUniformMatrix4fv( mvpID,
+//					1,
+//					GL_FALSE,
+//					value_ptr(MVP)
+//					);
+//
+//	//GLint pID = glGetUniformLocation(phongProgramID, "proj_matrix");
+//	glUniformMatrix4fv( vID,
+//					1,
+//					GL_FALSE,
+//					value_ptr(V)
+//					);
+//
+//	glUniformMatrix4fv( mID,
+//					1,
+//					GL_FALSE,
+//					value_ptr(M)
+//					);
+//
+//	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 100, 35);
+//
+//	glBindVertexArray(vanVAO);
+//	glActiveTexture(GL_TEXTURE0);
+//	glBindTexture(GL_TEXTURE_2D, Texture);
+//	// Set our "myTextureSampler" sampler to user Texture Unit 0
+//	glUniform1i(TextureID, 0);
+//
+//	glDrawArrays(GL_TRIANGLES, 0, textureVerts.size());
+//
+//	//glDrawElements(GL_TRIANGLES, phongFaces.size(), GL_UNSIGNED_INT, (void*)0);
+//}
+//
+//void RenderingEngine::testOBJLoading()
+//{
+//	string vsShader = "res\\Shaders\\textured-StandardShading.vertexshader";
+//	string fsShader = "res\\Shaders\\textured-StandardShading.fragmentshader";
+//	string vsSource = loadShaderStringfromFile(vsShader);
+//	string fsSource = loadShaderStringfromFile(fsShader);
+//	textureProgramID = CreateShaderProgram(vsSource, fsSource);
+//	glUseProgram(textureProgramID);
+//
+//	//std::vector<glm::vec3> vertices;
+//	//std::vector<glm::vec2> uvs;
+//	//std::vector<glm::vec3> normals; // Won't be used at the moment.
+//	//std::vector<GLuint> faces;
+//	bool res = ContentLoading::loadOBJ("res\\Models\\bigramp.obj", textureVerts, textureUVs, textureNorms);
+//	Texture = ContentLoading::loadDDS("res\\Textures\\ramp.DDS");
+//
+//	cout << "Number of verts " << textureVerts.size() << endl;
+//	cout << "Number of UVs " << textureUVs.size() << endl;
+//	cout << "Number of normals " << textureNorms.size() << endl;
+//
+//	glGenVertexArrays(1, &vanVAO);
+//	glBindVertexArray(vanVAO);
+//
+//
+//	glGenBuffers(1, &vanVerts);
+//	glGenBuffers(1, &vanUVs);
+//	glGenBuffers(1, &vanNormals);
+//
+//	
+//	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+//
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
+//	glBufferData(GL_ARRAY_BUFFER, textureVerts.size() * sizeof(glm::vec3), textureVerts.data(), GL_STATIC_DRAW);
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, vanUVs);
+//	glBufferData(GL_ARRAY_BUFFER, textureUVs.size() * sizeof(glm::vec2), textureUVs.data(), GL_STATIC_DRAW);
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
+//	glBufferData(GL_ARRAY_BUFFER, textureNorms.size() * sizeof(glm::vec3), textureNorms.data(), GL_STATIC_DRAW);
+//
+//
+//	glEnableVertexAttribArray(0);
+//	glBindBuffer(GL_ARRAY_BUFFER, vanVerts);
+//	glVertexAttribPointer(
+//		0,
+//		3,
+//		GL_FLOAT,
+//		GL_FALSE,
+//		0,
+//		(void*)0);
+//
+//	glEnableVertexAttribArray(1);
+//	glBindBuffer(GL_ARRAY_BUFFER, vanUVs);
+//	glVertexAttribPointer(
+//		1,
+//		2,
+//		GL_FLOAT,
+//		GL_FALSE,
+//		0,
+//		(void*)0);
+//	
+//	glEnableVertexAttribArray(2);
+//	glBindBuffer(GL_ARRAY_BUFFER, vanNormals);
+//	glVertexAttribPointer(
+//		2,
+//		3,
+//		GL_FLOAT,
+//		GL_FALSE,
+//		0,
+//		(void*)0);
+//	
+//
+//	glBindVertexArray(0);
+//}

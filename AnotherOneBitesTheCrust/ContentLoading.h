@@ -9,6 +9,7 @@
 #include <string>
 #include "Map.h"
 #include "PhysicsEngine.h"
+#include "graphNode.h"
 
 namespace ContentLoading
 {
@@ -21,6 +22,7 @@ namespace ContentLoading
 	bool loadRenderables(char* filename, std::map<std::string, Renderable*> &map);
 	bool validateMap(rapidjson::Document &d);
 	bool loadMap(char* filename, Map &map);
+	bool loadGraph(char * filename, graphNode &node);
 
 	bool loadOBJNonIndexed(
 		const char * path, 

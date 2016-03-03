@@ -5,8 +5,7 @@
 
 struct VehicleInput
 {
-	float leftSteer;
-	float rightSteer;
+	float steer;
 	float forward;
 	float backward;
 	bool handBrake;
@@ -15,18 +14,39 @@ struct VehicleInput
 
 struct VehicleTuning
 {
-	// Vehicle geometry
-	physx::PxF32 chassisMass;
+	// Should be taken from models
 	physx::PxVec3 chassisDims;
+	physx::PxF32 wheelWidth;
+	physx::PxF32 wheelRadius;
+
+	// Chassis physical properties
+	physx::PxF32 chassisMass;
 	physx::PxVec3 chassisMOI;
 	physx::PxVec3 chassisCMOffset;
 	physx::PxMaterial* chassisMaterial;
+
+	// Wheel physical properties
 	physx::PxF32 wheelMass;
-	physx::PxF32 wheelWidth;
-	physx::PxF32 wheelRadius;
 	physx::PxF32 wheelMOI;
-	physx::PxMaterial* wheelMaterial;
+	physx::PxF32 wheelDamping;
 	physx::PxU32 numWheels;
+	physx::PxMaterial* wheelMaterial;
+
+	// Other
+	physx::PxF32 maxBrakeTorque;
+	physx::PxF32 maxHandBrakeTorque;
+	physx::PxF32 maxSteer;
+
+	physx::PxF32 engineTorque;
+	physx::PxF32 engineRPM;
+	physx::PxF32 engineMOI;
+
+	physx::PxF32 gearSwitchTime;
+	physx::PxF32 gearFinalRatio;
+
+	physx::PxF32 clutchStrength;
+
+	// User only properties (not used directly in vehicle creation)
 	physx::PxReal chassisStaticFriction;
 	physx::PxReal chassisDynamicFriction;
 	physx::PxReal chassisRestitution;
@@ -34,7 +54,9 @@ struct VehicleTuning
 	physx::PxReal wheelDynamicFriction;
 	physx::PxReal wheelRestitution;
 
-	// Other properties
+	physx::PxVec3 chassisMOIscalar;
+	physx::PxF32 wheelMOIscalar;
+	physx::PxU32 maxSteerDegrees;
 };
 
 class Vehicle :
@@ -44,9 +66,10 @@ public:
 	Vehicle(void);
 	~Vehicle(void);
 
-	physx::PxVehicleDrive4W* physicsVehicle;
 	VehicleInput input;
 	VehicleTuning tuning;
+
+	int pizzaCount;
 
 	// AI stuff; might be moved into 'Player' class
 	std::vector<glm::vec3> currentPath;
@@ -54,12 +77,23 @@ public:
 	void updateTuning();
 	void handleInput();
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
+	glm::mat4 getModelMatrix();
 
-	sigslot::signal1<Vehicle*> ShootPizzaSignal;	
+	void setPhysicsVehicle(physx::PxVehicleDrive4W* vehicle);
 
-	const void test();
+	sigslot::signal1<Vehicle*> shootPizzaSignal;	
 
 private:
-	void defaultTuning();
+	physx::PxF32 tipAngle;
+
+	physx::PxVehicleDrive4W* physicsVehicle;
+	physx::PxVehicleDrive4WRawInputData vehicleInput;
+
+	physx::PxVehiclePadSmoothingData smoothingData;
+	physx::PxF32 steerVsSpeedData[2*8];
+	physx::PxFixedSizeLookupTable<8> steerVsSpeedTable;
+
+	void setSmoothingData();
+	void setSteerSpeedData();
 };
 

@@ -13,9 +13,84 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
 	rapidjson::Document d;
 	d.ParseStream(reader);
+
+	// Ben added this. Very ugle, should be done better probably
 	if (d.HasMember("mass")) {
 		vehicle->tuning.chassisMass = (float)d["mass"].GetDouble();
 	}
+	if (d.HasMember("chassisMOIscalarX")) {
+		vehicle->tuning.chassisMOIscalar.x = (float)d["chassisMOIscalarX"].GetDouble();
+	}
+	if (d.HasMember("chassisMOIscalarY")) {
+		vehicle->tuning.chassisMOIscalar.y = (float)d["chassisMOIscalarY"].GetDouble();
+	}
+	if (d.HasMember("chassisMOIscalarZ")) {
+		vehicle->tuning.chassisMOIscalar.z = (float)d["chassisMOIscalarZ"].GetDouble();
+	}
+	if (d.HasMember("chassisCMOffsetX")) {
+		vehicle->tuning.chassisCMOffset.x = (float)d["chassisCMOffsetX"].GetDouble();
+	}
+	if (d.HasMember("chassisCMOffsetY")) {
+		vehicle->tuning.chassisCMOffset.y = (float)d["chassisCMOffsetY"].GetDouble();
+	}
+	if (d.HasMember("chassisCMOffsetZ")) {
+		vehicle->tuning.chassisCMOffset.z = (float)d["chassisCMOffsetZ"].GetDouble();
+	}
+	if (d.HasMember("chassisStaticFriction")) {
+		vehicle->tuning.chassisStaticFriction = (float)d["chassisStaticFriction"].GetDouble();
+	}
+	if (d.HasMember("chassisDynamicFriction")) {
+		vehicle->tuning.chassisDynamicFriction = (float)d["chassisDynamicFriction"].GetDouble();
+	}
+	if (d.HasMember("chassisRestitution")) {
+		vehicle->tuning.chassisRestitution = (float)d["chassisRestitution"].GetDouble();
+	}
+	if (d.HasMember("wheelMass")) {
+		vehicle->tuning.wheelMass = (float)d["wheelMass"].GetDouble();
+	}
+	if (d.HasMember("wheelMOIscalar")) {
+		vehicle->tuning.wheelMOIscalar = (float)d["wheelMOIscalar"].GetDouble();
+	}
+	if (d.HasMember("wheelDamping")) {
+		vehicle->tuning.wheelDamping = (float)d["wheelDamping"].GetDouble();
+	}
+	if (d.HasMember("wheelStaticFriction")) {
+		vehicle->tuning.wheelStaticFriction = (float)d["wheelStaticFriction"].GetDouble();
+	}
+	if (d.HasMember("wheelDynamicFriction")) {
+		vehicle->tuning.wheelDynamicFriction = (float)d["wheelDynamicFriction"].GetDouble();
+	}
+	if (d.HasMember("wheelRestitution")) {
+		vehicle->tuning.wheelRestitution = (float)d["wheelRestitution"].GetDouble();
+	}
+	if (d.HasMember("maxBrakeTorque")) {
+		vehicle->tuning.maxBrakeTorque = (float)d["maxBrakeTorque"].GetDouble();
+	}
+	if (d.HasMember("maxHandBrakeTorque")) {
+		vehicle->tuning.maxHandBrakeTorque = (float)d["maxHandBrakeTorque"].GetDouble();
+	}
+	if (d.HasMember("maxSteerDegrees")) {
+		vehicle->tuning.maxSteerDegrees = (float)d["maxSteerDegrees"].GetInt();
+	}
+	if (d.HasMember("engineTorque")) {
+		vehicle->tuning.engineTorque = (float)d["engineTorque"].GetDouble();
+	}
+	if (d.HasMember("engineRPM")) {
+		vehicle->tuning.engineRPM = (float)d["engineRPM"].GetDouble();
+	}
+	if (d.HasMember("engineMOI")) {
+		vehicle->tuning.engineMOI = (float)d["engineMOI"].GetDouble();
+	}
+	if (d.HasMember("gearSwitchTime")) {
+		vehicle->tuning.gearSwitchTime = (float)d["gearSwitchTime"].GetDouble();
+	}
+	if (d.HasMember("gearFinalRatio")) {
+		vehicle->tuning.gearFinalRatio = (float)d["gearFinalRatio"].GetDouble();
+	}
+	if (d.HasMember("clutchStrength")) {
+		vehicle->tuning.clutchStrength = (float)d["clutchStrength"].GetDouble();
+	}
+
 	vehicle->updateTuning();
 
 	fclose(filePointer);
@@ -86,12 +161,15 @@ Renderable* createRenderable(std::string modelFile) {
 	std::vector<glm::vec3> verts;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
+
 	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals);
 	//std::cout << "Verts size " << verts.size() << std::endl;
+
 	r->setVerts(verts);
 	r->setUVs(uvs);
 	r->setNorms(normals);
 	//r->setColor(glm::vec3(1.0f,1.0f,1.0f));
+
 	return r;
 }
 
@@ -156,6 +234,25 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 					box->halfZ = (float)geometry[i]["halfZ"].GetDouble();
 				shape = box;
 			}
+
+			// Added by Ben for testing
+			else if (shapeName == "convexMesh")
+			{
+				ConvexMeshInfo* convexMesh = new ConvexMeshInfo();
+				convexMesh->geometry = Geometry::CONVEX_MESH;
+				convexMesh->verts = model->getVertices();
+				shape = convexMesh;
+			}
+			else if (shapeName == "triangleMesh")
+			{
+				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
+				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
+				triangleMesh->verts = model->getVertices();
+				triangleMesh->faces = model->getFaces();
+				shape = triangleMesh;
+			}
+			
+			
 			if (geometry[i].HasMember("flag0")) {
 				shape->filterFlag0 = stringToFlag(geometry[i]["flag0"].GetString());
 			} else {
@@ -166,8 +263,13 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			} else {
 				shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
 			}
+			if (geometry[i].HasMember("isDrivable")) {
+				shape->isDrivable = (geometry[i]["isDrivable"].GetInt() != 0);
+				std::cout << "TEST: " << geometry[i]["isDrivable"].GetInt() << std::endl;
+			}
 			info->shapeInfo.push_back(shape);
 		}
+
 	} else {
 		// Give a default box around the model
 		BoxInfo* box = new BoxInfo();
@@ -264,15 +366,45 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				y = entityArray[j]["y"].GetDouble();
 			if (entityArray[j].HasMember("z"))
 				z = entityArray[j]["z"].GetDouble();
+
+
 			TileEntity e;
 			e.model = model;
 			e.position = glm::vec3(x, y, z);
 			t.entities.push_back(e);
 		}
+
+		const rapidjson::Value& nodeArray = tileArray[i]["nodes"];
+		// Setting positions
+		for (rapidjson::SizeType j = 0; j < nodeArray.Size(); j++) 
+		{
+			graphNode * current = new graphNode();
+
+			double x, z;
+			if (nodeArray[j].HasMember("x"))
+				x = nodeArray[j]["x"].GetDouble();
+			if (nodeArray[j].HasMember("z"))
+				z = nodeArray[j]["z"].GetDouble();
+
+			current->setPosition(glm::vec3(x,0,z));
+			t.nodes.push_back(current);
+		}
+
+		// Connecting neighbours
+		for (rapidjson::SizeType j = 0; j < nodeArray.Size(); j++) 
+		{
+			const rapidjson::Value& neighboursArray = nodeArray[j]["neighbours"];
+			for (rapidjson::SizeType k = 0; k < neighboursArray.Size(); k++) 
+			{
+				int index = neighboursArray[k].GetInt();
+				t.nodes[j]->addNeighbour(t.nodes[index]);
+			}
+		}
+
 		tiles[id] = t;
 	}
 
-	// Construct the map
+	// Construct the map 
 	int tileSize = d["map"]["tile size"].GetInt();
 	map.tileSize = tileSize;
 	const rapidjson::Value& mapTilesArray = d["map"]["tiles"];
@@ -281,102 +413,47 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		std::vector<Tile> rowTiles;
 		for (rapidjson::SizeType j = 0; j < row.Size(); j++) {
 			int id = row[j].GetInt();
+
+			// changing relative coordinates to global coordinates
+			for(graphNode * n : tiles[id].nodes)
+			{
+				glm::vec3 pos = n->getPosition();
+				pos *= tileSize;
+				pos.x += (tileSize * j);
+				pos.z += (tileSize * i); 
+				n->setPosition(pos);
+			}
+
 			rowTiles.push_back(tiles[id]);
 		}
 		map.tiles.push_back(rowTiles);
 	}
 
-	return true;
-}
-
-bool ContentLoading::loadOBJNonIndexed(
-	const char * path, 
-	std::vector<glm::vec3> & out_vertices, 
-	//std::vector<glm::vec2> & out_uvs,
-	std::vector<glm::vec3> & out_normals
-){
-	printf("Loading OBJ file %s...\n", path);
-
-	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
-	std::vector<glm::vec3> temp_vertices; 
-	//std::vector<glm::vec2> temp_uvs;
-	std::vector<glm::vec3> temp_normals;
-
-
-	FILE * file;
-	errno_t err = fopen_s(&file, path, "r");
-	if( file == NULL ){
-		printf("Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n");
-		getchar();
-		return false;
-	}
-	while( 1 ){
-
-		char lineHeader[128];
-		// read the first word of the line
-		int res = fscanf_s(file, "%s", lineHeader, sizeof(lineHeader));
-		if (res == EOF)
-			break; // EOF = End Of File. Quit the loop.
-
-		// else : parse lineHeader
-		
-		if ( strcmp( lineHeader, "v" ) == 0 ){
-			glm::vec3 vertex;
-			fscanf_s(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
-			temp_vertices.push_back(vertex);
-		//}else if ( strcmp( lineHeader, "vt" ) == 0 ){
-		//	glm::vec2 uv;
-		//	fscanf(file, "%f %f\n", &uv.x, &uv.y );
-		//	uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
-		//	temp_uvs.push_back(uv);
-		}else if ( strcmp( lineHeader, "vn" ) == 0 ){
-			glm::vec3 normal;
-			fscanf_s(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z );
-			temp_normals.push_back(normal);
-		}else if ( strcmp( lineHeader, "f" ) == 0 ){
-			std::string vertex1, vertex2, vertex3;
-			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-			int matches = fscanf_s(file, "%d//%d %d//%d %d//%d\n", &vertexIndex[0], &normalIndex[0], &vertexIndex[1], &normalIndex[1], &vertexIndex[2], &normalIndex[2]);
-			if (matches != 6){
-				return false;
-			}
-			vertexIndices.push_back(vertexIndex[0]);
-			vertexIndices.push_back(vertexIndex[1]);
-			vertexIndices.push_back(vertexIndex[2]);
-			//uvIndices    .push_back(uvIndex[0]);
-			//uvIndices    .push_back(uvIndex[1]);
-			//uvIndices    .push_back(uvIndex[2]);
-			normalIndices.push_back(normalIndex[0]);
-			normalIndices.push_back(normalIndex[1]);
-			normalIndices.push_back(normalIndex[2]);
-		}else{
-			// Probably a comment, eat up the rest of the line
-			char stupidBuffer[1000];
-			fgets(stupidBuffer, 1000, file);
+	// Add connections for graph nodes between tiles
+	std::vector<graphNode*> allNodes;
+	for(std::vector<Tile> vt : map.tiles)
+	{
+		for(Tile t : vt)
+		{
+			allNodes.insert(allNodes.begin(), t.nodes.begin(), t.nodes.end());
 		}
-
 	}
+	for(int i = 0; i < allNodes.size(); i++)
+	{
+		graphNode * current = allNodes.at(i);
 
-	// For each vertex of each triangle
-	for( unsigned int i=0; i<vertexIndices.size(); i++ ){
+		for(int j = i+1; j < allNodes.size(); j++)
+		{
+			graphNode * comparing = allNodes.at(j);
 
-		// Get the indices of its attributes
-		unsigned int vertexIndex = vertexIndices[i];
-		//unsigned int uvIndex = uvIndices[i];
-		unsigned int normalIndex = normalIndices[i];
-		
-		// Get the attributes thanks to the index
-		glm::vec3 vertex = temp_vertices[ vertexIndex-1 ];
-		//glm::vec2 uv = temp_uvs[ uvIndex-1 ];
-		glm::vec3 normal = temp_normals[ normalIndex-1 ];
-		
-		// Put the attributes in buffers
-		out_vertices.push_back(vertex);
-		//out_uvs     .push_back(uv);
-		out_normals .push_back(normal);
-	
+			if(current->sameLocation(comparing))
+			{
+				// May need to actually merge these instead of just connecting them
+				current->addNeighbour(comparing);
+				comparing->addNeighbour(current);
+			}
+		}
 	}
-
 	return true;
 }
 
@@ -540,7 +617,8 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 	// "Bind" the newly created texture : all future texture functions will modify this texture
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);	
-	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); //uncomment to disable mipmaps
+
 	unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16; 
 	unsigned int offset = 0;
 

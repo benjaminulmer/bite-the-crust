@@ -93,30 +93,6 @@ public:
 
 	void renderText();
 
-	//phong testing
-	GLuint phongProgramID;
-	std::vector <glm::vec3> phongVerts;
-	std::vector <glm::vec3> phongNorms;
-	std::vector <glm::vec2> phongUVs;
-
-	//stuff for text
-	GLuint textVBO;
 	GLuint textVAO;
-	GLuint texture;
-	GLuint sampler;
-	GLint attribute_coord;
-	GLint uniform_tex;
-	GLint uniform_color;
-
-	FT_Library ft;
-	FT_Face face;
-
-	struct point {
-	GLfloat x;
-	GLfloat y;
-	GLfloat s;
-	GLfloat t;
-	};
-
 };
 

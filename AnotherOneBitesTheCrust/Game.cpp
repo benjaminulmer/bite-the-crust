@@ -98,6 +98,7 @@ void Game::setupEntities()
 	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
 		renderingEngine->assignBuffersTex(it->second);
 	}
+	deliveryManager->deliverTexture = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
 
 	// TODO fix this - testing shootings textures for now. Alexei can switch to json
 	pizza = new Renderable();
@@ -120,17 +121,19 @@ void Game::setupEntities()
 		for (unsigned int j = 0; j < map.tiles[i].size(); j++) {
 			deliveryManager->addDeliveryLocation(&map.tiles[i][j]);
 
-			Tile tile = map.tiles[i][j];
+			Tile* tile = &map.tiles[i][j];
 			Entity* ground = new Entity();
-			ground->setRenderable(renderablesMap[tile.groundModel]);
-			ground->setTexture(textureMap[tile.groundModel]);
+			ground->setRenderable(renderablesMap[tile->groundModel]);
+			ground->setTexture(textureMap[tile->groundModel]);
 
 			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
 			ground->setDefaultTranslation(glm::vec3(i*map.tileSize + map.tileSize/2, 0, j*map.tileSize + map.tileSize/2));
+			tile->ground = ground;
+			tile->groundTexture = textureMap[tile->groundModel];
 			entities.push_back(ground);
 
-			for (unsigned int k = 0; k < tile.entities.size(); k++) {
-				TileEntity tileEntity = tile.entities[k];
+			for (unsigned int k = 0; k < tile->entities.size(); k++) {
+				TileEntity tileEntity = tile->entities[k];
 
 				PhysicsEntity* e = new PhysicsEntity();
 				// TODO, error check that these models do exist, instead of just break
@@ -184,6 +187,8 @@ void Game::setupEntities()
 	}
 	cameraPosBufferIndex = 0;
 	camera.setUpVector(glm::vec3(0,1,0));
+
+	physicsEngine->createTrigger();
 }
 
 // Connects systems together
@@ -196,7 +201,8 @@ void Game::connectSystems()
 
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->assignDeliveries();
-	p1Vehicle->shootPizzaSignal.connect(deliveryManager, &DeliveryManager::pizzaShot);
+	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
+	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
 }
 
 // Main loop of the game
@@ -223,7 +229,7 @@ void Game::mainLoop()
 			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
-			aiEngine->updateAI(p2Vehicle);
+			aiEngine->updateAI(p2Vehicle, map);
 			p1Vehicle->update();
 			p2Vehicle->update();
 		
@@ -257,6 +263,10 @@ void Game::mainLoop()
 		renderingEngine->printText2D(score.data(), 800, 740, 24);
 		
 		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 500, 700, 20);
+
+		string pizzas = "Pizzas: ";
+		pizzas.append(to_string(p1Vehicle->pizzaCount));
+		renderingEngine->printText2D(pizzas.data(), 800, 680, 24);
 
 		//swap buffers
 		SDL_GL_SwapWindow(window);

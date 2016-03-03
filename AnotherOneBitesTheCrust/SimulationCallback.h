@@ -7,6 +7,7 @@
 class SimulationCallback
 	: public physx::PxSimulationEventCallback
 {
+public:
 	void onContact(const physx::PxContactPairHeader &pairHeader, const physx::PxContactPair *pairs, physx::PxU32 nbPairs);
 
 	void onTrigger(physx::PxTriggerPair *pairs, physx::PxU32 count);

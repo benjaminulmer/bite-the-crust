@@ -2,6 +2,7 @@
 #include <map>
 #include "Vehicle.h"
 #include "Map.h"
+#include "PizzaBox.h"
 #include <time.h>
 #include <iostream>
 #include <sigslot.h>
@@ -28,6 +29,7 @@ public:
 	std::vector<Vehicle*> players;
 	std::map<Vehicle*, Delivery> deliveries;
 	std::map<Vehicle*, int> scores;
+	GLuint deliverTexture;
 	
 	void addDeliveryLocation(Tile* location);
 	void addPlayer(Vehicle* player);
@@ -36,6 +38,7 @@ public:
 	int getScore(Vehicle* player);
 	void timePassed(double timeMs);
 	Delivery newDelivery();
-	void pizzaShot(Vehicle* player);
+	void pizzaLanded(PizzaBox* pizza);
+	void refillPizza(Vehicle* player);
 };
 

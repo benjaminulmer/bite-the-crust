@@ -6,6 +6,7 @@
 #include "FrictionPairs.h"
 #include "Vehicle.h"
 #include "PhysicsEntityInfo.h"
+#include "SimulationCallback.h"
 
 class PhysicsEngine
 {
@@ -21,6 +22,7 @@ public:
 	//TODO make this not suck
 	void createTrigger();
 
+	SimulationCallback* simulationCallback;
 private:
 	static const int MAX_VEHICLES = 4;
 	PhysicsHelper* helper;

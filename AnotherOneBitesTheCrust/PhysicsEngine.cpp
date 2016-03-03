@@ -1,7 +1,5 @@
 #include "PhysicsEngine.h"
 #include "Filtering.h"
-#include "SimulationCallback.h"
-
 #include <iostream>
 
 using namespace physx;
@@ -54,7 +52,7 @@ void PhysicsEngine::initPhysXSDK()
 	FilterCallback* filterCallback = new FilterCallback();
 	sceneDesc.filterCallback = filterCallback;
 
-	SimulationCallback* simulationCallback = new SimulationCallback();
+	simulationCallback = new SimulationCallback();
 	sceneDesc.simulationEventCallback = simulationCallback;
 
 	scene = physics->createScene(sceneDesc);

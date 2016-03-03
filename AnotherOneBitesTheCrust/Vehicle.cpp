@@ -20,6 +20,8 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 
 	setSmoothingData();
 	setSteerSpeedData();
+
+	pizzaCount = 3;
 }
 
 void Vehicle::setSmoothingData()
@@ -58,17 +60,6 @@ void Vehicle::setPhysicsVehicle(physx::PxVehicleDrive4W* vehicle)
 physx::PxVehicleDrive4W* Vehicle::getPhysicsVehicle()
 {
 	return physicsVehicle;
-}
-
-void Vehicle::updateTuning()
-{
-	// Recalculate variables which are based off of other variables, if some of them have been changed.
-	tuning.chassisMOI = PxVec3
-		((tuning.chassisDims.y * tuning.chassisDims.y + tuning.chassisDims.z * tuning.chassisDims.z) * tuning.chassisMass/12.0f,
-		 (tuning.chassisDims.x * tuning.chassisDims.x + tuning.chassisDims.z * tuning.chassisDims.z) * 0.8f * tuning.chassisMass/12.0f,
-		 (tuning.chassisDims.x * tuning.chassisDims.x + tuning.chassisDims.y * tuning.chassisDims.y) * tuning.chassisMass/12.0f);
-	tuning.chassisCMOffset = PxVec3(0.0f, -tuning.chassisDims.y * 0.5f + 0.65f, 0.25f);
-	tuning.wheelMOI = 0.5f * tuning.wheelMass * tuning.wheelRadius * tuning.wheelRadius;
 }
 
 void Vehicle::update()
@@ -121,8 +112,11 @@ void Vehicle::update()
 	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(smoothingData, steerVsSpeedTable, vehicleInput, stepSizeS, false, *physicsVehicle);
 
 	if (input.shootPizza)
-	{
-		shootPizzaSignal(this);
+	{ 
+		if (pizzaCount > 0) {
+			shootPizzaSignal(this);
+			pizzaCount--;
+		}
 		input.shootPizza = false;
 	}
 }

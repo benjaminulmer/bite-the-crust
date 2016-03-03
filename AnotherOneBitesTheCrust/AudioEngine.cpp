@@ -102,7 +102,6 @@ void AudioEngine::playCannonSound(PhysicsEntity * source)
 
 	result = fmodSystem->playSound(cannonSound, 0, false, &playingOn->channel);
 	playingOn->channel->setVolumeRamp(false); // For fixing popping noise at low volume.
-	//playingOn->channel->setVolume(0.5);
 	playingOn->channel->set3DAttributes(&glmVec3ToFmodVec(pos), 0);
 	playingOn->channel->setPaused(false);
 
@@ -121,8 +120,6 @@ void AudioEngine::initStreams()
 
 void AudioEngine::update3DPositions()
 {
-
-	
 		bool isPlaying = false;
 		for(std::list<Sound3D*>::iterator i = playing.begin(); i != playing.end(); i++)
 	{

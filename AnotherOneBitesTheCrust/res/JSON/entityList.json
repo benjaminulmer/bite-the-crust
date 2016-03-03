@@ -1,11 +1,8 @@
 {
     "entities": [
-        {"name": "floor", "model": "FlatFloor.obj", "physics": "default.json"},
-        {"name": "floor2", "model": "FlatFloor.obj", "physics": "default.json"},
-        {"name": "box", "model": "PizzaBox.obj", "physics": "box.json"},
-        {"name": "van", "model": "Van.obj", "physics": "default.json"},
-        {"name": "cube", "model": "cube.obj", "physics": "default.json"},
-        {"name": "barrier", "model": "constructionBarrier.obj", "physics": "barrier.json"},
-		{"name": "bigramp", "model": "bigramp.obj", "physics": "ramp.json"}
+        {"name": "floor", "model": "Floor.obj", "physics": "default.json", "texture": "Floor.DDS"},
+        {"name": "floor2", "model": "Floor.obj", "physics": "default.json", "texture": "Floor.DDS"},
+        {"name": "box", "model": "PizzaBox-centered.obj", "physics": "box.json", "texture": "PizzaBox-colored.DDS"},
+        {"name": "van", "model": "Van-with-uv.obj", "physics": "default.json", "texture": "Van-uv-colored.DDS"}
     ]
 }

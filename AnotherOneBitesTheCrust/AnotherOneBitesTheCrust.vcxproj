@@ -211,6 +211,8 @@
   <ItemGroup>
     <None Include="res\Shaders\StandardShading.fragmentshader" />
     <None Include="res\Shaders\StandardShading.vertexshader" />
+    <None Include="res\Shaders\textured-StandardShading.fragmentshader" />
+    <None Include="res\Shaders\textured-StandardShading.vertexshader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

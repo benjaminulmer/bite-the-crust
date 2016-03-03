@@ -28,6 +28,11 @@ void Renderable::setVerts(std::vector<glm::vec3> vertices)
 	verts = vertices;
 }
 
+void Renderable::setUVs(std::vector<glm::vec2> UVs)
+{
+	uvs = UVs;
+}
+
 void Renderable::setNorms(std::vector <glm::vec3> normals)
 {
 	norms = normals;
@@ -39,7 +44,8 @@ void Renderable::setFaces(std::vector<GLuint> face)
 }
 
 
-std::vector<glm::vec3> Renderable::getVertices() {
+std::vector<glm::vec3> Renderable::getVertices() 
+{
 	return verts;
 }
 
@@ -50,6 +56,11 @@ std::vector<glm::vec3> Renderable::getVertices() {
 //	}
 //	return vertices;
 //}
+
+std::vector<glm::vec2> Renderable::getUVs()
+{
+	return uvs;
+}
 
 std::vector<glm::vec3> Renderable::getNormals()
 {

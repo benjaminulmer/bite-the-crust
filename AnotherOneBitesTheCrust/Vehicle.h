@@ -63,7 +63,7 @@ class Vehicle :
 	public DynamicEntity
 {
 public:
-	Vehicle(void);
+	Vehicle(unsigned int stepSizeMS);
 	~Vehicle(void);
 
 	VehicleInput input;
@@ -82,6 +82,8 @@ public:
 	sigslot::signal1<Vehicle*> shootPizzaSignal;	
 
 private:
+	physx::PxF32 stepSizeS;
+
 	physx::PxF32 tipAngle;
 
 	physx::PxVehicleDrive4W* physicsVehicle;

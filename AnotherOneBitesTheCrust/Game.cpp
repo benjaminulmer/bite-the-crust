@@ -12,9 +12,8 @@ using namespace std;
 void fatalError(string errorString)
 {
 	cout << errorString << endl;
-	cout << "Enter any key to quit...";
-	int tmp;
-	cin >> tmp;
+	cout << "Enter enter to quit...";
+	cin.ignore();
 	SDL_Quit();
 	exit(1);
 }
@@ -46,10 +45,11 @@ void Game::run()
 	mainLoop();
 }
 
+// Initialize all subsystems for the game
 void Game::initSystems()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);		//Initialize SDL
-	window = SDL_CreateWindow("Another One Bites The Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 
 	if(window == nullptr)
 	{
@@ -84,12 +84,12 @@ void Game::initSystems()
 	renderingEngine = new RenderingEngine();
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
-
-	//renderingEngine->testOBJLoading();
 }
 
+// Create and initialize all loaded entities in the game world
 void Game::setupEntities()
 {
+	// Load data for entities
 	if (!ContentLoading::loadEntityList("res\\JSON\\entityList.json", renderablesMap, physicsEntityInfoMap, textureMap))
 		fatalError("Could not load entities list.");
 
@@ -98,12 +98,8 @@ void Game::setupEntities()
 	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
 		renderingEngine->assignBuffersTex(it->second);
 	}
-	// Set up the colours, since we don't have textures yet
-	//renderablesMap["floor2"]->setColor(glm::vec3(1,1,0));
-	//renderablesMap["box"]->setColor(glm::vec3(0,1,1));
-	//renderablesMap["van"]->setColor(glm::vec3(1,0,0));
 
-	//testing shootings textures for now. Alexei can switch to json
+	// TODO fix this - testing shootings textures for now. Alexei can switch to json
 	pizza = new Renderable();
 	vector<vec3>pizzaVerts;
 	vector<glm::vec2>pizzaUVs;
@@ -114,26 +110,30 @@ void Game::setupEntities()
 	pizza->setNorms(pizzaNormals);
 	renderingEngine->assignBuffersTex(pizza);
 
-	//
+	// Load the map
 	if (!ContentLoading::loadMap("res\\JSON\\map.json", map))
 		fatalError("Could not load map file.");
 	deliveryManager->map = &map;
+
 	// Create all the entities loaded in the map
 	for (unsigned int i = 0; i < map.tiles.size(); i++) {
 		for (unsigned int j = 0; j < map.tiles[i].size(); j++) {
 			deliveryManager->addDeliveryLocation(&map.tiles[i][j]);
+
 			Tile tile = map.tiles[i][j];
 			Entity* ground = new Entity();
 			ground->setRenderable(renderablesMap[tile.groundModel]);
 			ground->setTexture(textureMap[tile.groundModel]);
+
 			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
 			ground->setDefaultTranslation(glm::vec3(i*map.tileSize + map.tileSize/2, 0, j*map.tileSize + map.tileSize/2));
 			entities.push_back(ground);
+
 			for (unsigned int k = 0; k < tile.entities.size(); k++) {
 				TileEntity tileEntity = tile.entities[k];
 
-				DynamicEntity* e = new DynamicEntity();
-				// todo, error check that these models do exist, instead of just break
+				PhysicsEntity* e = new PhysicsEntity();
+				// TODO, error check that these models do exist, instead of just break
 				e->setRenderable(renderablesMap[tileEntity.model]);
 
 				e->setDefaultTranslation(e->getRenderable()->getCenter());
@@ -141,9 +141,6 @@ void Game::setupEntities()
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize + map.tileSize/2, 0, j * map.tileSize + map.tileSize/2);
-
-				// Centre is negated because Gorman sucks at naming things :P
-				glm::vec3 offset = renderablesMap[tileEntity.model]->getCenter();
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(physx::PxIdentity));
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
@@ -155,7 +152,7 @@ void Game::setupEntities()
 	/**********************************************************
 						Creating Vechicles
 	**********************************************************/
-	p1Vehicle = new Vehicle();
+	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
 	p1Vehicle->setRenderable(renderablesMap["van"]);
 	p1Vehicle->setTexture(textureMap["van"]);
@@ -168,7 +165,7 @@ void Game::setupEntities()
 	entities.push_back(p1Vehicle);
 
 	//// Player 2 (ie. AI)
-	p2Vehicle = new Vehicle();
+	p2Vehicle = new Vehicle(PHYSICS_STEP_MS);
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", p2Vehicle);
 	p2Vehicle->setRenderable(renderablesMap["van"]);
 	p2Vehicle->setTexture(textureMap["van"]);
@@ -180,6 +177,7 @@ void Game::setupEntities()
 	physicsEngine->createVehicle(p2Vehicle, physx::PxTransform(physx::PxVec3(10, 2, 0), physx::PxQuat(physx::PxIdentity)));
 	entities.push_back(p2Vehicle);
 
+	// Initialize player location buffer for camera
 	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
 	{
 		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
@@ -188,7 +186,7 @@ void Game::setupEntities()
 	camera.setUpVector(glm::vec3(0,1,0));
 }
 
-// TODO decide how signals will be used and set them up
+// Connects systems together
 void Game::connectSystems()
 {
 	inputEngine->setInputStruct(&p1Vehicle->input, 0);
@@ -201,18 +199,15 @@ void Game::connectSystems()
 	p1Vehicle->shootPizzaSignal.connect(deliveryManager, &DeliveryManager::pizzaShot);
 }
 
+// Main loop of the game
 void Game::mainLoop()
 {
 	unsigned int oldTimeMs = SDL_GetTicks();
 	unsigned int deltaTimeAccMs = 0;
-	unsigned int physicsStepSize = 16;
-	
-	physicsEngine->createTrigger();
 
 	// Game loop
 	while (gameState!= GameState::EXIT)
 	{
-
 		processSDLEvents();
 
 		// Figure out timestep and run physics
@@ -221,18 +216,18 @@ void Game::mainLoop()
 		oldTimeMs = newTimeMs;
 
 		deltaTimeAccMs += deltaTimeMs;
-		if (deltaTimeAccMs >= physicsStepSize) 
+		if (deltaTimeAccMs >= PHYSICS_STEP_MS) 
 		{
-			deltaTimeAccMs -= physicsStepSize;
+			deltaTimeAccMs -= PHYSICS_STEP_MS;
 
-			deliveryManager->timePassed(physicsStepSize);
+			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
 			aiEngine->updateAI(p2Vehicle);
 			p1Vehicle->handleInput();
 			p2Vehicle->handleInput();
 		
-			physicsEngine->simulate(physicsStepSize);
+			physicsEngine->simulate(PHYSICS_STEP_MS);
 
 			// Update the camera position buffer with new location
 			cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
@@ -269,6 +264,7 @@ void Game::mainLoop()
 	}
 }
 
+// Loop over all SDL events since last frame and call appropriate for each type of event
 void Game::processSDLEvents()
 {
 	SDL_Event event;
@@ -305,7 +301,7 @@ void Game::processSDLEvents()
 	}
 }
 
-// TODO move this to a different file
+// Creates and fires a pizza from the provided vehicle
 void Game::shootPizza(Vehicle* vehicle)
 {
 	PizzaBox* pizzaBox = new PizzaBox(vehicle);

@@ -2,7 +2,7 @@
 
 using namespace physx;
 
-Vehicle::Vehicle(void)
+Vehicle::Vehicle(unsigned int stepSizeMS)
 {
 	currentPath = std::vector<glm::vec3>();
 
@@ -12,8 +12,8 @@ Vehicle::Vehicle(void)
 	input.handBrake = false;
 	input.shootPizza = false;
 
+	stepSizeS = stepSizeMS/100.0f;
 	tipAngle = 0;
-
 	vehicleInput = PxVehicleDrive4WRawInputData();
 
 	setSmoothingData();
@@ -101,7 +101,7 @@ void Vehicle::handleInput()
 	vehicleInput.setAnalogSteer(input.steer);
 	vehicleInput.setAnalogHandbrake(handBrake);
 
-	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(smoothingData, steerVsSpeedTable, vehicleInput, 16.0f/1000.0f, false, *physicsVehicle);
+	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(smoothingData, steerVsSpeedTable, vehicleInput, stepSizeS, false, *physicsVehicle);
 
 	if (input.shootPizza)
 	{
@@ -112,7 +112,8 @@ void Vehicle::handleInput()
 
 glm::mat4 Vehicle::getModelMatrix()
 {
-	tipAngle = 0.98f * tipAngle + (0.02f * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
+	PxF32 alpha = 0.02f;
+	tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
 
 	PxTransform transform(PxQuat(tipAngle, PxVec3(0, 0, 1)));
 	transform = actor->getGlobalPose() * transform;

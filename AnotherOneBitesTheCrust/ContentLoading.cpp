@@ -2,6 +2,7 @@
 
 namespace ContentLoading {
 
+// Loads and stores tuning data for vehicle from provided file
 bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
@@ -98,6 +99,7 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	return true;
 }
 
+// Verifies entity list is well formated
 bool verifyEntityList(const rapidjson::Document &d) {
 	if (!d.HasMember("entities")) {
 		printf("Missing entities array.");
@@ -121,6 +123,7 @@ bool verifyEntityList(const rapidjson::Document &d) {
 	return true;
 }
 
+// Load entities and their information
 bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Renderable*> &modelMap, std::map<std::string, PhysicsEntityInfo*> &physicsMap,
 									std::map<std::string, GLuint> &textureMap) {
 	FILE* filePointer;
@@ -133,20 +136,25 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
 	rapidjson::Document d;
 	d.ParseStream(reader);
+
 	if (!verifyEntityList(d)) {
 		return false;
 	}
+
 	const rapidjson::Value& entitiesArray = d["entities"];
 	for (rapidjson::SizeType i = 0; i < entitiesArray.Size(); i++) {
 		std::string name = entitiesArray[i]["name"].GetString();
+
 		std::string renderableModelFile = entitiesArray[i]["model"].GetString();
 		renderableModelFile.insert(0, "res\\Models\\");
 		Renderable* r = createRenderable(renderableModelFile);
 		modelMap[name] = r;
+
 		std::string physicsDataName = entitiesArray[i]["physics"].GetString();
 		physicsDataName.insert(0, "res\\JSON\\Physics\\");
 		PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
 		physicsMap[name] = info;
+
 		if (entitiesArray[i].HasMember("texture")) {
 			std::string textureName = entitiesArray[i]["texture"].GetString();
 			textureName.insert(0, "res\\Textures\\");
@@ -156,6 +164,7 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 	return true;
 }
 
+// Create renderable from obj file
 Renderable* createRenderable(std::string modelFile) {
 	Renderable * r = new Renderable();
 	std::vector<glm::vec3> verts;
@@ -163,18 +172,15 @@ Renderable* createRenderable(std::string modelFile) {
 	std::vector<glm::vec3> normals;
 
 	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals);
-	//std::cout << "Verts size " << verts.size() << std::endl;
 
 	r->setVerts(verts);
 	r->setUVs(uvs);
 	r->setNorms(normals);
-	//r->setColor(glm::vec3(1.0f,1.0f,1.0f));
 
 	return r;
 }
 
-
-
+// Create physics information from JSON file. Uses obj if needed/specified
 PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
@@ -202,8 +208,8 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 	}
 	if (d.HasMember("dynamicInfo")) {
 		const rapidjson::Value& dynamicInfo = d["dynamicInfo"];
-		if (dynamicInfo.HasMember("mass")) {
-			info->dynamicInfo->mass = (float)dynamicInfo["mass"].GetDouble();
+		if (dynamicInfo.HasMember("density")) {
+			info->dynamicInfo->density = (float)dynamicInfo["mass"].GetDouble();
 		}
 		if (dynamicInfo.HasMember("linearDamping")) {
 			info->dynamicInfo->linearDamping = (float)dynamicInfo["linearDamping"].GetDouble();

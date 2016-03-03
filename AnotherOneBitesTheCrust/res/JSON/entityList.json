@@ -3,6 +3,7 @@
         {"name": "floor", "model": "Floor.obj", "physics": "default.json", "texture": "Floor.DDS"},
         {"name": "floor2", "model": "Floor.obj", "physics": "default.json", "texture": "Floor.DDS"},
         {"name": "box", "model": "PizzaBox-centered.obj", "physics": "box.json", "texture": "PizzaBox-colored.DDS"},
-        {"name": "van", "model": "Van-with-uv.obj", "physics": "default.json", "texture": "Van-uv-colored.DDS"}
+        {"name": "van", "model": "Van-with-uv.obj", "physics": "default.json", "texture": "Van-uv-colored.DDS"},
+		{"name": "bigramp", "model": "bigramp.obj", "physics": "ramp.json"}
     ]
 }

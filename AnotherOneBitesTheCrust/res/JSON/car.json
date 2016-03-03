@@ -1,10 +1,10 @@
 {
     "mass": 1500,
 	"chassisMOIscalarX": 1,
-	"chassisMOIscalarY": 0.8,
+	"chassisMOIscalarY": 0.7,
 	"chassisMOIscalarZ": 1,
 	"chassisCMOffsetX": 0,
-	"chassisCMOffsetY": -2,
+	"chassisCMOffsetY": -1,
 	"chassisCMOffsetZ": 0.25,
 	
 	"chassisStaticFriction": 0.5,

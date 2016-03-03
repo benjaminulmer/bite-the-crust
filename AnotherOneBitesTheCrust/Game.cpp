@@ -95,7 +95,8 @@ void Game::setupEntities()
 
 	// Assign the buffers for all the renderables
 	std::map<std::string, Renderable*>::iterator it;
-	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
+	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it)
+	{
 		renderingEngine->assignBuffersTex(it->second);
 	}
 	deliveryManager->deliverTexture = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
@@ -117,8 +118,10 @@ void Game::setupEntities()
 	deliveryManager->map = &map;
 
 	// Create all the entities loaded in the map
-	for (unsigned int i = 0; i < map.tiles.size(); i++) {
-		for (unsigned int j = 0; j < map.tiles[i].size(); j++) {
+	for (unsigned int i = 0; i < map.tiles.size(); i++)
+	{
+		for (unsigned int j = 0; j < map.tiles[i].size(); j++)
+		{
 			deliveryManager->addDeliveryLocation(&map.tiles[i][j]);
 
 			Tile* tile = &map.tiles[i][j];
@@ -132,29 +135,30 @@ void Game::setupEntities()
 			tile->groundTexture = textureMap[tile->groundModel];
 			entities.push_back(ground);
 
-			for (unsigned int k = 0; k < tile->entities.size(); k++) {
+			for (unsigned int k = 0; k < tile->entities.size(); k++)
+			{
 				TileEntity tileEntity = tile->entities[k];
 
-				PhysicsEntity* e = new PhysicsEntity();
-				// TODO, error check that these models do exist, instead of just break
-				e->setRenderable(renderablesMap[tileEntity.model]);
+				PhysicsEntity* e;
+				(physicsEntityInfoMap[tileEntity.name]->type == PhysicsType::DYNAMIC) ? e = new DynamicEntity() : e = new PhysicsEntity();
 
-				e->setDefaultTranslation(e->getRenderable()->getCenter());
-				e->setTexture(textureMap[tileEntity.model]);
+				// TODO, error check that these models do exist, instead of just break
+				e->setRenderable(renderablesMap[tileEntity.name]);
+
+				//e->setDefaultTranslation(e->getRenderable()->getCenter());
+				e->setTexture(textureMap[tileEntity.name]);
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize + map.tileSize/2, 0, j * map.tileSize + map.tileSize/2);
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(physx::PxIdentity));
 
-				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
+				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.name], transform);
 				entities.push_back(e);
 			}
 		}
 	}
 
-	/**********************************************************
-						Creating Vechicles
-	**********************************************************/
+	// Create vehicles
 	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
 	p1Vehicle->setRenderable(renderablesMap["van"]);
@@ -188,6 +192,7 @@ void Game::setupEntities()
 	cameraPosBufferIndex = 0;
 	camera.setUpVector(glm::vec3(0,1,0));
 
+	// TODO make this better/less hardcoded
 	physicsEngine->createTrigger();
 }
 

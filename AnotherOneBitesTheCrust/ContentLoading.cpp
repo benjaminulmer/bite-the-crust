@@ -216,6 +216,8 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			info->dynamicInfo->angularDamping = (float)dynamicInfo["angularDamping"].GetDouble();
 		}
 	}
+	glm::vec3 dims = model->getDimensions();
+	info->yPosOffset = dims.y * 0.5f;
 	if (d.HasMember("geometry")) {
 		const rapidjson::Value& geometry = d["geometry"];
 		for (rapidjson::SizeType i = 0; i < geometry.Size(); i++) {
@@ -225,10 +227,9 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 				BoxInfo* box = new BoxInfo();
 				box->geometry = Geometry::BOX;
 				// Use the model dimensions by default
-				glm::vec3 d = model->getDimensions();
-				box->halfX = d.x * 0.5f;
-				box->halfY = d.y * 0.5f;
-				box->halfZ = d.z * 0.5f;
+				box->halfX = dims.x * 0.5f;
+				box->halfY = dims.y * 0.5f;
+				box->halfZ = dims.z * 0.5f;
 				// Overwrite with specifics if they're there
 				if (geometry[i].HasMember("halfX"))
 					box->halfX = (float)geometry[i]["halfX"].GetDouble();
@@ -238,17 +239,25 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 					box->halfZ = (float)geometry[i]["halfZ"].GetDouble();
 				shape = box;
 			}
-
-			// Added by Ben for testing
-			else if (shapeName == "convexMesh")
-			{
+			else if (shapeName == "sphere") {
+				SphereInfo* sphere = new SphereInfo();
+				if (geometry[i].HasMember("radius"))
+					sphere->radius = (float)geometry[i]["radius"].GetDouble();
+			}
+			else if (shapeName == "capsule") {
+				CapsuleInfo* capsule = new CapsuleInfo();
+				if (geometry[i].HasMember("radius"))
+					capsule->radius = (float)geometry[i]["radius"].GetDouble();
+				if (geometry[i].HasMember("halfHeight"))
+					capsule->halfHeight= (float)geometry[i]["halfHeight"].GetDouble();
+			}
+			else if (shapeName == "convexMesh") {
 				ConvexMeshInfo* convexMesh = new ConvexMeshInfo();
 				convexMesh->geometry = Geometry::CONVEX_MESH;
 				convexMesh->verts = model->getVertices();
 				shape = convexMesh;
 			}
-			else if (shapeName == "triangleMesh")
-			{
+			else if (shapeName == "triangleMesh") {
 				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
 				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
 				triangleMesh->verts = model->getVertices();
@@ -256,20 +265,20 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 				shape = triangleMesh;
 			}
 			
-			
 			if (geometry[i].HasMember("flag0")) {
 				shape->filterFlag0 = stringToFlag(geometry[i]["flag0"].GetString());
-			} else {
-				shape->filterFlag0 = FilterFlag::OBSTACLE;
 			}
 			if (geometry[i].HasMember("flag1")) {
 				shape->filterFlag1 = stringToFlag(geometry[i]["flag1"].GetString());
-			} else {
-				shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
+			}
+			if (geometry[i].HasMember("flag2")) {
+				shape->filterFlag0 = stringToFlag(geometry[i]["flag2"].GetString());
+			}
+			if (geometry[i].HasMember("flag3")) {
+				shape->filterFlag1 = stringToFlag(geometry[i]["flag3"].GetString());
 			}
 			if (geometry[i].HasMember("isDrivable")) {
 				shape->isDrivable = (geometry[i]["isDrivable"].GetInt() != 0);
-				std::cout << "TEST: " << geometry[i]["isDrivable"].GetInt() << std::endl;
 			}
 			info->shapeInfo.push_back(shape);
 		}
@@ -309,7 +318,7 @@ bool validateMap(rapidjson::Document &d) {
 			return false;
 		}
 		for (rapidjson::SizeType j = 0; j < entry["entities"].Size(); j++) {
-			if (!entry["entities"][j].HasMember("model")) {
+			if (!entry["entities"][j].HasMember("name")) {
 				printf("Entity %d in tile %d is missing a model.", j, entry["id"]);
 				return false;
 			}
@@ -331,7 +340,7 @@ bool validateMap(rapidjson::Document &d) {
 	return true;
 }
 
-//todo, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
+//TODO, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
 bool ContentLoading::loadMap(char* filename, Map &map) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
@@ -360,7 +369,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		t.groundModel = ground;
 		const rapidjson::Value& entityArray = tileArray[i]["entities"];
 		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
-			std::string model = entityArray[j]["model"].GetString();
+			std::string name = entityArray[j]["name"].GetString();
 			double x = 0;
 			double y = 0;
 			double z = 0;
@@ -371,9 +380,8 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			if (entityArray[j].HasMember("z"))
 				z = entityArray[j]["z"].GetDouble();
 
-
 			TileEntity e;
-			e.model = model;
+			e.name = name;
 			e.position = glm::vec3(x, y, z);
 			t.entities.push_back(e);
 		}

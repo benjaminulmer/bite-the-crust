@@ -8,8 +8,7 @@
 // I think we'll want to add some kind of 'type' field to distinguish between static and dynamic entities later
 struct TileEntity 
 {
-	std::string model;
-	std::string physicsInfo;
+	std::string name;
 	glm::vec3 position;
 };
 

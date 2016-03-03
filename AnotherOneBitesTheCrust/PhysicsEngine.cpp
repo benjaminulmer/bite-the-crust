@@ -80,6 +80,7 @@ void PhysicsEngine::initVehicleSDK()
 // Creates an physics entity from an entity info structure and a starting transform
 void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info, PxTransform transform)
 {
+	transform.p.y += info->yPosOffset;
 	// Set static/dynamic info for actor depending on its type
 	PxRigidActor* actor;
 	if (info->type == PhysicsType::DYNAMIC) 
@@ -117,7 +118,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		else if (sInfo->geometry == Geometry::CAPSULE)
 		{
 			CapsuleInfo* capInfo = (CapsuleInfo*)sInfo;
-			geometry = new PxCapsuleGeometry(capInfo->raidus, capInfo->halfHeight);
+			geometry = new PxCapsuleGeometry(capInfo->radius, capInfo->halfHeight);
 		}
 		else if (sInfo->geometry == Geometry::CONVEX_MESH)
 		{

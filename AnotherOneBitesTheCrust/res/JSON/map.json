@@ -4,6 +4,7 @@
             "id": 1,
             "ground": "floor",
             "entities": [
+				{"name": "bigramp", "x": 10, "z": 10}
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},

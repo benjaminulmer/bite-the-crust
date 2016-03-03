@@ -8,6 +8,16 @@ Map::Map(void)
 
 Map::~Map(void)
 {
+	for(std::vector<Tile> v : tiles)
+	{
+		for(Tile t : v)
+		{
+			for(graphNode * n : t.nodes)
+			{
+				delete n;
+			}
+		}
+	}
 }
 
 Tile* Map::getTile(glm::vec3 position) {

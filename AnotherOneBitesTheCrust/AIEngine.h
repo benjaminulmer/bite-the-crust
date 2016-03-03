@@ -32,7 +32,6 @@ struct MapAI
 	static const int WIDTH = MAP_SIZE/TileAI::SIZE;
 	static const int DEPTH = MAP_SIZE/TileAI::SIZE;
 
-	// Vectors for ease of use, could just as easily be fixed size arrays
 	TileAI tiles[WIDTH][DEPTH];
 
 };

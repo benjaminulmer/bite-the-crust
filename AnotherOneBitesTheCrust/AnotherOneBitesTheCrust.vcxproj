@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -166,6 +166,7 @@
     <ClCompile Include="Filtering.cpp" />
     <ClCompile Include="FrictionPairs.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="graphNode.cpp" />
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="Filtering.h" />
     <ClInclude Include="FrictionPairs.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="graphNode.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="PhysicsCreator.h" />

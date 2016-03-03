@@ -253,15 +253,46 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				y = entityArray[j]["y"].GetDouble();
 			if (entityArray[j].HasMember("z"))
 				z = entityArray[j]["z"].GetDouble();
+
+
 			TileEntity e;
 			e.model = model;
 			e.position = glm::vec3(x, y, z);
 			t.entities.push_back(e);
 		}
+
+		const rapidjson::Value& nodeArray = tileArray[i]["nodes"];
+		// Setting positions
+		for (rapidjson::SizeType j = 0; j < nodeArray.Size(); j++) 
+		{
+			graphNode * current = new graphNode();
+
+			double x, y;
+			if (entityArray[j].HasMember("x"))
+				x = entityArray[j]["x"].GetDouble();
+			if (entityArray[j].HasMember("y"))
+				y = entityArray[j]["y"].GetDouble();
+
+			current->setPosition(glm::vec3(x,y,0));
+			t.nodes.push_back(current);
+		}
+
+		// Connecting neighbours
+		for (rapidjson::SizeType j = 0; j < nodeArray.Size(); j++) 
+		{
+			const rapidjson::Value& neighboursArray = nodeArray[j]["neighbours"];
+			for (rapidjson::SizeType k = 0; k < neighboursArray.Size(); k++) 
+			{
+				int index = neighboursArray[k].GetInt();
+				t.nodes[k]->addNeighbour(t.nodes[index]);
+			}
+		}
+
 		tiles[id] = t;
 	}
 
-	// Construct the map
+	// Construct the map 
+	// TODO: Add connections BETWEEN tiles 
 	int tileSize = d["map"]["tile size"].GetInt();
 	map.tileSize = tileSize;
 	const rapidjson::Value& mapTilesArray = d["map"]["tiles"];
@@ -277,6 +308,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 
 	return true;
 }
+
 
 bool ContentLoading::loadOBJNonIndexed(
 	const char * path, 

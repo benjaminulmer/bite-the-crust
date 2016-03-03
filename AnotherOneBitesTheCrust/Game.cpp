@@ -224,8 +224,8 @@ void Game::mainLoop()
 
 			// Update the player and AI cars
 			aiEngine->updateAI(p2Vehicle);
-			p1Vehicle->handleInput();
-			p2Vehicle->handleInput();
+			p1Vehicle->update();
+			p2Vehicle->update();
 		
 			physicsEngine->simulate(PHYSICS_STEP_MS);
 

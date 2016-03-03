@@ -73,7 +73,7 @@ public:
 	std::vector<glm::vec3> currentPath;
 
 	void updateTuning();
-	void handleInput();
+	void update();
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
 	glm::mat4 getModelMatrix();
 

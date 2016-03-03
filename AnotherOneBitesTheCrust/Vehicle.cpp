@@ -1,4 +1,6 @@
 #include "Vehicle.h"
+#include <cmath>
+#include <iostream>
 
 using namespace physx;
 
@@ -69,8 +71,23 @@ void Vehicle::updateTuning()
 	tuning.wheelMOI = 0.5f * tuning.wheelMass * tuning.wheelRadius * tuning.wheelRadius;
 }
 
-void Vehicle::handleInput()
+void Vehicle::update()
 {
+	PxVec3 up(0, 1, 0);
+	PxVec3 vehUp = actor->getGlobalPose().rotate(up);
+
+	PxF32 cos = vehUp.dot(up);
+	PxVec3 vel = ((PxRigidDynamic*)actor)->getLinearVelocity();
+	if (cos <= 0.5f && vel.x == 0 && vel.y == 0 && vel.z == 0)
+	{
+		PxVec3 forw(0, 0, 1);
+		PxVec3 vehForw = actor->getGlobalPose().rotate(forw);
+		PxF32 angleRad = acos(vehForw.dot(forw));
+
+		PxTransform cur = actor->getGlobalPose();
+		actor->setGlobalPose(PxTransform(PxVec3(cur.p.x, cur.p.y + 0.5f, cur.p.z), PxQuat(-angleRad, up)));
+	}
+
 	float handBrake = 0;
 	float forwardSpeed = physicsVehicle->computeForwardSpeed();
 	(input.handBrake) ? handBrake = 1.0f: handBrake = 0.0f;

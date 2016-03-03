@@ -160,7 +160,9 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		if (info->type == PhysicsType::DYNAMIC) 
 		{
 			DynamicInfo* dInfo = info->dynamicInfo;
-			PxRigidBodyExt::updateMassAndInertia(*(PxRigidBody*)actor, dInfo->density, &dInfo->cmOffset);			
+			PxRigidBodyExt::updateMassAndInertia(*(PxRigidBody*)actor, dInfo->density, &dInfo->cmOffset);
+
+			PxRigidBody* body = (PxRigidBody*)actor;
 		}
 	}
 

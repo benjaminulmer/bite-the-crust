@@ -209,7 +209,7 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 	if (d.HasMember("dynamicInfo")) {
 		const rapidjson::Value& dynamicInfo = d["dynamicInfo"];
 		if (dynamicInfo.HasMember("density")) {
-			info->dynamicInfo->density = (float)dynamicInfo["mass"].GetDouble();
+			info->dynamicInfo->density = (float)dynamicInfo["density"].GetDouble();
 		}
 		if (dynamicInfo.HasMember("linearDamping")) {
 			info->dynamicInfo->linearDamping = (float)dynamicInfo["linearDamping"].GetDouble();

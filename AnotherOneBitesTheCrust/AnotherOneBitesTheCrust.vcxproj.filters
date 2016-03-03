@@ -13,7 +13,6 @@
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="PhysicsCreator.cpp" />
     <ClCompile Include="VehicleCreator.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="PhysicsEntity.cpp" />
@@ -24,6 +23,9 @@
     <ClCompile Include="VehicleSceneQueryData.cpp" />
     <ClCompile Include="DeliveryManager.cpp" />
     <ClCompile Include="graphNode.cpp" />
+    <ClCompile Include="PhysicsHelper.cpp" />
+    <ClCompile Include="SimulationCallback.cpp" />
+    <ClCompile Include="PizzaBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
@@ -37,7 +39,6 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="PhysicsCreator.h" />
     <ClInclude Include="VehicleCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="PhysicsEntity.h" />
@@ -50,9 +51,14 @@
     <ClInclude Include="PhysicsEntityInfo.h" />
     <ClInclude Include="DeliveryManager.h" />
     <ClInclude Include="graphNode.h" />
+    <ClInclude Include="PhysicsHelper.h" />
+    <ClInclude Include="SimulationCallback.h" />
+    <ClInclude Include="PizzaBox.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\StandardShading.fragmentshader" />
     <None Include="res\Shaders\StandardShading.vertexshader" />
+    <None Include="res\Shaders\textured-StandardShading.fragmentshader" />
+    <None Include="res\Shaders\textured-StandardShading.vertexshader" />
   </ItemGroup>
 </Project>

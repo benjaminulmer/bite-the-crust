@@ -18,7 +18,7 @@ namespace ContentLoading
 
 	bool loadVehicleData(char* filename, Vehicle* vehicle);
 	bool verifyEntityList(const rapidjson::Document &d);
-	bool loadEntityList(char* filename, std::map<std::string, Renderable*> &modelMap, std::map<std::string, PhysicsEntityInfo*> &physicsMap);
+	bool loadEntityList(char* filename, std::map<std::string, Renderable*> &modelMap, std::map<std::string, PhysicsEntityInfo*> &physicsMap, std::map<std::string, GLuint> &textureMap);
 	bool loadRenderables(char* filename, std::map<std::string, Renderable*> &map);
 	bool validateMap(rapidjson::Document &d);
 	bool loadMap(char* filename, Map &map);
@@ -28,6 +28,12 @@ namespace ContentLoading
 		const char * path, 
 		std::vector<glm::vec3> & out_vertices, 
 		//std::vector<glm::vec2> & out_uvs,
+		std::vector<glm::vec3> & out_normals
+	);
+	bool loadOBJ(
+		const char * path, 
+		std::vector<glm::vec3> & out_vertices, 
+		std::vector<glm::vec2> & out_uvs,
 		std::vector<glm::vec3> & out_normals
 	);
 	GLuint loadDDS(const char * imagepath);

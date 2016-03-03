@@ -28,18 +28,15 @@ void InputEngine::controllerAxisMotion(SDL_Event e)
 	{
 		if (e.caxis.value < -deadzoneSize)
 		{
-			inputs[e.cdevice.which]->rightSteer = (float)(e.caxis.value + deadzoneSize)/(MIN_AXIS_VALUE + deadzoneSize);
-			inputs[e.cdevice.which]->leftSteer = 0;
+			inputs[e.cdevice.which]->steer = (float)(e.caxis.value + deadzoneSize)/(MIN_AXIS_VALUE + deadzoneSize);
 		} 
 		else if (e.caxis.value > deadzoneSize)
 		{
-			inputs[e.cdevice.which]->leftSteer = (float)(e.caxis.value - deadzoneSize)/(MAX_AXIS_VALUE - deadzoneSize);
-			inputs[e.cdevice.which]->rightSteer = 0;
+			inputs[e.cdevice.which]->steer = -(float)(e.caxis.value - deadzoneSize)/(MAX_AXIS_VALUE - deadzoneSize);
 		}
 		else
 		{
-			inputs[e.cdevice.which]->rightSteer = 0;
-			inputs[e.cdevice.which]->leftSteer = 0;
+			inputs[e.cdevice.which]->steer = 0;
 		}
 	}
 	else if (e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT)

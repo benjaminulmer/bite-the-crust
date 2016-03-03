@@ -1,3 +1,34 @@
 {
-    "mass": 1500
+    "mass": 1500,
+	"chassisMOIscalarX": 1,
+	"chassisMOIscalarY": 0.8,
+	"chassisMOIscalarZ": 1,
+	"chassisCMOffsetX": 0,
+	"chassisCMOffsetY": -2,
+	"chassisCMOffsetZ": 0.25,
+	
+	"chassisStaticFriction": 0.5,
+	"chassisDynamicFriction": 0.5, 
+	"chassisRestitution": 0.1, 
+	
+	"wheelMass": 20,
+	"wheelMOIscalar": 1,
+	"wheelDamping": 1,
+	
+	"wheelStaticFriction": 0.9,
+	"wheelDynamicFriction": 0.9,
+	"wheelRestitution": 0.6,
+	
+	"maxBrakeTorque": 1500,
+	"maxHandBrakeTorque": 4000,
+	"maxSteerDegrees": 60,
+	
+	"engineTorque": 1000,
+	"engineRPM": 600,
+	"engineMOI": 0.5,
+	
+	"gearSwitchTime": 0.2,
+	"gearFinalRatio": 2,
+	
+	"clutchStrength": 10
 }

@@ -21,7 +21,8 @@ struct Tile
 	std::string groundModel;
 	std::vector<TileEntity> entities;
 	std::vector<graphNode*> nodes;
-
+	Entity* ground;
+	GLuint groundTexture;
 };
 
 

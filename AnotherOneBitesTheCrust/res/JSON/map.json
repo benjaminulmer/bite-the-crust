@@ -4,9 +4,6 @@
             "id": 1,
             "ground": "floor",
             "entities": [
-                {"model": "cube", "x": 0, "z": 0},
-                {"model": "barrier", "x": 35, "z": 35},
-                {"model": "barrier", "x": 35, "z": 0}
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
@@ -27,9 +24,6 @@
             "id": 3,
             "ground": "floor",
             "entities": [
-                {"model": "cube", "x": 0, "z": 0},
-                {"model": "barrier", "x": 35, "z": 35},
-                {"model": "barrier", "x": 35, "z": 0}
             ],
 			"nodes" : [
 				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
@@ -40,16 +34,12 @@
             "id": 4,
             "ground": "floor",
             "entities": [
-                {"model": "cube", "x": 0, "z": 0},
-                {"model": "barrier", "x": 35, "z": 35},
-                {"model": "barrier", "x": 35, "z": 0}
             ],
 			"nodes" : [
 				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
 				{"x" : 1.0, "z" : 0.5, "neighbours" : [0]}
 			]
         }
-		 
     ],
 
     "map": {

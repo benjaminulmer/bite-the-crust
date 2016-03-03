@@ -199,6 +199,7 @@ void Game::connectSystems()
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
+	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
 }
 
 void Game::mainLoop()
@@ -262,6 +263,10 @@ void Game::mainLoop()
 		renderingEngine->printText2D(score.data(), 800, 740, 24);
 		
 		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 500, 700, 20);
+
+		string pizzas = "Pizzas: ";
+		pizzas.append(to_string(p1Vehicle->pizzaCount));
+		renderingEngine->printText2D(pizzas.data(), 800, 680, 24);
 
 		//swap buffers
 		SDL_GL_SwapWindow(window);

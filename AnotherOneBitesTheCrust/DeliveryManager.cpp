@@ -80,3 +80,7 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 		}
 	}
 }
+
+void DeliveryManager::refillPizza(Vehicle* player) {
+	player->pizzaCount = 3;
+}

@@ -18,6 +18,8 @@ Vehicle::Vehicle(void)
 
 	setSmoothingData();
 	setSteerSpeedData();
+
+	pizzaCount = 3;
 }
 
 void Vehicle::setSmoothingData()
@@ -104,8 +106,11 @@ void Vehicle::handleInput()
 	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(smoothingData, steerVsSpeedTable, vehicleInput, 16.0f/1000.0f, false, *physicsVehicle);
 
 	if (input.shootPizza)
-	{
-		shootPizzaSignal(this);
+	{ 
+		if (pizzaCount > 0) {
+			shootPizzaSignal(this);
+			pizzaCount--;
+		}
 		input.shootPizza = false;
 	}
 }

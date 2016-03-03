@@ -38,5 +38,6 @@ public:
 	void timePassed(double timeMs);
 	Delivery newDelivery();
 	void pizzaLanded(PizzaBox* pizza);
+	void refillPizza(Vehicle* player);
 };
 

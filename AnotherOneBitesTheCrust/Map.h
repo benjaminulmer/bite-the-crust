@@ -19,6 +19,8 @@ struct Tile
 	glm::vec3 entrance, exit;
 	std::string groundModel;
 	std::vector<TileEntity> entities;
+	Entity* ground;
+	GLuint groundTexture;
 };
 
 

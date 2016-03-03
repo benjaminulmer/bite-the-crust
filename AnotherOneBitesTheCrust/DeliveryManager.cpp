@@ -48,9 +48,8 @@ void DeliveryManager::timePassed(double timeMs) {
 		Delivery* d = &deliveries[players[i]];
 		d->time = d->time - timeMs;
 		if (d->time <= 0.0) {
-			std::cout << "Delivery failed!" << std::endl;
+			d->location->ground->setTexture(d->location->groundTexture);
 			scores[players[i]]--; // Decrement score for now, while testing things out
-			std::cout << "Score: " << scores[players[i]] << std::endl;
 			deliveries[players[i]] = newDelivery();
 		}
 	}
@@ -59,24 +58,27 @@ void DeliveryManager::timePassed(double timeMs) {
 Delivery DeliveryManager::newDelivery() {
 	Delivery d;
 	int randomTile = rand() % freeLocations.size();
-	std::cout << "Deliver to tile: " << randomTile << std::endl;
 	d.location = freeLocations[randomTile];
 	d.time = 1000.0 * 10.0; // 10 seconds
+	d.location->ground->setTexture(deliverTexture);
 	return d;
 }
 
 void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 	Tile* tile = map->getTile(pizza->getPosition());
-	std::cout << "sleep in tile " << tile << std::endl;
+	if (tile == nullptr) // The pizza right now can land outside the tiles
+		return;
 	if (tile == deliveries[pizza->owner].location) {
-		std::cout << "Delivered!" << std::endl;
+		tile->ground->setTexture(tile->groundTexture);
 		scores[pizza->owner]++;
-		std::cout << "Score = " << scores[pizza->owner] << std::endl;
 		deliveries[pizza->owner] = newDelivery();
 		// Anyone who was delivering to this location needs a new delivery
 		for (int i = 0; i < (int)players.size(); i++) {
-			if (deliveries[players[i]].location == tile)
+			Tile* t = deliveries[players[i]].location;
+			if (t == tile) {
+				t->ground->setTexture(t->groundTexture);
 				deliveries[players[i]] = newDelivery();
+			}
 		}
 	}
 }

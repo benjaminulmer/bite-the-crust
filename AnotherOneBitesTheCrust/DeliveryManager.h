@@ -29,6 +29,7 @@ public:
 	std::vector<Vehicle*> players;
 	std::map<Vehicle*, Delivery> deliveries;
 	std::map<Vehicle*, int> scores;
+	GLuint deliverTexture;
 	
 	void addDeliveryLocation(Tile* location);
 	void addPlayer(Vehicle* player);

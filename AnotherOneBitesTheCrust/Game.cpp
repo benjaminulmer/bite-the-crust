@@ -102,6 +102,8 @@ void Game::setupEntities()
 	//renderablesMap["floor2"]->setColor(glm::vec3(1,1,0));
 	//renderablesMap["box"]->setColor(glm::vec3(0,1,1));
 	//renderablesMap["van"]->setColor(glm::vec3(1,0,0));
+	// hard code this texture for now
+	deliveryManager->deliverTexture = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
 
 	//testing shootings textures for now. Alexei can switch to json
 	pizza = new Renderable();
@@ -122,15 +124,17 @@ void Game::setupEntities()
 	for (unsigned int i = 0; i < map.tiles.size(); i++) {
 		for (unsigned int j = 0; j < map.tiles[i].size(); j++) {
 			deliveryManager->addDeliveryLocation(&map.tiles[i][j]);
-			Tile tile = map.tiles[i][j];
+			Tile* tile = &map.tiles[i][j];
 			Entity* ground = new Entity();
-			ground->setRenderable(renderablesMap[tile.groundModel]);
-			ground->setTexture(textureMap[tile.groundModel]);
+			ground->setRenderable(renderablesMap[tile->groundModel]);
+			ground->setTexture(textureMap[tile->groundModel]);
 			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
 			ground->setDefaultTranslation(glm::vec3(i*map.tileSize + map.tileSize/2, 0, j*map.tileSize + map.tileSize/2));
+			tile->ground = ground;
+			tile->groundTexture = textureMap[tile->groundModel];
 			entities.push_back(ground);
-			for (unsigned int k = 0; k < tile.entities.size(); k++) {
-				TileEntity tileEntity = tile.entities[k];
+			for (unsigned int k = 0; k < tile->entities.size(); k++) {
+				TileEntity tileEntity = tile->entities[k];
 
 				DynamicEntity* e = new DynamicEntity();
 				// todo, error check that these models do exist, instead of just break

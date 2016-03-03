@@ -1,9 +1,7 @@
 #include "Game.h"
-#include "DynamicEntity.h"
+#include "PizzaBox.h"
 #include "Camera.h"
 #include "ContentLoading.h"
-
-#include <foundation/PxTransform.h> 
 
 #include <iostream>
 #include <string>
@@ -85,23 +83,38 @@ void Game::initSystems()
 	physicsEngine = new PhysicsEngine();
 	renderingEngine = new RenderingEngine();
 	deliveryManager = new DeliveryManager();
+	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
+
+	//renderingEngine->testOBJLoading();
 }
 
 void Game::setupEntities()
 {
-	if (!ContentLoading::loadEntityList("res\\JSON\\entityList.json", renderablesMap, physicsEntityInfoMap))
+	if (!ContentLoading::loadEntityList("res\\JSON\\entityList.json", renderablesMap, physicsEntityInfoMap, textureMap))
 		fatalError("Could not load entities list.");
 
 	// Assign the buffers for all the renderables
 	std::map<std::string, Renderable*>::iterator it;
 	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
-		renderingEngine->assignBuffers(it->second);
+		renderingEngine->assignBuffersTex(it->second);
 	}
 	// Set up the colours, since we don't have textures yet
-	renderablesMap["floor2"]->setColor(glm::vec3(1,1,0));
-	renderablesMap["box"]->setColor(glm::vec3(0,1,1));
-	renderablesMap["van"]->setColor(glm::vec3(1,0,0));
+	//renderablesMap["floor2"]->setColor(glm::vec3(1,1,0));
+	//renderablesMap["box"]->setColor(glm::vec3(0,1,1));
+	//renderablesMap["van"]->setColor(glm::vec3(1,0,0));
 
+	//testing shootings textures for now. Alexei can switch to json
+	pizza = new Renderable();
+	vector<vec3>pizzaVerts;
+	vector<glm::vec2>pizzaUVs;
+	vector<vec3>pizzaNormals;
+	bool pizzaRes = ContentLoading::loadOBJ("res\\Models\\PizzaBox_textured\\PizzaBox-centered.obj", pizzaVerts, pizzaUVs, pizzaNormals);
+	pizza->setVerts(pizzaVerts);
+	pizza->setUVs(pizzaUVs);
+	pizza->setNorms(pizzaNormals);
+	renderingEngine->assignBuffersTex(pizza);
+
+	//
 	if (!ContentLoading::loadMap("res\\JSON\\map.json", map))
 		fatalError("Could not load map file.");
 	deliveryManager->map = &map;
@@ -112,6 +125,7 @@ void Game::setupEntities()
 			Tile tile = map.tiles[i][j];
 			Entity* ground = new Entity();
 			ground->setRenderable(renderablesMap[tile.groundModel]);
+			ground->setTexture(textureMap[tile.groundModel]);
 			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
 			ground->setDefaultTranslation(glm::vec3(i*map.tileSize + map.tileSize/2, 0, j*map.tileSize + map.tileSize/2));
 			entities.push_back(ground);
@@ -121,11 +135,16 @@ void Game::setupEntities()
 				DynamicEntity* e = new DynamicEntity();
 				// todo, error check that these models do exist, instead of just break
 				e->setRenderable(renderablesMap[tileEntity.model]);
+
 				e->setDefaultTranslation(e->getRenderable()->getCenter());
+				e->setTexture(textureMap[tileEntity.model]);
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize + map.tileSize/2, 0, j * map.tileSize + map.tileSize/2);
-				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y + 5, pos.z), physx::PxQuat(physx::PxIdentity));
+
+				// Centre is negated because Gorman sucks at naming things :P
+				glm::vec3 offset = renderablesMap[tileEntity.model]->getCenter();
+				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(physx::PxIdentity));
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
 				entities.push_back(e);
@@ -139,6 +158,7 @@ void Game::setupEntities()
 	p1Vehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
 	p1Vehicle->setRenderable(renderablesMap["van"]);
+	p1Vehicle->setTexture(textureMap["van"]);
 	p1Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 	p1Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
 
@@ -151,6 +171,7 @@ void Game::setupEntities()
 	p2Vehicle = new Vehicle();
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", p2Vehicle);
 	p2Vehicle->setRenderable(renderablesMap["van"]);
+	p2Vehicle->setTexture(textureMap["van"]);
 	p2Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 	p2Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
 
@@ -172,12 +193,12 @@ void Game::connectSystems()
 {
 	inputEngine->setInputStruct(&p1Vehicle->input, 0);
 
-	p1Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
-	p2Vehicle->ShootPizzaSignal.connect(this, &Game::shootPizza);
+	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
+	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->assignDeliveries();
-	p1Vehicle->ShootPizzaSignal.connect(deliveryManager, &DeliveryManager::pizzaShot);
+	p1Vehicle->shootPizzaSignal.connect(deliveryManager, &DeliveryManager::pizzaShot);
 }
 
 void Game::mainLoop()
@@ -191,8 +212,6 @@ void Game::mainLoop()
 	// Game loop
 	while (gameState!= GameState::EXIT)
 	{
-		// Update Sound
-		audioEngine->update();
 
 		processSDLEvents();
 
@@ -224,10 +243,27 @@ void Game::mainLoop()
 			camera.setLookAtPosition(p1Vehicle->getPosition());
 			renderingEngine->updateView(camera);
 		}
-		// Display
-		renderingEngine->displayFunc(entities);
+		// Update Sound
+		audioEngine->update(p1Vehicle->getModelMatrix());
 
-		// Swap buffers
+		// Display
+		
+		renderingEngine->displayFuncTex(entities);
+		//renderingEngine->displayFuncTex(pizzaEntities);
+		///test drawing
+		//renderingEngine->testDraw();
+
+		string speed = "Speed: ";
+		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
+		renderingEngine->printText2D(speed.data(), 0, 740, 24);
+
+		string score = "Score: ";
+		score.append(to_string(deliveryManager->getScore(p1Vehicle)));
+		renderingEngine->printText2D(score.data(), 800, 740, 24);
+		
+		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 500, 700, 20);
+
+		//swap buffers
 		SDL_GL_SwapWindow(window);
 		physicsEngine->fetchSimulationResults();
 	}
@@ -272,11 +308,15 @@ void Game::processSDLEvents()
 // TODO move this to a different file
 void Game::shootPizza(Vehicle* vehicle)
 {
-	DynamicEntity* pizzaBox = new DynamicEntity();
-	pizzaBox->setRenderable(renderablesMap["box"]);
+	PizzaBox* pizzaBox = new PizzaBox(vehicle);
+	//pizzaBox->setRenderable(renderablesMap["box"]);
+	pizzaBox->setRenderable(pizza);
+	//pizzaBox->setDefaultTranslation(pizza->getCenter());
+	//pizzaBox->setTexture(ContentLoading::loadDDS("res\\Models\\PizzaBox_textured\\PizzaBox-colored.DDS"));
+	pizzaBox->setTexture(textureMap["box"]);
 
 	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();
-	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.2f, 1.0f));
+	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.25f, 1.0f));
 	transform.p += posOffset;
 
 	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 0.0f, 20.0f));
@@ -285,13 +325,17 @@ void Game::shootPizza(Vehicle* vehicle)
 
 	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["box"], transform);
 	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
+	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
+	//pizzaEntities.push_back(pizzaBox);
+
+	audioEngine->playCannonSound(vehicle);
 }
 
 Game::~Game(void)
 {
-	p1Vehicle->ShootPizzaSignal.disconnect_all();
-	p2Vehicle->ShootPizzaSignal.disconnect_all();
+	p1Vehicle->shootPizzaSignal.disconnect_all();
+	p2Vehicle->shootPizzaSignal.disconnect_all();
 	for (unsigned int i = 0; i < entities.size(); i++)
 	{
 		delete entities[i];

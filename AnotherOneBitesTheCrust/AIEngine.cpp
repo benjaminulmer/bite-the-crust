@@ -29,24 +29,25 @@ void AIEngine::goToPoint(Vehicle* driver, glm::vec3 desiredPos)
 
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
+	// Stuff Ben added
+	ratio *= 2;
+	if (ratio > 1) ratio = 1;
+
 	if(ratio > 0.1)
 	{
 		if(leftCosAngle > 0)
 		{
-			input->rightSteer = ratio;
-			input->leftSteer = 0;
+			input->steer = ratio;
 		}
 		else
 		{
-			input->leftSteer = ratio;
-			input->rightSteer = 0;
+			input->steer = -ratio;
 		}
 	}
 	else
 	{
-		input->rightSteer = 0;
-		input->leftSteer = 0;
-		if (rand()%100 < 10)
+		input->steer = 0;
+		if (rand()%100 < 5)
 		{
 			input->shootPizza = true;
 		}

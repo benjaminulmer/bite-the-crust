@@ -44,3 +44,10 @@ glm::mat4 PhysicsEntity::getModelMatrix()
 	}
 	return newM;
 }
+
+#include <iostream>
+
+void PhysicsEntity::onSleep()
+{
+	std::cout << "!!!TEST!!!" << std::endl;
+}

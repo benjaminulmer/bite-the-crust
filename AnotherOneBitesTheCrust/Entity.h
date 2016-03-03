@@ -13,10 +13,13 @@ public:
 	void setDefaultTranslation(glm::vec3 trans);
 	void setDefaultScale(glm::vec3 scale);
 
+	void setTexture(GLuint tex);
+
 	float getDefaultRotationAngle();
 	glm::vec3 getDefaultRotationAxis();
 	glm::vec3 getDefaultTranslation();
 	glm::vec3 getDefaultScale();
+	GLuint getTexture();
 
 	virtual void setPosition(glm::vec3 pos);
 	virtual glm::vec3 getPosition();
@@ -33,5 +36,7 @@ private:
 	glm::vec3 defaultRotationAxis;
 	glm::vec3 defaultTranslation;
 	glm::vec3 defaultScale;
+
+	GLuint texture;
 };
 

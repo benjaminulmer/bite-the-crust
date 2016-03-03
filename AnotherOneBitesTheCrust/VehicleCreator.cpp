@@ -2,11 +2,13 @@
 #include "VehicleSceneQueryData.h"
 #include "Filtering.h"
 #include "FrictionPairs.h"
-#include "PhysicsCreator.h"
 
 using namespace physx;
 
-PxConvexMesh* VehicleCreator::createChassisMesh(const PxVec3 dims, PxPhysics& physics, PxCooking& cooking)
+VehicleCreator::VehicleCreator(PxPhysics* physics, PxCooking* cooking, PhysicsHelper* helper)
+	: physics(physics), cooking(cooking), helper(helper) {}
+
+PxConvexMesh* VehicleCreator::createChassisMesh(const PxVec3 dims)
 {
 	const PxF32 x = dims.x*0.5f;
 	const PxF32 y = dims.y*0.5f;
@@ -22,10 +24,10 @@ PxConvexMesh* VehicleCreator::createChassisMesh(const PxVec3 dims, PxPhysics& ph
 		PxVec3(-x,-y,z),
 		PxVec3(-x,-y,-z)
 	};
-	return PhysicsCreator::createConvexMesh(verts,8,physics,cooking);
+	return helper->createConvexMesh(verts, 8);
 }
 
-PxConvexMesh* VehicleCreator::createWheelMesh(const PxF32 width, const PxF32 radius, PxPhysics& physics, PxCooking& cooking)
+PxConvexMesh* VehicleCreator::createWheelMesh(const PxF32 width, const PxF32 radius)
 {
 	PxVec3 points[2*16];
 	for(PxU32 i = 0; i < 16; i++)
@@ -38,16 +40,16 @@ PxConvexMesh* VehicleCreator::createWheelMesh(const PxF32 width, const PxF32 rad
 		points[2*i+1] = PxVec3(+width/2.0f, y, z);
 	}
 
-	return PhysicsCreator::createConvexMesh(points,32,physics,cooking);
+	return helper->createConvexMesh(points, 32);
 }
 
 PxRigidDynamic* VehicleCreator::createVehicleActor(const PxVehicleChassisData& chassisData, PxMaterial** wheelMaterials, 
 												   PxConvexMesh** wheelConvexMeshes, const PxU32 numWheels,PxMaterial** chassisMaterials, 
-												   PxConvexMesh** chassisConvexMeshes, const PxU32 numChassisMeshes, PxPhysics& physics)
+												   PxConvexMesh** chassisConvexMeshes, const PxU32 numChassisMeshes)
 {
 	//We need a rigid body actor for the vehicle.
 	//Don't forget to add the actor to the scene after setting up the associated vehicle.
-	PxRigidDynamic* vehActor = physics.createRigidDynamic(PxTransform(PxIdentity));
+	PxRigidDynamic* vehActor = physics->createRigidDynamic(PxTransform(PxIdentity));
 
 	//Wheel and chassis simulation filter data.
 	PxFilterData wheelSimFilterData;
@@ -68,7 +70,7 @@ PxRigidDynamic* VehicleCreator::createVehicleActor(const PxVehicleChassisData& c
 	for(PxU32 i = 0; i < numWheels; i++)
 	{
 		PxConvexMeshGeometry geom(wheelConvexMeshes[i]);
-		PxShape* wheelShape=vehActor->createShape(geom, *wheelMaterials[i]);
+		PxShape* wheelShape = vehActor->createShape(geom, *wheelMaterials[i]);
 		wheelShape->setQueryFilterData(wheelQryFilterData);
 		wheelShape->setSimulationFilterData(wheelSimFilterData);
 		wheelShape->setLocalPose(PxTransform(PxIdentity));
@@ -113,36 +115,35 @@ void VehicleCreator::computeWheelCenterActorOffsets4W(const PxF32 wheelFrontZ, c
 	}
 }
 
-void VehicleCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF32 wheelMOI, const PxF32 wheelRadius, const PxF32 wheelWidth, 
-											   const PxU32 numWheels, const PxVec3* wheelCenterActorOffsets, const PxVec3& chassisCMOffset,
-											   const PxF32 chassisMass,PxVehicleWheelsSimData* wheelsSimData)
+void VehicleCreator::setupWheelsSimulationData(VehicleTuning* tuning, const PxVec3* wheelCenterActorOffsets, PxVehicleWheelsSimData* wheelsSimData)
 {
 	//Set up the wheels.
 	PxVehicleWheelData wheels[PX_MAX_NB_WHEELS];
 	{
 		//Set up the wheel data structures with mass, moi, radius, width.
-		for(PxU32 i = 0; i < numWheels; i++)
+		for(PxU32 i = 0; i < tuning->numWheels; i++)
 		{
-			wheels[i].mMass = wheelMass;
-			wheels[i].mMOI = wheelMOI;
-			wheels[i].mRadius = wheelRadius;
-			wheels[i].mWidth = wheelWidth;
-			//wheels[i].mDampingRate = 0.25f;
+			wheels[i].mMass = tuning->wheelMass;
+			wheels[i].mMOI = tuning->wheelMOI;
+			wheels[i].mRadius = tuning->wheelRadius;
+			wheels[i].mWidth = tuning->wheelWidth;
+			wheels[i].mDampingRate = tuning->wheelDamping;
+			wheels[i].mMaxBrakeTorque = tuning->maxBrakeTorque;
 		}
 
 		//Enable the handbrake for the rear wheels only.
-		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque=4000.0f;
-		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque=4000.0f;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque=tuning->maxHandBrakeTorque;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque=tuning->maxHandBrakeTorque;
 		//Enable steering for the front wheels only.
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer=PxPi*0.3333f;
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer=PxPi*0.3333f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer=tuning->maxSteer;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer=tuning->maxSteer;
 	}
 
 	//Set up the tires.
 	PxVehicleTireData tires[PX_MAX_NB_WHEELS];
 	{
 		//Set up the tires.
-		for(PxU32 i = 0; i < numWheels; i++)
+		for(PxU32 i = 0; i < tuning->numWheels; i++)
 		{
 			tires[i].mType = (PxU32)TireType::NORMAL;
 		}
@@ -153,10 +154,10 @@ void VehicleCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 	{
 		//Compute the mass supported by each suspension spring.
 		PxF32 suspSprungMasses[PX_MAX_NB_WHEELS];
-		PxVehicleComputeSprungMasses(numWheels, wheelCenterActorOffsets, chassisCMOffset, chassisMass, 1, suspSprungMasses);
+		PxVehicleComputeSprungMasses(tuning->numWheels, wheelCenterActorOffsets, tuning->chassisCMOffset, tuning->chassisMass, 1, suspSprungMasses);
 
 		//Set the suspension data.
-		for(PxU32 i = 0; i < numWheels; i++)
+		for(PxU32 i = 0; i < tuning->numWheels; i++)
 		{
 			suspensions[i].mMaxCompression = 0.3f;
 			suspensions[i].mMaxDroop = 0.1f;
@@ -169,7 +170,7 @@ void VehicleCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 		const PxF32 camberAngleAtRest=0.0;
 		const PxF32 camberAngleAtMaxDroop=0.01f;
 		const PxF32 camberAngleAtMaxCompression=-0.01f;
-		for(PxU32 i = 0; i < numWheels; i+=2)
+		for(PxU32 i = 0; i < tuning->numWheels; i+=2)
 		{
 			suspensions[i + 0].mCamberAtRest =  camberAngleAtRest;
 			suspensions[i + 1].mCamberAtRest =  -camberAngleAtRest;
@@ -187,14 +188,14 @@ void VehicleCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 	PxVec3 tireForceAppCMOffsets[PX_MAX_NB_WHEELS];
 	{
 		//Set the geometry data.
-		for(PxU32 i = 0; i < numWheels; i++)
+		for(PxU32 i = 0; i < tuning->numWheels; i++)
 		{
 			//Vertical suspension travel.
 			suspTravelDirections[i] = PxVec3(0,-1,0);
 
 			//Wheel center offset is offset from rigid body center of mass.
 			wheelCentreCMOffsets[i] = 
-				wheelCenterActorOffsets[i] - chassisCMOffset;
+				wheelCenterActorOffsets[i] - tuning->chassisCMOffset;
 
 			//Suspension force application point 0.3 metres below 
 			//rigid body center of mass.
@@ -215,7 +216,7 @@ void VehicleCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 	//Set the wheel, tire and suspension data.
 	//Set the geometry data.
 	//Set the query filter data
-	for(PxU32 i = 0; i < numWheels; i++)
+	for(PxU32 i = 0; i < tuning->numWheels; i++)
 	{
 		wheelsSimData->setWheelData(i, wheels[i]);
 		wheelsSimData->setTireData(i, tires[i]);
@@ -229,7 +230,7 @@ void VehicleCreator::setupWheelsSimulationData(const PxF32 wheelMass, const PxF3
 	}
 }
 
-PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* physics, PxCooking* cooking) 
+PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle) 
 {
 	VehicleTuning* tuning = &vehicle->tuning;
 
@@ -243,7 +244,7 @@ PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* p
 	PxRigidDynamic* veh4WActor = NULL;
 	{
 		//Construct a convex mesh for a cylindrical wheel.
-		PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius, *physics, *cooking);
+		PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius);
 		//Assume all wheels are identical for simplicity.
 		PxConvexMesh* wheelConvexMeshes[PX_MAX_NB_WHEELS];
 		PxMaterial* wheelMaterials[PX_MAX_NB_WHEELS];
@@ -262,7 +263,7 @@ PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* p
 		}
 
 		//Chassis just has a single convex shape for simplicity.
-		PxConvexMesh* chassisConvexMesh = createChassisMesh(chassisDims, *physics, *cooking);
+		PxConvexMesh* chassisConvexMesh = createChassisMesh(chassisDims);
 		PxConvexMesh* chassisConvexMeshes[1] = {chassisConvexMesh};
 		PxMaterial* chassisMaterials[1] = {tuning->chassisMaterial};
 
@@ -275,8 +276,7 @@ PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* p
 		veh4WActor = createVehicleActor
 			(rigidBodyData,
 			wheelMaterials, wheelConvexMeshes, numWheels,
-			chassisMaterials, chassisConvexMeshes, 1,
-			*physics);
+			chassisMaterials, chassisConvexMeshes, 1);
 	}
 
 	//Set up the sim data for the wheels.
@@ -290,10 +290,7 @@ PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* p
 
 		//Set up the simulation data for all wheels.
 		setupWheelsSimulationData
-			(tuning->wheelMass, tuning->wheelMOI, wheelRadius, wheelWidth, 
-			 numWheels, wheelCenterActorOffsets,
-			 tuning->chassisCMOffset, tuning->chassisMass,
-			 wheelsSimData);
+			(tuning, wheelCenterActorOffsets, wheelsSimData);
 	}
 
 	//Set up the sim data for the vehicle drive model.
@@ -309,20 +306,21 @@ PxVehicleDrive4W* VehicleCreator::createVehicle4W(Vehicle* vehicle, PxPhysics* p
 
 		//Engine
 		PxVehicleEngineData engine;
-		engine.mPeakTorque=500.0f;
-		engine.mMaxOmega=600.0f;//approx 6000 rpm
-		//engine.mMOI = 0.25f;
+		engine.mPeakTorque=tuning->engineTorque;
+		engine.mMaxOmega=tuning->engineRPM;//approx 6000 rpm
+		engine.mMOI=tuning->engineMOI;
 		driveSimData.setEngineData(engine);
 
 		//Gears
 		PxVehicleGearsData gears;
-		gears.mSwitchTime=0.2f;
+		gears.mSwitchTime=tuning->gearSwitchTime;
+		gears.mFinalRatio=tuning->gearFinalRatio;
 		driveSimData.setGearsData(gears);
 
 		//Clutch
 		PxVehicleClutchData clutch;
 		clutch.mAccuracyMode = PxVehicleClutchAccuracyMode::eBEST_POSSIBLE;
-		clutch.mStrength=10.0f;
+		clutch.mStrength=tuning->clutchStrength;
 		driveSimData.setClutchData(clutch);
 
 		//Ackermann steer accuracy

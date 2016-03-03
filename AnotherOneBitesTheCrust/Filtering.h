@@ -4,17 +4,24 @@
 
 enum class FilterFlag
 {
+	// Flags for 0
 	GROUND            = 1 << 0,
 	WHEEL             = 1 << 1,
 	CHASSIS           = 1 << 2,
 	OBSTACLE          = 1 << 3, // Will colide with rigid body wheels
 	DRIVABLE_OBSTACLE = 1 << 4, // Will not colide with rigid body wheels
 
+	// Flags for 1
 	GROUND_AGAINST            =                  CHASSIS | OBSTACLE | DRIVABLE_OBSTACLE,
 	WHEEL_AGAINST             =	         WHEEL | CHASSIS | OBSTACLE,
 	CHASSIS_AGAINST	          = GROUND | WHEEL | CHASSIS | OBSTACLE | DRIVABLE_OBSTACLE,
 	OBSTACLE_AGAINST          = GROUND | WHEEL | CHASSIS | OBSTACLE | DRIVABLE_OBSTACLE,
 	DRIVABLE_OBSTACLE_AGAINST =	GROUND         | CHASSIS | OBSTACLE | DRIVABLE_OBSTACLE,
+
+	// Flags for 2
+	
+
+	// Flags for 3
 
 	DEFAULT
 };

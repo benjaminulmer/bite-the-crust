@@ -1,25 +1,31 @@
 #pragma once
 #include <PxPhysicsAPI.h>
+#include "PhysicsHelper.h"
 #include "Vehicle.h"
 
 class VehicleCreator
 {
 public:
-	static physx::PxConvexMesh* createChassisMesh(const physx::PxVec3 dims, physx::PxPhysics& physics, physx::PxCooking& cooking);
+	VehicleCreator(physx::PxPhysics* physics, physx::PxCooking* cooking, PhysicsHelper* helper);
+	~VehicleCreator(void);
 
-	static physx::PxConvexMesh* createWheelMesh(const physx::PxF32 width, const physx::PxF32 radius, physx::PxPhysics& physics, physx::PxCooking& cooking);
+	physx::PxConvexMesh* createChassisMesh(const physx::PxVec3 dims);
 
-	static physx::PxRigidDynamic* createVehicleActor(const physx::PxVehicleChassisData& chassisData, physx::PxMaterial** wheelMaterials,
-		                                             physx::PxConvexMesh** wheelConvexMeshes, const physx::PxU32 numWheels, physx::PxMaterial** chassisMaterials, 
-													 physx::PxConvexMesh** chassisConvexMeshes, const physx::PxU32 numChassisMeshes, physx::PxPhysics& physics);
+	physx::PxConvexMesh* createWheelMesh(const physx::PxF32 width, const physx::PxF32 radius);
 
-	static physx::PxVehicleDrive4W* createVehicle4W(Vehicle* vehDesc, physx::PxPhysics* physics, physx::PxCooking* cooking);
+	physx::PxRigidDynamic* createVehicleActor(const physx::PxVehicleChassisData& chassisData, physx::PxMaterial** wheelMaterials,
+		                                      physx::PxConvexMesh** wheelConvexMeshes, const physx::PxU32 numWheels, physx::PxMaterial** chassisMaterials, 
+											  physx::PxConvexMesh** chassisConvexMeshes, const physx::PxU32 numChassisMeshes);
+
+	physx::PxVehicleDrive4W* createVehicle4W(Vehicle* vehicle);
 
 private:
-	static void computeWheelCenterActorOffsets4W(const physx::PxF32 wheelFrontZ, const physx::PxF32 wheelRearZ, const physx::PxVec3& chassisDims, 
-		                                         const physx::PxF32 wheelWidth, const physx::PxF32 wheelRadius, const physx::PxU32 numWheels, physx::PxVec3* wheelCentreOffsets);
+	void computeWheelCenterActorOffsets4W(const physx::PxF32 wheelFrontZ, const physx::PxF32 wheelRearZ, const physx::PxVec3& chassisDims, 
+		                                  const physx::PxF32 wheelWidth, const physx::PxF32 wheelRadius, const physx::PxU32 numWheels, physx::PxVec3* wheelCentreOffsets);
 
-	static void setupWheelsSimulationData(const physx::PxF32 wheelMass, const physx::PxF32 wheelMOI, const physx::PxF32 wheelRadius, const physx::PxF32 wheelWidth, 
-		                                  const physx::PxU32 numWheels, const physx::PxVec3* wheelCenterActorOffsets, const physx::PxVec3& chassisCMOffset,
-										  const physx::PxF32 chassisMass, physx::PxVehicleWheelsSimData* wheelsSimData);
+	void setupWheelsSimulationData(VehicleTuning* tuning, const physx::PxVec3* wheelCenterActorOffsets, physx::PxVehicleWheelsSimData* wheelsSimData);
+
+	physx::PxPhysics* physics;
+	physx::PxCooking* cooking;
+	PhysicsHelper* helper;
 };

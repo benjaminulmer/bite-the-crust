@@ -1,4 +1,7 @@
 {
+	"geometry": [
+        {"shape":"convexMesh"}
+    ],
     "type": "dynamic",
     "dynamicInfo": {
         "mass": 10.0,

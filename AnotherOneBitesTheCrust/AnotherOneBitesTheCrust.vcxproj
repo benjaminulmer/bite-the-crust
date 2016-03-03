@@ -71,8 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\Include\glm;$(SolutionDir)\Include\rapidjson;$(SolutionDir)\Include\SDL;$(SolutionDir)\Include\PhysX;$(SolutionDir)\Include\glew-1.13.0;$(SolutionDir)\Include\sigslot;$(SolutionDir)\Include\fmod;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\Lib\PhysX;$(SolutionDir)\Lib\SDL;$(SolutionDir)\Lib\glew-1.13.0;$(SolutionDir)\Lib\fmod;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\Include\FreeType;$(SolutionDir)\Include\glm;$(SolutionDir)\Include\rapidjson;$(SolutionDir)\Include\SDL;$(SolutionDir)\Include\PhysX;$(SolutionDir)\Include\glew-1.13.0;$(SolutionDir)\Include\sigslot;$(SolutionDir)\Include\fmod;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Lib\FreeType;$(SolutionDir)\Lib\PhysX;$(SolutionDir)\Lib\SDL;$(SolutionDir)\Lib\glew-1.13.0;$(SolutionDir)\Lib\fmod;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -94,13 +94,13 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Include\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Include\FreeType\freetype2;$(SolutionDir)\Include\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;PhysX3VehicleCHECKED.lib;glew32.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;PhysX3VehicleCHECKED.lib;glew32.lib;freetype.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)\dlls\*" "$(OutDir)" /d /y</Command>
@@ -169,7 +169,9 @@
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="PhysicsCreator.cpp" />
+    <ClCompile Include="PhysicsHelper.cpp" />
+    <ClCompile Include="PizzaBox.cpp" />
+    <ClCompile Include="SimulationCallback.cpp" />
     <ClCompile Include="VehicleCreator.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="PhysicsEntity.cpp" />
@@ -192,8 +194,10 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="PhysicsCreator.h" />
+    <ClInclude Include="PhysicsHelper.h" />
     <ClInclude Include="PhysicsEntityInfo.h" />
+    <ClInclude Include="PizzaBox.h" />
+    <ClInclude Include="SimulationCallback.h" />
     <ClInclude Include="VehicleCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="PhysicsEntity.h" />
@@ -207,6 +211,8 @@
   <ItemGroup>
     <None Include="res\Shaders\StandardShading.fragmentshader" />
     <None Include="res\Shaders\StandardShading.vertexshader" />
+    <None Include="res\Shaders\textured-StandardShading.fragmentshader" />
+    <None Include="res\Shaders\textured-StandardShading.vertexshader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -64,6 +64,7 @@ void RenderingEngine::displayFunc(vector<Entity*> entities)
 void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 {
 	//glClearDepth(1.0);
+
 	glEnable(GL_DEPTH_TEST);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
@@ -97,7 +98,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 		glBindVertexArray(entities[i]->getRenderable()->getVAO());
 		GLuint tex = entities[i]->getTexture();
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
+		glBindTexture(GL_TEXTURE_2D, tex);
 		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
 
 	// Set our "myTextureSampler" sampler to user Texture Unit 0

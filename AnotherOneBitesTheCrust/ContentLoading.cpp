@@ -267,13 +267,13 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		{
 			graphNode * current = new graphNode();
 
-			double x, y;
-			if (entityArray[j].HasMember("x"))
-				x = entityArray[j]["x"].GetDouble();
-			if (entityArray[j].HasMember("y"))
-				y = entityArray[j]["y"].GetDouble();
+			double x, z;
+			if (nodeArray[j].HasMember("x"))
+				x = nodeArray[j]["x"].GetDouble();
+			if (nodeArray[j].HasMember("z"))
+				z = nodeArray[j]["z"].GetDouble();
 
-			current->setPosition(glm::vec3(x,y,0));
+			current->setPosition(glm::vec3(x,0,z));
 			t.nodes.push_back(current);
 		}
 
@@ -284,7 +284,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			for (rapidjson::SizeType k = 0; k < neighboursArray.Size(); k++) 
 			{
 				int index = neighboursArray[k].GetInt();
-				t.nodes[k]->addNeighbour(t.nodes[index]);
+				t.nodes[j]->addNeighbour(t.nodes[index]);
 			}
 		}
 
@@ -292,7 +292,6 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 	}
 
 	// Construct the map 
-	// TODO: Add connections BETWEEN tiles 
 	int tileSize = d["map"]["tile size"].GetInt();
 	map.tileSize = tileSize;
 	const rapidjson::Value& mapTilesArray = d["map"]["tiles"];
@@ -301,11 +300,47 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		std::vector<Tile> rowTiles;
 		for (rapidjson::SizeType j = 0; j < row.Size(); j++) {
 			int id = row[j].GetInt();
+
+			// changing relative coordinates to global coordinates
+			for(graphNode * n : tiles[id].nodes)
+			{
+				glm::vec3 pos = n->getPosition();
+				pos *= tileSize;
+				pos.x += (tileSize * j);
+				pos.z += (tileSize * i); 
+				n->setPosition(pos);
+			}
+
 			rowTiles.push_back(tiles[id]);
 		}
 		map.tiles.push_back(rowTiles);
 	}
 
+	// Add connections for graph nodes between tiles
+	std::vector<graphNode*> allNodes;
+	for(std::vector<Tile> vt : map.tiles)
+	{
+		for(Tile t : vt)
+		{
+			allNodes.insert(allNodes.begin(), t.nodes.begin(), t.nodes.end());
+		}
+	}
+	for(int i = 0; i < allNodes.size(); i++)
+	{
+		graphNode * current = allNodes.at(i);
+
+		for(int j = i+1; j < allNodes.size(); j++)
+		{
+			graphNode * comparing = allNodes.at(j);
+
+			if(current->sameLocation(comparing))
+			{
+				// May need to actually merge these instead of just connecting them
+				current->addNeighbour(comparing);
+				comparing->addNeighbour(current);
+			}
+		}
+	}
 	return true;
 }
 

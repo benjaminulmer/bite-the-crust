@@ -208,7 +208,7 @@ void Game::mainLoop()
 			deliveryManager->timePassed(physicsStepSize);
 
 			// Update the player and AI cars
-			aiEngine->updateAI(p2Vehicle);
+			aiEngine->updateAI(p2Vehicle, map);
 			p1Vehicle->handleInput();
 			p2Vehicle->handleInput();
 		

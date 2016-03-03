@@ -5,6 +5,7 @@
 #include <glm.hpp>
 #include <gtc\constants.hpp>
 #include "Vehicle.h"
+#include "Map.h"
 
 using std::vector;
 using glm::vec3;
@@ -42,10 +43,10 @@ public:
 	AIEngine(void);
 	~AIEngine(void);
 
-	void updateAI(Vehicle*);
+	void updateAI(Vehicle*, Map &);
 
 private:
-	void updatePath(Vehicle*);
-	void goToPoint(Vehicle*, glm::vec3);
+	void updatePath(Vehicle*, Map &);
+	void goToPoint(Vehicle*, const glm::vec3 &);
 };
 

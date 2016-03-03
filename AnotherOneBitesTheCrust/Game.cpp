@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "DynamicEntity.h"
+#include "PizzaBox.h"
 #include "Camera.h"
 #include "ContentLoading.h"
 
@@ -285,7 +285,7 @@ void Game::processSDLEvents()
 // TODO move this to a different file
 void Game::shootPizza(Vehicle* vehicle)
 {
-	DynamicEntity* pizzaBox = new DynamicEntity();
+	PizzaBox* pizzaBox = new PizzaBox(vehicle);
 	pizzaBox->setRenderable(renderablesMap["box"]);
 
 	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();

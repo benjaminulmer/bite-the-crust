@@ -112,7 +112,7 @@ void Vehicle::handleInput()
 
 glm::mat4 Vehicle::getModelMatrix()
 {
-	tipAngle = 0.98 * tipAngle + (0.02 * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
+	tipAngle = 0.98f * tipAngle + (0.02f * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
 
 	PxTransform transform(PxQuat(tipAngle, PxVec3(0, 0, 1)));
 	transform = actor->getGlobalPose() * transform;

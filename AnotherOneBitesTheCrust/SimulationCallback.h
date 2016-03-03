@@ -1,5 +1,8 @@
 #pragma once
 #include <PxPhysicsAPI.h>
+#include <sigslot.h>
+#include "Vehicle.h"
+#include "PizzaBox.h"
 
 class SimulationCallback
 	: public physx::PxSimulationEventCallback
@@ -13,4 +16,8 @@ class SimulationCallback
 	void onWake(physx::PxActor **actors, physx::PxU32 count);
 
 	void onConstraintBreak(physx::PxConstraintInfo *constraints, physx::PxU32 count);
+
+	sigslot::signal1<PizzaBox*> pizzaBoxSleep;
+
+	sigslot::signal1<Vehicle*> inPickUpLocation;
 };

@@ -12,15 +12,17 @@ void SimulationCallback::onContact(const physx::PxContactPairHeader &pairHeader,
 
 void SimulationCallback::onTrigger(physx::PxTriggerPair *pairs, physx::PxU32 count)
 {
-	std::cout << "trigger" << std::endl;
+	for (PxU32 i = 0; i < count; i++) 
+	{
+		inPickUpLocation((Vehicle*)pairs[i].otherActor->userData);
+	}
 }
 
 void SimulationCallback::onSleep(physx::PxActor **actors, physx::PxU32 count)
 {
 	for (PxU32 i = 0; i < count; i ++)
 	{
-		PhysicsEntity* entity = (PhysicsEntity*)actors[i]->userData;
-		//entity->onSleep();
+		pizzaBoxSleep((PizzaBox*)actors[i]->userData);
 	}
 }
 

@@ -35,10 +35,13 @@ PxFilterFlags FilterShader(PxFilterObjectAttributes attributes0, PxFilterData fi
 	PX_UNUSED(constantBlock);
 	PX_UNUSED(constantBlockSize);
 
-	if(PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
+	if ((PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1)))
     {
-        pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
-        return PxFilterFlags();
+		if (filterData0.word0 == (PxU32)FilterFlag::CHASSIS || filterData1.word0 == (PxU32)FilterFlag::CHASSIS)
+		{
+			pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
+			return PxFilterFlags();
+		}
     }
 
 	if(((filterData0.word0 & filterData1.word1) == 0) && ((filterData1.word0 & filterData0.word1) == 0))

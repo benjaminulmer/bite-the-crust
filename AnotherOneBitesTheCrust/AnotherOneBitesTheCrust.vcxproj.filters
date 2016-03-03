@@ -24,6 +24,7 @@
     <ClCompile Include="DeliveryManager.cpp" />
     <ClCompile Include="PhysicsHelper.cpp" />
     <ClCompile Include="SimulationCallback.cpp" />
+    <ClCompile Include="PizzaBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
@@ -50,6 +51,7 @@
     <ClInclude Include="DeliveryManager.h" />
     <ClInclude Include="PhysicsHelper.h" />
     <ClInclude Include="SimulationCallback.h" />
+    <ClInclude Include="PizzaBox.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\StandardShading.fragmentshader" />

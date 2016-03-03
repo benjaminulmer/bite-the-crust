@@ -170,6 +170,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="PhysicsHelper.cpp" />
+    <ClCompile Include="PizzaBox.cpp" />
     <ClCompile Include="SimulationCallback.cpp" />
     <ClCompile Include="VehicleCreator.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="Map.h" />
     <ClInclude Include="PhysicsHelper.h" />
     <ClInclude Include="PhysicsEntityInfo.h" />
+    <ClInclude Include="PizzaBox.h" />
     <ClInclude Include="SimulationCallback.h" />
     <ClInclude Include="VehicleCreator.h" />
     <ClInclude Include="PhysicsEngine.h" />

@@ -450,11 +450,11 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			allNodes.insert(allNodes.begin(), t.nodes.begin(), t.nodes.end());
 		}
 	}
-	for(int i = 0; i < allNodes.size(); i++)
+	for(unsigned int i = 0; i < allNodes.size(); i++)
 	{
 		graphNode * current = allNodes.at(i);
 
-		for(int j = i+1; j < allNodes.size(); j++)
+		for(unsigned int j = i+1; j < allNodes.size(); j++)
 		{
 			graphNode * comparing = allNodes.at(j);
 

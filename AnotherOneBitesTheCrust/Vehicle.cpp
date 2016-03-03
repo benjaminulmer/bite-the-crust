@@ -124,7 +124,7 @@ void Vehicle::update()
 glm::mat4 Vehicle::getModelMatrix()
 {
 	PxF32 alpha = 0.02f;
-	tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.02f);
+	tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
 	if (tipAngle > PxPi * (45.0f/180.0f))
 	{
 		tipAngle = PxPi * (45.0f/180.0f);

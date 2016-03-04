@@ -129,7 +129,7 @@ void Game::setupEntities()
 			ground->setRenderable(renderablesMap[tile->groundModel]);
 			ground->setTexture(textureMap[tile->groundModel]);
 			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
-			ground->setDefaultTranslation(glm::vec3(i*map.tileSize + map.tileSize/2, 0, j*map.tileSize + map.tileSize/2));
+			ground->setDefaultTranslation(glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2));
 			tile->ground = ground;
 			tile->groundTexture = textureMap[tile->groundModel];
 			entities.push_back(ground);
@@ -144,7 +144,7 @@ void Game::setupEntities()
 				e->setTexture(textureMap[tileEntity.model]);
 
 				// Offset position based on what tile we're in
-				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize + map.tileSize/2, 0, j * map.tileSize + map.tileSize/2);
+				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize + map.tileSize/2, 0, i * map.tileSize + map.tileSize/2);
 
 				// Centre is negated because Gorman sucks at naming things :P
 				glm::vec3 offset = renderablesMap[tileEntity.model]->getCenter();

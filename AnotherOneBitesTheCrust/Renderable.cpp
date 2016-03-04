@@ -43,6 +43,10 @@ void Renderable::setFaces(std::vector<GLuint> face)
 	faces = face;
 }
 
+void Renderable::setRawVerts(std::vector<glm::vec3> raw)
+{
+	raw_verts = raw;
+}
 
 std::vector<glm::vec3> Renderable::getVertices() 
 {
@@ -69,6 +73,11 @@ std::vector<glm::vec3> Renderable::getNormals()
 
 std::vector<GLuint> Renderable::getFaces(){
 	return faces;
+}
+
+std::vector<glm::vec3> Renderable::getRawVerts() 
+{
+	return raw_verts;
 }
 
 //std::vector<GLPoint> Renderable::getPoints() {

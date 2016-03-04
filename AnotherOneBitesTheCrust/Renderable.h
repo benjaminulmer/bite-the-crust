@@ -27,6 +27,7 @@ public:
 	void setUVs(std::vector <glm::vec2> UVs);
 	void setNorms(std::vector <glm::vec3> normals);
 	void setFaces(std::vector <GLuint> faces);
+	void setRawVerts(std::vector <glm::vec3> raw);
 	//void setColors(std::vector <glm::vec3> colors);
 
 
@@ -35,6 +36,7 @@ public:
 	std::vector<glm::vec3> getNormals();
 	//std::vector<glm::vec3> getColours();
 	std::vector<GLuint> getFaces();
+	std::vector<glm::vec3> getRawVerts();
 	std::vector<GLPoint> getPoints();
 
 	void setVAO(GLuint v);
@@ -57,6 +59,7 @@ private:
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> norms;
 	std::vector<GLuint> faces;
+	std::vector<glm::vec3> raw_verts;
 	GLuint vertexVBO, colourVBO;
 	GLuint vao;
 	GLuint indexBuffer;

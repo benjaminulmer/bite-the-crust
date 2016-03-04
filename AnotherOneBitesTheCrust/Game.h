@@ -1,8 +1,3 @@
-/*
-  The class responsible for the game state, entity hierarchy, and game loop. Right now only worries about setting up a basic test
-  entity and the rendering engine, to test out glut and passing between systems.
-*/
-
 #pragma once
 #include "RenderingEngine.h"
 #include "PhysicsEngine.h"
@@ -10,10 +5,10 @@
 #include "AIEngine.h"
 #include "AudioEngine.h"
 #include "Renderable.h"
-#include "Entity.h"
 #include "PhysicsEntityInfo.h"
 #include "DeliveryManager.h"
 #include "Map.h"
+
 #include <SDL.h>
 #include <glew.h>
 #include <map>
@@ -45,6 +40,8 @@ public:
 	Renderable * pizza;
 
 private:
+	static const unsigned int PHYSICS_STEP_MS = 16;
+
 	void initSystems();
 	void setupEntities();
 	void connectSystems();
@@ -67,7 +64,6 @@ private:
 	PhysicsEntityInfo* pizzaInfo;
 
 	std::vector<Entity*> entities;
-	std::vector<Entity*> pizzaEntities;
 	std::map<std::string, Renderable*> renderablesMap;
 	std::map<std::string, PhysicsEntityInfo*> physicsEntityInfoMap;
 	std::map<std::string, GLuint> textureMap;

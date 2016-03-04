@@ -86,8 +86,6 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 	{
 		DynamicInfo* dInfo = info->dynamicInfo;
 		PxRigidDynamic* dynamicActor = physics->createRigidDynamic(transform);
-		dynamicActor->setMass(dInfo->mass);
-		dynamicActor->setCMassLocalPose(dInfo->cmOffset);
 		dynamicActor->setLinearDamping(dInfo->linearDamping);
 		dynamicActor->setAngularDamping(dInfo->angularDamping);
 		dynamicActor->setMaxAngularVelocity(dInfo->maxAngularVelocity);
@@ -157,7 +155,13 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		simFilterData.word3 = (PxU32)sInfo->filterFlag3;
 		shape->setSimulationFilterData(simFilterData);
 
-		//PxRigidBodyExt::updateMassAndInertia(actor) // TODO this thing otherwise mass wont work 
+		if (info->type == PhysicsType::DYNAMIC) 
+		{
+			DynamicInfo* dInfo = info->dynamicInfo;
+			PxRigidBodyExt::updateMassAndInertia(*(PxRigidBody*)actor, dInfo->density, &dInfo->cmOffset);
+
+			PxRigidBody* body = (PxRigidBody*)actor;
+		}
 	}
 
 	// Add actor to scene, set actor for entity, and set user data for actor. Creates one to one between entities and phyX

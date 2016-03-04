@@ -1,8 +1,10 @@
 #include "Vehicle.h"
+#include <cmath>
+#include <iostream>
 
 using namespace physx;
 
-Vehicle::Vehicle(void)
+Vehicle::Vehicle(unsigned int stepSizeMS)
 {
 	currentPath = std::vector<glm::vec3>();
 
@@ -12,8 +14,8 @@ Vehicle::Vehicle(void)
 	input.handBrake = false;
 	input.shootPizza = false;
 
+	stepSizeS = stepSizeMS/100.0f;
 	tipAngle = 0;
-
 	vehicleInput = PxVehicleDrive4WRawInputData();
 
 	setSmoothingData();
@@ -60,19 +62,23 @@ physx::PxVehicleDrive4W* Vehicle::getPhysicsVehicle()
 	return physicsVehicle;
 }
 
-void Vehicle::updateTuning()
+void Vehicle::update()
 {
-	// Recalculate variables which are based off of other variables, if some of them have been changed.
-	tuning.chassisMOI = PxVec3
-		((tuning.chassisDims.y * tuning.chassisDims.y + tuning.chassisDims.z * tuning.chassisDims.z) * tuning.chassisMass/12.0f,
-		 (tuning.chassisDims.x * tuning.chassisDims.x + tuning.chassisDims.z * tuning.chassisDims.z) * 0.8f * tuning.chassisMass/12.0f,
-		 (tuning.chassisDims.x * tuning.chassisDims.x + tuning.chassisDims.y * tuning.chassisDims.y) * tuning.chassisMass/12.0f);
-	tuning.chassisCMOffset = PxVec3(0.0f, -tuning.chassisDims.y * 0.5f + 0.65f, 0.25f);
-	tuning.wheelMOI = 0.5f * tuning.wheelMass * tuning.wheelRadius * tuning.wheelRadius;
-}
+	PxVec3 up(0, 1, 0);
+	PxVec3 vehUp = actor->getGlobalPose().rotate(up);
 
-void Vehicle::handleInput()
-{
+	PxF32 cos = vehUp.dot(up);
+	PxVec3 vel = ((PxRigidDynamic*)actor)->getLinearVelocity();
+	if (cos <= 0.5f && vel.x == 0 && vel.y == 0 && vel.z == 0)
+	{
+		PxVec3 forw(0, 0, 1);
+		PxVec3 vehForw = actor->getGlobalPose().rotate(forw);
+		PxF32 angleRad = acos(vehForw.dot(forw));
+
+		PxTransform cur = actor->getGlobalPose();
+		actor->setGlobalPose(PxTransform(PxVec3(cur.p.x, cur.p.y + 0.5f, cur.p.z), PxQuat(-angleRad, up)));
+	}
+
 	float handBrake = 0;
 	float forwardSpeed = physicsVehicle->computeForwardSpeed();
 	(input.handBrake) ? handBrake = 1.0f: handBrake = 0.0f;
@@ -103,7 +109,7 @@ void Vehicle::handleInput()
 	vehicleInput.setAnalogSteer(input.steer);
 	vehicleInput.setAnalogHandbrake(handBrake);
 
-	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(smoothingData, steerVsSpeedTable, vehicleInput, 16.0f/1000.0f, false, *physicsVehicle);
+	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(smoothingData, steerVsSpeedTable, vehicleInput, stepSizeS, false, *physicsVehicle);
 
 	if (input.shootPizza)
 	{ 
@@ -117,7 +123,8 @@ void Vehicle::handleInput()
 
 glm::mat4 Vehicle::getModelMatrix()
 {
-	tipAngle = 0.98f * tipAngle + (0.02f * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
+	PxF32 alpha = 0.02f;
+	tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
 
 	PxTransform transform(PxQuat(tipAngle, PxVec3(0, 0, 1)));
 	transform = actor->getGlobalPose() * transform;

@@ -7,19 +7,56 @@ AIEngine::AIEngine(void)
 	srand((int)time(0));
 }
 
+std::vector<glm::vec3> AIEngine::dijkstras(graphNode * start, graphNode * destination, vector<graphNode *> allNodes)
+{
+	std::map<graphNode *, double> distances;
+	std::map<graphNode *, graphNode *> previous;
+	std::list<graphNode *> toVisit;
+
+	for(graphNode * n : allNodes)
+		distances[n] = DBL_MAX;
+
+	toVisit.push_front(start);
+	distances[start] = 0;
+
+	while(!toVisit.empty())
+	{
+		graphNode * current = toVisit.front();
+		toVisit.pop_front();
+
+		for(graphNode * neighbour : current->getNeighbours())
+		{
+			double distance = 0;
+
+			distance += distances[neighbour] + glm::length(neighbour->getPosition() - current->getPosition());
+			if(distance < distances[neighbour])
+			{
+				distances[neighbour] = distance;
+				previous[neighbour] = current;
+			}
+		}
+	}
+
+	std::vector<glm::vec3> path;
+	graphNode * current = destination;
+	while(previous.find(current) != previous.end())
+	{	
+		path.push_back(current->getPosition());
+		current = previous[current];
+	}
+	path.push_back(current->getPosition());
+	std::reverse(path.begin(), path.end());
+
+	return path; 
+}
+
+// TODO: add logic for firing pizzas
 void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 {
 	VehicleInput* input = &driver->input;
 	input->forward = 1.0;
 	input->backward = 0.0;
 	input->handBrake = false;
-
-	// Pizza shooting proof of concept
-	//int pizzaRand = rand() % 100;
-	//if (pizzaRand == 0)
-	//{
-	//	input->shootPizza = true;
-	//}
 	
 	glm::vec3 desiredDirection = glm::normalize(desiredPos - driver->getPosition());
 	glm::vec3 forward(glm::normalize(driver->getModelMatrix() * glm::vec4(0,0,1,0)));
@@ -54,7 +91,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 	}
 }
 
-void AIEngine::updatePath(Vehicle* toUpdate, Map & map)
+void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 {
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 
@@ -73,20 +110,14 @@ void AIEngine::updatePath(Vehicle* toUpdate, Map & map)
 		}
 	}
 
-	// TODO: add actual pathfinding logic
-	graphNode * current = closest;
-	do
-	{
-		toUpdate->currentPath.push_back(current->getPosition());
-		current = current->getNeighbours().at(0);
-	}while(current != closest);
+	toUpdate->currentPath = dijkstras(closest, destination.location->nodes.at(0), map.allNodes);
 }
 
-void AIEngine::updateAI(Vehicle* toUpdate, Map & map) 
+void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map) 
 { 
 	if(toUpdate->currentPath.empty())
 	{
-		updatePath(toUpdate, map);
+		updatePath(toUpdate, destination, map);
 		if(toUpdate->currentPath.empty())
 			return;
 	}

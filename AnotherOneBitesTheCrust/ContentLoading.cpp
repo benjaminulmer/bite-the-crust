@@ -153,6 +153,8 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 			textureMap[name] = loadDDS(textureName.c_str());
 		}
 	}
+
+	fclose(filePointer);
 	return true;
 }
 
@@ -282,6 +284,8 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 		box->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
 		info->shapeInfo.push_back(box);
 	}
+
+	fclose(filePointer);
 	return info;
 }
 
@@ -454,6 +458,10 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			}
 		}
 	}
+
+
+	map.allNodes.insert(map.allNodes.end(), allNodes.begin(), allNodes.end());
+	fclose(filePointer);
 	return true;
 }
 
@@ -546,6 +554,7 @@ bool ContentLoading::loadOBJ(
 	
 	}
 
+	fclose(file);
 	return true;
 }
 
@@ -588,7 +597,7 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 	/* how big is it going to be including all mipmaps? */ 
 	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize; 
 	buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char)); 
-	fread(buffer, 1, bufsize, fp); 
+	int read = fread(buffer, 1, bufsize, fp); 
 	/* close the file pointer */ 
 	fclose(fp);
 
@@ -640,7 +649,7 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 	} 
 
 	free(buffer); 
-
+	fclose(fp);
 
 	return textureID;
 

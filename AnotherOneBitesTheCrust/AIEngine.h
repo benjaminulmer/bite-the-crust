@@ -2,10 +2,13 @@
 
 #include <vector>
 #include <ctime>
+#include <map>
+#include <limits>
 #include <glm.hpp>
 #include <gtc\constants.hpp>
 #include "Vehicle.h"
 #include "Map.h"
+#include "DeliveryManager.h"
 
 using std::vector;
 using glm::vec3;
@@ -43,10 +46,12 @@ public:
 	AIEngine(void);
 	~AIEngine(void);
 
-	void updateAI(Vehicle*, Map &);
+	void updateAI(Vehicle*, Delivery, Map &);
+	
 
 private:
-	void updatePath(Vehicle*, Map &);
+	void updatePath(Vehicle*, Delivery, Map &);
 	void goToPoint(Vehicle*, const glm::vec3 &);
+	std::vector<glm::vec3> dijkstras(graphNode *, graphNode *, std::vector<graphNode*>);
 };
 

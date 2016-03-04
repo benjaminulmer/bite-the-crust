@@ -25,7 +25,6 @@ struct Tile
 	GLuint groundTexture;
 };
 
-
 class Map
 {
 public:
@@ -37,6 +36,7 @@ public:
 	//static const int DEPTH = MAP_SIZE/Tile::SIZE;
 	int depth, width, tileSize; // Loading everything dynamically from the json now
 
+	std::vector<graphNode *> allNodes;
 	std::vector<std::vector<Tile>> tiles;
 
 	Tile* getTile(glm::vec3 position);

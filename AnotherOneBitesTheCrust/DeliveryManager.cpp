@@ -25,7 +25,7 @@ void DeliveryManager::addPlayer(Vehicle* player) {
 void DeliveryManager::assignDeliveries() {
 	if (freeLocations.size() != 0) {
 		for (int i = 0; i < (int)players.size(); i++) {
-			deliveries[players[i]] = newDelivery();
+			deliveries[players[i]] = newDelivery(players[i]);
 		}
 	}
 }
@@ -49,18 +49,20 @@ void DeliveryManager::timePassed(double timeMs) {
 		d->time = d->time - timeMs;
 		if (d->time <= 0.0) {
 			d->location->ground->setTexture(d->location->groundTexture);
+			freeLocations.push_back(d->location); // Free the tile back up for now, not Splatoon yet
 			scores[players[i]]--; // Decrement score for now, while testing things out
-			deliveries[players[i]] = newDelivery();
+			deliveries[players[i]] = newDelivery(players[i]);
 		}
 	}
 }
 
-Delivery DeliveryManager::newDelivery() {
+Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	Delivery d;
 	int randomTile = rand() % freeLocations.size();
 	d.location = freeLocations[randomTile];
-	d.time = 1000.0 * 10.0; // 10 seconds
-	d.location->ground->setTexture(deliverTexture);
+	d.time = 1000.0 * 20.0; // 10 seconds
+	d.location->ground->setTexture(deliveryTextures[player]);
+	freeLocations.erase(freeLocations.begin() + randomTile);
 	return d;
 }
 
@@ -69,17 +71,10 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 	if (tile == nullptr) // The pizza right now can land outside the tiles
 		return;
 	if (tile == deliveries[pizza->owner].location) {
+		freeLocations.push_back(tile); // Free the tile back up for now, not Splatoon yet
 		tile->ground->setTexture(tile->groundTexture);
 		scores[pizza->owner]++;
-		deliveries[pizza->owner] = newDelivery();
-		// Anyone who was delivering to this location needs a new delivery
-		for (int i = 0; i < (int)players.size(); i++) {
-			Tile* t = deliveries[players[i]].location;
-			if (t == tile) {
-				t->ground->setTexture(t->groundTexture);
-				deliveries[players[i]] = newDelivery();
-			}
-		}
+		deliveries[pizza->owner] = newDelivery(pizza->owner);
 	}
 }
 

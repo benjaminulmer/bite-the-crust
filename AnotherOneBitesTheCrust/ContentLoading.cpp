@@ -159,6 +159,8 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 			textureMap[name] = loadDDS(textureName.c_str());
 		}
 	}
+
+	fclose(filePointer);
 	return true;
 }
 
@@ -289,6 +291,8 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 		box->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
 		info->shapeInfo.push_back(box);
 	}
+
+	fclose(filePointer);
 	return info;
 }
 
@@ -351,6 +355,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 
 	// Read in the tiles array
 	std::map<int, Tile> tiles;
+	std::map<int, std::vector<NodeTemplate>> nodes;
 	const rapidjson::Value& tileArray = d["tiles"];
 	if (!tileArray.IsArray()) {
 		printf("Error, map file is improperly defined.");
@@ -382,10 +387,11 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		}
 
 		const rapidjson::Value& nodeArray = tileArray[i]["nodes"];
+		std::vector<NodeTemplate> tileNodes;
 		// Setting positions
 		for (rapidjson::SizeType j = 0; j < nodeArray.Size(); j++) 
 		{
-			graphNode * current = new graphNode();
+			NodeTemplate current;
 
 			double x, z;
 			if (nodeArray[j].HasMember("x"))
@@ -393,21 +399,17 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			if (nodeArray[j].HasMember("z"))
 				z = nodeArray[j]["z"].GetDouble();
 
-			current->setPosition(glm::vec3(x,0,z));
-			t.nodes.push_back(current);
-		}
-
-		// Connecting neighbours
-		for (rapidjson::SizeType j = 0; j < nodeArray.Size(); j++) 
-		{
+			current.position = glm::vec3(x,0,z);
 			const rapidjson::Value& neighboursArray = nodeArray[j]["neighbours"];
 			for (rapidjson::SizeType k = 0; k < neighboursArray.Size(); k++) 
 			{
 				int index = neighboursArray[k].GetInt();
-				t.nodes[j]->addNeighbour(t.nodes[index]);
+				current.neighbours.push_back(index);
 			}
-		}
 
+			tileNodes.push_back(current);
+		}
+		nodes[id] = tileNodes;
 		tiles[id] = t;
 	}
 
@@ -419,19 +421,83 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		const rapidjson::Value& row = mapTilesArray[i];
 		std::vector<Tile> rowTiles;
 		for (rapidjson::SizeType j = 0; j < row.Size(); j++) {
-			int id = row[j].GetInt();
+			std::string tileString = row[j].GetString();
+			int splitPoint = tileString.find(".");
+			int id = std::stoi(tileString.substr(0, splitPoint));
+			std::string rotation = tileString.substr(splitPoint+1);
+			Tile tile = tiles[id];
+			std::vector<NodeTemplate> tileNodes = nodes[id];
 
-			// changing relative coordinates to global coordinates
-			for(graphNode * n : tiles[id].nodes)
+			// Handle rotations
+			if (rotation == "R") {
+				for (int i = 0; i < tile.entities.size(); i++) {
+					int x = tile.entities[i].position.x;
+					int z = tile.entities[i].position.z;
+					tile.entities[i].position.x = tileSize - z;
+					tile.entities[i].position.z = x;
+				}
+				for (int i = 0; i < tileNodes.size(); i++) {
+					glm::vec3 pos = tileNodes[i].position;
+					pos.x = 1.0 - pos.z;
+					pos.z = pos.x;
+					tileNodes[i].position = pos;
+				}
+			}
+			if (rotation == "L") {
+				for (int i = 0; i < tile.entities.size(); i++) {
+					int x = tile.entities[i].position.x;
+					int z = tile.entities[i].position.z;
+					tile.entities[i].position.x = z;
+					tile.entities[i].position.z = tileSize - x;
+				}
+				for (int i = 0; i < tileNodes.size(); i++) {
+					glm::vec3 pos = tileNodes[i].position;
+					pos.x = pos.z;
+					pos.z = 1.0 - pos.x;
+					tileNodes[i].position = pos;
+				}
+			}
+			if (rotation == "RR" || rotation == "LL") {
+				for (int i = 0; i < tile.entities.size(); i++) {
+					int x = tile.entities[i].position.x;
+					int z = tile.entities[i].position.z;
+					tile.entities[i].position.x = tileSize - x;
+					tile.entities[i].position.z = tileSize - z;
+				}
+				for (int i = 0; i < tileNodes.size(); i++) {
+					glm::vec3 pos = tileNodes[i].position;
+					pos.x = 1.0 - pos.x;
+					pos.z = 1.0 - pos.z;
+					tileNodes[i].position = pos;
+				}
+			}
+
+			// Positions of nodes
+			for(NodeTemplate n : tileNodes)
 			{
-				glm::vec3 pos = n->getPosition();
+				// changing relative coordinates to global coordinates
+				glm::vec3 pos = n.position;
 				pos *= tileSize;
 				pos.x += (tileSize * j);
 				pos.z += (tileSize * i); 
-				n->setPosition(pos);
+
+				graphNode * newNode = new graphNode();
+				newNode->setPosition(pos);
+				tile.nodes.push_back(newNode);
 			}
 
-			rowTiles.push_back(tiles[id]);
+			// Local Connections
+			for(int k = 0; k < tileNodes.size(); k++)
+			{
+				NodeTemplate current = tileNodes.at(k);
+				for(int l = 0; l < current.neighbours.size(); l++)
+				{
+					int index = current.neighbours[l];
+					tile.nodes.at(k)->addNeighbour(tile.nodes.at(index));
+				}
+			}
+
+			rowTiles.push_back(tile);
 		}
 		map.tiles.push_back(rowTiles);
 	}
@@ -461,6 +527,10 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			}
 		}
 	}
+
+
+	map.allNodes.insert(map.allNodes.end(), allNodes.begin(), allNodes.end());
+	fclose(filePointer);
 	return true;
 }
 
@@ -559,6 +629,7 @@ bool ContentLoading::loadOBJ(
 	
 	}
 
+	fclose(file);
 	return true;
 }
 
@@ -600,7 +671,7 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 	/* how big is it going to be including all mipmaps? */ 
 	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize; 
 	buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char)); 
-	fread(buffer, 1, bufsize, fp); 
+	int read = fread(buffer, 1, bufsize, fp); 
 	/* close the file pointer */ 
 	fclose(fp);
 
@@ -652,7 +723,7 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 	} 
 
 	free(buffer); 
-
+	fclose(fp);
 
 	return textureID;
 }

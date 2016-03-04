@@ -131,7 +131,7 @@ void Game::setupEntities()
 				e->setTexture(textureMap[tileEntity.model]);
 
 				// Offset position based on what tile we're in
-				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize + map.tileSize/2, 0, i * map.tileSize + map.tileSize/2);
+				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
 
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(physx::PxIdentity));
 

@@ -4,8 +4,8 @@
             "id": 1,
             "ground": "floor",
             "entities": [
-                {"model": "ramp", "x": -25, "z": -35},
-                {"model": "ramp", "x": -35, "z": -25}
+                {"model": "ramp", "x": 60, "z": 0},
+                {"model": "ramp", "x": 70, "z": 10}
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
@@ -13,46 +13,11 @@
 				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]}
 			]
         },
-        {
+		{
             "id": 2,
-            "ground": "floor2",
-            "entities": [
-				
-            ],
-			"nodes" : [
-				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2]},
-				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
-			]
-        },
-		{
-            "id": 3,
             "ground": "floor",
             "entities": [
-            ],
-			"nodes" : [
-				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2]},
-				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]}
-			]
-        },
-		{
-            "id": 4,
-            "ground": "floor",
-            "entities": [
-				
-            ],
-			"nodes" : [
-				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2]},
-				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
-			]
-        },
-		{
-            "id": 5,
-            "ground": "floor",
-            "entities": [
-			
+				{"model": "ramp", "x": 35, "z": 0}
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
@@ -66,8 +31,8 @@
     "map": {
         "tile size": 70,
         "tiles": [
-		  ["2.","5.","1."],
-		  ["4.","5.","3."]
+		  ["1.L","2","1"],
+		  ["1.LL","2.LL","1.R"]
 	   ]
     }
 }

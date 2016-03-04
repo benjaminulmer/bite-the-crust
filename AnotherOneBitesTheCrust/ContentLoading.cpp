@@ -423,13 +423,21 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			int id = std::stoi(tileString.substr(0, splitPoint));
 			std::string rotation = tileString.substr(splitPoint+1);
 			Tile tile = tiles[id];
+			std::vector<NodeTemplate> tileNodes = nodes[id];
+
 			// Handle rotations
 			if (rotation == "R") {
 				for (int i = 0; i < tile.entities.size(); i++) {
 					int x = tile.entities[i].position.x;
 					int z = tile.entities[i].position.z;
-					tile.entities[i].position.x = -z;
+					tile.entities[i].position.x = tileSize - z;
 					tile.entities[i].position.z = x;
+				}
+				for (int i = 0; i < tileNodes.size(); i++) {
+					glm::vec3 pos = tileNodes[i].position;
+					pos.x = 1.0 - pos.z;
+					pos.z = pos.x;
+					tileNodes[i].position = pos;
 				}
 			}
 			if (rotation == "L") {
@@ -437,18 +445,29 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 					int x = tile.entities[i].position.x;
 					int z = tile.entities[i].position.z;
 					tile.entities[i].position.x = z;
-					tile.entities[i].position.z = -x;
+					tile.entities[i].position.z = tileSize - x;
+				}
+				for (int i = 0; i < tileNodes.size(); i++) {
+					glm::vec3 pos = tileNodes[i].position;
+					pos.x = pos.z;
+					pos.z = 1.0 - pos.x;
+					tileNodes[i].position = pos;
 				}
 			}
 			if (rotation == "RR" || rotation == "LL") {
 				for (int i = 0; i < tile.entities.size(); i++) {
 					int x = tile.entities[i].position.x;
 					int z = tile.entities[i].position.z;
-					tile.entities[i].position.x = -x;
-					tile.entities[i].position.z = -z;
+					tile.entities[i].position.x = tileSize - x;
+					tile.entities[i].position.z = tileSize - z;
+				}
+				for (int i = 0; i < tileNodes.size(); i++) {
+					glm::vec3 pos = tileNodes[i].position;
+					pos.x = 1.0 - pos.x;
+					pos.z = 1.0 - pos.z;
+					tileNodes[i].position = pos;
 				}
 			}
-			std::vector<NodeTemplate> tileNodes = nodes[id];
 
 			// Positions of nodes
 			for(NodeTemplate n : tileNodes)
@@ -463,6 +482,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				newNode->setPosition(pos);
 				tile.nodes.push_back(newNode);
 			}
+
 			// Local Connections
 			for(int k = 0; k < tileNodes.size(); k++)
 			{

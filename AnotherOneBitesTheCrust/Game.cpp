@@ -100,17 +100,6 @@ void Game::setupEntities()
 	}
 	deliveryManager->deliverTexture = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
 
-	// TODO fix this - testing shootings textures for now. Alexei can switch to json
-	pizza = new Renderable();
-	vector<vec3>pizzaVerts;
-	vector<glm::vec2>pizzaUVs;
-	vector<vec3>pizzaNormals;
-	bool pizzaRes = ContentLoading::loadOBJ("res\\Models\\PizzaBox_textured\\PizzaBox-centered.obj", pizzaVerts, pizzaUVs, pizzaNormals);
-	pizza->setVerts(pizzaVerts);
-	pizza->setUVs(pizzaUVs);
-	pizza->setNorms(pizzaNormals);
-	renderingEngine->assignBuffersTex(pizza);
-
 	// Load the map
 	if (!ContentLoading::loadMap("res\\JSON\\map.json", map))
 		fatalError("Could not load map file.");
@@ -315,10 +304,7 @@ void Game::processSDLEvents()
 void Game::shootPizza(Vehicle* vehicle)
 {
 	PizzaBox* pizzaBox = new PizzaBox(vehicle);
-	//pizzaBox->setRenderable(renderablesMap["box"]);
-	pizzaBox->setRenderable(pizza);
-	//pizzaBox->setDefaultTranslation(pizza->getCenter());
-	//pizzaBox->setTexture(ContentLoading::loadDDS("res\\Models\\PizzaBox_textured\\PizzaBox-colored.DDS"));
+	pizzaBox->setRenderable(renderablesMap["box"]);
 	pizzaBox->setTexture(textureMap["box"]);
 
 	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();
@@ -333,7 +319,6 @@ void Game::shootPizza(Vehicle* vehicle)
 	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
-	//pizzaEntities.push_back(pizzaBox);
 
 	audioEngine->playCannonSound(vehicle);
 }

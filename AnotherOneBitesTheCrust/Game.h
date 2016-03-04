@@ -64,7 +64,6 @@ private:
 	PhysicsEntityInfo* pizzaInfo;
 
 	std::vector<Entity*> entities;
-	std::vector<Entity*> pizzaEntities;
 	std::map<std::string, Renderable*> renderablesMap;
 	std::map<std::string, PhysicsEntityInfo*> physicsEntityInfoMap;
 	std::map<std::string, GLuint> textureMap;

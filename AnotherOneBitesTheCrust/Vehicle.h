@@ -63,7 +63,7 @@ class Vehicle :
 	public DynamicEntity
 {
 public:
-	Vehicle(void);
+	Vehicle(unsigned int stepSizeMS);
 	~Vehicle(void);
 
 	VehicleInput input;
@@ -74,8 +74,7 @@ public:
 	// AI stuff; might be moved into 'Player' class
 	std::vector<glm::vec3> currentPath;
 
-	void updateTuning();
-	void handleInput();
+	void update();
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
 	glm::mat4 getModelMatrix();
 
@@ -86,6 +85,8 @@ public:
 	glm::vec3 getDestination();
 
 private:
+	physx::PxF32 stepSizeS;
+
 	physx::PxF32 tipAngle;
 
 	physx::PxVehicleDrive4W* physicsVehicle;

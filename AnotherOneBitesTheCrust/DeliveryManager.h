@@ -29,7 +29,7 @@ public:
 	std::vector<Vehicle*> players;
 	std::map<Vehicle*, Delivery> deliveries;
 	std::map<Vehicle*, int> scores;
-	GLuint deliverTexture;
+	std::map<Vehicle*, GLuint> deliveryTextures;
 	
 	void addDeliveryLocation(Tile* location);
 	void addPlayer(Vehicle* player);
@@ -37,7 +37,7 @@ public:
 	std::string getDeliveryText(Vehicle* player);
 	int getScore(Vehicle* player);
 	void timePassed(double timeMs);
-	Delivery newDelivery();
+	Delivery newDelivery(Vehicle* player);
 	void pizzaLanded(PizzaBox* pizza);
 	void refillPizza(Vehicle* player);
 };

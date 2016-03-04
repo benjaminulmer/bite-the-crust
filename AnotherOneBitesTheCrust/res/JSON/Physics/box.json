@@ -4,6 +4,6 @@
     ],
     "type": "dynamic",
     "dynamicInfo": {
-        "mass": 1.0
+        "density": 1.0
     }
 }

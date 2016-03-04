@@ -2,6 +2,7 @@
 
 namespace ContentLoading {
 
+// Loads and stores tuning data for vehicle from provided file
 bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
@@ -70,7 +71,7 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 		vehicle->tuning.maxHandBrakeTorque = (float)d["maxHandBrakeTorque"].GetDouble();
 	}
 	if (d.HasMember("maxSteerDegrees")) {
-		vehicle->tuning.maxSteerDegrees = (float)d["maxSteerDegrees"].GetInt();
+		vehicle->tuning.maxSteerDegrees = d["maxSteerDegrees"].GetInt();
 	}
 	if (d.HasMember("engineTorque")) {
 		vehicle->tuning.engineTorque = (float)d["engineTorque"].GetDouble();
@@ -91,13 +92,12 @@ bool loadVehicleData(char* filename, Vehicle* vehicle) {
 		vehicle->tuning.clutchStrength = (float)d["clutchStrength"].GetDouble();
 	}
 
-	vehicle->updateTuning();
-
 	fclose(filePointer);
 
 	return true;
 }
 
+// Verifies entity list is well formated
 bool verifyEntityList(const rapidjson::Document &d) {
 	if (!d.HasMember("entities")) {
 		printf("Missing entities array.");
@@ -121,6 +121,7 @@ bool verifyEntityList(const rapidjson::Document &d) {
 	return true;
 }
 
+// Load entities and their information
 bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Renderable*> &modelMap, std::map<std::string, PhysicsEntityInfo*> &physicsMap,
 									std::map<std::string, GLuint> &textureMap) {
 	FILE* filePointer;
@@ -133,20 +134,25 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
 	rapidjson::Document d;
 	d.ParseStream(reader);
+
 	if (!verifyEntityList(d)) {
 		return false;
 	}
+
 	const rapidjson::Value& entitiesArray = d["entities"];
 	for (rapidjson::SizeType i = 0; i < entitiesArray.Size(); i++) {
 		std::string name = entitiesArray[i]["name"].GetString();
+
 		std::string renderableModelFile = entitiesArray[i]["model"].GetString();
 		renderableModelFile.insert(0, "res\\Models\\");
 		Renderable* r = createRenderable(renderableModelFile);
 		modelMap[name] = r;
+
 		std::string physicsDataName = entitiesArray[i]["physics"].GetString();
 		physicsDataName.insert(0, "res\\JSON\\Physics\\");
 		PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
 		physicsMap[name] = info;
+
 		if (entitiesArray[i].HasMember("texture")) {
 			std::string textureName = entitiesArray[i]["texture"].GetString();
 			textureName.insert(0, "res\\Textures\\");
@@ -158,6 +164,7 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 	return true;
 }
 
+// Create renderable from obj file
 Renderable* createRenderable(std::string modelFile) {
 	Renderable * r = new Renderable();
 	std::vector<glm::vec3> verts;
@@ -165,18 +172,15 @@ Renderable* createRenderable(std::string modelFile) {
 	std::vector<glm::vec3> normals;
 
 	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals);
-	//std::cout << "Verts size " << verts.size() << std::endl;
 
 	r->setVerts(verts);
 	r->setUVs(uvs);
 	r->setNorms(normals);
-	//r->setColor(glm::vec3(1.0f,1.0f,1.0f));
 
 	return r;
 }
 
-
-
+// Create physics information from JSON file. Uses obj if needed/specified
 PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
@@ -204,8 +208,8 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 	}
 	if (d.HasMember("dynamicInfo")) {
 		const rapidjson::Value& dynamicInfo = d["dynamicInfo"];
-		if (dynamicInfo.HasMember("mass")) {
-			info->dynamicInfo->mass = (float)dynamicInfo["mass"].GetDouble();
+		if (dynamicInfo.HasMember("density")) {
+			info->dynamicInfo->density = (float)dynamicInfo["density"].GetDouble();
 		}
 		if (dynamicInfo.HasMember("linearDamping")) {
 			info->dynamicInfo->linearDamping = (float)dynamicInfo["linearDamping"].GetDouble();
@@ -492,8 +496,8 @@ bool ContentLoading::loadOBJ(
 	std::vector<glm::vec2> temp_uvs;
 	std::vector<glm::vec3> temp_normals;
 
-
-	FILE * file = fopen(path, "r");
+	FILE * file; 
+	errno_t err = fopen_s(&file, path, "r");
 	if( file == NULL ){
 		printf("Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n");
 		getchar();
@@ -504,7 +508,7 @@ bool ContentLoading::loadOBJ(
 
 		char lineHeader[128];
 		// read the first word of the line
-		int res = fscanf(file, "%s", lineHeader);
+		int res = fscanf_s(file, "%s", lineHeader);
 		if (res == EOF)
 			break; // EOF = End Of File. Quit the loop.
 
@@ -512,21 +516,21 @@ bool ContentLoading::loadOBJ(
 		
 		if ( strcmp( lineHeader, "v" ) == 0 ){
 			glm::vec3 vertex;
-			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
+			fscanf_s(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
 			temp_vertices.push_back(vertex);
 		}else if ( strcmp( lineHeader, "vt" ) == 0 ){
 			glm::vec2 uv;
-			fscanf(file, "%f %f\n", &uv.x, &uv.y );
+			fscanf_s(file, "%f %f\n", &uv.x, &uv.y );
 			uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
 			temp_uvs.push_back(uv);
 		}else if ( strcmp( lineHeader, "vn" ) == 0 ){
 			glm::vec3 normal;
-			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z );
+			fscanf_s(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z );
 			temp_normals.push_back(normal);
 		}else if ( strcmp( lineHeader, "f" ) == 0 ){
 			std::string vertex1, vertex2, vertex3;
 			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
+			int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
 			if (matches != 9){
 				printf("File can't be read by our simple parser :-( Try exporting with other options\n");
 				return false;
@@ -580,10 +584,9 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 
 	unsigned char header[124];
 
-	FILE *fp; 
- 
 	/* try to open the file */ 
-	fp = fopen(imagepath, "rb"); 
+	FILE* fp;
+	errno_t err = fopen_s(&fp, imagepath, "rb"); 
 	if (fp == NULL){
 		printf("%s could not be opened. Are you in the right directory ? Don't forget to read the FAQ !\n", imagepath); getchar(); 
 		return 0;
@@ -666,8 +669,5 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 	fclose(fp);
 
 	return textureID;
-
-
 }
-
 }

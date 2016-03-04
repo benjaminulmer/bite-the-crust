@@ -25,7 +25,6 @@ struct Tile
 	GLuint groundTexture;
 };
 
-
 class Map
 {
 public:

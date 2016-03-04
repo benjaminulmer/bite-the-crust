@@ -37,7 +37,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	GLuint tID = glGetUniformLocation(textureProgramID, "myTextureSampler");
 	GLuint normalID = glGetUniformLocation(textureProgramID, "normalMatrix");
 
-	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 150, 35);
+	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 100, 35);
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
@@ -199,6 +199,7 @@ void RenderingEngine::initText2D(const char * texturePath){
 
 void RenderingEngine::printText2D(const char * text, int x, int y, int size){
 
+
 	unsigned int length = strlen(text);
 
 	// Fill buffers
@@ -279,6 +280,9 @@ void RenderingEngine::printText2D(const char * text, int x, int y, int size){
 	glBindVertexArray(0);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+	glDeleteVertexArrays(1, &textVAO);
+	glDeleteBuffers(1, &Text2DVertexBufferID);
+	glDeleteBuffers(1, &Text2DUVBufferID);
 
 }
 

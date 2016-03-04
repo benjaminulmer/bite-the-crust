@@ -98,7 +98,6 @@ void Game::setupEntities()
 	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
 		renderingEngine->assignBuffersTex(it->second);
 	}
-	deliveryManager->deliverTexture = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
 
 	// TODO fix this - testing shootings textures for now. Alexei can switch to json
 	pizza = new Renderable();
@@ -200,6 +199,9 @@ void Game::connectSystems()
 	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 
 	deliveryManager->addPlayer(p1Vehicle);
+	deliveryManager->addPlayer(p2Vehicle);
+	deliveryManager->deliveryTextures[p1Vehicle] = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
+	deliveryManager->deliveryTextures[p2Vehicle] = ContentLoading::loadDDS("res\\Textures\\AIDeliverFloor.DDS");
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);

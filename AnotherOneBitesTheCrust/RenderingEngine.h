@@ -61,6 +61,15 @@ public:
 	GLuint TextureID;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	//////////////////////BLOB SHADOWS////////////////////////////////////
+	GLuint shadowProgramID;
+	GLuint sphereVAO;
+	GLuint sphereVertBuffer;
+	GLuint sphereColorBuffer;
+	std::vector<glm::vec3> shadowVertices;
+	void setupShadowBuffers();
+	void drawShadow(glm::vec3 position);
+
 	//int init_resourses();
 	//void render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy);
 	//void displayText();

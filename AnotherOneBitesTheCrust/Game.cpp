@@ -84,6 +84,7 @@ void Game::initSystems()
 	renderingEngine = new RenderingEngine();
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
+	renderingEngine->setupShadowBuffers();
 }
 
 // Create and initialize all loaded entities in the game world
@@ -239,6 +240,8 @@ void Game::mainLoop()
 		// Display
 		
 		renderingEngine->displayFuncTex(entities);
+		renderingEngine->drawShadow(p1Vehicle->getPosition());
+		renderingEngine->drawShadow(p2Vehicle->getPosition());
 		//renderingEngine->displayFuncTex(pizzaEntities);
 		///test drawing
 		//renderingEngine->testDraw();

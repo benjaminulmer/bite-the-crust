@@ -129,7 +129,7 @@ std::string loadShaderStringfromFile( const std::string & filePath )
 			shaderCode += "\n" + line;
 		}
 
-		std::cout << "Shader loaded correctly " << std::endl;
+		std::cout << "Shader loaded correctly " <<filePath << std::endl;
 		fileStream.close();
 	
 	}

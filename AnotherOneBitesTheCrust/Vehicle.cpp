@@ -24,6 +24,11 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	pizzaCount = 3;
 }
 
+glm::vec3 Vehicle::getDestination()
+{
+	return currentPath.back();
+}
+
 void Vehicle::setSmoothingData()
 {
 	smoothingData.mRiseRates[0] = 6.0f;
@@ -84,13 +89,13 @@ void Vehicle::update()
 	(input.handBrake) ? handBrake = 1.0f: handBrake = 0.0f;
 
 	// Check if gear should switch from reverse to forward or vise versa
-	if (forwardSpeed == 0 && input.backward > 0)
+	if (forwardSpeed < 5 && input.backward > 0)
 	{
-		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+		physicsVehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eREVERSE);
 	}
-	else if (forwardSpeed == 0 && input.forward > 0)
+	else if (forwardSpeed > -5 && input.forward > 0)
 	{
-		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+		physicsVehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eFIRST);
 	}
 
 	// Determine how to apply controller input depending on current gear

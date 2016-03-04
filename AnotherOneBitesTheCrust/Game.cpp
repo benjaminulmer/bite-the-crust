@@ -99,18 +99,6 @@ void Game::setupEntities()
 	{
 		renderingEngine->assignBuffersTex(it->second);
 	}
-	deliveryManager->deliverTexture = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
-
-	// TODO fix this - testing shootings textures for now. Alexei can switch to json
-	pizza = new Renderable();
-	vector<vec3>pizzaVerts;
-	vector<glm::vec2>pizzaUVs;
-	vector<vec3>pizzaNormals;
-	bool pizzaRes = ContentLoading::loadOBJ("res\\Models\\PizzaBox_textured\\PizzaBox-centered.obj", pizzaVerts, pizzaUVs, pizzaNormals);
-	pizza->setVerts(pizzaVerts);
-	pizza->setUVs(pizzaUVs);
-	pizza->setNorms(pizzaNormals);
-	renderingEngine->assignBuffersTex(pizza);
 
 	// Load the map
 	if (!ContentLoading::loadMap("res\\JSON\\map.json", map))
@@ -130,7 +118,7 @@ void Game::setupEntities()
 			ground->setTexture(textureMap[tile->groundModel]);
 
 			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
-			ground->setDefaultTranslation(glm::vec3(i*map.tileSize + map.tileSize/2, 0, j*map.tileSize + map.tileSize/2));
+			ground->setDefaultTranslation(glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2));
 			tile->ground = ground;
 			tile->groundTexture = textureMap[tile->groundModel];
 			entities.push_back(ground);
@@ -149,7 +137,8 @@ void Game::setupEntities()
 				e->setTexture(textureMap[tileEntity.name]);
 
 				// Offset position based on what tile we're in
-				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize + map.tileSize/2, 0, j * map.tileSize + map.tileSize/2);
+				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize + map.tileSize/2, 0, i * map.tileSize + map.tileSize/2);
+
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(physx::PxIdentity));
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.name], transform);
@@ -205,6 +194,10 @@ void Game::connectSystems()
 	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 
 	deliveryManager->addPlayer(p1Vehicle);
+	deliveryManager->addPlayer(p2Vehicle);
+
+	deliveryManager->deliveryTextures[p1Vehicle] = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
+	deliveryManager->deliveryTextures[p2Vehicle] = ContentLoading::loadDDS("res\\Textures\\AIDeliverFloor.DDS");
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
@@ -234,9 +227,11 @@ void Game::mainLoop()
 			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
-			aiEngine->updateAI(p2Vehicle, map);
+
+			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map);
 			p1Vehicle->update();
 			p2Vehicle->update();
+
 		
 			physicsEngine->simulate(PHYSICS_STEP_MS);
 
@@ -320,10 +315,7 @@ void Game::processSDLEvents()
 void Game::shootPizza(Vehicle* vehicle)
 {
 	PizzaBox* pizzaBox = new PizzaBox(vehicle);
-	//pizzaBox->setRenderable(renderablesMap["box"]);
-	pizzaBox->setRenderable(pizza);
-	//pizzaBox->setDefaultTranslation(pizza->getCenter());
-	//pizzaBox->setTexture(ContentLoading::loadDDS("res\\Models\\PizzaBox_textured\\PizzaBox-colored.DDS"));
+	pizzaBox->setRenderable(renderablesMap["box"]);
 	pizzaBox->setTexture(textureMap["box"]);
 
 	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();
@@ -338,7 +330,6 @@ void Game::shootPizza(Vehicle* vehicle)
 	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
-	//pizzaEntities.push_back(pizzaBox);
 
 	audioEngine->playCannonSound(vehicle);
 }

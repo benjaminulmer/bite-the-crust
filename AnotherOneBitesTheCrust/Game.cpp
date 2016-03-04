@@ -190,11 +190,9 @@ void Game::connectSystems()
 
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->addPlayer(p2Vehicle);
-<<<<<<< HEAD
-=======
+
 	deliveryManager->deliveryTextures[p1Vehicle] = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
 	deliveryManager->deliveryTextures[p2Vehicle] = ContentLoading::loadDDS("res\\Textures\\AIDeliverFloor.DDS");
->>>>>>> 68320e867dc826bf7745497da48aa35c43413cbd
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
@@ -224,15 +222,11 @@ void Game::mainLoop()
 			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
-<<<<<<< HEAD
+
 			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map);
-			p1Vehicle->handleInput();
-			p2Vehicle->handleInput();
-=======
-			aiEngine->updateAI(p2Vehicle, map);
 			p1Vehicle->update();
 			p2Vehicle->update();
->>>>>>> 68320e867dc826bf7745497da48aa35c43413cbd
+
 		
 			physicsEngine->simulate(PHYSICS_STEP_MS);
 

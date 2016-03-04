@@ -60,7 +60,7 @@ Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	Delivery d;
 	int randomTile = rand() % freeLocations.size();
 	d.location = freeLocations[randomTile];
-	d.time = 1000.0 * 10.0; // 10 seconds
+	d.time = 1000.0 * 20.0; // 10 seconds
 	d.location->ground->setTexture(deliveryTextures[player]);
 	freeLocations.erase(freeLocations.begin() + randomTile);
 	return d;

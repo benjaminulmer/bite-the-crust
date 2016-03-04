@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-const int MIN_DIST = 10;
+const int MIN_DIST = 35;
 
 AIEngine::AIEngine(void)
 {
@@ -15,22 +15,40 @@ std::vector<glm::vec3> AIEngine::dijkstras(graphNode * start, graphNode * destin
 	std::map<graphNode *, graphNode *> previous;
 	std::list<graphNode *> toVisit;
 
+	toVisit.push_back(start);
 	for(graphNode * n : allNodes)
+	{
 		distances[n] = DBL_MAX;
+		if(n != start)
+			toVisit.push_back(n);
+	}
 
-	toVisit.push_front(start);
+	
 	distances[start] = 0;
+	previous[start] = nullptr;
 
 	while(!toVisit.empty())
 	{
-		graphNode * current = toVisit.front();
-		toVisit.pop_front();
+
+		std::list<graphNode*>::iterator position = toVisit.begin();
+		double minDist = DBL_MAX;
+		for(std::list<graphNode*>::iterator i = toVisit.begin(); i != toVisit.end(); i++)
+		{
+			if(distances[*i] < minDist)
+			{
+				position = i;
+				minDist = distances[*i];
+			}
+		}
+		
+		graphNode * current = *position;
+		toVisit.erase(position);
 
 		for(graphNode * neighbour : current->getNeighbours())
 		{
 			double distance = 0;
 
-			distance += distances[neighbour] + glm::length(neighbour->getPosition() - current->getPosition());
+			distance += distances[current] + glm::length(neighbour->getPosition() - current->getPosition());
 			if(distance < distances[neighbour])
 			{
 				distances[neighbour] = distance;
@@ -41,12 +59,11 @@ std::vector<glm::vec3> AIEngine::dijkstras(graphNode * start, graphNode * destin
 
 	std::vector<glm::vec3> path;
 	graphNode * current = destination;
-	while(previous.find(current) != previous.end())
+	while(current != nullptr)
 	{	
 		path.push_back(current->getPosition());
 		current = previous[current];
 	}
-	path.push_back(current->getPosition());
 	std::reverse(path.begin(), path.end());
 
 	return path; 
@@ -119,7 +136,15 @@ void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 	if(glm::length(destinationNode->getPosition() - closest->getPosition()) <= MIN_DIST)
 		toUpdate->currentPath.push_back(destinationNode->getPosition());
 	else
-		toUpdate->currentPath = dijkstras(closest, destinationNode, map.allNodes);
+	{
+		// Uncomment this to use dijkstras. Right now it's a little buggy and needs some work,
+		// heading straight to the destination works better for now. I believe re-running
+		// dijkstras each frame would fix the issue (right now I'm uncertain whether this would
+		// cause too much overhead)
+		//
+		//toUpdate->currentPath = dijkstras(closest, destinationNode, map.allNodes);
+		toUpdate->currentPath.push_back(destinationNode->getPosition());
+	}
 }
 
 inline bool equals(glm::vec3 x, glm::vec3 y)
@@ -154,6 +179,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 		if(toUpdate->currentPath.empty())
 		{
 			toUpdate->input.forward = 0;
+			toUpdate->input.backward = 1;
 			toUpdate->input.handBrake = true;
 			return;
 		} 

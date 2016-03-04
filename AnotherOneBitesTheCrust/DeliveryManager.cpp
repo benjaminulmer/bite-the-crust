@@ -31,7 +31,7 @@ void DeliveryManager::assignDeliveries() {
 }
 
 std::string DeliveryManager::getDeliveryText(Vehicle* player) {
-	int seconds = ceil(deliveries[player].time / 1000.0);
+	int seconds = (int)(ceil(deliveries[player].time / 1000.0f));
 	int minutes = seconds / 60;
 	seconds = seconds % 60;
     std::string text = std::to_string(minutes);

@@ -1,8 +1,6 @@
 #include "SimulationCallback.h"
 #include "PhysicsEntity.h"
 
-#include <iostream>
-
 using namespace physx;
 
 void SimulationCallback::onContact(const physx::PxContactPairHeader &pairHeader, const physx::PxContactPair *pairs, physx::PxU32 nbPairs)

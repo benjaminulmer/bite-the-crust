@@ -24,6 +24,11 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	pizzaCount = 3;
 }
 
+glm::vec3 Vehicle::getDestination()
+{
+	return currentPath.back();
+}
+
 void Vehicle::setSmoothingData()
 {
 	smoothingData.mRiseRates[0] = 6.0f;

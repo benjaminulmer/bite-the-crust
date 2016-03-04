@@ -115,7 +115,7 @@ void Game::setupEntities()
 			ground->setTexture(textureMap[tile->groundModel]);
 
 			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
-			ground->setDefaultTranslation(glm::vec3(i*map.tileSize + map.tileSize/2, 0, j*map.tileSize + map.tileSize/2));
+			ground->setDefaultTranslation(glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2));
 			tile->ground = ground;
 			tile->groundTexture = textureMap[tile->groundModel];
 			entities.push_back(ground);
@@ -131,7 +131,8 @@ void Game::setupEntities()
 				e->setTexture(textureMap[tileEntity.model]);
 
 				// Offset position based on what tile we're in
-				glm::vec3 pos = tileEntity.position + glm::vec3(i * map.tileSize + map.tileSize/2, 0, j * map.tileSize + map.tileSize/2);
+				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize + map.tileSize/2, 0, i * map.tileSize + map.tileSize/2);
+
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(physx::PxIdentity));
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
@@ -189,6 +190,7 @@ void Game::connectSystems()
 
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->addPlayer(p2Vehicle);
+
 	deliveryManager->deliveryTextures[p1Vehicle] = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
 	deliveryManager->deliveryTextures[p2Vehicle] = ContentLoading::loadDDS("res\\Textures\\AIDeliverFloor.DDS");
 	deliveryManager->assignDeliveries();
@@ -220,9 +222,11 @@ void Game::mainLoop()
 			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
-			aiEngine->updateAI(p2Vehicle, map);
+
+			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map);
 			p1Vehicle->update();
 			p2Vehicle->update();
+
 		
 			physicsEngine->simulate(PHYSICS_STEP_MS);
 

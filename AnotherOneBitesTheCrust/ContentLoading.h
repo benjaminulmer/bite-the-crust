@@ -11,6 +11,12 @@
 #include "PhysicsEngine.h"
 #include "graphNode.h"
 
+struct NodeTemplate
+{
+	glm::vec3 position;
+	std::vector<int> neighbours;
+};
+
 namespace ContentLoading
 {
 	Renderable* createRenderable(std::string modelFile);

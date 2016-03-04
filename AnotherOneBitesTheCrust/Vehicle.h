@@ -80,7 +80,9 @@ public:
 
 	void setPhysicsVehicle(physx::PxVehicleDrive4W* vehicle);
 
-	sigslot::signal1<Vehicle*> shootPizzaSignal;	
+	sigslot::signal1<Vehicle*> shootPizzaSignal;
+
+	glm::vec3 getDestination();
 
 private:
 	physx::PxF32 stepSizeS;

@@ -14,7 +14,8 @@ Map::~Map(void)
 		{
 			for(graphNode * n : t.nodes)
 			{
-				delete n;
+				// This doesn't work right now because multiple tiles have the same graphNode pointers
+				//delete n;
 			}
 		}
 	}

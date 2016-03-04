@@ -4,6 +4,8 @@
             "id": 1,
             "ground": "floor",
             "entities": [
+                {"model": "ramp", "x": -25, "z": -35},
+                {"model": "ramp", "x": -35, "z": -25}
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
@@ -45,8 +47,8 @@
     "map": {
         "tile size": 70,
         "tiles": [
-		  [2,1],
-		  [4,3]
+		  ["1.","1.L"],
+		  ["1.R","1.RR"]
 	   ]
     }
 }

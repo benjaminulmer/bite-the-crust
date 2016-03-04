@@ -416,7 +416,36 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		const rapidjson::Value& row = mapTilesArray[i];
 		std::vector<Tile> rowTiles;
 		for (rapidjson::SizeType j = 0; j < row.Size(); j++) {
-			int id = row[j].GetInt();
+			std::string tileString = row[j].GetString();
+			int splitPoint = tileString.find(".");
+			int id = std::stoi(tileString.substr(0, splitPoint));
+			std::string rotation = tileString.substr(splitPoint+1);
+			Tile tile = tiles[id];
+			// Handle rotations
+			if (rotation == "R") {
+				for (int i = 0; i < tile.entities.size(); i++) {
+					int x = tile.entities[i].position.x;
+					int z = tile.entities[i].position.z;
+					tile.entities[i].position.x = -z;
+					tile.entities[i].position.z = x;
+				}
+			}
+			if (rotation == "L") {
+				for (int i = 0; i < tile.entities.size(); i++) {
+					int x = tile.entities[i].position.x;
+					int z = tile.entities[i].position.z;
+					tile.entities[i].position.x = z;
+					tile.entities[i].position.z = -x;
+				}
+			}
+			if (rotation == "RR" || rotation == "LL") {
+				for (int i = 0; i < tile.entities.size(); i++) {
+					int x = tile.entities[i].position.x;
+					int z = tile.entities[i].position.z;
+					tile.entities[i].position.x = -x;
+					tile.entities[i].position.z = -z;
+				}
+			}
 
 			// changing relative coordinates to global coordinates
 			for(graphNode * n : tiles[id].nodes)
@@ -428,7 +457,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				n->setPosition(pos);
 			}
 
-			rowTiles.push_back(tiles[id]);
+			rowTiles.push_back(tile);
 		}
 		map.tiles.push_back(rowTiles);
 	}

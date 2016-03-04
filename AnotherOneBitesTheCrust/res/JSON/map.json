@@ -4,8 +4,8 @@
             "id": 1,
             "ground": "floor",
             "entities": [
-                {"model": "ramp", "x": 60, "z": 0},
-                {"model": "ramp", "x": 70, "z": 10}
+                {"model": "ramp", "x": 15, "z": 0},
+                {"model": "ramp", "x": 20, "z": 10}
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
@@ -17,7 +17,7 @@
             "id": 2,
             "ground": "floor",
             "entities": [
-				{"model": "ramp", "x": 35, "z": 0}
+				{"model": "ramp", "x": 10, "z": 0}
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
@@ -29,7 +29,7 @@
     ],
 
     "map": {
-        "tile size": 70,
+        "tile size": 20,
         "tiles": [
 		  ["1.L","2","1"],
 		  ["1.LL","2.LL","1.R"]

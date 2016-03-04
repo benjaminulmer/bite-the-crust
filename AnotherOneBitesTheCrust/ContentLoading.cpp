@@ -170,12 +170,15 @@ Renderable* createRenderable(std::string modelFile) {
 	std::vector<glm::vec3> verts;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
+	std::vector<GLuint> faces;
+	std::vector<glm::vec3> raw_verts;
 
-	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals);
+	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals, faces, raw_verts);
 
 	r->setVerts(verts);
 	r->setUVs(uvs);
 	r->setNorms(normals);
+	r->setFaces(faces);
 
 	return r;
 }
@@ -535,7 +538,9 @@ bool ContentLoading::loadOBJ(
 	const char * path, 
 	std::vector<glm::vec3> & out_vertices, 
 	std::vector<glm::vec2> & out_uvs,
-	std::vector<glm::vec3> & out_normals
+	std::vector<glm::vec3> & out_normals,
+	std::vector<GLuint> & out_faces,
+	std::vector<glm::vec3> & raw_verts
 ){
 	printf("Loading OBJ file %s...\n", path);
 
@@ -592,6 +597,10 @@ bool ContentLoading::loadOBJ(
 			normalIndices.push_back(normalIndex[0]);
 			normalIndices.push_back(normalIndex[1]);
 			normalIndices.push_back(normalIndex[2]);
+			out_faces.push_back(vertexIndex[0]-1);
+			out_faces.push_back(vertexIndex[1]-1);
+			out_faces.push_back(vertexIndex[2]-1);
+			raw_verts = temp_vertices;
 		}else{
 			// Probably a comment, eat up the rest of the line
 			char stupidBuffer[1000];

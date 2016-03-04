@@ -29,7 +29,8 @@ namespace ContentLoading
 		std::vector<glm::vec3> & out_vertices, 
 		std::vector<glm::vec2> & out_uvs,
 		std::vector<glm::vec3> & out_normals,
-		std::vector<GLuint> &out_faces
+		std::vector<GLuint> &out_faces,
+		std::vector<glm::vec3> & raw_verts
 	);
 	GLuint loadDDS(const char * imagepath);
 };

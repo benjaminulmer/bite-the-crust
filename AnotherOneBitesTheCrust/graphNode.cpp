@@ -39,3 +39,11 @@ bool graphNode::sameLocation(graphNode * comparing)
 		return true;
 	return false;
 }
+
+bool graphNode::sameLocation(glm::vec3 comparingPosition)
+{
+
+	if(position.x == comparingPosition.x && position.y == comparingPosition.y && position.z == comparingPosition.z)
+		return true;
+	return false;
+}

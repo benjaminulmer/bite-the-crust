@@ -11,6 +11,7 @@ public:
 	void addNeighbour(graphNode*);
 	void setPosition(glm::vec3);
 	bool sameLocation(graphNode*);
+	bool sameLocation(glm::vec3);
 
 	std::vector<graphNode*> getNeighbours();
 	glm::vec3 getPosition();

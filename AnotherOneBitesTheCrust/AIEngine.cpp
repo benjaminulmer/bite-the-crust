@@ -2,6 +2,8 @@
 #include <iostream>
 #include <stdlib.h>
 
+const int MIN_DIST = 10;
+
 AIEngine::AIEngine(void)
 {
 	srand((int)time(0));
@@ -93,6 +95,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 
 void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 {
+
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 
 	// Find closest node
@@ -110,7 +113,18 @@ void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 		}
 	}
 
-	toUpdate->currentPath = dijkstras(closest, destination.location->nodes.at(0), map.allNodes);
+
+	// Should be 'goal node' of this tile
+	graphNode * destinationNode = destination.location->nodes.at(1);
+	if(glm::length(destinationNode->getPosition() - closest->getPosition()) <= MIN_DIST)
+		toUpdate->currentPath.push_back(destinationNode->getPosition());
+	else
+		toUpdate->currentPath = dijkstras(closest, destinationNode, map.allNodes);
+}
+
+inline bool equals(glm::vec3 x, glm::vec3 y)
+{
+	return x.x == y.x && x.y == y.y && x.z == y.z;
 }
 
 void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map) 
@@ -122,17 +136,25 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 			return;
 	}
 
+	// Should be goal node
+	if(!equals(toUpdate->getDestination(), destination.location->nodes.at(1)->getPosition()))
+	{
+		toUpdate->currentPath.clear();
+		return;
+	}
+
 	// May want to consider something more efficient, uses square root in here
 	float distanceToNext = glm::length(toUpdate->currentPath.at(0) - toUpdate->getPosition());
 
-	if(distanceToNext < 10)
+	if(distanceToNext < MIN_DIST)
 	{
 		std::cout << "Waypoint get! Position: "<< toUpdate->currentPath.at(0).x << "," << toUpdate->currentPath.at(0).y << ", " << toUpdate->currentPath.at(0).z << std::endl;
 		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
 
 		if(toUpdate->currentPath.empty())
 		{
-			// return DrivingInput();
+			toUpdate->input.forward = 0;
+			toUpdate->input.handBrake = true;
 			return;
 		} 
 	}

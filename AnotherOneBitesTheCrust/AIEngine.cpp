@@ -173,7 +173,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 
 	if(distanceToNext < MIN_DIST)
 	{
-		std::cout << "Waypoint get! Position: "<< toUpdate->currentPath.at(0).x << "," << toUpdate->currentPath.at(0).y << ", " << toUpdate->currentPath.at(0).z << std::endl;
+		//std::cout << "Waypoint get! Position: "<< toUpdate->currentPath.at(0).x << "," << toUpdate->currentPath.at(0).y << ", " << toUpdate->currentPath.at(0).z << std::endl;
 		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
 
 		if(toUpdate->currentPath.empty())

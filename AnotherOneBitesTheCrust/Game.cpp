@@ -117,6 +117,10 @@ void Game::setupEntities()
 			if (tile->deliverable) {
 				deliveryManager->addDeliveryLocation(tile);
 			}
+			if (tile->pickup) {
+				// TODO make this better/less hardcoded
+				physicsEngine->createPizzaPickup(physx::PxVec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2), 5.0f);
+			}
 
 			Entity* ground = new Entity();
 			ground->setRenderable(renderablesMap[tile->groundModel]);
@@ -166,9 +170,6 @@ void Game::setupEntities()
 	}
 	cameraPosBufferIndex = 0;
 	camera.setUpVector(glm::vec3(0,1,0));
-
-	// TODO make this better/less hardcoded
-	physicsEngine->createPizzaPickup(physx::PxVec3(50, 0, 40), 5.0f);
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform)
@@ -269,7 +270,6 @@ void Game::mainLoop()
 		renderingEngine->displayFuncTex(entities);
 		renderingEngine->drawShadow(p1Vehicle->getPosition());
 		renderingEngine->drawShadow(p2Vehicle->getPosition());
-		//renderingEngine->displayFuncTex(pizzaEntities);
 		///test drawing
 		//renderingEngine->testDraw();
 
@@ -282,6 +282,10 @@ void Game::mainLoop()
 		renderingEngine->printText2D(score.data(), 800, 740, 24);
 		
 		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 500, 700, 20);
+
+		std::string framerate = "Rate: ";
+		framerate.append(to_string(deltaTimeMs));
+		renderingEngine->printText2D(framerate.data(), 700, 700, 20);
 
 		string pizzas = "Pizzas: ";
 		pizzas.append(to_string(p1Vehicle->pizzaCount));

@@ -25,6 +25,7 @@ struct Tile
 	GLuint groundTexture;
 	int groundRotationDeg;
 	bool deliverable;
+	bool pickup;
 };
 
 class Map

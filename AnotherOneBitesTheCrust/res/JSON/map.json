@@ -31,7 +31,8 @@
 			"ground": "lawn",
 			"deliverable": true,
 			"entities": [
-				{"name": "fence", "x": 10, "rotation": 270}
+				{"name": "fence", "x": 10, "rotation": 270},
+				{"name": "house", "x": 10, "z": 10}
 			],
 			"nodes": [ 
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
@@ -57,6 +58,7 @@
 		{
 			"id": 5,
 			"description": "Center lawn tile with no fences",
+			"pickup": true,
 			"ground": "lawn",
 			"entities": [
 			],

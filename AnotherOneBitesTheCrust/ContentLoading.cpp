@@ -383,6 +383,11 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		} else {
 			t.deliverable = false;
 		}
+		if (tileArray[i].HasMember("pickup")) {
+			t.pickup = tileArray[i]["pickup"].GetBool();
+		} else {
+			t.pickup = false;
+		}
 		const rapidjson::Value& entityArray = tileArray[i]["entities"];
 		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
 			std::string name = entityArray[j]["name"].GetString();

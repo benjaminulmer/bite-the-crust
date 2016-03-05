@@ -63,6 +63,10 @@ void InputEngine::controllerButtonDown(SDL_Event e)
 	{
 		reverseCam(true);
 	}
+	else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSTICK)
+	{
+		unFucker();
+	}
 }
 
 void InputEngine::controllerButtonUp(SDL_Event e)

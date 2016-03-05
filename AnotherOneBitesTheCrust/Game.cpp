@@ -168,7 +168,7 @@ void Game::setupEntities()
 	camera.setUpVector(glm::vec3(0,1,0));
 
 	// TODO make this better/less hardcoded
-	physicsEngine->createPizzaPickup(physx::PxVec3(50, 0, 40), 10.0f);
+	physicsEngine->createPizzaPickup(physx::PxVec3(50, 0, 40), 5.0f);
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform)

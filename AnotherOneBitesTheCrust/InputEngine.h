@@ -21,6 +21,7 @@ public:
 	void openControllers();
 
 	sigslot::signal1<bool> reverseCam;
+	sigslot::signal0<> unFucker;
 
 private:
 	SDL_GameController* controllers[MAX_NUM_CONTROLLERS];

@@ -208,6 +208,7 @@ void Game::connectSystems()
 	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 
 	inputEngine->reverseCam.connect(&camera, &Camera::setReverseCam);
+	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->addPlayer(p2Vehicle);
@@ -266,26 +267,22 @@ void Game::mainLoop()
 		audioEngine->update(p1Vehicle->getModelMatrix());
 
 		// Display
-		
 		renderingEngine->displayFuncTex(entities);
 		renderingEngine->drawShadow(p1Vehicle->getPosition());
 		renderingEngine->drawShadow(p2Vehicle->getPosition());
-		///test drawing
-		//renderingEngine->testDraw();
 
 		string speed = "Speed: ";
 		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
 		renderingEngine->printText2D(speed.data(), 0, 740, 24);
 
+		string frameRate = "DeltaTime: ";
+		frameRate.append(to_string(deltaTimeMs));
+		renderingEngine->printText2D(frameRate.data(), 0, 700, 20);
+
 		string score = "Score: ";
 		score.append(to_string(deliveryManager->getScore(p1Vehicle)));
 		renderingEngine->printText2D(score.data(), 800, 740, 24);
-		
 		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 500, 700, 20);
-
-		std::string framerate = "Rate: ";
-		framerate.append(to_string(deltaTimeMs));
-		renderingEngine->printText2D(framerate.data(), 700, 700, 20);
 
 		string pizzas = "Pizzas: ";
 		pizzas.append(to_string(p1Vehicle->pizzaCount));
@@ -355,6 +352,22 @@ void Game::shootPizza(Vehicle* vehicle)
 	entities.push_back(pizzaBox);
 
 	audioEngine->playCannonSound(vehicle);
+}
+
+void Game::unFuckerTheGame()
+{
+	p1Vehicle->getDynamicActor()->setGlobalPose(physx::PxTransform(10, 2, 20));
+	p2Vehicle->getDynamicActor()->setGlobalPose(physx::PxTransform(30, 2, 20));
+	p1Vehicle->getPhysicsVehicle()->setToRestState();
+	p2Vehicle->getPhysicsVehicle()->setToRestState();
+
+	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
+	{
+		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+	}
+	cameraPosBufferIndex = 0;
+
+	p1Vehicle->pizzaCount = 100000;
 }
 
 Game::~Game(void)

@@ -51,6 +51,9 @@ private:
 	void quitGame();
 	void shootPizza(Vehicle* vehicle);
 
+	// Temporary
+	void Game::unFuckerTheGame();
+
 	SDL_Window* window;
 	SDL_Surface* screen;
 	int screenWidth;

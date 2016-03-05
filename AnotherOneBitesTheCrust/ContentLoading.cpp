@@ -378,6 +378,11 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		std::string ground = tileArray[i]["ground"].GetString();
 		Tile t;
 		t.groundModel = ground;
+		if (tileArray[i].HasMember("deliverable")) {
+			t.deliverable = tileArray[i]["deliverable"].GetBool();
+		} else {
+			t.deliverable = false;
+		}
 		const rapidjson::Value& entityArray = tileArray[i]["entities"];
 		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
 			std::string name = entityArray[j]["name"].GetString();

@@ -15,6 +15,7 @@
 		{
             "id": 2,
             "ground": "road-straight",
+			"deliverable": true,
             "entities": [
 				{"name": "ramp", "x": 10, "z": 0}
             ],

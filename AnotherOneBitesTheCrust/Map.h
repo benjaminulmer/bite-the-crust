@@ -23,6 +23,7 @@ struct Tile
 	std::vector<graphNode*> nodes;
 	Entity* ground;
 	GLuint groundTexture;
+	bool deliverable;
 };
 
 class Map

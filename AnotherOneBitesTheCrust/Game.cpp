@@ -112,9 +112,12 @@ void Game::setupEntities()
 	{
 		for (unsigned int j = 0; j < map.tiles[i].size(); j++)
 		{
-			deliveryManager->addDeliveryLocation(&map.tiles[i][j]);
-
 			Tile* tile = &map.tiles[i][j];
+
+			if (tile->deliverable) {
+				deliveryManager->addDeliveryLocation(tile);
+			}
+
 			Entity* ground = new Entity();
 			ground->setRenderable(renderablesMap[tile->groundModel]);
 			ground->setTexture(textureMap[tile->groundModel]);

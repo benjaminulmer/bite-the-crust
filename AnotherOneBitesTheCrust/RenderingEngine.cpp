@@ -320,7 +320,7 @@ void RenderingEngine::setupShadowBuffers()
 							// RGB values for the 4 vertices of the quad
 	vector <float> colors;
 
-	for (int i = 0; i < shadowVertices.size(); i++)
+	for (unsigned int i = 0; i < shadowVertices.size(); i++)
 	{
 		colors.push_back(0.2f);
 		colors.push_back(0.2f);

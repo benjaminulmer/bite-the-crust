@@ -1,9 +1,9 @@
 #include "DeliveryManager.h"
 
-
 DeliveryManager::DeliveryManager(void)
 {
-	srand((unsigned int)time(NULL));
+	std::random_device rd;
+	generator.seed(rd());
 }
 
 
@@ -58,7 +58,8 @@ void DeliveryManager::timePassed(double timeMs) {
 
 Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	Delivery d;
-	int randomTile = rand() % freeLocations.size();
+	std::uniform_int_distribution<int> dist(0, freeLocations.size()-1);
+	int randomTile = dist(generator);
 	d.location = freeLocations[randomTile];
 	d.time = 1000.0 * 20.0; // 10 seconds
 	d.location->ground->setTexture(deliveryTextures[player]);

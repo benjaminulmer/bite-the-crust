@@ -378,6 +378,11 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		std::string ground = tileArray[i]["ground"].GetString();
 		Tile t;
 		t.groundModel = ground;
+		if (tileArray[i].HasMember("deliverable")) {
+			t.deliverable = tileArray[i]["deliverable"].GetBool();
+		} else {
+			t.deliverable = false;
+		}
 		const rapidjson::Value& entityArray = tileArray[i]["entities"];
 		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
 			std::string name = entityArray[j]["name"].GetString();
@@ -394,6 +399,12 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			TileEntity e;
 			e.name = name;
 			e.position = glm::vec3(x, y, z);
+
+			if (entityArray[j].HasMember("rotation"))
+				e.rotationDeg = (float)entityArray[j]["rotation"].GetDouble();
+			else
+				e.rotationDeg = 0;
+
 			t.entities.push_back(e);
 		}
 
@@ -439,6 +450,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			Tile tile = tiles[id];
 			std::vector<NodeTemplate> tileNodes = nodes[id];
 
+			tile.groundRotationDeg = 0;
 			// Handle rotations
 			if (rotation == "R") {
 				for (unsigned int i = 0; i < tile.entities.size(); i++) {
@@ -446,6 +458,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 					int z = (int)tile.entities[i].position.z;
 					tile.entities[i].position.x = (float)(tileSize - z);
 					tile.entities[i].position.z = (float)x;
+					tile.entities[i].rotationDeg += -90;
 				}
 				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
@@ -453,6 +466,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 					pos.z = pos.x;
 					tileNodes[i].position = pos;
 				}
+				tile.groundRotationDeg += -90;
 			}
 			if (rotation == "L") {
 				for (unsigned int i = 0; i < tile.entities.size(); i++) {
@@ -460,6 +474,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 					int z = (int)tile.entities[i].position.z;
 					tile.entities[i].position.x = (float)z;
 					tile.entities[i].position.z = (float)(tileSize - x);
+					tile.entities[i].rotationDeg += 90;
 				}
 				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
@@ -467,6 +482,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 					pos.z = 1.0f - pos.x;
 					tileNodes[i].position = pos;
 				}
+				tile.groundRotationDeg += 90;
 			}
 			if (rotation == "RR" || rotation == "LL") {
 				for (unsigned int i = 0; i < tile.entities.size(); i++) {
@@ -474,6 +490,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 					int z = (int)tile.entities[i].position.z;
 					tile.entities[i].position.x = (float)(tileSize - x);
 					tile.entities[i].position.z = (float)(tileSize - z);
+					tile.entities[i].rotationDeg += 180;
 				}
 				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
@@ -481,6 +498,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 					pos.z = 1.0f - pos.z;
 					tileNodes[i].position = pos;
 				}
+				tile.groundRotationDeg += 180;
 			}
 
 			// Positions of nodes

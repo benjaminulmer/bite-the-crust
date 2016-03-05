@@ -112,14 +112,18 @@ void Game::setupEntities()
 	{
 		for (unsigned int j = 0; j < map.tiles[i].size(); j++)
 		{
-			deliveryManager->addDeliveryLocation(&map.tiles[i][j]);
-
 			Tile* tile = &map.tiles[i][j];
+
+			if (tile->deliverable) {
+				deliveryManager->addDeliveryLocation(tile);
+			}
+
 			Entity* ground = new Entity();
 			ground->setRenderable(renderablesMap[tile->groundModel]);
 			ground->setTexture(textureMap[tile->groundModel]);
 
 			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
+			ground->setDefaultRotation(physx::PxPi * (tile->groundRotationDeg) / 180.0f, glm::vec3(0,1,0));
 			ground->setDefaultTranslation(glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2));
 			tile->ground = ground;
 			tile->groundTexture = textureMap[tile->groundModel];
@@ -141,8 +145,6 @@ void Game::setupEntities()
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
 
-				tileEntity.rotationDeg = 45.0f;
-
 				float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
 
@@ -153,9 +155,9 @@ void Game::setupEntities()
 	}
 	// Create vehicles
 	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
-	setupVehicle(p1Vehicle, physx::PxTransform(0, 2, 0));
+	setupVehicle(p1Vehicle, physx::PxTransform(10, 2, 20));
 	p2Vehicle = new Vehicle(PHYSICS_STEP_MS);
-	setupVehicle(p2Vehicle, physx::PxTransform(10, 2, 0));
+	setupVehicle(p2Vehicle, physx::PxTransform(30, 2, 20));
 
 	// Initialize player location buffer for camera
 	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
@@ -166,7 +168,7 @@ void Game::setupEntities()
 	camera.setUpVector(glm::vec3(0,1,0));
 
 	// TODO make this better/less hardcoded
-	physicsEngine->createPizzaPickup(physx::PxVec3(20, 0, 0), 20.0f);
+	physicsEngine->createPizzaPickup(physx::PxVec3(50, 0, 40), 5.0f);
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform)
@@ -209,8 +211,8 @@ void Game::connectSystems()
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->addPlayer(p2Vehicle);
 
-	deliveryManager->deliveryTextures[p1Vehicle] = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
-	deliveryManager->deliveryTextures[p2Vehicle] = ContentLoading::loadDDS("res\\Textures\\AIDeliverFloor.DDS");
+	deliveryManager->deliveryTextures[p1Vehicle] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
+	deliveryManager->deliveryTextures[p2Vehicle] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);

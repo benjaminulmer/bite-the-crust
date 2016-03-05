@@ -53,6 +53,10 @@ std::vector<glm::vec3> Renderable::getVertices()
 	return verts;
 }
 
+int Renderable::vertexCount() {
+	return verts.size();
+}
+
 //std::vector<glm::vec3> Renderable::getColours() {
 //	std::vector<glm::vec3> vertices;
 //	for (int i = 0; i < (int)points.size(); i++) {

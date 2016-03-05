@@ -65,7 +65,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
 		glUniform1i(tID, 0);
-		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertices().size());
+		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->vertexCount());
 		glBindVertexArray(0);
 		//glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->getFaces().size(), GL_UNSIGNED_INT, (void*)0);
 	}

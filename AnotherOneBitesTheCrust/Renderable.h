@@ -38,6 +38,7 @@ public:
 	std::vector<GLuint> getFaces();
 	std::vector<glm::vec3> getRawVerts();
 	std::vector<GLPoint> getPoints();
+	int vertexCount();
 
 	void setVAO(GLuint v);
 	GLuint getVAO();

@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "PizzaBox.h"
+#include "WheelEntity.h"
 #include "Camera.h"
 #include "ContentLoading.h"
 
@@ -146,32 +147,11 @@ void Game::setupEntities()
 			}
 		}
 	}
-
 	// Create vehicles
 	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
-	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
-	p1Vehicle->setRenderable(renderablesMap["van"]);
-	p1Vehicle->setTexture(textureMap["van"]);
-	p1Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
-	p1Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
-
-	// TODO get dimensions working properly for vehicle
-	p1Vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
-	physicsEngine->createVehicle(p1Vehicle, physx::PxTransform(physx::PxVec3(0, 2, 0), physx::PxQuat(physx::PxIdentity)));
-	entities.push_back(p1Vehicle);
-
-	//// Player 2 (ie. AI)
+	setupVehicle(p1Vehicle, physx::PxTransform(0, 2, 0));
 	p2Vehicle = new Vehicle(PHYSICS_STEP_MS);
-	ContentLoading::loadVehicleData("res\\JSON\\car.json", p2Vehicle);
-	p2Vehicle->setRenderable(renderablesMap["van"]);
-	p2Vehicle->setTexture(textureMap["van"]);
-	p2Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
-	p2Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
-
-	// TODO get dimensions working properly for vehicle
-	p2Vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
-	physicsEngine->createVehicle(p2Vehicle, physx::PxTransform(physx::PxVec3(10, 2, 0), physx::PxQuat(physx::PxIdentity)));
-	entities.push_back(p2Vehicle);
+	setupVehicle(p2Vehicle, physx::PxTransform(10, 2, 0));
 
 	// Initialize player location buffer for camera
 	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
@@ -183,6 +163,33 @@ void Game::setupEntities()
 
 	// TODO make this better/less hardcoded
 	physicsEngine->createTrigger();
+}
+
+void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform)
+{
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", vehicle);
+	vehicle->setRenderable(renderablesMap["van"]);
+	vehicle->setTexture(textureMap["van"]);
+	vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+	vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
+
+	// TODO get dimensions working properly for vehicle
+	vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
+	physicsEngine->createVehicle(vehicle, transform);
+	entities.push_back(vehicle);
+
+	physx::PxShape* wheels[4];
+	physx::PxRigidDynamic* actor = vehicle->getDynamicActor();
+	actor->getShapes(wheels, 4);
+
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		WheelEntity* wheel = new WheelEntity(vehicle, wheels[i]);
+		wheel->setRenderable(renderablesMap["wheel"]);
+		wheel->setTexture(textureMap["wheel"]);
+		wheel->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+		entities.push_back(wheel);
+	}
 }
 
 // Connects systems together

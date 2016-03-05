@@ -10,8 +10,6 @@ public:
 
 	physx::PxRigidDynamic* createBox(physx::PxMaterial* material);
 
-	physx::PxActor* createTriggerVolume();
-
 	physx::PxRigidStatic* createDrivablePlane(physx::PxMaterial* material);
 
 	physx::PxConvexMesh* createConvexMesh(const physx::PxVec3* verts, const physx::PxU32 numVerts);

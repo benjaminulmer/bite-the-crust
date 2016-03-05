@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Renderable.h"
 #include <glm.hpp>
 

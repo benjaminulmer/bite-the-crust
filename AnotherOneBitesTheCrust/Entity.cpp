@@ -8,9 +8,7 @@ Entity::Entity(void)
 	defaultTranslation = glm::vec3(0,0,0);
 	defaultScale = glm::vec3(1,1,1);
 	renderable = nullptr;
-
 }
-
 
 Entity::~Entity(void)
 {

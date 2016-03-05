@@ -3,6 +3,7 @@
 
 Camera::Camera(void)
 {
+	reverseCam = false;
 }
 
 
@@ -32,4 +33,12 @@ void Camera::setLookAtPosition(glm::vec3 v) {
 
 glm::vec3 Camera::getLookAtPosition() {
 	return lookAtPosition;
+}
+
+void Camera::setReverseCam(bool val) {
+	reverseCam = val;
+}
+
+bool Camera::isReverseCam() {
+	return reverseCam;
 }

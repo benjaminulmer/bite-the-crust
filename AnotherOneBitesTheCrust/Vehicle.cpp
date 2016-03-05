@@ -89,13 +89,13 @@ void Vehicle::update()
 	(input.handBrake) ? handBrake = 1.0f: handBrake = 0.0f;
 
 	// Check if gear should switch from reverse to forward or vise versa
-	if (forwardSpeed == 0 && input.backward > 0)
+	if (forwardSpeed < 5 && input.backward > 0)
 	{
-		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+		physicsVehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eREVERSE);
 	}
-	else if (forwardSpeed == 0 && input.forward > 0)
+	else if (forwardSpeed > -5 && input.forward > 0)
 	{
-		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+		physicsVehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eFIRST);
 	}
 
 	// Determine how to apply controller input depending on current gear
@@ -130,6 +130,10 @@ glm::mat4 Vehicle::getModelMatrix()
 {
 	PxF32 alpha = 0.02f;
 	tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
+	if (tipAngle > PxPi * (45.0f/180.0f))
+	{
+		tipAngle = PxPi * (45.0f/180.0f);
+	}
 
 	PxTransform transform(PxQuat(tipAngle, PxVec3(0, 0, 1)));
 	transform = actor->getGlobalPose() * transform;

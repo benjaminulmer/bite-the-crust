@@ -59,6 +59,10 @@ void InputEngine::controllerButtonDown(SDL_Event e)
 	{
 		inputs[e.cdevice.which]->handBrake = true;
 	}
+	else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+	{
+		reverseCam(true);
+	}
 }
 
 void InputEngine::controllerButtonUp(SDL_Event e)
@@ -71,6 +75,10 @@ void InputEngine::controllerButtonUp(SDL_Event e)
 	{
 		inputs[e.cdevice.which]->shootPizza = false;
 	}*/
+	else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+	{
+		reverseCam(false);
+	}
 }
 
 void InputEngine::setInputStruct(VehicleInput* input, int controllerNum) {

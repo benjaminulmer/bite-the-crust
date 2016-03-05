@@ -20,6 +20,8 @@ public:
 	void controllerButtonUp(SDL_Event e);
 	void openControllers();
 
+	sigslot::signal1<bool> reverseCam;
+
 private:
 	SDL_GameController* controllers[MAX_NUM_CONTROLLERS];
 	VehicleInput* inputs[MAX_NUM_CONTROLLERS];

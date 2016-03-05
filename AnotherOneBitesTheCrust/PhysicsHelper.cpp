@@ -7,22 +7,6 @@ using namespace physx;
 PhysicsHelper::PhysicsHelper(PxPhysics* physics, PxCooking* cooking)
 	: physics(physics), cooking(cooking) {}
 
-PxActor* PhysicsHelper::createTriggerVolume()
-{
-	PxSphereGeometry geometry(10.0f); 
-	PxTransform transform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
-	PxMaterial* material = physics->createMaterial(0.5f, 0.5f, 0.5f);
-
-	PxRigidStatic* actor = PxCreateStatic(*physics, transform, geometry, *material);
-	PxShape* shape;
-	actor->getShapes(&shape, 1);
-	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
-	shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
-
-	return actor;
-}
-
 PxRigidStatic* PhysicsHelper::createDrivablePlane(PxMaterial* material)
 {
 	//Add a plane to the scene.

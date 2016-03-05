@@ -143,6 +143,9 @@ void Game::setupEntities()
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
+
+				tileEntity.rotationDeg = 45.0f;
+
 				float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
 
@@ -166,7 +169,7 @@ void Game::setupEntities()
 	camera.setUpVector(glm::vec3(0,1,0));
 
 	// TODO make this better/less hardcoded
-	physicsEngine->createTrigger();
+	physicsEngine->createPizzaPickup(physx::PxVec3(20, 0, 0), 20.0f);
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform)
@@ -204,6 +207,8 @@ void Game::connectSystems()
 	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 
+	inputEngine->reverseCam.connect(&camera, &Camera::setReverseCam);
+
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->addPlayer(p2Vehicle);
 
@@ -234,20 +239,22 @@ void Game::mainLoop()
 		if (deltaTimeAccMs >= PHYSICS_STEP_MS) 
 		{
 			deltaTimeAccMs -= PHYSICS_STEP_MS;
-
 			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
-
 			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map);
 			p1Vehicle->update();
 			p2Vehicle->update();
-
 		
 			physicsEngine->simulate(PHYSICS_STEP_MS);
 
 			// Update the camera position buffer with new location
-			cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+			if (camera.isReverseCam()) {
+				cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,15,0));
+			}
+			else {
+				cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+			}
 			cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
 
 			// Set camera to look at player with a positional delay

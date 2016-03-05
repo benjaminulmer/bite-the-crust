@@ -171,10 +171,20 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 	actor->userData = entity;
 }
 
-void PhysicsEngine::createTrigger()
+void PhysicsEngine::createPizzaPickup(physx::PxVec3 location, physx::PxF32 radius)
 {
-	PxActor* object = helper->createTriggerVolume();
-	scene->addActor(*object);
+	PxSphereGeometry geometry(radius); 
+	PxTransform transform(location, PxQuat::createIdentity());
+	PxMaterial* material = physics->createMaterial(0.5f, 0.5f, 0.5f);
+
+	PxRigidStatic* actor = PxCreateStatic(*physics, transform, geometry, *material);
+	PxShape* shape;
+	actor->getShapes(&shape, 1);
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+	shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+
+	scene->addActor(*actor);
 }
 
 void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
@@ -182,7 +192,6 @@ void PhysicsEngine::createVehicle(Vehicle* vehicle, PxTransform transform)
 	VehicleTuning* tuning = &vehicle->tuning;
 	tuningFromUserTuning(vehicle);
 	
-
 	PxVehicleDrive4W* physVehicle = vehCreator->createVehicle4W(vehicle);
 	//PxTransform startTransform(PxVec3(0, (tuning->chassisDims.y*0.5f + tuning->wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
 	PxRigidDynamic* actor = physVehicle->getRigidDynamicActor();

@@ -171,7 +171,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 	actor->userData = entity;
 }
 
-void PhysicsEngine::createTrigger()
+void PhysicsEngine::createPizzaPickup()
 {
 	PxActor* object = helper->createTriggerVolume();
 	scene->addActor(*object);

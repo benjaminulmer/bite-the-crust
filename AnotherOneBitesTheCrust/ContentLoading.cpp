@@ -221,8 +221,11 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			info->dynamicInfo->angularDamping = (float)dynamicInfo["angularDamping"].GetDouble();
 		}
 	}
+	//if (d.HasMember("rotation
+
 	glm::vec3 dims = model->getDimensions();
 	info->yPosOffset = dims.y * 0.5f;
+
 	if (d.HasMember("geometry")) {
 		const rapidjson::Value& geometry = d["geometry"];
 		for (rapidjson::SizeType i = 0; i < geometry.Size(); i++) {

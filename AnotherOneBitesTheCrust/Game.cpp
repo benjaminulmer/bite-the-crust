@@ -140,8 +140,8 @@ void Game::setupEntities()
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
-
-				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(physx::PxIdentity));
+				float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
+				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.name], transform);
 				entities.push_back(e);

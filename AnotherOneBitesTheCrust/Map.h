@@ -10,6 +10,7 @@ struct TileEntity
 {
 	std::string name;
 	glm::vec3 position;
+	float rotationDeg;
 };
 
 struct Tile

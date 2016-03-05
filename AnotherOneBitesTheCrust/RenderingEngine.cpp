@@ -73,10 +73,11 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 
 mat4 RenderingEngine::calculateDefaultModel(mat4 model, Entity * entity)
 {
-	//Translations done here. Order of translations is scale, rotate, translate
+	//Translations done here. Order of translations is scale, translate, rotate
 	model = glm::scale(model,entity->getDefaultScale());
-	model = glm::rotate(model, entity->getDefaultRotationAngle(), entity->getDefaultRotationAxis());
 	model = glm::translate(model, entity->getDefaultTranslation());
+	model = glm::rotate(model, entity->getDefaultRotationAngle(), entity->getDefaultRotationAxis());
+
 	return model;
 }
 

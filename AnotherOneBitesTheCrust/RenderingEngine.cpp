@@ -9,7 +9,7 @@ using namespace glm;
 RenderingEngine::RenderingEngine()
 {
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
+	//glEnable(GL_MULTISAMPLE);
 	//glDepthFunc(GL_LESS);
 
 	//glEnable(GL_CULL_FACE);
@@ -37,7 +37,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	GLuint tID = glGetUniformLocation(textureProgramID, "myTextureSampler");
 	GLuint normalID = glGetUniformLocation(textureProgramID, "normalMatrix");
 
-	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 100, 35);
+	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 90, 35);
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
@@ -95,6 +95,17 @@ void RenderingEngine::generateIDs()
 	string texfsSource = loadShaderStringfromFile(texfsShader);
 	textureProgramID = CreateShaderProgram(texvsSource, texfsSource);
 	glUseProgram(textureProgramID);
+
+	string shadowVsShader = "res\\Shaders\\basic_vs.glsl";
+	string shadowFsShader = "res\\Shaders\\basic_fs.glsl";
+	string shadowVsSource = loadShaderStringfromFile(shadowVsShader);
+	string shadowFsSource = loadShaderStringfromFile(shadowFsShader);
+	shadowProgramID = CreateShaderProgram(shadowVsSource, shadowFsSource);
+	glUseProgram(shadowProgramID);
+	glGenVertexArrays(1, &sphereVAO);
+	glGenBuffers(1, &sphereVertBuffer);
+	glGenBuffers(1, &sphereColorBuffer);
+
 }
 
 void RenderingEngine::loadProjectionMatrix()
@@ -286,6 +297,92 @@ void RenderingEngine::printText2D(const char * text, int x, int y, int size){
 
 }
 
+void RenderingEngine::setupShadowBuffers()
+{
+
+	glUseProgram(shadowProgramID);
+
+	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec3> normals; // Won't be used at the moment.
+	std::vector<GLuint> faces;
+	std::vector<glm::vec3> raw_verts;
+
+	bool res = ContentLoading::loadOBJ("res\\Models\\blobShadow.obj", shadowVertices, uvs, normals, faces, raw_verts);
+
+	glBindVertexArray(sphereVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, sphereVertBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3) * shadowVertices.size(),	// byte size of Vec3f, 4 of them
+		shadowVertices.data(),		// pointer (Vec3f*) to contents of verts
+		GL_STATIC_DRAW);	// Usage pattern of GPU buffer
+
+							// RGB values for the 4 vertices of the quad
+	vector <float> colors;
+
+	for (int i = 0; i < shadowVertices.size(); i++)
+	{
+		colors.push_back(0.2f);
+		colors.push_back(0.2f);
+		colors.push_back(0.2f);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, sphereColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(float)*colors.size(),
+		colors.data(),
+		GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, sphereVertBuffer);
+	glVertexAttribPointer(
+		0,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glEnableVertexAttribArray(1); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, sphereColorBuffer);
+	glVertexAttribPointer(
+		1,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glBindVertexArray(0); // reset to default		
+}
+
+void RenderingEngine::drawShadow(glm::vec3 position)
+{
+	glEnable(GL_DEPTH_TEST);
+	glUseProgram(shadowProgramID);
+
+	// Use VAO that holds buffer bindings
+	// and attribute config of buffers
+	glBindVertexArray(sphereVAO);
+	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
+	GLint mvpID = glGetUniformLocation(shadowProgramID, "MVP");
+
+
+	M = mat4(1.0f);
+	M = translate(M, glm::vec3(position.x, 0.01, position.z));
+	mat4 MVP = P * V * M;
+
+	glUniformMatrix4fv(mvpID,		// ID
+		1,		// only 1 matrix
+		GL_FALSE,	// transpose matrix, Mat4f is row major
+		value_ptr(MVP)	// pointer to data in Mat4f
+		);
+	glDrawArrays(GL_TRIANGLES, 0, shadowVertices.size());
+	glBindVertexArray(0);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TESTING STUFF BELOW
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -335,6 +432,8 @@ void RenderingEngine::printText2D(const char * text, int x, int y, int size){
 //
 //	//glDrawElements(GL_TRIANGLES, phongFaces.size(), GL_UNSIGNED_INT, (void*)0);
 //}
+//
+//
 //
 //void RenderingEngine::testOBJLoading()
 //{

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-const int MIN_DIST = 35;
+const int MIN_DIST = 10;
 
 AIEngine::AIEngine(void)
 {

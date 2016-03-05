@@ -85,6 +85,7 @@ void Game::initSystems()
 	renderingEngine = new RenderingEngine();
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
+	renderingEngine->setupShadowBuffers();
 }
 
 // Create and initialize all loaded entities in the game world
@@ -138,7 +139,7 @@ void Game::setupEntities()
 				e->setTexture(textureMap[tileEntity.name]);
 
 				// Offset position based on what tile we're in
-				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize + map.tileSize/2, 0, i * map.tileSize + map.tileSize/2);
+				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
 
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(physx::PxIdentity));
 
@@ -257,6 +258,8 @@ void Game::mainLoop()
 		// Display
 		
 		renderingEngine->displayFuncTex(entities);
+		renderingEngine->drawShadow(p1Vehicle->getPosition());
+		renderingEngine->drawShadow(p2Vehicle->getPosition());
 		//renderingEngine->displayFuncTex(pizzaEntities);
 		///test drawing
 		//renderingEngine->testDraw();

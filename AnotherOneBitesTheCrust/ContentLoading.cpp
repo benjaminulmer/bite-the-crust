@@ -170,12 +170,15 @@ Renderable* createRenderable(std::string modelFile) {
 	std::vector<glm::vec3> verts;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
+	std::vector<GLuint> faces;
+	std::vector<glm::vec3> raw_verts;
 
-	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals);
+	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals, faces, raw_verts);
 
 	r->setVerts(verts);
 	r->setUVs(uvs);
 	r->setNorms(normals);
+	r->setFaces(faces);
 
 	return r;
 }
@@ -323,7 +326,7 @@ bool validateMap(rapidjson::Document &d) {
 		}
 		for (rapidjson::SizeType j = 0; j < entry["entities"].Size(); j++) {
 			if (!entry["entities"][j].HasMember("name")) {
-				printf("Entity %d in tile %d is missing a model.", j, entry["id"]);
+				printf("Entity %d in tile %d is missing a name.", j, entry["id"]);
 				return false;
 			}
 		}
@@ -426,9 +429,56 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		const rapidjson::Value& row = mapTilesArray[i];
 		std::vector<Tile> rowTiles;
 		for (rapidjson::SizeType j = 0; j < row.Size(); j++) {
-			int id = row[j].GetInt();
+			std::string tileString = row[j].GetString();
+			int splitPoint = tileString.find(".");
+			int id = std::stoi(tileString.substr(0, splitPoint));
+			std::string rotation = tileString.substr(splitPoint+1);
+			Tile tile = tiles[id];
 			std::vector<NodeTemplate> tileNodes = nodes[id];
-			Tile t = tiles[id];
+
+			// Handle rotations
+			if (rotation == "R") {
+				for (int i = 0; i < tile.entities.size(); i++) {
+					int x = tile.entities[i].position.x;
+					int z = tile.entities[i].position.z;
+					tile.entities[i].position.x = tileSize - z;
+					tile.entities[i].position.z = x;
+				}
+				for (int i = 0; i < tileNodes.size(); i++) {
+					glm::vec3 pos = tileNodes[i].position;
+					pos.x = 1.0 - pos.z;
+					pos.z = pos.x;
+					tileNodes[i].position = pos;
+				}
+			}
+			if (rotation == "L") {
+				for (int i = 0; i < tile.entities.size(); i++) {
+					int x = tile.entities[i].position.x;
+					int z = tile.entities[i].position.z;
+					tile.entities[i].position.x = z;
+					tile.entities[i].position.z = tileSize - x;
+				}
+				for (int i = 0; i < tileNodes.size(); i++) {
+					glm::vec3 pos = tileNodes[i].position;
+					pos.x = pos.z;
+					pos.z = 1.0 - pos.x;
+					tileNodes[i].position = pos;
+				}
+			}
+			if (rotation == "RR" || rotation == "LL") {
+				for (int i = 0; i < tile.entities.size(); i++) {
+					int x = tile.entities[i].position.x;
+					int z = tile.entities[i].position.z;
+					tile.entities[i].position.x = tileSize - x;
+					tile.entities[i].position.z = tileSize - z;
+				}
+				for (int i = 0; i < tileNodes.size(); i++) {
+					glm::vec3 pos = tileNodes[i].position;
+					pos.x = 1.0 - pos.x;
+					pos.z = 1.0 - pos.z;
+					tileNodes[i].position = pos;
+				}
+			}
 
 			// Positions of nodes
 			for(NodeTemplate n : tileNodes)
@@ -441,8 +491,9 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 
 				graphNode * newNode = new graphNode();
 				newNode->setPosition(pos);
-				t.nodes.push_back(newNode);
+				tile.nodes.push_back(newNode);
 			}
+
 			// Local Connections
 			for(int k = 0; k < tileNodes.size(); k++)
 			{
@@ -450,11 +501,11 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				for(int l = 0; l < current.neighbours.size(); l++)
 				{
 					int index = current.neighbours[l];
-					t.nodes.at(k)->addNeighbour(t.nodes.at(index));
+					tile.nodes.at(k)->addNeighbour(tile.nodes.at(index));
 				}
 			}
 
-			rowTiles.push_back(t);
+			rowTiles.push_back(tile);
 		}
 		map.tiles.push_back(rowTiles);
 	}
@@ -495,7 +546,9 @@ bool ContentLoading::loadOBJ(
 	const char * path, 
 	std::vector<glm::vec3> & out_vertices, 
 	std::vector<glm::vec2> & out_uvs,
-	std::vector<glm::vec3> & out_normals
+	std::vector<glm::vec3> & out_normals,
+	std::vector<GLuint> & out_faces,
+	std::vector<glm::vec3> & raw_verts
 ){
 	printf("Loading OBJ file %s...\n", path);
 
@@ -552,6 +605,10 @@ bool ContentLoading::loadOBJ(
 			normalIndices.push_back(normalIndex[0]);
 			normalIndices.push_back(normalIndex[1]);
 			normalIndices.push_back(normalIndex[2]);
+			out_faces.push_back(vertexIndex[0]-1);
+			out_faces.push_back(vertexIndex[1]-1);
+			out_faces.push_back(vertexIndex[2]-1);
+			raw_verts = temp_vertices;
 		}else{
 			// Probably a comment, eat up the rest of the line
 			char stupidBuffer[1000];

@@ -34,10 +34,7 @@ public:
 	Map(void);
 	~Map(void);
 
-	//static const int MAP_SIZE = 70;
-	//static const int WIDTH = MAP_SIZE/Tile::SIZE;
-	//static const int DEPTH = MAP_SIZE/Tile::SIZE;
-	int depth, width, tileSize; // Loading everything dynamically from the json now
+	int depth, width, tileSize;
 
 	std::vector<graphNode *> allNodes;
 	std::vector<std::vector<Tile>> tiles;

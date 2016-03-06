@@ -175,10 +175,10 @@ Renderable* createRenderable(std::string modelFile) {
 
 	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals, faces, raw_verts);
 
-	r->setVerts(verts);
-	r->setUVs(uvs);
-	r->setNorms(normals);
-	r->setFaces(faces);
+	r->verts = verts;
+	r->uvs = uvs;
+	r->norms = normals;
+	r->faces = faces;
 
 	return r;
 }
@@ -262,14 +262,14 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			else if (shapeName == "convexMesh") {
 				ConvexMeshInfo* convexMesh = new ConvexMeshInfo();
 				convexMesh->geometry = Geometry::CONVEX_MESH;
-				convexMesh->verts = model->getVertices();
+				convexMesh->verts = model->verts;
 				shape = convexMesh;
 			}
 			else if (shapeName == "triangleMesh") {
 				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
 				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
-				triangleMesh->verts = model->getVertices();
-				triangleMesh->faces = model->getFaces();
+				triangleMesh->verts = model->verts;
+				triangleMesh->faces = model->faces;
 				shape = triangleMesh;
 			}
 			

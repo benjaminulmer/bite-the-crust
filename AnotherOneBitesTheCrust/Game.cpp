@@ -142,8 +142,6 @@ void Game::setupEntities()
 
 				// TODO, error check that these models do exist, instead of just break
 				e->setRenderable(renderablesMap[tileEntity.name]);
-
-				//e->setDefaultTranslation(e->getRenderable()->getCenter());
 				e->setTexture(textureMap[tileEntity.name]);
 
 				// Offset position based on what tile we're in
@@ -178,7 +176,6 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform)
 	vehicle->setRenderable(renderablesMap["van"]);
 	vehicle->setTexture(textureMap["van"]);
 	vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
-	vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
 
 	// TODO get dimensions working properly for vehicle
 	vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);

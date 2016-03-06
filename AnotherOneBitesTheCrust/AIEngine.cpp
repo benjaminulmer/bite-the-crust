@@ -73,23 +73,48 @@ std::vector<glm::vec3> AIEngine::dijkstras(graphNode * start, graphNode * destin
 void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 {
 	VehicleInput* input = &driver->input;
-	input->forward = 1.0;
-	input->backward = 0.0;
-	input->handBrake = false;
 	
-	glm::vec3 desiredDirection = glm::normalize(desiredPos - driver->getPosition());
+	glm::vec3 desiredDirection = desiredPos - driver->getPosition();
+	float distance = glm::length(desiredDirection);
+	desiredDirection = glm::normalize(desiredDirection);
 	glm::vec3 forward(glm::normalize(driver->getModelMatrix() * glm::vec4(0,0,1,0)));
 	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
 	float cosAngle = glm::dot(desiredDirection, forward);
 	float leftCosAngle = glm::dot(desiredDirection, left);
 
+	float speed = driver->getPhysicsVehicle()->computeForwardSpeed();
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
-	// Stuff Ben added
-	ratio *= 2;
-	if (ratio > 1) ratio = 1;
+	if (distance > speed)
+	{
+		input->forward = 1.0;
+		input->backward = 0.0;
+		input->handBrake = false;
+	}
+	else
+	{
+		input->forward = 0.0;
+		input->backward = 1.0;
+		input->handBrake = false;
+	}
+	std::cout << "d = " << distance << " s = " << speed << " backward = " << input->backward << std::endl;
+	//std::cout << input->backward << std::endl;
 
-	if(ratio > 0.1)
+	ratio *= 2;
+	if (ratio > 1)
+	{
+		ratio = 1;
+	}
+	if(leftCosAngle > 0)
+	{
+		input->steer = ratio;
+	}
+	else
+	{
+		input->steer = -ratio;
+	}
+
+	/*if(ratio > 0.1)
 	{
 		if(leftCosAngle > 0)
 		{
@@ -107,7 +132,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 		{
 			input->shootPizza = true;
 		}
-	}
+	}*/
 }
 
 void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
@@ -179,7 +204,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 		if(toUpdate->currentPath.empty())
 		{
 			toUpdate->input.forward = 0;
-			toUpdate->input.backward = 1;
+			toUpdate->input.backward = 0;
 			toUpdate->input.handBrake = true;
 			return;
 		} 

@@ -22,7 +22,7 @@ struct Player
 
 struct TileAI
 {
-	static const int SIZE = 10;
+	static const int SIZE = 2;
 
 	// Should these coordinates be relative to the tile or the map?
 	// If it's relative to the tile, need a method to get player space -> tile space

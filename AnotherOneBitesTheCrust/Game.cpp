@@ -363,8 +363,6 @@ void Game::unFuckerTheGame()
 		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
 	}
 	cameraPosBufferIndex = 0;
-
-	p1Vehicle->pizzaCount = 100000;
 }
 
 Game::~Game(void)

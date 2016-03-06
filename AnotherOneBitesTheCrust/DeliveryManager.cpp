@@ -6,7 +6,6 @@ DeliveryManager::DeliveryManager(void)
 	generator.seed(rd());
 }
 
-
 DeliveryManager::~DeliveryManager(void)
 {
 }
@@ -19,8 +18,6 @@ void DeliveryManager::addPlayer(Vehicle* player) {
 	players.push_back(player);
 	scores[player] = 0;
 }
-
-
 
 void DeliveryManager::assignDeliveries() {
 	if (freeLocations.size() != 0) {
@@ -62,7 +59,7 @@ Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	std::uniform_int_distribution<int> dist(0, freeLocations.size()-1);
 	int randomTile = dist(generator);
 	d.location = freeLocations[randomTile];
-	d.time = 1000.0 * 20.0; // 10 seconds
+	d.time = 1000.0 * 10.0; // 10 seconds
 	d.location->ground->setTexture(deliveryTextures[player]);
 	freeLocations.erase(freeLocations.begin() + randomTile);
 	return d;

@@ -30,8 +30,7 @@
 			"ground": "lawn",
 			"deliverable": true,
 			"entities": [
-				{"name": "fence", "x": 10, "rotation": 270},
-                {"name": "house", "x": 10, "z": 10}
+				{"name": "fence", "x": 10, "rotation": 270}
 			],
 			"nodes": [ 
 				{"x" : 0, "z" : 1.0, "neighbours" : [1]},
@@ -46,8 +45,7 @@
             "deliverable": true,
 			"entities": [
 				{"name": "fence", "x": 10, "rotation": 270},
-				{"name": "fence", "z": 10},
-                {"name": "house", "x": 10, "z": 10, "rotation": 35}
+				{"name": "fence", "z": 10}
 			],
 			"nodes": [
 				{"x": 0.8, "z": 1.0, "neighbours": [1]},

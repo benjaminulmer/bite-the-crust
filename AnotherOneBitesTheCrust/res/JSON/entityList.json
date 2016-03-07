@@ -8,6 +8,9 @@
         {"name": "ramp", "model": "bigramp.obj", "physics": "ramp.json", "texture": "ramp.DDS"},
         {"name": "van", "model": "Van-centered.obj", "physics": "default.json", "texture": "Van-blue.DDS"},
 		{"name": "fence", "model": "fence.obj", "physics": "fence.json", "texture": "fence-colored.DDS"},
-		{"name": "house", "model": "house.obj", "physics": "static-box.json", "texture": "house-colored.DDS"}
+		{"name": "house", "model": "house.obj", "physics": "static-box.json", "texture": "house-colored.DDS"},
+
+		{"name": "node", "model": "wheel.obj", "physics": "fence.json", "texture": "lawn.DDS"}
+		
     ]
 }

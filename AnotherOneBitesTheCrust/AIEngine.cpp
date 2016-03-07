@@ -9,7 +9,7 @@ AIEngine::AIEngine(void)
 	srand((int)time(0));
 }
 
-std::vector<glm::vec3> AIEngine::dijkstras(graphNode * start, graphNode * destination, vector<graphNode *> allNodes)
+std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destination, vector<graphNode *> allNodes)
 {
 	std::map<graphNode *, double> distances;
 	std::map<graphNode *, double> heuristic;
@@ -108,7 +108,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 	{
 		input->forward = 0.0;
 		input->backward = 1.0;
-		input->handBrake = false;
+		input->handBrake = true;
 	}
 	std::cout << "d = " << distance << " s = " << speed << " backward = " << input->backward << std::endl;
 	//std::cout << input->backward << std::endl;
@@ -148,39 +148,89 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 	}
 }
 
+inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, const glm::vec3& pos, const float& radius)
+{
+	glm::vec3 posToRay = rayorig - pos;
+
+	float radius2 = radius * radius;
+	float a = glm::dot(raydir,raydir);
+	float b = glm::dot(raydir,  (2.0f * posToRay));
+	float c = glm::dot(posToRay, posToRay) - radius2;
+	float D = b * b - (4.0 * a * c);
+
+	// If ray can not intersect then stop
+	if (D < 0)
+			return false;
+
+	return true;
+}
+
+bool AIEngine::tooClose(Vehicle * avoider, PhysicsEntity * avoiding)
+{
+	// Should be able to get this from the vehicle / house somehow
+	float carLength = 1; 
+	float objectWidth = 8;
+
+	glm::vec3 forward(glm::normalize(avoider->getModelMatrix() * glm::vec4(0,0,1,0)));
+
+	if(sphereIntersect(forward, avoider->getPosition(), avoiding->getPosition(), objectWidth))
+	{
+		if(glm::length(avoider->getPosition() - avoiding->getPosition()) < (carLength + objectWidth))
+			return true;
+
+	}
+
+	return false;
+}
+
+void AIEngine::avoid(Vehicle * driver, PhysicsEntity * obstacle, graphNode * destinationNode)
+{
+	glm::vec3 desiredDirection = glm::normalize(destinationNode->getPosition() - driver->getPosition());
+	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
+	float leftCosAngle = glm::dot(desiredDirection, left);
+
+	driver->input.backward = 1.0;
+	driver->input.forward = 0.0;
+
+	if(leftCosAngle > 0)
+	{
+		driver->input.steer = -1.0;
+	}
+	else
+	{
+		
+		driver->input.steer = 1.0;
+	}
+}
+
 void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 {
 
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
-
-	// Find closest node
-	graphNode * closest = currentTile->nodes.at(0);
-	if(!closest)
-		return;
-	double minDist = -1;
-	for(graphNode * n : currentTile->nodes)
-	{
-		double currentDist = glm::length(toUpdate->getPosition() - closest->getPosition());
-		if(currentDist < minDist)
-		{
-			closest = n;
-			minDist = currentDist;
-		}
-	}
-
-
 	// Should be 'goal node' of this tile
 	graphNode * destinationNode = destination.location->nodes.at(0);
+
+	
 	if(glm::length(destinationNode->getPosition() - toUpdate->getPosition()) <= MIN_DIST)
 		toUpdate->currentPath.push_back(destinationNode->getPosition());
 	else
 	{
-		// Uncomment this to use dijkstras. Right now it's a little buggy and needs some work,
-		// heading straight to the destination works better for now. I believe re-running
-		// dijkstras each frame would fix the issue (right now I'm uncertain whether this would
-		// cause too much overhead)
-		//
-		toUpdate->currentPath = dijkstras(closest, destinationNode, map.allNodes);
+
+		// Find closest node
+		graphNode * closest = currentTile->nodes.at(0);
+		if(!closest)
+			return;
+		double minDist = -1;
+		for(graphNode * n : currentTile->nodes)
+		{
+			double currentDist = glm::length(toUpdate->getPosition() - closest->getPosition());
+			if(currentDist < minDist)
+			{
+				closest = n;
+				minDist = currentDist;
+			}
+		}
+		toUpdate->currentPath = aStar(closest, destinationNode, map.allNodes);
 		//toUpdate->currentPath.push_back(destinationNode->getPosition());
 	}
 }
@@ -198,6 +248,18 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 		updatePath(toUpdate, destination, map);
 		if(toUpdate->currentPath.empty())
 			return;
+	}
+
+	Tile * currentTile = map.getTile(toUpdate->getPosition());
+	// Should be 'goal node' of this tile
+	graphNode * destinationNode = destination.location->nodes.at(0);
+	for(PhysicsEntity * obstacle : currentTile->staticEntities)
+	{
+		if(tooClose(toUpdate, obstacle))
+		{
+			avoid(toUpdate, obstacle, destinationNode);
+			return;
+		}
 	}
 
 	// Should be goal node

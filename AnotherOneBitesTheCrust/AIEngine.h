@@ -52,6 +52,9 @@ public:
 private:
 	void updatePath(Vehicle*, Delivery, Map &);
 	void goToPoint(Vehicle*, const glm::vec3 &);
-	std::vector<glm::vec3> dijkstras(graphNode *, graphNode *, std::vector<graphNode*>);
+	void avoid(Vehicle *, PhysicsEntity*, graphNode*);
+	bool tooClose(Vehicle*, PhysicsEntity*);
+
+	std::vector<glm::vec3> aStar(graphNode *, graphNode *, std::vector<graphNode*>);
 };
 

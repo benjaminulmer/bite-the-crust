@@ -45,13 +45,6 @@ public:
 	void testDraw();
 	void testOBJLoading();
 	GLuint textureProgramID;
-	
-	bool loadOBJ(
-	const char * path, 
-	std::vector<glm::vec3> & out_vertices, 
-	std::vector<glm::vec2> & out_uvs,
-	std::vector<glm::vec3> & out_normals
-	);
 
 	std::vector <glm::vec3> textureVerts;
 	std::vector <glm::vec3> textureNorms;
@@ -82,6 +75,12 @@ public:
 	GLuint textTextureID;			//texture
 	GLuint Text2DVertexBufferID;	//vertex buffer
 	GLuint Text2DUVBufferID;		//UV buffer
+	GLuint mvpID;
+	GLuint vID;
+	GLuint mID;
+	GLuint tID;
+	GLuint normalID;
+	GLuint lightPos;
 
 	GLuint basicProgramID;		//shader program 
 

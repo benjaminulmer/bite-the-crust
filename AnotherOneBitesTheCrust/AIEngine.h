@@ -22,7 +22,7 @@ struct Player
 
 struct TileAI
 {
-	static const int SIZE = 10;
+	static const int SIZE = 2;
 
 	// Should these coordinates be relative to the tile or the map?
 	// If it's relative to the tile, need a method to get player space -> tile space
@@ -52,6 +52,9 @@ public:
 private:
 	void updatePath(Vehicle*, Delivery, Map &);
 	void goToPoint(Vehicle*, const glm::vec3 &);
-	std::vector<glm::vec3> dijkstras(graphNode *, graphNode *, std::vector<graphNode*>);
+	void avoid(Vehicle *, PhysicsEntity*, graphNode*);
+	bool tooClose(Vehicle*, PhysicsEntity*);
+
+	std::vector<glm::vec3> aStar(graphNode *, graphNode *, std::vector<graphNode*>);
 };
 

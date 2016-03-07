@@ -1,9 +1,16 @@
 {
     "entities": [
-        {"name": "floor", "model": "Straight.obj", "physics": "default.json", "texture": "Straight-colored.DDS"},
-        {"name": "floor2", "model": "Turn.obj", "physics": "default.json", "texture": "Turn-colored.DDS"},
+        {"name": "road-straight", "model": "Straight.obj", "physics": "default.json", "texture": "Straight-colored.DDS"},
+        {"name": "road-turn", "model": "Turn.obj", "physics": "default.json", "texture": "Turn-colored.DDS"},
+		{"name": "lawn", "model": "Lawn.obj", "physics": "default.json", "texture": "lawn.DDS"},
         {"name": "box", "model": "PizzaBox-centered.obj", "physics": "box.json", "texture": "PizzaBox-colored.DDS"},
+		{"name": "wheel", "model": "wheel.obj", "physics": "default.json", "texture": "wheel-colored.DDS"},
         {"name": "ramp", "model": "bigramp.obj", "physics": "ramp.json", "texture": "ramp.DDS"},
-        {"name": "van", "model": "Van-centered.obj", "physics": "default.json", "texture": "Van-blue.DDS"}
+        {"name": "van", "model": "Van-centered.obj", "physics": "default.json", "texture": "Van-blue.DDS"},
+		{"name": "fence", "model": "fence.obj", "physics": "fence.json", "texture": "fence-colored.DDS"},
+		{"name": "house", "model": "house.obj", "physics": "static-box.json", "texture": "house-colored.DDS"},
+
+		{"name": "node", "model": "wheel.obj", "physics": "fence.json", "texture": "lawn.DDS"}
+		
     ]
 }

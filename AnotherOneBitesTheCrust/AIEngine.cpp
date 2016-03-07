@@ -9,32 +9,34 @@ AIEngine::AIEngine(void)
 	srand((int)time(0));
 }
 
-std::vector<glm::vec3> AIEngine::dijkstras(graphNode * start, graphNode * destination, vector<graphNode *> allNodes)
+std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destination, vector<graphNode *> allNodes)
 {
 	std::map<graphNode *, double> distances;
+	std::map<graphNode *, double> heuristic;
 	std::map<graphNode *, graphNode *> previous;
-	std::list<graphNode *> toVisit;
+	std::set<graphNode *> toVisit;
 
-	toVisit.push_back(start);
+	toVisit.insert(start);
 	for(graphNode * n : allNodes)
 	{
 		distances[n] = DBL_MAX;
-		if(n != start)
-			toVisit.push_back(n);
+		heuristic[n] = DBL_MAX;
 	}
 
 	
 	distances[start] = 0;
+	heuristic[start] = glm::length(start->getPosition() - destination->getPosition());
+
 	previous[start] = nullptr;
 
 	while(!toVisit.empty())
 	{
 
-		std::list<graphNode*>::iterator position = toVisit.begin();
+		std::set<graphNode*>::iterator position = toVisit.begin();
 		double minDist = DBL_MAX;
-		for(std::list<graphNode*>::iterator i = toVisit.begin(); i != toVisit.end(); i++)
+		for(std::set<graphNode*>::iterator i = toVisit.begin(); i != toVisit.end(); i++)
 		{
-			if(distances[*i] < minDist)
+			if(heuristic[*i] < minDist)
 			{
 				position = i;
 				minDist = distances[*i];
@@ -43,17 +45,28 @@ std::vector<glm::vec3> AIEngine::dijkstras(graphNode * start, graphNode * destin
 		
 		graphNode * current = *position;
 		toVisit.erase(position);
+		if(current == destination)
+			break;
 
 		for(graphNode * neighbour : current->getNeighbours())
 		{
+			// If the node has been visited, don't check
+			if(distances[neighbour] != DBL_MAX)
+				continue;
+
 			double distance = 0;
 
 			distance += distances[current] + glm::length(neighbour->getPosition() - current->getPosition());
-			if(distance < distances[neighbour])
-			{
-				distances[neighbour] = distance;
-				previous[neighbour] = current;
-			}
+
+			if(toVisit.find(neighbour) == toVisit.end())
+				toVisit.insert(neighbour);
+			else if(distance >= distances[neighbour])
+				continue;
+
+			previous[neighbour] = current;
+			distances[neighbour] = distance;
+			heuristic[neighbour] = distances[neighbour] + glm::length(neighbour->getPosition() - destination->getPosition());
+			
 		}
 	}
 
@@ -73,21 +86,46 @@ std::vector<glm::vec3> AIEngine::dijkstras(graphNode * start, graphNode * destin
 void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 {
 	VehicleInput* input = &driver->input;
-	input->forward = 1.0;
-	input->backward = 0.0;
-	input->handBrake = false;
 	
-	glm::vec3 desiredDirection = glm::normalize(desiredPos - driver->getPosition());
+	glm::vec3 desiredDirection = desiredPos - driver->getPosition();
+	float distance = glm::length(desiredDirection);
+	desiredDirection = glm::normalize(desiredDirection);
 	glm::vec3 forward(glm::normalize(driver->getModelMatrix() * glm::vec4(0,0,1,0)));
 	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
 	float cosAngle = glm::dot(desiredDirection, forward);
 	float leftCosAngle = glm::dot(desiredDirection, left);
 
+	float speed = driver->getPhysicsVehicle()->computeForwardSpeed();
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
-	// Stuff Ben added
-	ratio *= 2;
-	if (ratio > 1) ratio = 1;
+	if (distance > speed)
+	{
+		input->forward = 1.0;
+		input->backward = 0.0;
+		input->handBrake = false;
+	}
+	else
+	{
+		input->forward = 0.0;
+		input->backward = 1.0;
+		input->handBrake = true;
+	}
+	std::cout << "d = " << distance << " s = " << speed << " backward = " << input->backward << std::endl;
+	//std::cout << input->backward << std::endl;
+
+	/*ratio *= 2;
+	if (ratio > 1)
+	{
+		ratio = 1;
+	}
+	if(leftCosAngle > 0)
+	{
+		input->steer = ratio;
+	}
+	else
+	{
+		input->steer = -ratio;
+	}*/
 
 	if(ratio > 0.1)
 	{
@@ -110,40 +148,90 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 	}
 }
 
+inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, const glm::vec3& pos, const float& radius)
+{
+	glm::vec3 posToRay = rayorig - pos;
+
+	float radius2 = radius * radius;
+	float a = glm::dot(raydir,raydir);
+	float b = glm::dot(raydir,  (2.0f * posToRay));
+	float c = glm::dot(posToRay, posToRay) - radius2;
+	float D = b * b - (4.0 * a * c);
+
+	// If ray can not intersect then stop
+	if (D < 0)
+			return false;
+
+	return true;
+}
+
+bool AIEngine::tooClose(Vehicle * avoider, PhysicsEntity * avoiding)
+{
+	// Should be able to get this from the vehicle / house somehow
+	float carLength = 2; 
+	float objectWidth = 7;
+
+	glm::vec3 forward(glm::normalize(avoider->getModelMatrix() * glm::vec4(0,0,1,0)));
+
+	if(sphereIntersect(forward, avoider->getPosition(), avoiding->getPosition(), objectWidth))
+	{
+		if(glm::length(avoider->getPosition() - avoiding->getPosition()) < (carLength + objectWidth))
+			return true;
+
+	}
+
+	return false;
+}
+
+void AIEngine::avoid(Vehicle * driver, PhysicsEntity * obstacle, graphNode * destinationNode)
+{
+	glm::vec3 desiredDirection = glm::normalize(destinationNode->getPosition() - driver->getPosition());
+	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
+	float leftCosAngle = glm::dot(desiredDirection, left);
+
+	driver->input.backward = 1.0;
+	driver->input.forward = 0.0;
+
+	if(leftCosAngle > 0)
+	{
+		driver->input.steer = -1.0;
+	}
+	else
+	{
+		
+		driver->input.steer = 1.0;
+	}
+}
+
 void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 {
 
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
-
-	// Find closest node
-	graphNode * closest = currentTile->nodes.at(0);
-	if(!closest)
-		return;
-	double minDist = -1;
-	for(graphNode * n : currentTile->nodes)
-	{
-		double currentDist = glm::length(toUpdate->getPosition() - closest->getPosition());
-		if(currentDist < minDist)
-		{
-			closest = n;
-			minDist = currentDist;
-		}
-	}
-
-
 	// Should be 'goal node' of this tile
-	graphNode * destinationNode = destination.location->nodes.at(1);
-	if(glm::length(destinationNode->getPosition() - closest->getPosition()) <= MIN_DIST)
+	graphNode * destinationNode = destination.location->nodes.at(0);
+
+	
+	if(glm::length(destinationNode->getPosition() - toUpdate->getPosition()) <= MIN_DIST)
 		toUpdate->currentPath.push_back(destinationNode->getPosition());
 	else
 	{
-		// Uncomment this to use dijkstras. Right now it's a little buggy and needs some work,
-		// heading straight to the destination works better for now. I believe re-running
-		// dijkstras each frame would fix the issue (right now I'm uncertain whether this would
-		// cause too much overhead)
-		//
-		//toUpdate->currentPath = dijkstras(closest, destinationNode, map.allNodes);
-		toUpdate->currentPath.push_back(destinationNode->getPosition());
+
+		// Find closest node
+		graphNode * closest = currentTile->nodes.at(0);
+		if(!closest)
+			return;
+		double minDist = -1;
+		for(graphNode * n : currentTile->nodes)
+		{
+			double currentDist = glm::length(toUpdate->getPosition() - closest->getPosition());
+			if(currentDist < minDist)
+			{
+				closest = n;
+				minDist = currentDist;
+			}
+		}
+		toUpdate->currentPath = aStar(closest, destinationNode, map.allNodes);
+		//toUpdate->currentPath.push_back(destinationNode->getPosition());
 	}
 }
 
@@ -154,6 +242,7 @@ inline bool equals(glm::vec3 x, glm::vec3 y)
 
 void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map) 
 { 
+	
 	if(toUpdate->currentPath.empty())
 	{
 		updatePath(toUpdate, destination, map);
@@ -161,8 +250,20 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 			return;
 	}
 
+	Tile * currentTile = map.getTile(toUpdate->getPosition());
+	// Should be 'goal node' of this tile
+	graphNode * destinationNode = destination.location->nodes.at(0);
+	for(PhysicsEntity * obstacle : currentTile->staticEntities)
+	{
+		if(tooClose(toUpdate, obstacle))
+		{
+			avoid(toUpdate, obstacle, destinationNode);
+			return;
+		}
+	}
+
 	// Should be goal node
-	if(!equals(toUpdate->getDestination(), destination.location->nodes.at(1)->getPosition()))
+	if(!equals(toUpdate->getDestination(), destination.location->nodes.at(0)->getPosition()))
 	{
 		toUpdate->currentPath.clear();
 		return;
@@ -173,13 +274,13 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 
 	if(distanceToNext < MIN_DIST)
 	{
-		std::cout << "Waypoint get! Position: "<< toUpdate->currentPath.at(0).x << "," << toUpdate->currentPath.at(0).y << ", " << toUpdate->currentPath.at(0).z << std::endl;
+		//std::cout << "Waypoint get! Position: "<< toUpdate->currentPath.at(0).x << "," << toUpdate->currentPath.at(0).y << ", " << toUpdate->currentPath.at(0).z << std::endl;
 		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
 
 		if(toUpdate->currentPath.empty())
 		{
 			toUpdate->input.forward = 0;
-			toUpdate->input.backward = 1;
+			toUpdate->input.backward = 0;
 			toUpdate->input.handBrake = true;
 			return;
 		} 

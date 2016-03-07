@@ -31,13 +31,9 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
-	GLuint mvpID = glGetUniformLocation(textureProgramID, "MVP");
-	GLuint vID = glGetUniformLocation(textureProgramID, "V");
-	GLuint mID = glGetUniformLocation(textureProgramID, "M");
-	GLuint tID = glGetUniformLocation(textureProgramID, "myTextureSampler");
-	GLuint normalID = glGetUniformLocation(textureProgramID, "normalMatrix");
 
-	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 90, 35);
+
+	glUniform3f(lightPos, 100, 100, 100);
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
@@ -57,7 +53,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 		glUniformMatrix4fv(normalID, 1, GL_FALSE, value_ptr(normal));
 
 
-		glBindVertexArray(entities[i]->getRenderable()->getVAO());
+		glBindVertexArray(entities[i]->getRenderable()->vao);
 		GLuint tex = entities[i]->getTexture();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex);
@@ -65,18 +61,19 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
 		glUniform1i(tID, 0);
-		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->getVertices().size());
+		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
 		glBindVertexArray(0);
-		//glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->getFaces().size(), GL_UNSIGNED_INT, (void*)0);
+		//glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->faces.size(), GL_UNSIGNED_INT, (void*)0);
 	}
 }
 
 mat4 RenderingEngine::calculateDefaultModel(mat4 model, Entity * entity)
 {
-	//Translations done here. Order of translations is scale, rotate, translate
+	//Translations done here. Order of translations is scale, translate, rotate
 	model = glm::scale(model,entity->getDefaultScale());
-	model = glm::rotate(model, entity->getDefaultRotationAngle(), entity->getDefaultRotationAxis());
 	model = glm::translate(model, entity->getDefaultTranslation());
+	model = glm::rotate(model, entity->getDefaultRotationAngle(), entity->getDefaultRotationAxis());
+
 	return model;
 }
 
@@ -95,6 +92,13 @@ void RenderingEngine::generateIDs()
 	string texfsSource = loadShaderStringfromFile(texfsShader);
 	textureProgramID = CreateShaderProgram(texvsSource, texfsSource);
 	glUseProgram(textureProgramID);
+	//get shader location
+	mvpID = glGetUniformLocation(textureProgramID, "MVP");
+	vID = glGetUniformLocation(textureProgramID, "V");
+	mID = glGetUniformLocation(textureProgramID, "M");
+	tID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+	normalID = glGetUniformLocation(textureProgramID, "normalMatrix");
+	lightPos = glGetUniformLocation(textureProgramID, "LightPosition_worldspace");
 
 	string shadowVsShader = "res\\Shaders\\basic_vs.glsl";
 	string shadowFsShader = "res\\Shaders\\basic_fs.glsl";
@@ -136,9 +140,9 @@ void RenderingEngine::assignBuffersTex(Renderable* r)
 	glGenBuffers(1, &uvBuffer);
 	glGenBuffers(1, &normalBuffer);		//color vbo
 
-	vector<vec3> vertices = r->getVertices();
-	vector<vec2> uvs = r->getUVs();
-	vector<vec3> normals = r->getNormals();
+	vector<vec3> vertices = r->verts;
+	vector<vec2> uvs = r->uvs;
+	vector<vec3> normals = r->norms;
 
 	glBindVertexArray(vao);
 
@@ -151,8 +155,8 @@ void RenderingEngine::assignBuffersTex(Renderable* r)
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*normals.size(), normals.data(), GL_STATIC_DRAW);		//buffering normal data
 
-	r->setVertexVBO(vertexBuffer);
-	r->setColourVBO(normalBuffer);
+	r->vbo = vertexBuffer;
+	//r->setColourVBO(normalBuffer);
 
 	//bind to shaders
 	glEnableVertexAttribArray(0);
@@ -185,20 +189,18 @@ void RenderingEngine::assignBuffersTex(Renderable* r)
 		0,
 		(void*)0);
 
-	r->setVAO(vao);
+	r->vao = vao;
 	glBindVertexArray(0);
 }
 
 
 void RenderingEngine::deleteBuffers(Renderable *r)
 {
-	GLuint vao = r->getVAO();
-	GLuint vbuf = r->getVertexVBO();
-	GLuint cbuf = r->getColourVBO();
+	GLuint vao = r->vao;
+	GLuint vbuf = r->vbo;
 	
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbuf);
-	glDeleteBuffers(1, &cbuf);
 }
 
 
@@ -320,7 +322,7 @@ void RenderingEngine::setupShadowBuffers()
 							// RGB values for the 4 vertices of the quad
 	vector <float> colors;
 
-	for (int i = 0; i < shadowVertices.size(); i++)
+	for (unsigned int i = 0; i < shadowVertices.size(); i++)
 	{
 		colors.push_back(0.2f);
 		colors.push_back(0.2f);

@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "PizzaBox.h"
+#include "WheelEntity.h"
 #include "Camera.h"
 #include "ContentLoading.h"
 
@@ -96,7 +97,8 @@ void Game::setupEntities()
 
 	// Assign the buffers for all the renderables
 	std::map<std::string, Renderable*>::iterator it;
-	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
+	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it)
+	{
 		renderingEngine->assignBuffersTex(it->second);
 	}
 
@@ -106,69 +108,63 @@ void Game::setupEntities()
 	deliveryManager->map = &map;
 
 	// Create all the entities loaded in the map
-	for (unsigned int i = 0; i < map.tiles.size(); i++) {
-		for (unsigned int j = 0; j < map.tiles[i].size(); j++) {
-			deliveryManager->addDeliveryLocation(&map.tiles[i][j]);
-
+	for (unsigned int i = 0; i < map.tiles.size(); i++)
+	{
+		for (unsigned int j = 0; j < map.tiles[i].size(); j++)
+		{
 			Tile* tile = &map.tiles[i][j];
+
+			if (tile->deliverable) {
+				deliveryManager->addDeliveryLocation(tile);
+			}
+			if (tile->pickup) {
+				// TODO make this better/less hardcoded
+				physicsEngine->createPizzaPickup(physx::PxVec3((float)j*map.tileSize + map.tileSize/2, 0, (float)i*map.tileSize + map.tileSize/2), 5.0f);
+			}
+
 			Entity* ground = new Entity();
 			ground->setRenderable(renderablesMap[tile->groundModel]);
 			ground->setTexture(textureMap[tile->groundModel]);
 
 			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
+			ground->setDefaultRotation(physx::PxPi * (tile->groundRotationDeg) / 180.0f, glm::vec3(0,1,0));
 			ground->setDefaultTranslation(glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2));
 			tile->ground = ground;
 			tile->groundTexture = textureMap[tile->groundModel];
 			entities.push_back(ground);
 
-			for (unsigned int k = 0; k < tile->entities.size(); k++) {
-				TileEntity tileEntity = tile->entities[k];
+			for (unsigned int k = 0; k < tile->entityTemplates.size(); k++)
+			{
+				TileEntity tileEntity = tile->entityTemplates[k];
 
-				PhysicsEntity* e = new PhysicsEntity();
+				PhysicsEntity* e;
+				if (physicsEntityInfoMap[tileEntity.name]->type == PhysicsType::DYNAMIC) {
+					e = new DynamicEntity();
+				} else {
+					e = new PhysicsEntity();
+					tile->staticEntities.push_back(e);
+				}
+
 				// TODO, error check that these models do exist, instead of just break
-				e->setRenderable(renderablesMap[tileEntity.model]);
-
-				e->setDefaultTranslation(e->getRenderable()->getCenter());
-				e->setTexture(textureMap[tileEntity.model]);
+				e->setRenderable(renderablesMap[tileEntity.name]);
+				e->setTexture(textureMap[tileEntity.name]);
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
 
-				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(physx::PxIdentity));
+				float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
+				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
 
-				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.model], transform);
+				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.name], transform);
 				entities.push_back(e);
 			}
 		}
 	}
-
-	/**********************************************************
-						Creating Vechicles
-	**********************************************************/
+	// Create vehicles
 	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
-	ContentLoading::loadVehicleData("res\\JSON\\car.json", p1Vehicle);
-	p1Vehicle->setRenderable(renderablesMap["van"]);
-	p1Vehicle->setTexture(textureMap["van"]);
-	p1Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
-	p1Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
-
-	// TODO get dimensions working properly for vehicle
-	p1Vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
-	physicsEngine->createVehicle(p1Vehicle, physx::PxTransform(physx::PxVec3(0, 2, 0), physx::PxQuat(physx::PxIdentity)));
-	entities.push_back(p1Vehicle);
-
-	//// Player 2 (ie. AI)
+	setupVehicle(p1Vehicle, physx::PxTransform(10, 2, 20));
 	p2Vehicle = new Vehicle(PHYSICS_STEP_MS);
-	ContentLoading::loadVehicleData("res\\JSON\\car.json", p2Vehicle);
-	p2Vehicle->setRenderable(renderablesMap["van"]);
-	p2Vehicle->setTexture(textureMap["van"]);
-	p2Vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
-	p2Vehicle->setDefaultTranslation(renderablesMap["van"]->getCenter());
-
-	// TODO get dimensions working properly for vehicle
-	p2Vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
-	physicsEngine->createVehicle(p2Vehicle, physx::PxTransform(physx::PxVec3(10, 2, 0), physx::PxQuat(physx::PxIdentity)));
-	entities.push_back(p2Vehicle);
+	setupVehicle(p2Vehicle, physx::PxTransform(30, 2, 20));
 
 	// Initialize player location buffer for camera
 	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
@@ -177,8 +173,32 @@ void Game::setupEntities()
 	}
 	cameraPosBufferIndex = 0;
 	camera.setUpVector(glm::vec3(0,1,0));
+}
 
-	physicsEngine->createTrigger();
+void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform)
+{
+	ContentLoading::loadVehicleData("res\\JSON\\car.json", vehicle);
+	vehicle->setRenderable(renderablesMap["van"]);
+	vehicle->setTexture(textureMap["van"]);
+	vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+
+	// TODO get dimensions working properly for vehicle
+	vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
+	physicsEngine->createVehicle(vehicle, transform);
+	entities.push_back(vehicle);
+
+	physx::PxShape* wheels[4];
+	physx::PxRigidDynamic* actor = vehicle->getDynamicActor();
+	actor->getShapes(wheels, 4);
+
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		WheelEntity* wheel = new WheelEntity(vehicle, wheels[i]);
+		wheel->setRenderable(renderablesMap["wheel"]);
+		wheel->setTexture(textureMap["wheel"]);
+		wheel->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+		entities.push_back(wheel);
+	}
 }
 
 // Connects systems together
@@ -189,11 +209,14 @@ void Game::connectSystems()
 	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 
+	inputEngine->reverseCam.connect(&camera, &Camera::setReverseCam);
+	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
+
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->addPlayer(p2Vehicle);
 
-	deliveryManager->deliveryTextures[p1Vehicle] = ContentLoading::loadDDS("res\\Textures\\DeliverFloor.DDS");
-	deliveryManager->deliveryTextures[p2Vehicle] = ContentLoading::loadDDS("res\\Textures\\AIDeliverFloor.DDS");
+	deliveryManager->deliveryTextures[p1Vehicle] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
+	deliveryManager->deliveryTextures[p2Vehicle] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
@@ -219,20 +242,22 @@ void Game::mainLoop()
 		if (deltaTimeAccMs >= PHYSICS_STEP_MS) 
 		{
 			deltaTimeAccMs -= PHYSICS_STEP_MS;
-
 			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
-
 			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map);
 			p1Vehicle->update();
 			p2Vehicle->update();
-
 		
 			physicsEngine->simulate(PHYSICS_STEP_MS);
 
 			// Update the camera position buffer with new location
-			cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+			if (camera.isReverseCam()) {
+				cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,15,0));
+			}
+			else {
+				cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+			}
 			cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
 
 			// Set camera to look at player with a positional delay
@@ -244,22 +269,21 @@ void Game::mainLoop()
 		audioEngine->update(p1Vehicle->getModelMatrix());
 
 		// Display
-		
 		renderingEngine->displayFuncTex(entities);
 		renderingEngine->drawShadow(p1Vehicle->getPosition());
 		renderingEngine->drawShadow(p2Vehicle->getPosition());
-		//renderingEngine->displayFuncTex(pizzaEntities);
-		///test drawing
-		//renderingEngine->testDraw();
 
 		string speed = "Speed: ";
 		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
 		renderingEngine->printText2D(speed.data(), 0, 740, 24);
 
+		string frameRate = "DeltaTime: ";
+		frameRate.append(to_string(deltaTimeMs));
+		renderingEngine->printText2D(frameRate.data(), 0, 700, 20);
+
 		string score = "Score: ";
 		score.append(to_string(deliveryManager->getScore(p1Vehicle)));
 		renderingEngine->printText2D(score.data(), 800, 740, 24);
-		
 		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 500, 700, 20);
 
 		string pizzas = "Pizzas: ";
@@ -330,6 +354,20 @@ void Game::shootPizza(Vehicle* vehicle)
 	entities.push_back(pizzaBox);
 
 	audioEngine->playCannonSound(vehicle);
+}
+
+void Game::unFuckerTheGame()
+{
+	p1Vehicle->getDynamicActor()->setGlobalPose(physx::PxTransform(10, 2, 20));
+	p2Vehicle->getDynamicActor()->setGlobalPose(physx::PxTransform(30, 2, 20));
+	p1Vehicle->getPhysicsVehicle()->setToRestState();
+	p2Vehicle->getPhysicsVehicle()->setToRestState();
+
+	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
+	{
+		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+	}
+	cameraPosBufferIndex = 0;
 }
 
 Game::~Game(void)

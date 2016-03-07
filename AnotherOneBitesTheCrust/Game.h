@@ -44,11 +44,15 @@ private:
 
 	void initSystems();
 	void setupEntities();
+	void setupVehicle(Vehicle* vehicle, physx::PxTransform transform);
 	void connectSystems();
 	void mainLoop();
 	void processSDLEvents();
 	void quitGame();
 	void shootPizza(Vehicle* vehicle);
+
+	// Temporary
+	void Game::unFuckerTheGame();
 
 	SDL_Window* window;
 	SDL_Surface* screen;

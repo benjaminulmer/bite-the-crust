@@ -175,10 +175,10 @@ Renderable* createRenderable(std::string modelFile) {
 
 	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals, faces, raw_verts);
 
-	r->setVerts(verts);
-	r->setUVs(uvs);
-	r->setNorms(normals);
-	r->setFaces(faces);
+	r->verts = verts;
+	r->uvs = uvs;
+	r->norms = normals;
+	r->faces = faces;
 
 	return r;
 }
@@ -221,6 +221,11 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			info->dynamicInfo->angularDamping = (float)dynamicInfo["angularDamping"].GetDouble();
 		}
 	}
+	//if (d.HasMember("rotation
+
+	glm::vec3 dims = model->getDimensions();
+	info->yPosOffset = dims.y * 0.5f;
+
 	if (d.HasMember("geometry")) {
 		const rapidjson::Value& geometry = d["geometry"];
 		for (rapidjson::SizeType i = 0; i < geometry.Size(); i++) {
@@ -230,10 +235,9 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 				BoxInfo* box = new BoxInfo();
 				box->geometry = Geometry::BOX;
 				// Use the model dimensions by default
-				glm::vec3 d = model->getDimensions();
-				box->halfX = d.x * 0.5f;
-				box->halfY = d.y * 0.5f;
-				box->halfZ = d.z * 0.5f;
+				box->halfX = dims.x * 0.5f;
+				box->halfY = dims.y * 0.5f;
+				box->halfZ = dims.z * 0.5f;
 				// Overwrite with specifics if they're there
 				if (geometry[i].HasMember("halfX"))
 					box->halfX = (float)geometry[i]["halfX"].GetDouble();
@@ -243,38 +247,46 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 					box->halfZ = (float)geometry[i]["halfZ"].GetDouble();
 				shape = box;
 			}
-
-			// Added by Ben for testing
-			else if (shapeName == "convexMesh")
-			{
+			else if (shapeName == "sphere") {
+				SphereInfo* sphere = new SphereInfo();
+				if (geometry[i].HasMember("radius"))
+					sphere->radius = (float)geometry[i]["radius"].GetDouble();
+			}
+			else if (shapeName == "capsule") {
+				CapsuleInfo* capsule = new CapsuleInfo();
+				if (geometry[i].HasMember("radius"))
+					capsule->radius = (float)geometry[i]["radius"].GetDouble();
+				if (geometry[i].HasMember("halfHeight"))
+					capsule->halfHeight= (float)geometry[i]["halfHeight"].GetDouble();
+			}
+			else if (shapeName == "convexMesh") {
 				ConvexMeshInfo* convexMesh = new ConvexMeshInfo();
 				convexMesh->geometry = Geometry::CONVEX_MESH;
-				convexMesh->verts = model->getVertices();
+				convexMesh->verts = model->verts;
 				shape = convexMesh;
 			}
-			else if (shapeName == "triangleMesh")
-			{
+			else if (shapeName == "triangleMesh") {
 				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
 				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
-				triangleMesh->verts = model->getVertices();
-				triangleMesh->faces = model->getFaces();
+				triangleMesh->verts = model->verts;
+				triangleMesh->faces = model->faces;
 				shape = triangleMesh;
 			}
 			
-			
 			if (geometry[i].HasMember("flag0")) {
 				shape->filterFlag0 = stringToFlag(geometry[i]["flag0"].GetString());
-			} else {
-				shape->filterFlag0 = FilterFlag::OBSTACLE;
 			}
 			if (geometry[i].HasMember("flag1")) {
 				shape->filterFlag1 = stringToFlag(geometry[i]["flag1"].GetString());
-			} else {
-				shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
+			}
+			if (geometry[i].HasMember("flag2")) {
+				shape->filterFlag0 = stringToFlag(geometry[i]["flag2"].GetString());
+			}
+			if (geometry[i].HasMember("flag3")) {
+				shape->filterFlag1 = stringToFlag(geometry[i]["flag3"].GetString());
 			}
 			if (geometry[i].HasMember("isDrivable")) {
 				shape->isDrivable = (geometry[i]["isDrivable"].GetInt() != 0);
-				std::cout << "TEST: " << geometry[i]["isDrivable"].GetInt() << std::endl;
 			}
 			info->shapeInfo.push_back(shape);
 		}
@@ -316,8 +328,8 @@ bool validateMap(rapidjson::Document &d) {
 			return false;
 		}
 		for (rapidjson::SizeType j = 0; j < entry["entities"].Size(); j++) {
-			if (!entry["entities"][j].HasMember("model")) {
-				printf("Entity %d in tile %d is missing a model.", j, entry["id"]);
+			if (!entry["entities"][j].HasMember("name")) {
+				printf("Entity %d in tile %d is missing a name.", j, entry["id"]);
 				return false;
 			}
 		}
@@ -338,7 +350,7 @@ bool validateMap(rapidjson::Document &d) {
 	return true;
 }
 
-//todo, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
+//TODO, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
 bool ContentLoading::loadMap(char* filename, Map &map) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
@@ -366,9 +378,19 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		std::string ground = tileArray[i]["ground"].GetString();
 		Tile t;
 		t.groundModel = ground;
+		if (tileArray[i].HasMember("deliverable")) {
+			t.deliverable = tileArray[i]["deliverable"].GetBool();
+		} else {
+			t.deliverable = false;
+		}
+		if (tileArray[i].HasMember("pickup")) {
+			t.pickup = tileArray[i]["pickup"].GetBool();
+		} else {
+			t.pickup = false;
+		}
 		const rapidjson::Value& entityArray = tileArray[i]["entities"];
 		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
-			std::string model = entityArray[j]["model"].GetString();
+			std::string name = entityArray[j]["name"].GetString();
 			double x = 0;
 			double y = 0;
 			double z = 0;
@@ -379,11 +401,16 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			if (entityArray[j].HasMember("z"))
 				z = entityArray[j]["z"].GetDouble();
 
-
 			TileEntity e;
-			e.model = model;
+			e.name = name;
 			e.position = glm::vec3(x, y, z);
-			t.entities.push_back(e);
+
+			if (entityArray[j].HasMember("rotation"))
+				e.rotationDeg = (float)entityArray[j]["rotation"].GetDouble();
+			else
+				e.rotationDeg = 0;
+
+			t.entityTemplates.push_back(e);
 		}
 
 		const rapidjson::Value& nodeArray = tileArray[i]["nodes"];
@@ -428,48 +455,55 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			Tile tile = tiles[id];
 			std::vector<NodeTemplate> tileNodes = nodes[id];
 
+			tile.groundRotationDeg = 0;
 			// Handle rotations
 			if (rotation == "R") {
-				for (int i = 0; i < tile.entities.size(); i++) {
-					int x = tile.entities[i].position.x;
-					int z = tile.entities[i].position.z;
-					tile.entities[i].position.x = tileSize - z;
-					tile.entities[i].position.z = x;
+				for (unsigned int i = 0; i < tile.entityTemplates.size(); i++) {
+					int x = (int)tile.entityTemplates[i].position.x;
+					int z = (int)tile.entityTemplates[i].position.z;
+					tile.entityTemplates[i].position.x = (float)(tileSize - z);
+					tile.entityTemplates[i].position.z = (float)x;
+					tile.entityTemplates[i].rotationDeg += -90;
 				}
-				for (int i = 0; i < tileNodes.size(); i++) {
+				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
-					pos.x = 1.0 - pos.z;
+					pos.x = 1.0f - pos.z;
 					pos.z = pos.x;
 					tileNodes[i].position = pos;
 				}
+				tile.groundRotationDeg += -90;
 			}
 			if (rotation == "L") {
-				for (int i = 0; i < tile.entities.size(); i++) {
-					int x = tile.entities[i].position.x;
-					int z = tile.entities[i].position.z;
-					tile.entities[i].position.x = z;
-					tile.entities[i].position.z = tileSize - x;
+				for (unsigned int i = 0; i < tile.entityTemplates.size(); i++) {
+					int x = (int)tile.entityTemplates[i].position.x;
+					int z = (int)tile.entityTemplates[i].position.z;
+					tile.entityTemplates[i].position.x = (float)z;
+					tile.entityTemplates[i].position.z = (float)(tileSize - x);
+					tile.entityTemplates[i].rotationDeg += 90;
 				}
-				for (int i = 0; i < tileNodes.size(); i++) {
+				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
 					pos.x = pos.z;
-					pos.z = 1.0 - pos.x;
+					pos.z = 1.0f - pos.x;
 					tileNodes[i].position = pos;
 				}
+				tile.groundRotationDeg += 90;
 			}
 			if (rotation == "RR" || rotation == "LL") {
-				for (int i = 0; i < tile.entities.size(); i++) {
-					int x = tile.entities[i].position.x;
-					int z = tile.entities[i].position.z;
-					tile.entities[i].position.x = tileSize - x;
-					tile.entities[i].position.z = tileSize - z;
+				for (unsigned int i = 0; i < tile.entityTemplates.size(); i++) {
+					int x = (int)tile.entityTemplates[i].position.x;
+					int z = (int)tile.entityTemplates[i].position.z;
+					tile.entityTemplates[i].position.x = (float)(tileSize - x);
+					tile.entityTemplates[i].position.z = (float)(tileSize - z);
+					tile.entityTemplates[i].rotationDeg += 180;
 				}
-				for (int i = 0; i < tileNodes.size(); i++) {
+				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
-					pos.x = 1.0 - pos.x;
-					pos.z = 1.0 - pos.z;
+					pos.x = 1.0f - pos.x;
+					pos.z = 1.0f - pos.z;
 					tileNodes[i].position = pos;
 				}
+				tile.groundRotationDeg += 180;
 			}
 
 			// Positions of nodes
@@ -487,10 +521,10 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			}
 
 			// Local Connections
-			for(int k = 0; k < tileNodes.size(); k++)
+			for(unsigned int k = 0; k < tileNodes.size(); k++)
 			{
 				NodeTemplate current = tileNodes.at(k);
-				for(int l = 0; l < current.neighbours.size(); l++)
+				for(unsigned int l = 0; l < current.neighbours.size(); l++)
 				{
 					int index = current.neighbours[l];
 					tile.nodes.at(k)->addNeighbour(tile.nodes.at(index));
@@ -511,11 +545,11 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			allNodes.insert(allNodes.begin(), t.nodes.begin(), t.nodes.end());
 		}
 	}
-	for(int i = 0; i < allNodes.size(); i++)
+	for(unsigned int i = 0; i < allNodes.size(); i++)
 	{
 		graphNode * current = allNodes.at(i);
 
-		for(int j = i+1; j < allNodes.size(); j++)
+		for(unsigned int j = i+1; j < allNodes.size(); j++)
 		{
 			graphNode * comparing = allNodes.at(j);
 

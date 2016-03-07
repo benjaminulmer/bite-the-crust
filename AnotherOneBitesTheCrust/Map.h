@@ -19,7 +19,8 @@ struct Tile
 	// If it's relative to the tile, need a method to get player space -> tile space
 	glm::vec3 entrance, exit;
 	std::string groundModel;
-	std::vector<TileEntity> entities;
+	std::vector<TileEntity> entityTemplates;
+	std::vector<PhysicsEntity*> staticEntities;
 	std::vector<graphNode*> nodes;
 	Entity* ground;
 	GLuint groundTexture;

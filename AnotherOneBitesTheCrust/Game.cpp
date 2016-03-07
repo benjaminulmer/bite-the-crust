@@ -133,12 +133,17 @@ void Game::setupEntities()
 			tile->groundTexture = textureMap[tile->groundModel];
 			entities.push_back(ground);
 
-			for (unsigned int k = 0; k < tile->entities.size(); k++)
+			for (unsigned int k = 0; k < tile->entityTemplates.size(); k++)
 			{
-				TileEntity tileEntity = tile->entities[k];
+				TileEntity tileEntity = tile->entityTemplates[k];
 
 				PhysicsEntity* e;
-				(physicsEntityInfoMap[tileEntity.name]->type == PhysicsType::DYNAMIC) ? e = new DynamicEntity() : e = new PhysicsEntity();
+				if (physicsEntityInfoMap[tileEntity.name]->type == PhysicsType::DYNAMIC) {
+					e = new DynamicEntity();
+				} else {
+					e = new PhysicsEntity();
+					tile->staticEntities.push_back(e);
+				}
 
 				// TODO, error check that these models do exist, instead of just break
 				e->setRenderable(renderablesMap[tileEntity.name]);

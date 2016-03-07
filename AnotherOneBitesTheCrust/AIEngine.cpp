@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-const int MIN_DIST = 15;
+const int MIN_DIST = 10;
 
 AIEngine::AIEngine(void)
 {
@@ -168,8 +168,8 @@ inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, c
 bool AIEngine::tooClose(Vehicle * avoider, PhysicsEntity * avoiding)
 {
 	// Should be able to get this from the vehicle / house somehow
-	float carLength = 1; 
-	float objectWidth = 8;
+	float carLength = 2; 
+	float objectWidth = 7;
 
 	glm::vec3 forward(glm::normalize(avoider->getModelMatrix() * glm::vec4(0,0,1,0)));
 

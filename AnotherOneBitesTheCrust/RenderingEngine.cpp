@@ -466,7 +466,7 @@ void RenderingEngine::drawSkybox(glm::vec3 position)
 
 	glUniform3f(lightPos, 35.0f, 90.0f, 35.0f);
 	glUniform1f(lightPow, 0.0f);
-	glUniform3f(ambientScale, 0.8, 0.8, 0.8);
+	glUniform3f(ambientScale, 1, 1, 1);
 
 
 	M = mat4(1.0f);

@@ -8,3 +8,10 @@ Construction Barrier model by PagDev
 	http://opengameart.org/content/construction-barrier-3d
 
 The Compressionator
+	http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/the-compressonator/
+
+Obj and DDS loading
+	http://www.opengl-tutorial.org/
+
+Textures from
+	http://www.textures.com/

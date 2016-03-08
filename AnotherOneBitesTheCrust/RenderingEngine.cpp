@@ -61,9 +61,11 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
 		glUniform1i(tID, 0);
-		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+		//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+		
+		glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
+
 		glBindVertexArray(0);
-		//glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->faces.size(), GL_UNSIGNED_INT, (void*)0);
 	}
 }
 
@@ -132,17 +134,19 @@ void RenderingEngine::assignBuffersTex(Renderable* r)
 	GLuint vertexBuffer;
 	GLuint uvBuffer;
 	GLuint normalBuffer;
-	//GLuint indexBuffer;
+	GLuint indexBuffer;
 	GLuint vao;
 
 	glGenVertexArrays(1, &vao);			//vao
 	glGenBuffers(1, &vertexBuffer);		//vertices vbo
 	glGenBuffers(1, &uvBuffer);
 	glGenBuffers(1, &normalBuffer);		//color vbo
+	glGenBuffers(1, &indexBuffer);
 
 	vector<vec3> vertices = r->verts;
 	vector<vec2> uvs = r->uvs;
 	vector<vec3> normals = r->norms;
+	vector<unsigned short> faces = r->drawFaces;
 
 	glBindVertexArray(vao);
 
@@ -154,6 +158,9 @@ void RenderingEngine::assignBuffersTex(Renderable* r)
 
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*normals.size(), normals.data(), GL_STATIC_DRAW);		//buffering normal data
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * faces.size(), faces.data(), GL_STATIC_DRAW);
 
 	r->vbo = vertexBuffer;
 	//r->setColourVBO(normalBuffer);

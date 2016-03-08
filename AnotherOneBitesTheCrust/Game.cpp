@@ -162,9 +162,9 @@ void Game::setupEntities()
 	}
 	// Create vehicles
 	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
-	setupVehicle(p1Vehicle, physx::PxTransform(10, 2, 20));
+	setupVehicle(p1Vehicle, physx::PxTransform(10, 2, 20), 0);
 	p2Vehicle = new Vehicle(PHYSICS_STEP_MS);
-	setupVehicle(p2Vehicle, physx::PxTransform(30, 2, 20));
+	setupVehicle(p2Vehicle, physx::PxTransform(30, 2, 20), 1);
 
 	// Initialize player location buffer for camera
 	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
@@ -175,12 +175,20 @@ void Game::setupEntities()
 	camera.setUpVector(glm::vec3(0,1,0));
 }
 
-void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform)
+void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 {
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", vehicle);
-	vehicle->setRenderable(renderablesMap["van"]);
-	vehicle->setTexture(textureMap["van"]);
 	vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
+	if(num == 0)
+	{
+		vehicle->setRenderable(renderablesMap["van"]);
+		vehicle->setTexture(textureMap["van"]);
+	}
+	else if(num == 1)
+	{
+		vehicle->setRenderable(renderablesMap["aivan"]);
+		vehicle->setTexture(textureMap["aivan"]);
+	}
 
 	// TODO get dimensions working properly for vehicle
 	vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);

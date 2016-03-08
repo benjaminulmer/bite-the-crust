@@ -85,7 +85,7 @@ void Game::initSystems()
 	renderingEngine = new RenderingEngine();
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
-	renderingEngine->setupShadowBuffers();
+	renderingEngine->setupMiscBuffers();
 }
 
 // Create and initialize all loaded entities in the game world
@@ -172,7 +172,10 @@ void Game::setupEntities()
 		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
 	}
 	cameraPosBufferIndex = 0;
+	camera.setPosition(cameraPosBuffer[CAMERA_POS_BUFFER_SIZE]);
+	camera.setLookAtPosition(p1Vehicle->getPosition());
 	camera.setUpVector(glm::vec3(0,1,0));
+	renderingEngine->updateView(camera);
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
@@ -280,6 +283,7 @@ void Game::mainLoop()
 		renderingEngine->displayFuncTex(entities);
 		renderingEngine->drawShadow(p1Vehicle->getPosition());
 		renderingEngine->drawShadow(p2Vehicle->getPosition());
+		renderingEngine->drawSkybox(p1Vehicle->getPosition());
 
 		string speed = "Speed: ";
 		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));

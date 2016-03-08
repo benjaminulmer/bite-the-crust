@@ -10,6 +10,17 @@ Construction Barrier model by PagDev
 The Compressionator
 	http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/the-compressonator/
 
+
+engineRev.wav
+	http://www.freesound.org/people/ReadeOnly/sounds/186960/
+
+engineIdle.wav
+	http://www.freesound.org/people/ReadeOnly/sounds/186939/
+
+brake.wav
+	http://www.freesound.org/people/Iberian_Runa/sounds/217542/
+
+	
 Obj and DDS loading
 	http://www.opengl-tutorial.org/
 

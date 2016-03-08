@@ -103,12 +103,20 @@ void Vehicle::update()
 	{
 		vehicleInput.setAnalogAccel(input.backward);
 		vehicleInput.setAnalogBrake(input.forward);
+		if(input.forward > 0 && forwardSpeed < 0)
+			brakeSignal(this);
 	} 
 	else 
 	{
 		vehicleInput.setAnalogAccel(input.forward);
 		vehicleInput.setAnalogBrake(input.backward);
+		/*if(input.forward > 0)
+			gasSignal(this);*/
+		if(input.backward > 0 && forwardSpeed > 0)
+			brakeSignal(this);
 	}
+	/*if(input.forward == 0 && input.backward == 0)
+		idleSignal(this);*/
 
 	// Steer and handbrake
 	vehicleInput.setAnalogSteer(input.steer);
@@ -128,8 +136,8 @@ void Vehicle::update()
 
 glm::mat4 Vehicle::getModelMatrix()
 {
-	PxF32 alpha = 0.02f;
-	tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
+	PxF32 alpha = 0.01f;
+	tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.008f);
 	if (tipAngle > PxPi * (45.0f/180.0f))
 	{
 		tipAngle = PxPi * (45.0f/180.0f);

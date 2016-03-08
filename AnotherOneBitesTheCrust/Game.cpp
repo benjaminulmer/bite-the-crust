@@ -119,7 +119,7 @@ void Game::setupEntities()
 			}
 			if (tile->pickup) {
 				// TODO make this better/less hardcoded
-				physicsEngine->createPizzaPickup(physx::PxVec3((float)j*map.tileSize + map.tileSize/2, 0, (float)i*map.tileSize + map.tileSize/2), 5.0f);
+				physicsEngine->createPizzaPickup(physx::PxVec3((float)j*map.tileSize + map.tileSize/2, 0, (float)i*map.tileSize + map.tileSize/2), 8.0f);
 			}
 
 			Entity* ground = new Entity();
@@ -218,7 +218,19 @@ void Game::connectSystems()
 	inputEngine->setInputStruct(&p1Vehicle->input, 0);
 
 	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
+	p1Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
+	audioEngine->playEngineIdleSound(p1Vehicle);
+	/*
+	p1Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
+	p1Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);*/
+
 	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
+	p2Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
+	audioEngine->playEngineIdleSound(p2Vehicle);
+	/*
+	p2Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
+	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);*/
+
 
 	inputEngine->reverseCam.connect(&camera, &Camera::setReverseCam);
 	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
@@ -391,7 +403,7 @@ Game::~Game(void)
 		delete entities[i];
 	}
 	std::map<std::string, Renderable*>::iterator it;
-	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
+	for (it = ContentLoading::loadedModels.begin(); it != ContentLoading::loadedModels.end(); ++it) {
 		delete it->second;
 	}
 }

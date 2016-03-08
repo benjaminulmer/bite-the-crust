@@ -2,6 +2,9 @@
 
 namespace ContentLoading {
 
+	std::map<std::string, Renderable*> loadedModels;
+	std::map<std::string, GLuint> loadedTextures;
+
 // Loads and stores tuning data for vehicle from provided file
 bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	FILE* filePointer;
@@ -145,8 +148,14 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 
 		std::string renderableModelFile = entitiesArray[i]["model"].GetString();
 		renderableModelFile.insert(0, "res\\Models\\");
-		Renderable* r = createRenderable(renderableModelFile);
-		modelMap[name] = r;
+		Renderable* r;
+		if (loadedModels.find(renderableModelFile) == loadedModels.end()) {
+			r = createRenderable(renderableModelFile);
+			loadedModels[renderableModelFile] = r;
+			modelMap[name] = r;
+		} else {
+			modelMap[name] = loadedModels[renderableModelFile];
+		}
 
 		std::string physicsDataName = entitiesArray[i]["physics"].GetString();
 		physicsDataName.insert(0, "res\\JSON\\Physics\\");
@@ -156,7 +165,13 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 		if (entitiesArray[i].HasMember("texture")) {
 			std::string textureName = entitiesArray[i]["texture"].GetString();
 			textureName.insert(0, "res\\Textures\\");
-			textureMap[name] = loadDDS(textureName.c_str());
+			if (loadedTextures.find(textureName) == loadedTextures.end()) {
+				GLuint texture = loadDDS(textureName.c_str());
+				loadedTextures[textureName] = texture;
+				textureMap[name] = texture;
+			} else {
+				textureMap[name] = loadedTextures[textureName];
+			}
 		}
 	}
 

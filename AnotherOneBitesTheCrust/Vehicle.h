@@ -81,6 +81,9 @@ public:
 	void setPhysicsVehicle(physx::PxVehicleDrive4W* vehicle);
 
 	sigslot::signal1<Vehicle*> shootPizzaSignal;
+	sigslot::signal1<PhysicsEntity*> brakeSignal;
+	sigslot::signal1<PhysicsEntity*> idleSignal;
+	sigslot::signal1<PhysicsEntity*> gasSignal;
 
 	glm::vec3 getDestination();
 

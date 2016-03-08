@@ -33,9 +33,7 @@
                 {"name": "house", "x": 10, "z": 5}
 			],
 			"nodes": [ 
-				{"x" : 0, "z" : 1.0, "neighbours" : [1]},
-                {"x": 0.5, "z": 1.0, "neighbours": [0,2]},
-                {"x": 1, "z": 1, "neighbours": [1]}
+                {"x": 0.5, "z": 1.0, "neighbours": []}
 			]
 		},
         {

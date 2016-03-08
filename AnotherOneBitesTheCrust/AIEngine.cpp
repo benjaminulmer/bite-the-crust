@@ -101,15 +101,14 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 	if (distance > speed)
 	{
 		input->forward = 1.0;
-		input->backward = 0.0;
-		input->handBrake = false;
+		
 	}
 	else
 	{
 		input->forward = 0.0;
-		input->backward = 1.0;
-		input->handBrake = true;
 	}
+	input->backward = 0.0;
+	input->handBrake = false;
 	std::cout << "d = " << distance << " s = " << speed << " backward = " << input->backward << std::endl;
 	//std::cout << input->backward << std::endl;
 
@@ -168,14 +167,17 @@ inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, c
 bool AIEngine::tooClose(Vehicle * avoider, PhysicsEntity * avoiding)
 {
 	// Should be able to get this from the vehicle / house somehow
-	float carLength = 2; 
-	float objectWidth = 7;
+	float carLength = 2.5; 
+	float objectWidth = 4.5;
 
 	glm::vec3 forward(glm::normalize(avoider->getModelMatrix() * glm::vec4(0,0,1,0)));
 
 	if(sphereIntersect(forward, avoider->getPosition(), avoiding->getPosition(), objectWidth))
 	{
-		if(glm::length(avoider->getPosition() - avoiding->getPosition()) < (carLength + objectWidth))
+		float distanceToCenter = glm::length(avoider->getPosition() - avoiding->getPosition()) - carLength;
+		float objectCarRadius = (carLength + objectWidth);
+
+		if(distanceToCenter < objectCarRadius)
 			return true;
 
 	}
@@ -216,11 +218,12 @@ void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 	else
 	{
 
+		
 		// Find closest node
 		graphNode * closest = currentTile->nodes.at(0);
 		if(!closest)
 			return;
-		double minDist = -1;
+		double minDist = DBL_MAX;
 		for(graphNode * n : currentTile->nodes)
 		{
 			double currentDist = glm::length(toUpdate->getPosition() - closest->getPosition());
@@ -250,18 +253,6 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 			return;
 	}
 
-	Tile * currentTile = map.getTile(toUpdate->getPosition());
-	// Should be 'goal node' of this tile
-	graphNode * destinationNode = destination.location->nodes.at(0);
-	for(PhysicsEntity * obstacle : currentTile->staticEntities)
-	{
-		if(tooClose(toUpdate, obstacle))
-		{
-			avoid(toUpdate, obstacle, destinationNode);
-			return;
-		}
-	}
-
 	// Should be goal node
 	if(!equals(toUpdate->getDestination(), destination.location->nodes.at(0)->getPosition()))
 	{
@@ -280,10 +271,22 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 		if(toUpdate->currentPath.empty())
 		{
 			toUpdate->input.forward = 0;
-			toUpdate->input.backward = 0;
+			toUpdate->input.backward = 1;
 			toUpdate->input.handBrake = true;
 			return;
 		} 
+	}
+
+	Tile * currentTile = map.getTile(toUpdate->getPosition());
+	// Should be 'goal node' of this tile
+	graphNode * destinationNode = destination.location->nodes.at(0);
+	for(PhysicsEntity * obstacle : currentTile->staticEntities)
+	{
+		if(tooClose(toUpdate, obstacle))
+		{
+			avoid(toUpdate, obstacle, destinationNode);
+			return;
+		}
 	}
 	goToPoint(toUpdate, toUpdate->currentPath.at(0));
 }

@@ -19,7 +19,7 @@ AudioEngine::AudioEngine(void)
 
 
 	initStreams();
-	startBackgroundMusic();
+	//startBackgroundMusic();
 }
 
 AudioEngine::~AudioEngine(void)
@@ -89,24 +89,105 @@ Sound3D * AudioEngine::getOpenChannel()
 	return playingOn;
 }
 
-void AudioEngine::playCannonSound(PhysicsEntity * source)
+FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, PhysicsEntity * source)
 {
-	glm::vec3 pos = source->getPosition();
-
 	Sound3D * playingOn = getOpenChannel();
 	
 	if(!playingOn)
-		return;
+		return nullptr;
 
 	playingOn->source = source;
 
-	result = fmodSystem->playSound(cannonSound, 0, false, &playingOn->channel);
+	result = fmodSystem->playSound(sound, 0, false, &playingOn->channel);
 	playingOn->channel->setVolumeRamp(false); // For fixing popping noise at low volume.
 	playingOn->channel->set3DAttributes(&glmVec3ToFmodVec(pos), 0);
 	playingOn->channel->setPaused(false);
 
 	playing.push_back(playingOn);
 	errorCheck();
+
+	return playingOn->channel;
+}
+
+void AudioEngine::playCannonSound(PhysicsEntity * source)
+{
+	glm::vec3 pos = source->getPosition();
+
+	playSound(cannonSound, pos, source);
+}
+
+void AudioEngine::playBrakeSound(PhysicsEntity * source)
+{
+	glm::vec3 pos = source->getPosition();
+
+	FMOD::Channel * playingOn = loopingSounds[source];
+	FMOD::Sound * currentlyPlaying;  
+	if(playingOn == nullptr)
+	{
+		loopingSounds[source] = playSound(brakeSound, pos, source);
+		loopingSounds[source]->setVolume(0.3);
+		return;
+	}
+	result = playingOn->getCurrentSound(&currentlyPlaying);
+	errorCheck();
+	if(currentlyPlaying == brakeSound && stillPlaying(playingOn))
+		return;
+	else
+	{
+		loopingSounds[source] = playSound(brakeSound, pos, source);
+		loopingSounds[source]->setVolume(0.3);
+	}
+}
+
+
+/*
+* TODO: Work on state machine for car noises
+*/
+void AudioEngine::playEngineIdleSound(PhysicsEntity * source)
+{
+	glm::vec3 pos = source->getPosition();
+	playSound(engineIdleSound, pos, source);
+
+	//FMOD::Channel * playingOn = loopingSounds[source];
+	//FMOD::Sound * currentlyPlaying;  
+	//if(playingOn == nullptr)
+	//{
+	//	loopingSounds[source] = playSound(engineIdleSound, pos, source);
+	//	return;
+	//}
+	//result = playingOn->getCurrentSound(&currentlyPlaying);
+	//errorCheck();
+	//if(currentlyPlaying == engineIdleSound && stillPlaying(playingOn))
+	//	return;
+	//else
+	//{
+	//	playingOn->setPaused(true);
+	//	loopingSounds[source] = playSound(engineIdleSound, pos, source);
+	//}
+}
+
+void AudioEngine::playEngineRevSound(PhysicsEntity * source)
+{
+	glm::vec3 pos = source->getPosition();
+
+	FMOD::Channel * playingOn = loopingSounds[source];
+	FMOD::Sound * currentlyPlaying;  
+	if(playingOn == nullptr)
+	{
+		loopingSounds[source] = playSound(engineRevSound, pos, source);
+		loopingSounds[source]->setVolume(0.3);
+		return;
+	}
+	result = playingOn->getCurrentSound(&currentlyPlaying);
+	errorCheck();
+	if(currentlyPlaying == engineRevSound && stillPlaying(playingOn))
+		return;
+	else
+	{
+		playingOn->setPaused(true);
+		loopingSounds[source] = playSound(engineRevSound, pos, source);
+		loopingSounds[source]->setVolume(0.3);
+	}
 }
 
 void AudioEngine::initStreams()
@@ -116,6 +197,39 @@ void AudioEngine::initStreams()
 
 	result = fmodSystem->createSound("res\\Audio\\cannon.wav", FMOD_3D, 0, &cannonSound);
     errorCheck();
+
+	result = fmodSystem->createSound("res\\Audio\\engineIdle.wav", FMOD_LOOP_NORMAL | FMOD_3D, 0, &engineIdleSound);
+    errorCheck();
+
+	result = fmodSystem->createSound("res\\Audio\\engineRev.wav", FMOD_LOOP_NORMAL | FMOD_3D, 0, &engineRevSound);
+    errorCheck();
+
+	result = fmodSystem->createSound("res\\Audio\\brake.wav", FMOD_LOOP_OFF | FMOD_3D, 0, &brakeSound);
+    errorCheck();
+}
+
+bool AudioEngine::stillPlaying(FMOD::Channel * playingOn)
+{
+	FMOD::Sound * sound;
+
+
+	unsigned int soundPos;
+	unsigned int length;
+	result = playingOn->getPosition(&soundPos, FMOD_TIMEUNIT_MS);
+	errorCheck();
+	result = playingOn->getCurrentSound(&sound);
+	errorCheck();
+
+	// TODO: EngineIdle is being returned as not playing at some point
+	if(sound == engineIdleSound)
+		return true;
+	
+	result = sound->getLength(&length, FMOD_TIMEUNIT_MS);
+	errorCheck();
+	bool paused;
+	result = playingOn->getPaused(&paused);
+
+	return (soundPos < length) && !paused;
 }
 
 void AudioEngine::update3DPositions()
@@ -124,18 +238,16 @@ void AudioEngine::update3DPositions()
 		for(std::list<Sound3D*>::iterator i = playing.begin(); i != playing.end(); i++)
 	{
 			Sound3D * s = *i;
-			FMOD::Sound * sound;
-
-			unsigned int soundPos;
-			unsigned int length;
-			result = s->channel->getPosition(&soundPos, FMOD_TIMEUNIT_MS);
-			errorCheck();
-			result = s->channel->getCurrentSound(&sound);
-			errorCheck();
-			result = sound->getLength(&length, FMOD_TIMEUNIT_MS);
-			errorCheck();
-			if(soundPos >= length)
+		
+			if(!stillPlaying(s->channel))
 			{
+				FMOD::Sound * sound;
+				result = s->channel->getCurrentSound(&sound);
+				errorCheck();
+
+				if(sound == brakeSound)
+					loopingSounds[s->source] = nullptr;
+
 				s->channel = nullptr;
 				s->source = nullptr;
 				availablePointers.push_back(s);

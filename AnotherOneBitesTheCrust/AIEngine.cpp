@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-const int MIN_DIST = 10;
+const int MIN_DIST = 6;
 
 AIEngine::AIEngine(void)
 {
@@ -109,7 +109,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 	}
 	input->backward = 0.0;
 	input->handBrake = false;
-	std::cout << "d = " << distance << " s = " << speed << " backward = " << input->backward << std::endl;
+	//std::cout << "d = " << distance << " s = " << speed << " backward = " << input->backward << std::endl;
 	//std::cout << input->backward << std::endl;
 
 	/*ratio *= 2;

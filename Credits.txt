@@ -8,3 +8,12 @@ Construction Barrier model by PagDev
 	http://opengameart.org/content/construction-barrier-3d
 
 The Compressionator
+
+engineRev.wav
+	http://www.freesound.org/people/ReadeOnly/sounds/186960/
+
+engineIdle.wav
+	http://www.freesound.org/people/ReadeOnly/sounds/186939/
+
+brake.wav
+	http://www.freesound.org/people/Iberian_Runa/sounds/217542/

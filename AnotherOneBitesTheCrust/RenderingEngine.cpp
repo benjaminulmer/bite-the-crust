@@ -31,13 +31,9 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
-	GLuint mvpID = glGetUniformLocation(textureProgramID, "MVP");
-	GLuint vID = glGetUniformLocation(textureProgramID, "V");
-	GLuint mID = glGetUniformLocation(textureProgramID, "M");
-	GLuint tID = glGetUniformLocation(textureProgramID, "myTextureSampler");
-	GLuint normalID = glGetUniformLocation(textureProgramID, "normalMatrix");
 
-	glUniform3f(glGetUniformLocation(textureProgramID, "LightPosition_worldspace"), 35, 90, 35);
+
+	glUniform3f(lightPos, 100, 100, 100);
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
@@ -96,6 +92,13 @@ void RenderingEngine::generateIDs()
 	string texfsSource = loadShaderStringfromFile(texfsShader);
 	textureProgramID = CreateShaderProgram(texvsSource, texfsSource);
 	glUseProgram(textureProgramID);
+	//get shader location
+	mvpID = glGetUniformLocation(textureProgramID, "MVP");
+	vID = glGetUniformLocation(textureProgramID, "V");
+	mID = glGetUniformLocation(textureProgramID, "M");
+	tID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+	normalID = glGetUniformLocation(textureProgramID, "normalMatrix");
+	lightPos = glGetUniformLocation(textureProgramID, "LightPosition_worldspace");
 
 	string shadowVsShader = "res\\Shaders\\basic_vs.glsl";
 	string shadowFsShader = "res\\Shaders\\basic_fs.glsl";

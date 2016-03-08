@@ -57,7 +57,6 @@ namespace ContentLoading
 	GLuint loadDDS(const char * imagepath);
 
 	extern std::map<std::string, Renderable*> loadedModels;
-	extern std::map<std::string, PhysicsEntityInfo*> loadedPhysics;
 	extern std::map<std::string, GLuint> loadedTextures;
 };
 

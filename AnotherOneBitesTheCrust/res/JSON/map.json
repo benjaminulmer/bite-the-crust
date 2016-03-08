@@ -88,6 +88,7 @@
 			"pickup": true,
 			"ground": "lawn",
 			"entities": [
+                {"name": "billboard", "x": 10, "z": 10, "rotation": 35}
 			],
 			"nodes": [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},

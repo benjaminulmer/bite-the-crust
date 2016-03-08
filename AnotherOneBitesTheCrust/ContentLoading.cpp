@@ -3,7 +3,6 @@
 namespace ContentLoading {
 
 	std::map<std::string, Renderable*> loadedModels;
-	std::map<std::string, PhysicsEntityInfo*> loadedPhysics;
 	std::map<std::string, GLuint> loadedTextures;
 
 // Loads and stores tuning data for vehicle from provided file
@@ -160,13 +159,8 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 
 		std::string physicsDataName = entitiesArray[i]["physics"].GetString();
 		physicsDataName.insert(0, "res\\JSON\\Physics\\");
-		if (loadedPhysics.find(physicsDataName) == loadedPhysics.end()) {
-			PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
-			loadedPhysics[physicsDataName] = info;
-			physicsMap[name] = info;
-		} else {
-			physicsMap[name] = loadedPhysics[physicsDataName];
-		}
+		PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
+		physicsMap[name] = info;
 
 		if (entitiesArray[i].HasMember("texture")) {
 			std::string textureName = entitiesArray[i]["texture"].GetString();

@@ -18,7 +18,7 @@ glm::vec3 WheelEntity::getPosition()
 
 glm::mat4 WheelEntity::getModelMatrix()
 {
-	glm::mat4 vehicleMatrix = vehicle->DynamicEntity::getModelMatrix();
+	glm::mat4 vehicleMatrix = vehicle->getModelMatrix();
 	PxMat44 oldM(physicsShape->getLocalPose());
 	
 	glm::mat4 newM;

@@ -54,14 +54,24 @@ public:
 	GLuint TextureID;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//////////////////////BLOB SHADOWS////////////////////////////////////
+	//////////////////////MISC////////////////////////////////////
 	GLuint shadowProgramID;
 	GLuint sphereVAO;
 	GLuint sphereVertBuffer;
 	GLuint sphereColorBuffer;
 	std::vector<glm::vec3> shadowVertices;
-	void setupShadowBuffers();
+
+	GLuint skyVAO;
+	GLuint skyVertBuffer;
+	GLuint skyUVBuffer;
+	GLuint skyNormalBuffer;
+	std::vector<glm::vec3> skyVertices;
+	std::vector <glm::vec3> skyNorms;
+	std::vector <glm::vec2> skyUVs;
+	GLuint skyTex;
+	void setupMiscBuffers();
 	void drawShadow(glm::vec3 position);
+	void drawSkybox(glm::vec3 position);
 
 	//int init_resourses();
 	//void render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy);
@@ -81,6 +91,8 @@ public:
 	GLuint tID;
 	GLuint normalID;
 	GLuint lightPos;
+	GLuint lightPow;
+	GLuint ambientScale;
 
 	GLuint basicProgramID;		//shader program 
 

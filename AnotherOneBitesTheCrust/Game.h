@@ -44,7 +44,7 @@ private:
 
 	void initSystems();
 	void setupEntities();
-	void setupVehicle(Vehicle* vehicle, physx::PxTransform transform);
+	void setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num);
 	void connectSystems();
 	void mainLoop();
 	void processSDLEvents();

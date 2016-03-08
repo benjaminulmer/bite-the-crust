@@ -175,9 +175,15 @@ Renderable* createRenderable(std::string modelFile) {
 
 	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals, faces, raw_verts);
 
-	r->verts = verts;
-	r->uvs = uvs;
-	r->norms = normals;
+	std::vector<unsigned short> indices;
+	std::vector<glm::vec3> indexed_vertices;
+	std::vector<glm::vec2> indexed_uvs;
+	std::vector<glm::vec3> indexed_normals;
+	ContentLoading::indexVBO(verts, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
+	r->verts = indexed_vertices;
+	r->uvs = indexed_uvs;
+	r->norms = indexed_normals;
+	r->drawFaces = indices;
 	r->faces = faces;
 
 	return r;
@@ -568,6 +574,65 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 	return true;
 }
 
+
+bool ContentLoading::same(float v1, float v2)
+{
+	return fabs( v1-v2 ) < 0.01f;
+}
+
+bool ContentLoading::getSimilarVertexIndex( 
+	glm::vec3 & in_vertex, 
+	glm::vec2 & in_uv, 
+	glm::vec3 & in_normal, 
+	std::vector<glm::vec3> & out_vertices,
+	std::vector<glm::vec2> & out_uvs,
+	std::vector<glm::vec3> & out_normals,
+	unsigned short & result
+){
+	for ( unsigned int i=0; i<out_vertices.size(); i++ ){
+		if (
+			ContentLoading::same( in_vertex.x , out_vertices[i].x ) &&
+			ContentLoading::same( in_vertex.y , out_vertices[i].y ) &&
+			ContentLoading::same( in_vertex.z , out_vertices[i].z ) &&
+			ContentLoading::same( in_uv.x     , out_uvs     [i].x ) &&
+			ContentLoading::same( in_uv.y     , out_uvs     [i].y ) &&
+			ContentLoading::same( in_normal.x , out_normals [i].x ) &&
+			ContentLoading::same( in_normal.y , out_normals [i].y ) &&
+			ContentLoading::same( in_normal.z , out_normals [i].z )
+		){
+			result = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+void ContentLoading::indexVBO(
+	std::vector<glm::vec3> & in_vertices,
+	std::vector<glm::vec2> & in_uvs,
+	std::vector<glm::vec3> & in_normals,
+
+	std::vector<unsigned short> & out_indices,
+	std::vector<glm::vec3> & out_vertices,
+	std::vector<glm::vec2> & out_uvs,
+	std::vector<glm::vec3> & out_normals
+){
+	for ( unsigned int i=0; i<in_vertices.size(); i++ ){
+		unsigned short index;
+		bool found = getSimilarVertexIndex(in_vertices[i], in_uvs[i], in_normals[i],     out_vertices, out_uvs, out_normals, index);
+		if ( found ){
+			out_indices.push_back( index );
+		}else{
+			out_vertices.push_back( in_vertices[i]);
+			out_uvs     .push_back( in_uvs[i]);
+			out_normals .push_back( in_normals[i]);
+			out_indices .push_back( (unsigned short)out_vertices.size() - 1 );
+		}
+	}
+}
+
+
+
 bool ContentLoading::loadOBJ(
 	const char * path, 
 	std::vector<glm::vec3> & out_vertices, 
@@ -608,7 +673,7 @@ bool ContentLoading::loadOBJ(
 		}else if ( strcmp( lineHeader, "vt" ) == 0 ){
 			glm::vec2 uv;
 			fscanf_s(file, "%f %f\n", &uv.x, &uv.y );
-			uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
+			uv.y = -uv.y; 
 			temp_uvs.push_back(uv);
 		}else if ( strcmp( lineHeader, "vn" ) == 0 ){
 			glm::vec3 normal;
@@ -618,10 +683,7 @@ bool ContentLoading::loadOBJ(
 			std::string vertex1, vertex2, vertex3;
 			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
 			int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
-			if (matches != 9){
-				printf("File can't be read by our simple parser :-( Try exporting with other options\n");
-				return false;
-			}
+
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
 			vertexIndices.push_back(vertexIndex[2]);

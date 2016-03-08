@@ -55,5 +55,9 @@ namespace ContentLoading
 		std::vector<GLuint> &out_faces,
 		std::vector<glm::vec3> & raw_verts);
 	GLuint loadDDS(const char * imagepath);
+
+	extern std::map<std::string, Renderable*> loadedModels;
+	extern std::map<std::string, PhysicsEntityInfo*> loadedPhysics;
+	extern std::map<std::string, GLuint> loadedTextures;
 };
 

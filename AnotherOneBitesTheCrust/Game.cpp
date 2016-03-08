@@ -391,7 +391,7 @@ Game::~Game(void)
 		delete entities[i];
 	}
 	std::map<std::string, Renderable*>::iterator it;
-	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it) {
+	for (it = ContentLoading::loadedModels.begin(); it != ContentLoading::loadedModels.end(); ++it) {
 		delete it->second;
 	}
 }

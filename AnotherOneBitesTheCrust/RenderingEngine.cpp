@@ -33,7 +33,9 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	glUseProgram(textureProgramID);
 
 
-	glUniform3f(lightPos, 100, 100, 100);
+	glUniform3f(lightPos, 100.0f, 100.0f, 100.0f);
+	glUniform1f(lightPow, 5000.0f);
+	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
@@ -52,7 +54,6 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(M));
 		glUniformMatrix4fv(normalID, 1, GL_FALSE, value_ptr(normal));
 
-
 		glBindVertexArray(entities[i]->getRenderable()->vao);
 		GLuint tex = entities[i]->getTexture();
 		glActiveTexture(GL_TEXTURE0);
@@ -61,9 +62,11 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
 		glUniform1i(tID, 0);
-		glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+		//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+		
+		glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
+
 		glBindVertexArray(0);
-		//glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->faces.size(), GL_UNSIGNED_INT, (void*)0);
 	}
 }
 
@@ -99,6 +102,8 @@ void RenderingEngine::generateIDs()
 	tID = glGetUniformLocation(textureProgramID, "myTextureSampler");
 	normalID = glGetUniformLocation(textureProgramID, "normalMatrix");
 	lightPos = glGetUniformLocation(textureProgramID, "LightPosition_worldspace");
+	lightPow = glGetUniformLocation(textureProgramID, "LightPower");
+	ambientScale = glGetUniformLocation(textureProgramID, "AmbientScale");
 
 	string shadowVsShader = "res\\Shaders\\basic_vs.glsl";
 	string shadowFsShader = "res\\Shaders\\basic_fs.glsl";
@@ -132,17 +137,19 @@ void RenderingEngine::assignBuffersTex(Renderable* r)
 	GLuint vertexBuffer;
 	GLuint uvBuffer;
 	GLuint normalBuffer;
-	//GLuint indexBuffer;
+	GLuint indexBuffer;
 	GLuint vao;
 
 	glGenVertexArrays(1, &vao);			//vao
 	glGenBuffers(1, &vertexBuffer);		//vertices vbo
 	glGenBuffers(1, &uvBuffer);
 	glGenBuffers(1, &normalBuffer);		//color vbo
+	glGenBuffers(1, &indexBuffer);
 
 	vector<vec3> vertices = r->verts;
 	vector<vec2> uvs = r->uvs;
 	vector<vec3> normals = r->norms;
+	vector<unsigned short> faces = r->drawFaces;
 
 	glBindVertexArray(vao);
 
@@ -154,6 +161,9 @@ void RenderingEngine::assignBuffersTex(Renderable* r)
 
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*normals.size(), normals.data(), GL_STATIC_DRAW);		//buffering normal data
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * faces.size(), faces.data(), GL_STATIC_DRAW);
 
 	r->vbo = vertexBuffer;
 	//r->setColourVBO(normalBuffer);
@@ -299,9 +309,71 @@ void RenderingEngine::printText2D(const char * text, int x, int y, int size){
 
 }
 
-void RenderingEngine::setupShadowBuffers()
+void RenderingEngine::setupMiscBuffers()
 {
 
+//loading sky
+	glUseProgram(textureProgramID);
+	glGenBuffers(1, &skyVertBuffer);		//vertices vbo
+	glGenBuffers(1, &skyUVBuffer);
+	glGenBuffers(1, &skyNormalBuffer);		//color vbo
+
+	std::vector<GLuint> skyfaces;
+	std::vector<glm::vec3> skyraw_verts;
+
+	ContentLoading::loadOBJ("res\\Models\\Skybox.obj", skyVertices, skyUVs, skyNorms, skyfaces, skyraw_verts);
+
+	glGenVertexArrays(1, &skyVAO);
+	glBindVertexArray(skyVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, skyVertBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*skyVertices.size(), skyVertices.data(), GL_STATIC_DRAW);	//buffering vertex data
+
+	glBindBuffer(GL_ARRAY_BUFFER, skyUVBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec2)*skyUVs.size(), skyUVs.data(), GL_STATIC_DRAW);	//buffering uv data
+
+	glBindBuffer(GL_ARRAY_BUFFER, skyNormalBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*skyNorms.size(), skyNorms.data(), GL_STATIC_DRAW);		//buffering normal data
+
+	//bind to shaders
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, skyVertBuffer);
+	glVertexAttribPointer(
+		0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, skyUVBuffer);
+	glVertexAttribPointer(
+		1,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+	
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, skyNormalBuffer);
+	glVertexAttribPointer(
+		2,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0);
+
+	glBindVertexArray(0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+
+	skyTex = ContentLoading::loadDDS("res\\Textures\\Skybox.DDS");
+
+//Loading shadows
 	glUseProgram(shadowProgramID);
 
 	std::vector<glm::vec2> uvs;
@@ -362,7 +434,8 @@ void RenderingEngine::setupShadowBuffers()
 
 void RenderingEngine::drawShadow(glm::vec3 position)
 {
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
+	//drawing shadow
 	glUseProgram(shadowProgramID);
 
 	// Use VAO that holds buffer bindings
@@ -382,6 +455,37 @@ void RenderingEngine::drawShadow(glm::vec3 position)
 		value_ptr(MVP)	// pointer to data in Mat4f
 		);
 	glDrawArrays(GL_TRIANGLES, 0, shadowVertices.size());
+	glBindVertexArray(0);
+
+}
+
+void RenderingEngine::drawSkybox(glm::vec3 position)
+{
+		//Drawing skybox
+	glUseProgram(textureProgramID);
+
+	glUniform3f(lightPos, 35.0f, 90.0f, 35.0f);
+	glUniform1f(lightPow, 0.0f);
+	glUniform3f(ambientScale, 1, 1, 1);
+
+
+	M = mat4(1.0f);
+	M = translate(M, position);
+	mat4 MVP = P * V * M;
+	glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
+	glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(V));
+	glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(M));
+
+
+	glBindVertexArray(skyVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, skyTex);
+		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
+
+	// Set our "myTextureSampler" sampler to user Texture Unit 0
+	glUniform1i(tID, 0);
+	glDrawArrays(GL_TRIANGLES, 0, skyVertices.size());
+		
 	glBindVertexArray(0);
 }
 

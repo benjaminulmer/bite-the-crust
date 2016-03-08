@@ -19,7 +19,7 @@ AudioEngine::AudioEngine(void)
 
 
 	initStreams();
-	//startBackgroundMusic();
+	startBackgroundMusic();
 }
 
 AudioEngine::~AudioEngine(void)

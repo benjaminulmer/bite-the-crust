@@ -35,7 +35,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 
 	glUniform3f(lightPos, 100.0f, 100.0f, 100.0f);
 	glUniform1f(lightPow, 5000.0f);
-	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
+	glUniform3f(ambientScale, 0.6, 0.6, 0.6);
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())

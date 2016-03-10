@@ -89,14 +89,25 @@ void Vehicle::update()
 	(input.handBrake) ? handBrake = 1.0f: handBrake = 0.0f;
 
 	// Check if gear should switch from reverse to forward or vise versa
-	if (forwardSpeed < 5 && input.backward > 0)
+	if (forwardSpeed == 0) 
+	{
+		if (input.forward > 0)
+		{
+			physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+		}
+		else if (input.backward > 0) 
+		{
+			physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+		}
+	}
+	else if (forwardSpeed < 5 && input.backward > 0)
 	{
 		physicsVehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eREVERSE);
 	}
 	else if (forwardSpeed > -5 && input.forward > 0)
 	{
 		physicsVehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eFIRST);
-	}
+	}	
 
 	// Determine how to apply controller input depending on current gear
 	if (physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE)

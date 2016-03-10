@@ -114,12 +114,20 @@ void Vehicle::update()
 	{
 		vehicleInput.setAnalogAccel(input.backward);
 		vehicleInput.setAnalogBrake(input.forward);
+		if(input.forward > 0 && forwardSpeed < 0)
+			brakeSignal(this);
 	} 
 	else 
 	{
 		vehicleInput.setAnalogAccel(input.forward);
 		vehicleInput.setAnalogBrake(input.backward);
+		/*if(input.forward > 0)
+			gasSignal(this);*/
+		if(input.backward > 0 && forwardSpeed > 0)
+			brakeSignal(this);
 	}
+	/*if(input.forward == 0 && input.backward == 0)
+		idleSignal(this);*/
 
 	// Steer and handbrake
 	vehicleInput.setAnalogSteer(input.steer);

@@ -242,7 +242,6 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			info->dynamicInfo->angularDamping = (float)dynamicInfo["angularDamping"].GetDouble();
 		}
 	}
-	//if (d.HasMember("rotation
 
 	glm::vec3 dims = model->getDimensions();
 	info->yPosOffset = dims.y * 0.5f;

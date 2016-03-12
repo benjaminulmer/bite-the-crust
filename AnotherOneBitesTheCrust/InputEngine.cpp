@@ -67,6 +67,10 @@ void InputEngine::controllerButtonDown(SDL_Event e)
 	{
 		unFucker();
 	}
+	else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
+	{
+		inputs[e.cdevice.which]->jump = true;
+	}
 }
 
 void InputEngine::controllerButtonUp(SDL_Event e)

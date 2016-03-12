@@ -13,6 +13,7 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	input.steer = 0;
 	input.handBrake = false;
 	input.shootPizza = false;
+	input.jump = false;
 
 	stepSizeS = stepSizeMS/100.0f;
 	tipAngle = 0;
@@ -142,6 +143,13 @@ void Vehicle::update()
 			pizzaCount--;
 		}
 		input.shootPizza = false;
+	}
+
+	if (input.jump)
+	{
+		PxRigidBody* rigid = (PxRigidBody*)actor;
+		rigid->addForce(PxVec3(0, 500, 0), PxForceMode::eACCELERATION);
+		input.jump = false;
 	}
 }
 

@@ -190,8 +190,6 @@ Renderable* createRenderable(std::string modelFile) {
 
 	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals, faces, raw_verts);
 
-	std::cout << faces.size() * 3 << std::endl;
-
 	std::vector<unsigned short> indices;
 	std::vector<glm::vec3> indexed_vertices;
 	std::vector<glm::vec2> indexed_uvs;
@@ -645,8 +643,6 @@ void ContentLoading::indexVBO(
 			out_indices .push_back( (unsigned short)out_vertices.size() - 1 );
 		}
 	}
-	std::cout << out_vertices.size() << std::endl;
-	std::cout << "done" << std::endl;
 }
 
 
@@ -740,7 +736,6 @@ bool ContentLoading::loadOBJ(
 		out_normals .push_back(normal);
 	
 	}
-	std::cout << out_vertices.size() << std::endl;
 	fclose(file);
 	return true;
 }

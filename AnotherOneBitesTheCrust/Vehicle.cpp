@@ -147,12 +147,12 @@ void Vehicle::update()
 		input.shootPizza = false;
 	}
 
-	/*if (input.jump)
+	if (input.jump)
 	{
 		PxRigidBody* rigid = (PxRigidBody*)actor;
 		rigid->addForce(PxVec3(0, 500, 0), PxForceMode::eACCELERATION);
 		input.jump = false;
-	}*/
+	}
 }
 
 glm::mat4 Vehicle::getModelMatrix()

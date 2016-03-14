@@ -3,6 +3,7 @@
 PhysicsEntity::PhysicsEntity(void)
 {
 	actor = nullptr;
+	type = EntityType::PHYSICS;
 }
 
 

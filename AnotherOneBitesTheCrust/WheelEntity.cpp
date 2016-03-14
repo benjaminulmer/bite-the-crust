@@ -6,6 +6,8 @@ WheelEntity::WheelEntity(Vehicle* vehicle, PxShape* physicsShape)
 {
 	this->vehicle = vehicle;
 	this->physicsShape = physicsShape;
+
+	type = EntityType::WHEEL;
 }
 
 glm::vec3 WheelEntity::getPosition()

@@ -2,11 +2,23 @@
 #include "Renderable.h"
 #include <glm.hpp>
 
+enum class EntityType
+{
+	BASE,
+	PHYSICS,
+	DYNAMIC,
+	VEHICLE,
+	WHEEL
+};
+
 class Entity
 {
 public:
 	Entity(void);
 	~Entity(void);
+
+	EntityType type;
+	void testPrint();
 
 	// THESE NEED TO DIE IN A FIRE
 	void setDefaultRotation(float radians, glm::vec3 axis);

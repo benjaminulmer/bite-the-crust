@@ -88,7 +88,7 @@ struct TriangleMeshInfo
 	: public ShapeInfo
 {
 	std::vector<glm::vec3> verts;
-	std::vector<unsigned int> faces;
+	std::vector<unsigned short> faces;
 };
 
 struct PhysicsEntityInfo

@@ -272,6 +272,7 @@ void Game::mainLoop()
 			p1Vehicle->update();
 			p2Vehicle->update();
 		
+			physicsEngine->AISweep();
 			physicsEngine->simulate(PHYSICS_STEP_MS);
 
 			// Update the camera position buffer with new location

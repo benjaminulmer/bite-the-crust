@@ -18,6 +18,8 @@ public:
 
 	std::vector<physx::PxVec3> glmVertsToPhysXVerts(std::vector<glm::vec3> verts);
 
+	std::vector<physx::PxU32> u16ToU32Faces(std::vector<unsigned short> faces);
+
 private:
 	physx::PxPhysics* physics;
 	physx::PxCooking* cooking;

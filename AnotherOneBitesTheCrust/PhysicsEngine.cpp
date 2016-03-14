@@ -133,8 +133,9 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		{
 			TriangleMeshInfo* tmInfo = (TriangleMeshInfo*)sInfo;
 			std::vector<PxVec3> verts = helper->glmVertsToPhysXVerts(tmInfo->verts);
+			std::vector<PxU32> faces = helper->u16ToU32Faces(tmInfo->faces);
 
-			PxTriangleMesh* mesh = helper->createTriangleMesh(verts.data(), verts.size(), tmInfo->faces.data(), tmInfo->faces.size());
+			PxTriangleMesh* mesh = helper->createTriangleMesh(verts.data(), verts.size(), faces.data(), faces.size());
 			geometry = new PxTriangleMeshGeometry(mesh);
 
 			std::cout << "verts: " << tmInfo->verts.size() << std::endl;
@@ -234,6 +235,26 @@ void PhysicsEngine::tuningFromUserTuning(Vehicle* vehicle)
 
 	tuning->chassisMaterial = physics->createMaterial(tuning->chassisStaticFriction, tuning->chassisDynamicFriction, tuning->chassisRestitution);
 	tuning->wheelMaterial = physics->createMaterial(tuning->wheelStaticFriction, tuning->wheelDynamicFriction, tuning->wheelRestitution);
+}
+
+void PhysicsEngine::AISweep()
+{
+	PxRaycastBuffer hit;
+	PxGeometry shape = PxBoxGeometry(0.5f, 0.5, 0.5f);
+	PxTransform transform = PxTransform(-10, 100, -10);
+	PxVec3 dir(0, 1, 0);
+	PxVec3 origin(0, 2, 0);
+	bool result = scene->raycast(origin, dir, 1.0f, hit);
+
+	if (hit.hasBlock) 
+	{
+		PxRaycastHit test = hit.block;
+		
+
+		std::cout << std::boolalpha;
+		std::cout << test.position.x << " : " << test.position.y << " : " << test.position.z << std::endl;
+	}
+	
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs)

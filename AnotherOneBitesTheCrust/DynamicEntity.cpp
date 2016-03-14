@@ -2,6 +2,7 @@
 
 DynamicEntity::DynamicEntity(void)
 {
+	type = EntityType::DYNAMIC;
 }
 
 DynamicEntity::~DynamicEntity(void)

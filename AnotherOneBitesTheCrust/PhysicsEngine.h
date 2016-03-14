@@ -19,10 +19,12 @@ public:
 	
 	void createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info, physx::PxTransform transform);
 	void createVehicle(Vehicle* vehicle, physx::PxTransform transform);
-	//TODO make this not suck
 	void createPizzaPickup(physx::PxVec3 location, physx::PxF32 radius);
 
+	void AISweep();
+
 	SimulationCallback* simulationCallback;
+
 private:
 	static const int MAX_VEHICLES = 4;
 	PhysicsHelper* helper;

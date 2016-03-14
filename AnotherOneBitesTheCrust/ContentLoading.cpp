@@ -190,6 +190,8 @@ Renderable* createRenderable(std::string modelFile) {
 
 	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals, faces, raw_verts);
 
+	std::cout << faces.size() * 3 << std::endl;
+
 	std::vector<unsigned short> indices;
 	std::vector<glm::vec3> indexed_vertices;
 	std::vector<glm::vec2> indexed_uvs;
@@ -289,7 +291,7 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
 				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
 				triangleMesh->verts = model->verts;
-				triangleMesh->faces = model->faces;
+				triangleMesh->faces = model->drawFaces;
 				shape = triangleMesh;
 			}
 			
@@ -643,6 +645,8 @@ void ContentLoading::indexVBO(
 			out_indices .push_back( (unsigned short)out_vertices.size() - 1 );
 		}
 	}
+	std::cout << out_vertices.size() << std::endl;
+	std::cout << "done" << std::endl;
 }
 
 
@@ -710,7 +714,6 @@ bool ContentLoading::loadOBJ(
 			out_faces.push_back(vertexIndex[0]-1);
 			out_faces.push_back(vertexIndex[1]-1);
 			out_faces.push_back(vertexIndex[2]-1);
-			raw_verts = temp_vertices;
 		}else{
 			// Probably a comment, eat up the rest of the line
 			char stupidBuffer[1000];
@@ -718,7 +721,6 @@ bool ContentLoading::loadOBJ(
 		}
 
 	}
-
 	// For each vertex of each triangle
 	for( unsigned int i=0; i<vertexIndices.size(); i++ ){
 
@@ -738,7 +740,7 @@ bool ContentLoading::loadOBJ(
 		out_normals .push_back(normal);
 	
 	}
-
+	std::cout << out_vertices.size() << std::endl;
 	fclose(file);
 	return true;
 }

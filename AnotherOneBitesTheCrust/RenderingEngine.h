@@ -19,14 +19,15 @@
 #include "Camera.h"
 #include "ContentLoading.h"
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include <FTGL\ftgl.h>
 
 class RenderingEngine
 {
 public:
 	RenderingEngine(void);
 	~RenderingEngine(void);	
+
+	void testFTGL();
 
 	void displayFunc(std::vector<Entity*> entities);
 	void displayFuncTex(std::vector<Entity*> entities);
@@ -82,9 +83,12 @@ public:
 
 	void initText2D(const char * texturePath);
 	void printText2D(const char * text, int x, int y, int size);
+	void printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color);
+	void printText2Doutline2(const char * text, int x, int y, int size, glm::vec4 color);
 	void cleanupText2D();
 
 	GLuint textProgramID;			//shader
+	GLuint colorID;
 	GLuint textTextureID;			//texture
 	GLuint Text2DVertexBufferID;	//vertex buffer
 	GLuint Text2DUVBufferID;		//UV buffer

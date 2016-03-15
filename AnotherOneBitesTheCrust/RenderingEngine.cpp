@@ -20,8 +20,10 @@ RenderingEngine::RenderingEngine()
 
 RenderingEngine::~RenderingEngine(void) {}
 
+
 //vehicle dimensions
 //x: 2.5, y:2, z:5
+
 
 void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 {
@@ -88,6 +90,7 @@ void RenderingEngine::generateIDs()
 	string textFsSource = loadShaderStringfromFile(textFsShader);
 	textProgramID = CreateShaderProgram(textVsSource, textFsSource);
 	glUseProgram(textProgramID);
+	colorID = glGetUniformLocation(textProgramID, "color");
 
 	string texvsShader = "res\\Shaders\\textured-StandardShading.vertexshader";
 	string texfsShader = "res\\Shaders\\textured-StandardShading.fragmentshader";
@@ -220,7 +223,14 @@ void RenderingEngine::initText2D(const char * texturePath){
 	textTextureID = ContentLoading::loadDDS(texturePath);
 }
 
-void RenderingEngine::printText2D(const char * text, int x, int y, int size){
+void RenderingEngine::printText2D(const char * text, int x, int y, int size)
+{
+	
+	printText2Doutline(text, x+1, y+1, size+0.5, glm::vec4(0,0,0,1));
+	printText2Doutline(text, x, y, size, glm::vec4(1,1,1,1));
+}
+
+void RenderingEngine::printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color){
 
 
 	unsigned int length = strlen(text);
@@ -292,8 +302,11 @@ void RenderingEngine::printText2D(const char * text, int x, int y, int size){
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE_MINUS_SRC_ALPHA,GL_SRC_ALPHA);
 	//glDisable(GL_CULL_FACE);
-   // glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
+
+	glUniform4f(colorID, color.x, color.y, color.z, color.a);
 
 	// Draw call
 	glBindVertexArray(textVAO);
@@ -308,6 +321,7 @@ void RenderingEngine::printText2D(const char * text, int x, int y, int size){
 	glDeleteBuffers(1, &Text2DUVBufferID);
 
 }
+
 
 void RenderingEngine::setupMiscBuffers()
 {
@@ -622,3 +636,16 @@ void RenderingEngine::setupMinimap(Map map)
 //
 //	glBindVertexArray(0);
 //}
+
+
+void RenderingEngine::testFTGL()
+{
+	FTGLPixmapFont font("res\\Fonts\\comic.ttf");
+	if(font.Error())
+		exit(1);
+
+
+	font.FaceSize(72);
+	font.Render("Hello World!");
+
+}

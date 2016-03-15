@@ -86,6 +86,8 @@ void Game::initSystems()
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
 	renderingEngine->setupMiscBuffers();
+
+
 }
 
 // Create and initialize all loaded entities in the game world
@@ -314,10 +316,13 @@ void Game::mainLoop()
 		pizzas.append(to_string(p1Vehicle->pizzaCount));
 		renderingEngine->printText2D(pizzas.data(), 800, 680, 24);
 
+
 		//swap buffers
 		SDL_GL_SwapWindow(window);
 		physicsEngine->fetchSimulationResults();
 	}
+
+
 }
 
 // Loop over all SDL events since last frame and call appropriate for each type of event

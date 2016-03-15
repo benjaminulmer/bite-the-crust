@@ -73,6 +73,9 @@ public:
 	void drawShadow(glm::vec3 position);
 	void drawSkybox(glm::vec3 position);
 
+
+	void setupMinimap(Map map);
+
 	//int init_resourses();
 	//void render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy);
 	//void displayText();

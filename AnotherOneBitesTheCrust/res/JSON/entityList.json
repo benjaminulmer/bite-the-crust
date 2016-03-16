@@ -1,8 +1,8 @@
 {
     "entities": [
-        {"name": "road-straight", "model": "Straight.obj", "physics": "tile.json", "texture": "Straight-colored.DDS"},
-        {"name": "road-turn", "model": "Turn.obj", "physics": "tile.json", "texture": "Turn-colored.DDS"},
-		{"name": "lawn", "model": "Lawn.obj", "physics": "tile.json", "texture": "lawn.DDS"},
+        {"name": "road-straight", "model": "Straight.obj", "physics": "default.json", "texture": "Straight-colored.DDS"},
+        {"name": "road-turn", "model": "Turn.obj", "physics": "default.json", "texture": "Turn-colored.DDS"},
+		{"name": "lawn", "model": "Lawn.obj", "physics": "default.json", "texture": "lawn.DDS"},
         {"name": "box", "model": "PizzaBox-centered.obj", "physics": "box.json", "texture": "PizzaBox-colored.DDS"},
 		{"name": "wheel", "model": "wheel.obj", "physics": "default.json", "texture": "wheel-colored.DDS"},
         {"name": "ramp", "model": "bigramp.obj", "physics": "ramp.json", "texture": "ramp.DDS"},

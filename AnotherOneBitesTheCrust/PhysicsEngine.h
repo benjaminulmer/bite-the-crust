@@ -21,7 +21,7 @@ public:
 	void createVehicle(Vehicle* vehicle, physx::PxTransform transform);
 	void createPizzaPickup(physx::PxVec3 location, physx::PxF32 radius);
 
-	void AISweep();
+	void AISweep(Vehicle* vehicle);
 
 	SimulationCallback* simulationCallback;
 

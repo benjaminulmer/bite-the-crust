@@ -71,6 +71,10 @@ void PhysicsEngine::initVehicleSDK()
 
 	drivingSurfaces[0] = physics->createMaterial(0.8f, 0.8f, 0.6f);
 	frictionPairs = FrictionPairs::createFrictionPairs(drivingSurfaces[0]);
+
+	// Create a plane and add it to the scene
+	groundPlane = helper->createDrivablePlane(drivingSurfaces[0]);
+	scene->addActor(*groundPlane);
 }
 
 // Creates an physics entity from an entity info structure and a starting transform
@@ -230,38 +234,42 @@ void PhysicsEngine::tuningFromUserTuning(Vehicle* vehicle)
 	tuning->wheelMaterial = physics->createMaterial(tuning->wheelStaticFriction, tuning->wheelDynamicFriction, tuning->wheelRestitution);
 }
 
-void PhysicsEngine::AISweep()
+void PhysicsEngine::AISweep(Vehicle* vehicle)
 {
-	PxSweepBuffer hit;
-	PxGeometry shape = PxBoxGeometry(0.5f, 0.5, 0.5f);
-	PxTransform transform = PxTransform(10, 1, 20);
-	PxVec3 dir(0, 0, 1);
-	bool result = scene->sweep(shape, transform, dir, 10.0f, hit);
+	PxTransform transform = vehicle->getActor()->getGlobalPose();
 
-	if (hit.hasBlock) 
+	PxF32 xOffset = (vehicle->tuning.chassisDims.x * 0.5f) + 0.1f;
+	PxF32 zOffset = (vehicle->tuning.chassisDims.y * 0.5f) + 0.1f;
+
+	PxVec3 offset1 = transform.rotate(PxVec3(-xOffset, 0, zOffset));
+	PxVec3 offset2 = transform.rotate(PxVec3(xOffset, 0, zOffset));
+
+	PxVec3 origin1 = offset1 + transform.p;
+	PxVec3 origin2 = offset2 + transform.p;
+	PxVec3 direction = transform.rotate(PxVec3(0, 0, 1));
+	PxF32 distance = 10;
+	PxRaycastBuffer hit1;
+	PxRaycastBuffer hit2;
+
+	scene->raycast(origin1, direction, distance, hit1);
+	scene->raycast(origin2, direction, distance, hit2);
+
+	if (hit1.hasBlock) 
 	{
-		PxSweepHit test = hit.block;
+		PxRaycastHit test = hit1.block;
 		Entity* entity = (Entity*)test.actor->userData;
-		entity->testPrint();
+		//entity->testPrint();
 		std::cout << std::boolalpha;
 		std::cout << test.position.x << " : " << test.position.y << " : " << test.position.z << std::endl;
 	}
-	
-	/*PxRaycastBuffer hit;
-	PxGeometry shape = PxBoxGeometry(0.5f, 0.5, 0.5f);
-	PxTransform transform = PxTransform(-10, 100, -10);
-	PxVec3 dir(0, 0, 1);
-	PxVec3 origin(10, 1, 20);
-	bool result = scene->raycast(origin, dir, 10.0f, hit);
-
-	if (hit.hasBlock) 
-	{
-		PxRaycastHit test = hit.block;
-		
-
+	else if (hit2.hasBlock)
+		{
+		PxRaycastHit test = hit2.block;
+		Entity* entity = (Entity*)test.actor->userData;
+		//entity->testPrint();
 		std::cout << std::boolalpha;
 		std::cout << test.position.x << " : " << test.position.y << " : " << test.position.z << std::endl;
-	}*/
+	}
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs)

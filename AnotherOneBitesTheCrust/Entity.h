@@ -7,6 +7,7 @@ enum class EntityType
 	BASE,
 	PHYSICS,
 	DYNAMIC,
+	PIZZABOX,
 	VEHICLE,
 	WHEEL
 };

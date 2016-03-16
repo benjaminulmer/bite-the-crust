@@ -71,10 +71,6 @@ void PhysicsEngine::initVehicleSDK()
 
 	drivingSurfaces[0] = physics->createMaterial(0.8f, 0.8f, 0.6f);
 	frictionPairs = FrictionPairs::createFrictionPairs(drivingSurfaces[0]);
-
-	// Create a plane and add it to the scene
-	//groundPlane = helper->createDrivablePlane(drivingSurfaces[0]);
-	//scene->addActor(*groundPlane);
 }
 
 // Creates an physics entity from an entity info structure and a starting transform
@@ -137,9 +133,6 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 
 			PxTriangleMesh* mesh = helper->createTriangleMesh(verts.data(), verts.size(), faces.data(), faces.size());
 			geometry = new PxTriangleMeshGeometry(mesh);
-
-			std::cout << "verts: " << tmInfo->verts.size() << std::endl;
-			std::cout << "faces: " << tmInfo->faces.size() << std::endl;
 		}
 		PxShape* shape = actor->createShape(*geometry, *material); // TODO support shape flags
 		shape->setLocalPose(sInfo->transform);
@@ -239,12 +232,27 @@ void PhysicsEngine::tuningFromUserTuning(Vehicle* vehicle)
 
 void PhysicsEngine::AISweep()
 {
-	PxRaycastBuffer hit;
+	PxSweepBuffer hit;
+	PxGeometry shape = PxBoxGeometry(0.5f, 0.5, 0.5f);
+	PxTransform transform = PxTransform(10, 1, 20);
+	PxVec3 dir(0, 0, 1);
+	bool result = scene->sweep(shape, transform, dir, 10.0f, hit);
+
+	if (hit.hasBlock) 
+	{
+		PxSweepHit test = hit.block;
+		Entity* entity = (Entity*)test.actor->userData;
+		entity->testPrint();
+		std::cout << std::boolalpha;
+		std::cout << test.position.x << " : " << test.position.y << " : " << test.position.z << std::endl;
+	}
+	
+	/*PxRaycastBuffer hit;
 	PxGeometry shape = PxBoxGeometry(0.5f, 0.5, 0.5f);
 	PxTransform transform = PxTransform(-10, 100, -10);
-	PxVec3 dir(0, 1, 0);
-	PxVec3 origin(0, 2, 0);
-	bool result = scene->raycast(origin, dir, 1.0f, hit);
+	PxVec3 dir(0, 0, 1);
+	PxVec3 origin(10, 1, 20);
+	bool result = scene->raycast(origin, dir, 10.0f, hit);
 
 	if (hit.hasBlock) 
 	{
@@ -253,8 +261,7 @@ void PhysicsEngine::AISweep()
 
 		std::cout << std::boolalpha;
 		std::cout << test.position.x << " : " << test.position.y << " : " << test.position.z << std::endl;
-	}
-	
+	}*/
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs)

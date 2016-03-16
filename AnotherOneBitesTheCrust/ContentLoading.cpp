@@ -196,6 +196,7 @@ Renderable* createRenderable(std::string modelFile) {
 	std::vector<glm::vec3> indexed_normals;
 	ContentLoading::indexVBO(verts, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
 	r->verts = indexed_vertices;
+	r->raw_verts = raw_verts;
 	r->uvs = indexed_uvs;
 	r->norms = indexed_normals;
 	r->drawFaces = indices;
@@ -288,8 +289,8 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			else if (shapeName == "triangleMesh") {
 				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
 				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
-				triangleMesh->verts = model->verts;
-				triangleMesh->faces = model->drawFaces;
+				triangleMesh->verts = model->raw_verts;
+				triangleMesh->faces = model->faces;
 				shape = triangleMesh;
 			}
 			
@@ -717,6 +718,8 @@ bool ContentLoading::loadOBJ(
 		}
 
 	}
+	raw_verts = temp_vertices;
+
 	// For each vertex of each triangle
 	for( unsigned int i=0; i<vertexIndices.size(); i++ ){
 

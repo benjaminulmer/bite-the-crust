@@ -129,7 +129,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		{
 			TriangleMeshInfo* tmInfo = (TriangleMeshInfo*)sInfo;
 			std::vector<PxVec3> verts = helper->glmVertsToPhysXVerts(tmInfo->verts);
-			std::vector<PxU32> faces = helper->u16ToU32Faces(tmInfo->faces);
+			std::vector<PxU32> faces = tmInfo->faces;
 
 			PxTriangleMesh* mesh = helper->createTriangleMesh(verts.data(), verts.size(), faces.data(), faces.size());
 			geometry = new PxTriangleMeshGeometry(mesh);

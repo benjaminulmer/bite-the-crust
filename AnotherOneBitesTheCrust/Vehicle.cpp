@@ -54,9 +54,9 @@ void Vehicle::setSteerSpeedData()
 	steerVsSpeedData[4] = 30.0f;         steerVsSpeedData[5] = 0.125f;
 	steerVsSpeedData[6] = 120.0f;        steerVsSpeedData[7] = 0.1f;
 	steerVsSpeedData[8] = PX_MAX_F32;    steerVsSpeedData[9] = PX_MAX_F32;
-	steerVsSpeedData[10] = PX_MAX_F32;    steerVsSpeedData[11] = PX_MAX_F32;
-	steerVsSpeedData[12] = PX_MAX_F32;    steerVsSpeedData[13] = PX_MAX_F32;
-	steerVsSpeedData[14] = PX_MAX_F32;    steerVsSpeedData[15] = PX_MAX_F32;
+	steerVsSpeedData[10] = PX_MAX_F32;   steerVsSpeedData[11] = PX_MAX_F32;
+	steerVsSpeedData[12] = PX_MAX_F32;   steerVsSpeedData[13] = PX_MAX_F32;
+	steerVsSpeedData[14] = PX_MAX_F32;   steerVsSpeedData[15] = PX_MAX_F32;
 	steerVsSpeedTable = PxFixedSizeLookupTable<8>(steerVsSpeedData, 4); 
 }
 

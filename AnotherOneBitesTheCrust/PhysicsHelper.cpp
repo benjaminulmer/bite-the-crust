@@ -27,6 +27,8 @@ PxConvexMesh* PhysicsHelper::createConvexMesh(const PxVec3* verts, const PxU32 n
 	return convexMesh;
 }
 
+#include <iostream>
+
 PxTriangleMesh* PhysicsHelper::createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxU32* faces, const PxU32 numFaces)
 {
 	PxTriangleMeshDesc meshDesc;
@@ -44,6 +46,9 @@ PxTriangleMesh* PhysicsHelper::createTriangleMesh(const PxVec3* verts, const PxU
 	{
 		PxDefaultMemoryInputData id(buf.getData(), buf.getSize());
 		triangleMesh = physics->createTriangleMesh(id);
+	}
+	else {
+		std::cout << "bad triangle mesh" << std::endl;
 	}
 
 	return triangleMesh;

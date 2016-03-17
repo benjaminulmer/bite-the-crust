@@ -264,6 +264,7 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 		toReturn.radius = (hitPoint - actorCentre).magnitude();
 		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
 		toReturn.entity = (Entity*)hit.actor->userData;
+		toReturn.distance = hit.distance;
 
 		return toReturn;
 	}
@@ -277,6 +278,7 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 		toReturn.radius = (hitPoint - actorCentre).magnitude();
 		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
 		toReturn.entity = (Entity*)hit.actor->userData;
+		toReturn.distance = hit.distance;
 
 		return toReturn;
 	}

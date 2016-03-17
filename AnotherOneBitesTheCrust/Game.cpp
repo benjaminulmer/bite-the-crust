@@ -268,9 +268,9 @@ void Game::mainLoop()
 			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
-			physicsEngine->AISweep(p1Vehicle);
-			//physicsEngine->AISweep(p2Vehicle);
-			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map);
+			//physicsEngine->AISweep(p1Vehicle);
+			AICollisionEntity closest = physicsEngine->AISweep(p2Vehicle);
+			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map, closest);
 			p1Vehicle->update();
 			p2Vehicle->update();
 		

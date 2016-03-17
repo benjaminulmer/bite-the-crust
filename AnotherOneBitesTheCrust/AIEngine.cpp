@@ -95,43 +95,34 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	float cosAngle = glm::dot(desiredDirection, forward);
 	float leftCosAngle = glm::dot(desiredDirection, left);
 
-	float speed = driver->getPhysicsVehicle()->computeForwardSpeed();
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
+	// TODO: Should divide by half the map or something
 	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)1);
-	printf("%f\n", gas);
 
+	// TODO: Maybe put these in an init file for tuning purposes?
 	if (gas > 0.3)
 	{
 		input->forward = gas;
 		input->backward = 0;
 	}
 	else
-	{
-		input->backward = gas;
-		input->forward = 0;
-	}
+		brake(driver, 1 - gas);
 	
 	input->handBrake = false;
 
 	if(ratio > 0.1)
 	{
 		if(leftCosAngle > 0)
-		{
 			input->steer = ratio;
-		}
 		else
-		{
 			input->steer = -ratio;
-		}
 	}
 	else
 	{
 		input->steer = 0;
 		if (rand()%100 < 5)
-		{
 			input->shootPizza = true;
-		}
 	}
 }
 
@@ -152,28 +143,28 @@ inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, c
 	return true;
 }
 
-bool AIEngine::tooClose(Vehicle * avoider, PhysicsEntity * avoiding)
+bool AIEngine::tooClose(Vehicle * avoider, AICollisionEntity & avoiding)
 {
-	// Should be able to get this from the vehicle / house somehow
-	float carLength = 2.5; 
-	float objectWidth = 4.5;
+	//// Should be able to get this from the vehicle / house somehow
+	//float carLength = 2.5; 
+	//float objectWidth = 4.5;
 
-	glm::vec3 forward(glm::normalize(avoider->getModelMatrix() * glm::vec4(0,0,1,0)));
+	//glm::vec3 forward(glm::normalize(avoider->getModelMatrix() * glm::vec4(0,0,1,0)));
 
-	if(sphereIntersect(forward, avoider->getPosition(), avoiding->getPosition(), objectWidth))
-	{
-		float distanceToCenter = glm::length(avoider->getPosition() - avoiding->getPosition()) - carLength;
-		float objectCarRadius = (carLength + objectWidth);
+	//if(sphereIntersect(forward, avoider->getPosition(), avoiding->getPosition(), objectWidth))
+	//{
+	//	float distanceToCenter = glm::length(avoider->getPosition() - avoiding->getPosition()) - carLength;
+	//	float objectCarRadius = (carLength + objectWidth);
 
-		if(distanceToCenter < objectCarRadius)
-			return true;
+	//	if(distanceToCenter < objectCarRadius)
+	//		return true;
 
-	}
+	//}
 
 	return false;
 }
 
-void AIEngine::avoid(Vehicle * driver, PhysicsEntity * obstacle, graphNode * destinationNode)
+void AIEngine::avoid(Vehicle * driver, graphNode * destinationNode)
 {
 	glm::vec3 desiredDirection = glm::normalize(destinationNode->getPosition() - driver->getPosition());
 	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
@@ -183,14 +174,9 @@ void AIEngine::avoid(Vehicle * driver, PhysicsEntity * obstacle, graphNode * des
 	driver->input.forward = 0.0;
 
 	if(leftCosAngle > 0)
-	{
 		driver->input.steer = -1.0;
-	}
-	else
-	{
-		
+	else	
 		driver->input.steer = 1.0;
-	}
 }
 
 void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
@@ -231,7 +217,19 @@ inline bool equals(glm::vec3 x, glm::vec3 y)
 	return x.x == y.x && x.y == y.y && x.z == y.z;
 }
 
-void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map) 
+void AIEngine::brake(Vehicle* toUpdate, const float & amount)
+{
+	float speed = toUpdate->getPhysicsVehicle()->computeForwardSpeed();
+
+	if(speed > 0)
+			toUpdate->input.backward = amount;
+		else
+			toUpdate->input.backward = 0;
+		
+		toUpdate->input.forward = 0;
+}
+
+void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICollisionEntity & obstacle) 
 { 
 	
 	if(toUpdate->currentPath.empty())
@@ -258,9 +256,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 
 		if(toUpdate->currentPath.empty())
 		{
-			toUpdate->input.forward = 0;
-			toUpdate->input.backward = 1;
-			toUpdate->input.handBrake = true;
+			brake(toUpdate, 1);
 			return;
 		} 
 	}
@@ -268,13 +264,10 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
 	graphNode * destinationNode = destination.location->nodes.at(0);
-	for(PhysicsEntity * obstacle : currentTile->staticEntities)
+	if(obstacle.distance < 2)
 	{
-		if(tooClose(toUpdate, obstacle))
-		{
-			avoid(toUpdate, obstacle, destinationNode);
-			return;
-		}
+		avoid(toUpdate, destinationNode);
+		return;
 	}
 	goToPoint(toUpdate, toUpdate->currentPath.at(0), glm::length(destinationNode->getPosition() - toUpdate->getPosition()));
 }

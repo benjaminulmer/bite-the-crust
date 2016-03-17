@@ -13,7 +13,6 @@
 #include <glew.h>
 #include <map>
 
-#include <FTGL\ftgl.h>
 
 enum class GameState
 {

@@ -19,8 +19,6 @@
 #include "Camera.h"
 #include "ContentLoading.h"
 
-#include <FTGL\ftgl.h>
-
 class RenderingEngine
 {
 public:
@@ -100,6 +98,7 @@ public:
 	GLuint lightPos;
 	GLuint lightPow;
 	GLuint ambientScale;
+	GLint basicmvpID;
 
 	GLuint basicProgramID;		//shader program 
 

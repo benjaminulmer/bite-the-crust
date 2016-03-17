@@ -117,6 +117,8 @@ void RenderingEngine::generateIDs()
 	glGenVertexArrays(1, &sphereVAO);
 	glGenBuffers(1, &sphereVertBuffer);
 	glGenBuffers(1, &sphereColorBuffer);
+	basicmvpID = glGetUniformLocation(shadowProgramID, "MVP");
+
 
 }
 
@@ -456,14 +458,13 @@ void RenderingEngine::drawShadow(glm::vec3 position)
 	// and attribute config of buffers
 	glBindVertexArray(sphereVAO);
 	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
-	GLint mvpID = glGetUniformLocation(shadowProgramID, "MVP");
-
+	
 
 	M = mat4(1.0f);
 	M = translate(M, glm::vec3(position.x, 0.01, position.z));
 	mat4 MVP = P * V * M;
 
-	glUniformMatrix4fv(mvpID,		// ID
+	glUniformMatrix4fv(basicmvpID,		// ID
 		1,		// only 1 matrix
 		GL_FALSE,	// transpose matrix, Mat4f is row major
 		value_ptr(MVP)	// pointer to data in Mat4f
@@ -506,7 +507,24 @@ void RenderingEngine::drawSkybox(glm::vec3 position)
 
 void RenderingEngine::setupMinimap(Map map)
 {
+	for(int i = 0; i < map.tiles.size(); i++)
+	{
+		for(int j = 0; j < map.tiles[i].size(); j++)
+		{
+			Tile* tile = &map.tiles[i][j];
 
+			//cout << "TEST ";
+			Entity* ground = tile->ground;
+			glm::vec3 pos = ground->getDefaultTranslation();
+
+			cout << pos.x << " " << pos.y << " " << pos.z << " ";
+
+			if(tile->groundModel == "road-straight" || tile->groundModel == "road-turn")
+				cout << "ROAD" << endl;
+		}
+
+		cout << endl;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -637,15 +655,3 @@ void RenderingEngine::setupMinimap(Map map)
 //	glBindVertexArray(0);
 //}
 
-
-void RenderingEngine::testFTGL()
-{
-	FTGLPixmapFont font("res\\Fonts\\comic.ttf");
-	if(font.Error())
-		exit(1);
-
-
-	font.FaceSize(72);
-	font.Render("Hello World!");
-
-}

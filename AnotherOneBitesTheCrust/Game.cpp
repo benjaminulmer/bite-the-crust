@@ -178,6 +178,7 @@ void Game::setupEntities()
 	camera.setLookAtPosition(p1Vehicle->getPosition());
 	camera.setUpVector(glm::vec3(0,1,0));
 	renderingEngine->updateView(camera);
+	renderingEngine->setupMinimap(map);
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)

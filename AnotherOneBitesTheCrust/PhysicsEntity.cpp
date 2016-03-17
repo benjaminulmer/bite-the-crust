@@ -3,6 +3,7 @@
 PhysicsEntity::PhysicsEntity(void)
 {
 	actor = nullptr;
+	type = EntityType::PHYSICS;
 }
 
 
@@ -28,7 +29,7 @@ glm::vec3 PhysicsEntity::getPosition()
 
 void PhysicsEntity::setPosition(glm::vec3 pos)
 {
-	actor->setGlobalPose(physx::PxTransform(physx::PxVec3(pos.x, pos.y, pos.z),physx::PxQuat(physx::PxIdentity)));
+	actor->setGlobalPose(physx::PxTransform(pos.x, pos.y, pos.z));
 }
 
 glm::mat4 PhysicsEntity::getModelMatrix()
@@ -43,11 +44,4 @@ glm::mat4 PhysicsEntity::getModelMatrix()
 		}
 	}
 	return newM;
-}
-
-#include <iostream>
-
-void PhysicsEntity::onSleep()
-{
-	std::cout << "!!!TEST!!!" << std::endl;
 }

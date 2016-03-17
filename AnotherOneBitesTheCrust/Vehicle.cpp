@@ -13,6 +13,7 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	input.steer = 0;
 	input.handBrake = false;
 	input.shootPizza = false;
+	input.jump = false;
 
 	stepSizeS = stepSizeMS/100.0f;
 	tipAngle = 0;
@@ -22,6 +23,8 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	setSteerSpeedData();
 
 	pizzaCount = 3;
+
+	type = EntityType::VEHICLE;
 }
 
 glm::vec3 Vehicle::getDestination()
@@ -51,9 +54,9 @@ void Vehicle::setSteerSpeedData()
 	steerVsSpeedData[4] = 30.0f;         steerVsSpeedData[5] = 0.125f;
 	steerVsSpeedData[6] = 120.0f;        steerVsSpeedData[7] = 0.1f;
 	steerVsSpeedData[8] = PX_MAX_F32;    steerVsSpeedData[9] = PX_MAX_F32;
-	steerVsSpeedData[10] = PX_MAX_F32;    steerVsSpeedData[11] = PX_MAX_F32;
-	steerVsSpeedData[12] = PX_MAX_F32;    steerVsSpeedData[13] = PX_MAX_F32;
-	steerVsSpeedData[14] = PX_MAX_F32;    steerVsSpeedData[15] = PX_MAX_F32;
+	steerVsSpeedData[10] = PX_MAX_F32;   steerVsSpeedData[11] = PX_MAX_F32;
+	steerVsSpeedData[12] = PX_MAX_F32;   steerVsSpeedData[13] = PX_MAX_F32;
+	steerVsSpeedData[14] = PX_MAX_F32;   steerVsSpeedData[15] = PX_MAX_F32;
 	steerVsSpeedTable = PxFixedSizeLookupTable<8>(steerVsSpeedData, 4); 
 }
 
@@ -142,6 +145,13 @@ void Vehicle::update()
 			pizzaCount--;
 		}
 		input.shootPizza = false;
+	}
+
+	if (input.jump)
+	{
+		PxRigidBody* rigid = (PxRigidBody*)actor;
+		rigid->addForce(PxVec3(0, 500, 0), PxForceMode::eACCELERATION);
+		input.jump = false;
 	}
 }
 

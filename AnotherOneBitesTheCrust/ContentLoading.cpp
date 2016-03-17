@@ -196,6 +196,7 @@ Renderable* createRenderable(std::string modelFile) {
 	std::vector<glm::vec3> indexed_normals;
 	ContentLoading::indexVBO(verts, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
 	r->verts = indexed_vertices;
+	r->raw_verts = raw_verts;
 	r->uvs = indexed_uvs;
 	r->norms = indexed_normals;
 	r->drawFaces = indices;
@@ -242,7 +243,6 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			info->dynamicInfo->angularDamping = (float)dynamicInfo["angularDamping"].GetDouble();
 		}
 	}
-	//if (d.HasMember("rotation
 
 	glm::vec3 dims = model->getDimensions();
 	info->yPosOffset = dims.y * 0.5f;
@@ -289,7 +289,7 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			else if (shapeName == "triangleMesh") {
 				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
 				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
-				triangleMesh->verts = model->verts;
+				triangleMesh->verts = model->raw_verts;
 				triangleMesh->faces = model->faces;
 				shape = triangleMesh;
 			}
@@ -711,7 +711,6 @@ bool ContentLoading::loadOBJ(
 			out_faces.push_back(vertexIndex[0]-1);
 			out_faces.push_back(vertexIndex[1]-1);
 			out_faces.push_back(vertexIndex[2]-1);
-			raw_verts = temp_vertices;
 		}else{
 			// Probably a comment, eat up the rest of the line
 			char stupidBuffer[1000];
@@ -719,6 +718,7 @@ bool ContentLoading::loadOBJ(
 		}
 
 	}
+	raw_verts = temp_vertices;
 
 	// For each vertex of each triangle
 	for( unsigned int i=0; i<vertexIndices.size(); i++ ){
@@ -739,7 +739,6 @@ bool ContentLoading::loadOBJ(
 		out_normals .push_back(normal);
 	
 	}
-
 	fclose(file);
 	return true;
 }

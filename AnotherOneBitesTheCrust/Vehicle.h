@@ -10,6 +10,9 @@ struct VehicleInput
 	float backward;
 	bool handBrake;
 	bool shootPizza;
+
+	// inputs for cheats
+	bool jump;
 };
 
 struct VehicleTuning

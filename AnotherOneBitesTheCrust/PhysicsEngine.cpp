@@ -133,12 +133,10 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		{
 			TriangleMeshInfo* tmInfo = (TriangleMeshInfo*)sInfo;
 			std::vector<PxVec3> verts = helper->glmVertsToPhysXVerts(tmInfo->verts);
+			std::vector<PxU32> faces = tmInfo->faces;
 
-			PxTriangleMesh* mesh = helper->createTriangleMesh(verts.data(), verts.size(), tmInfo->faces.data(), tmInfo->faces.size());
+			PxTriangleMesh* mesh = helper->createTriangleMesh(verts.data(), verts.size(), faces.data(), faces.size());
 			geometry = new PxTriangleMeshGeometry(mesh);
-
-			std::cout << "verts: " << tmInfo->verts.size() << std::endl;
-			std::cout << "faces: " << tmInfo->faces.size() << std::endl;
 		}
 		PxShape* shape = actor->createShape(*geometry, *material); // TODO support shape flags
 		shape->setLocalPose(sInfo->transform);
@@ -234,6 +232,54 @@ void PhysicsEngine::tuningFromUserTuning(Vehicle* vehicle)
 
 	tuning->chassisMaterial = physics->createMaterial(tuning->chassisStaticFriction, tuning->chassisDynamicFriction, tuning->chassisRestitution);
 	tuning->wheelMaterial = physics->createMaterial(tuning->wheelStaticFriction, tuning->wheelDynamicFriction, tuning->wheelRestitution);
+}
+
+AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
+{
+	PxTransform transform = vehicle->getActor()->getGlobalPose();
+
+	PxF32 xOffset = (vehicle->tuning.chassisDims.x * 0.5f) + 0.1f;
+	PxF32 zOffset = (vehicle->tuning.chassisDims.z * 0.5f) + 0.1f;
+
+	PxVec3 offset1 = transform.rotate(PxVec3(-xOffset, 0, zOffset));
+	PxVec3 offset2 = transform.rotate(PxVec3(xOffset, 0, zOffset));
+
+	PxVec3 origin1 = offset1 + transform.p;
+	PxVec3 origin2 = offset2 + transform.p;
+	PxVec3 direction = transform.rotate(PxVec3(0, 0, 1));
+	PxF32 distance = 10;
+	PxRaycastBuffer buffer1;
+	PxRaycastBuffer buffer2;
+
+	scene->raycast(origin1, direction, distance, buffer1);
+	scene->raycast(origin2, direction, distance, buffer2);
+
+	if (buffer1.hasBlock) 
+	{
+		AICollisionEntity toReturn = AICollisionEntity();
+		PxRaycastHit hit = buffer1.block;
+
+		PxVec3 actorCentre = hit.actor->getGlobalPose().p;
+		PxVec3 hitPoint = hit.position;
+		toReturn.radius = (hitPoint - actorCentre).magnitude();
+		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
+		toReturn.entity = (Entity*)hit.actor->userData;
+
+		return toReturn;
+	}
+	else if (buffer2.hasBlock)
+	{
+		AICollisionEntity toReturn = AICollisionEntity();
+		PxRaycastHit hit = buffer2.block;
+
+		PxVec3 actorCentre = hit.actor->getGlobalPose().p;
+		PxVec3 hitPoint = hit.position;
+		toReturn.radius = (hitPoint - actorCentre).magnitude();
+		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
+		toReturn.entity = (Entity*)hit.actor->userData;
+
+		return toReturn;
+	}
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs)

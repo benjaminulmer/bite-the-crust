@@ -83,3 +83,13 @@ std::vector<PxVec3> PhysicsHelper::glmVertsToPhysXVerts(std::vector<glm::vec3> v
 	return toReturn;
 }
 
+std::vector<PxU32> PhysicsHelper::u16ToU32Faces(std::vector<unsigned short> faces)
+{
+	std::vector<PxU32> toReturn = std::vector<PxU32>(); 
+	for (auto face : faces)
+	{
+		toReturn.push_back((PxU32)face);
+	}
+
+	return toReturn;
+}

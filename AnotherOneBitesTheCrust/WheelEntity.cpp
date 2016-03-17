@@ -6,11 +6,13 @@ WheelEntity::WheelEntity(Vehicle* vehicle, PxShape* physicsShape)
 {
 	this->vehicle = vehicle;
 	this->physicsShape = physicsShape;
+
+	type = EntityType::WHEEL;
 }
 
 glm::vec3 WheelEntity::getPosition()
 {
-	PxTransform vehicleTransform = vehicle->getDynamicActor()->getGlobalPose();
+	PxTransform vehicleTransform = vehicle->getActor()->getGlobalPose();
 	PxTransform transform = physicsShape->getLocalPose();
 	transform = transform * vehicleTransform;
 	return glm::vec3(transform.p.x, transform.p.y, transform.p.z); 

@@ -1,23 +1,14 @@
 #include "DynamicEntity.h"
 
-
 DynamicEntity::DynamicEntity(void)
 {
+	type = EntityType::DYNAMIC;
 }
-
 
 DynamicEntity::~DynamicEntity(void)
 {
 }
 
-void DynamicEntity::setActor(physx::PxRigidDynamic* a) {
-	actor = a;
-}
-
-physx::PxRigidActor* DynamicEntity::getActor() {
-	return actor;
-}
-
-physx::PxRigidDynamic* DynamicEntity::getDynamicActor() {
-	return (physx::PxRigidDynamic*)(actor);
+physx::PxRigidDynamic* DynamicEntity::getRigidDynamic() {
+	return (physx::PxRigidDynamic*)actor;
 }

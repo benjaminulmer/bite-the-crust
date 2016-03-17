@@ -234,12 +234,12 @@ void PhysicsEngine::tuningFromUserTuning(Vehicle* vehicle)
 	tuning->wheelMaterial = physics->createMaterial(tuning->wheelStaticFriction, tuning->wheelDynamicFriction, tuning->wheelRestitution);
 }
 
-void PhysicsEngine::AISweep(Vehicle* vehicle)
+AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 {
 	PxTransform transform = vehicle->getActor()->getGlobalPose();
 
 	PxF32 xOffset = (vehicle->tuning.chassisDims.x * 0.5f) + 0.1f;
-	PxF32 zOffset = (vehicle->tuning.chassisDims.y * 0.5f) + 0.1f;
+	PxF32 zOffset = (vehicle->tuning.chassisDims.z * 0.5f) + 0.1f;
 
 	PxVec3 offset1 = transform.rotate(PxVec3(-xOffset, 0, zOffset));
 	PxVec3 offset2 = transform.rotate(PxVec3(xOffset, 0, zOffset));
@@ -248,27 +248,37 @@ void PhysicsEngine::AISweep(Vehicle* vehicle)
 	PxVec3 origin2 = offset2 + transform.p;
 	PxVec3 direction = transform.rotate(PxVec3(0, 0, 1));
 	PxF32 distance = 10;
-	PxRaycastBuffer hit1;
-	PxRaycastBuffer hit2;
+	PxRaycastBuffer buffer1;
+	PxRaycastBuffer buffer2;
 
-	scene->raycast(origin1, direction, distance, hit1);
-	scene->raycast(origin2, direction, distance, hit2);
+	scene->raycast(origin1, direction, distance, buffer1);
+	scene->raycast(origin2, direction, distance, buffer2);
 
-	if (hit1.hasBlock) 
+	if (buffer1.hasBlock) 
 	{
-		PxRaycastHit test = hit1.block;
-		Entity* entity = (Entity*)test.actor->userData;
-		//entity->testPrint();
-		std::cout << std::boolalpha;
-		std::cout << test.position.x << " : " << test.position.y << " : " << test.position.z << std::endl;
+		AICollisionEntity toReturn = AICollisionEntity();
+		PxRaycastHit hit = buffer1.block;
+
+		PxVec3 actorCentre = hit.actor->getGlobalPose().p;
+		PxVec3 hitPoint = hit.position;
+		toReturn.radius = (hitPoint - actorCentre).magnitude();
+		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
+		toReturn.entity = (Entity*)hit.actor->userData;
+
+		return toReturn;
 	}
-	else if (hit2.hasBlock)
-		{
-		PxRaycastHit test = hit2.block;
-		Entity* entity = (Entity*)test.actor->userData;
-		//entity->testPrint();
-		std::cout << std::boolalpha;
-		std::cout << test.position.x << " : " << test.position.y << " : " << test.position.z << std::endl;
+	else if (buffer2.hasBlock)
+	{
+		AICollisionEntity toReturn = AICollisionEntity();
+		PxRaycastHit hit = buffer2.block;
+
+		PxVec3 actorCentre = hit.actor->getGlobalPose().p;
+		PxVec3 hitPoint = hit.position;
+		toReturn.radius = (hitPoint - actorCentre).magnitude();
+		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
+		toReturn.entity = (Entity*)hit.actor->userData;
+
+		return toReturn;
 	}
 }
 

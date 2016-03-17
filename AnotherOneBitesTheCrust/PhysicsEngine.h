@@ -7,6 +7,7 @@
 #include "Vehicle.h"
 #include "PhysicsEntityInfo.h"
 #include "SimulationCallback.h"
+#include "AICollisionEntity.h"
 
 class PhysicsEngine
 {
@@ -21,7 +22,7 @@ public:
 	void createVehicle(Vehicle* vehicle, physx::PxTransform transform);
 	void createPizzaPickup(physx::PxVec3 location, physx::PxF32 radius);
 
-	void AISweep(Vehicle* vehicle);
+	AICollisionEntity AISweep(Vehicle* vehicle);
 
 	SimulationCallback* simulationCallback;
 

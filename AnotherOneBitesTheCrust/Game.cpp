@@ -219,17 +219,17 @@ void Game::connectSystems()
 
 	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 	p1Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-	audioEngine->playEngineIdleSound(p1Vehicle);
-	/*
+	//audioEngine->playEngineIdleSound(p1Vehicle);
+	
 	p1Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
-	p1Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);*/
+	p1Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
 
 	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 	p2Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-	audioEngine->playEngineIdleSound(p2Vehicle);
-	/*
+	//audioEngine->playEngineIdleSound(p2Vehicle);
+	
 	p2Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
-	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);*/
+	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
 
 
 	inputEngine->reverseCam.connect(&camera, &Camera::setReverseCam);

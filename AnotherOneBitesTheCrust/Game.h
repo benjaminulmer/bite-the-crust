@@ -62,7 +62,7 @@ private:
 	SDL_Surface *text;
 	
 	GameState gameState;
-	Camera camera;
+	Camera* camera;
 	Vehicle* p1Vehicle, *p2Vehicle;
 
 	PhysicsEntityInfo* pizzaInfo;
@@ -72,10 +72,5 @@ private:
 	std::map<std::string, PhysicsEntityInfo*> physicsEntityInfoMap;
 	std::map<std::string, GLuint> textureMap;
 	Map map;
-
-	// vehicle location for previous frames 
-	static const int CAMERA_POS_BUFFER_SIZE = 10;
-	glm::vec3 cameraPosBuffer[CAMERA_POS_BUFFER_SIZE];
-	int cameraPosBufferIndex;
 };
 

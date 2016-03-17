@@ -166,16 +166,8 @@ void Game::setupEntities()
 	p2Vehicle = new Vehicle(PHYSICS_STEP_MS);
 	setupVehicle(p2Vehicle, physx::PxTransform(30, 2, 20), 1);
 
-	// Initialize player location buffer for camera
-	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
-	{
-		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
-	}
-	cameraPosBufferIndex = 0;
-	camera.setPosition(cameraPosBuffer[CAMERA_POS_BUFFER_SIZE]);
-	camera.setLookAtPosition(p1Vehicle->getPosition());
-	camera.setUpVector(glm::vec3(0,1,0));
-	renderingEngine->updateView(camera);
+	camera = new Camera(p1Vehicle);
+	renderingEngine->updateView(*camera);
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
@@ -232,7 +224,7 @@ void Game::connectSystems()
 	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);*/
 
 
-	inputEngine->reverseCam.connect(&camera, &Camera::setReverseCam);
+	inputEngine->reverseCam.connect(camera, &Camera::setReverseCam);
 	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
 	deliveryManager->addPlayer(p1Vehicle);
@@ -277,18 +269,8 @@ void Game::mainLoop()
 			physicsEngine->simulate(PHYSICS_STEP_MS);
 
 			// Update the camera position buffer with new location
-			if (camera.isReverseCam()) {
-				cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,15,0));
-			}
-			else {
-				cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
-			}
-			cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
-
-			// Set camera to look at player with a positional delay
-			camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
-			camera.setLookAtPosition(p1Vehicle->getPosition());
-			renderingEngine->updateView(camera);
+			camera->update();
+			renderingEngine->updateView(*camera);
 		}
 		// Update Sound
 		audioEngine->update(p1Vehicle->getModelMatrix());
@@ -389,11 +371,11 @@ void Game::unFuckerTheGame()
 	p1Vehicle->getPhysicsVehicle()->setToRestState();
 	p2Vehicle->getPhysicsVehicle()->setToRestState();
 
-	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
+	/*for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
 	{
 		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
 	}
-	cameraPosBufferIndex = 0;
+	cameraPosBufferIndex = 0;*/
 }
 
 Game::~Game(void)

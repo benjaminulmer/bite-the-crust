@@ -51,7 +51,7 @@ public:
 
 private:
 	void updatePath(Vehicle*, Delivery, Map &);
-	void goToPoint(Vehicle*, const glm::vec3 &);
+	void goToPoint(Vehicle*, const glm::vec3 &, const float &);
 	void avoid(Vehicle *, PhysicsEntity*, graphNode*);
 	bool tooClose(Vehicle*, PhysicsEntity*);
 

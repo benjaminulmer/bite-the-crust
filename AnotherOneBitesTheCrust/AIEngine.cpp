@@ -83,7 +83,7 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 }
 
 // TODO: add logic for firing pizzas
-void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
+void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const float & distanceToGoal)
 {
 	VehicleInput* input = &driver->input;
 	
@@ -98,33 +98,21 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos)
 	float speed = driver->getPhysicsVehicle()->computeForwardSpeed();
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
-	if (distance > speed)
-	{
-		input->forward = 1.0;
-		
-	}
-	else
-	{
-		input->forward = 0.0;
-	}
-	input->backward = 0.0;
-	input->handBrake = false;
-	//std::cout << "d = " << distance << " s = " << speed << " backward = " << input->backward << std::endl;
-	//std::cout << input->backward << std::endl;
+	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)1);
+	printf("%f\n", gas);
 
-	/*ratio *= 2;
-	if (ratio > 1)
+	if (gas > 0.3)
 	{
-		ratio = 1;
-	}
-	if(leftCosAngle > 0)
-	{
-		input->steer = ratio;
+		input->forward = gas;
+		input->backward = 0;
 	}
 	else
 	{
-		input->steer = -ratio;
-	}*/
+		input->backward = gas;
+		input->forward = 0;
+	}
+	
+	input->handBrake = false;
 
 	if(ratio > 0.1)
 	{
@@ -288,7 +276,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map)
 			return;
 		}
 	}
-	goToPoint(toUpdate, toUpdate->currentPath.at(0));
+	goToPoint(toUpdate, toUpdate->currentPath.at(0), glm::length(destinationNode->getPosition() - toUpdate->getPosition()));
 }
 
 AIEngine::~AIEngine(void)

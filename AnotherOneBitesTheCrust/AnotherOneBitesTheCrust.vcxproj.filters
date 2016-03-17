@@ -27,6 +27,7 @@
     <ClCompile Include="SimulationCallback.cpp" />
     <ClCompile Include="PizzaBox.cpp" />
     <ClCompile Include="WheelEntity.cpp" />
+    <ClCompile Include="StaticEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
@@ -57,6 +58,7 @@
     <ClInclude Include="PizzaBox.h" />
     <ClInclude Include="WheelEntity.h" />
     <ClInclude Include="AICollisionEntity.h" />
+    <ClInclude Include="StaticEntity.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\textured-StandardShading.fragmentshader" />

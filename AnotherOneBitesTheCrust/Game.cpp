@@ -1,8 +1,8 @@
 #include "Game.h"
 #include "PizzaBox.h"
 #include "WheelEntity.h"
-#include "Camera.h"
 #include "ContentLoading.h"
+#include "StaticEntity.h"
 
 #include <iostream>
 #include <string>
@@ -141,7 +141,7 @@ void Game::setupEntities()
 				if (physicsEntityInfoMap[tileEntity.name]->type == PhysicsType::DYNAMIC) {
 					e = new DynamicEntity();
 				} else {
-					e = new PhysicsEntity();
+					e = new StaticEntity();
 					tile->staticEntities.push_back(e);
 				}
 
@@ -371,11 +371,10 @@ void Game::unFuckerTheGame()
 	p1Vehicle->getPhysicsVehicle()->setToRestState();
 	p2Vehicle->getPhysicsVehicle()->setToRestState();
 
-	/*for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
+	for (unsigned int i = 0; i < 10; i++) 
 	{
-		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+		camera->update();
 	}
-	cameraPosBufferIndex = 0;*/
 }
 
 Game::~Game(void)

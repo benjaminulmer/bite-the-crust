@@ -14,13 +14,17 @@ Camera::Camera(Vehicle* vehicle)
 	position = (posBufferForward[BUFFER_SIZE]);
 	lookAtPosition = vehicle->getPosition();
 	upVector = glm::vec3(0,1,0);
+
+	type = EntityType::CAMERA;
 }
 
 void Camera::update()
 {
+	// Update buffer from vehicle position
 	posBufferForward[posBufferIndex] = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
 	posBufferReverse[posBufferIndex] = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0,8,15,0));
 
+	// Don't let camera fall below ground
 	if (posBufferForward[posBufferIndex].y < 1) 
 	{
 			posBufferForward[posBufferIndex].y = 1;
@@ -31,7 +35,7 @@ void Camera::update()
 	}
 	posBufferIndex = (posBufferIndex + 1) % BUFFER_SIZE;
 
-	// Set camera to look at player with a positional delay
+	// Set location based on which mode (forward vs reverse)
 	(reverseCam) ? position = posBufferReverse[posBufferIndex] : position = posBufferForward[posBufferIndex];
 	lookAtPosition = vehicle->getPosition();
 }

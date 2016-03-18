@@ -49,9 +49,9 @@ void Vehicle::setSmoothingData()
 
 void Vehicle::setSteerSpeedData()
 {
-	steerVsSpeedData[0] = 0.0f;          steerVsSpeedData[1] = 0.75f;
-	steerVsSpeedData[2] = 5.0f;          steerVsSpeedData[3] = 0.75f;
-	steerVsSpeedData[4] = 30.0f;         steerVsSpeedData[5] = 0.125f;
+	steerVsSpeedData[0] = 0.0f;          steerVsSpeedData[1] = 1.0f;
+	steerVsSpeedData[2] = 5.0f;          steerVsSpeedData[3] = 0.7f;
+	steerVsSpeedData[4] = 30.0f;         steerVsSpeedData[5] = 0.2f;
 	steerVsSpeedData[6] = 120.0f;        steerVsSpeedData[7] = 0.1f;
 	steerVsSpeedData[8] = PX_MAX_F32;    steerVsSpeedData[9] = PX_MAX_F32;
 	steerVsSpeedData[10] = PX_MAX_F32;   steerVsSpeedData[11] = PX_MAX_F32;

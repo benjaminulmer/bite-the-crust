@@ -22,8 +22,8 @@ void fatalError(string errorString)
 Game::Game(void)
 {
 	window = nullptr;
-	screenWidth = 1024;		//pro csgo resolution
-	screenHeight = 768;
+	screenWidth = 1280;		//pro csgo resolution
+	screenHeight = 720;
 	gameState = GameState::PLAY;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
@@ -162,6 +162,7 @@ void Game::setupEntities()
 			}
 		}
 	}
+	renderingEngine->setupMinimap(map);
 	// Create vehicles
 	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
 	setupVehicle(p1Vehicle, physx::PxTransform(10, 2, 20), 0);
@@ -178,7 +179,7 @@ void Game::setupEntities()
 	camera.setLookAtPosition(p1Vehicle->getPosition());
 	camera.setUpVector(glm::vec3(0,1,0));
 	renderingEngine->updateView(camera);
-	renderingEngine->setupMinimap(map);
+	
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
@@ -299,23 +300,24 @@ void Game::mainLoop()
 		renderingEngine->drawShadow(p1Vehicle->getPosition());
 		renderingEngine->drawShadow(p2Vehicle->getPosition());
 		renderingEngine->drawSkybox(p1Vehicle->getPosition());
+		renderingEngine->drawMinimap();
 
 		string speed = "Speed: ";
 		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
-		renderingEngine->printText2D(speed.data(), 0, 740, 24);
+		renderingEngine->printText2D(speed.data(), 0, 700, 24);
 
 		string frameRate = "DeltaTime: ";
 		frameRate.append(to_string(deltaTimeMs));
-		renderingEngine->printText2D(frameRate.data(), 0, 700, 20);
+		renderingEngine->printText2D(frameRate.data(), 0, 670, 20);
 
 		string score = "Score: ";
 		score.append(to_string(deliveryManager->getScore(p1Vehicle)));
-		renderingEngine->printText2D(score.data(), 800, 740, 24);
-		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 500, 700, 20);
+		renderingEngine->printText2D(score.data(), 1050, 700, 24);
+		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 725, 670, 20);
 
 		string pizzas = "Pizzas: ";
 		pizzas.append(to_string(p1Vehicle->pizzaCount));
-		renderingEngine->printText2D(pizzas.data(), 800, 680, 24);
+		renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
 
 		//swap buffers

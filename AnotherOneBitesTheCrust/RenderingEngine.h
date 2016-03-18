@@ -25,8 +25,6 @@ public:
 	RenderingEngine(void);
 	~RenderingEngine(void);	
 
-	void testFTGL();
-
 	void displayFunc(std::vector<Entity*> entities);
 	void displayFuncTex(std::vector<Entity*> entities);
 	glm::mat4 calculateDefaultModel(glm::mat4 model, Entity * entity);
@@ -72,17 +70,9 @@ public:
 	void drawShadow(glm::vec3 position);
 	void drawSkybox(glm::vec3 position);
 
-
-	void setupMinimap(Map map);
-
-	//int init_resourses();
-	//void render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy);
-	//void displayText();
-
 	void initText2D(const char * texturePath);
 	void printText2D(const char * text, int x, int y, int size);
 	void printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color);
-	void printText2Doutline2(const char * text, int x, int y, int size, glm::vec4 color);
 	void cleanupText2D();
 
 	GLuint textProgramID;			//shader
@@ -117,8 +107,20 @@ public:
 	glm::mat4 P;
 	glm::mat4 O;
 
-	void renderText();
 
 	GLuint textVAO;
+
+	//minimap stuff
+	void setupMinimap(Map map);
+	void drawMinimap();
+	std::vector<glm::vec3> mmVecs;
+	std::vector<float> mmColors;
+	GLuint mmVAO;
+	GLuint mmVertBuffer;
+	GLuint mmColorBuffer;
+	glm::mat4 mmV;
+	glm::mat4 mmM;
+	glm::vec3 mmScale;
+	glm::vec3 mmCenter;
 };
 

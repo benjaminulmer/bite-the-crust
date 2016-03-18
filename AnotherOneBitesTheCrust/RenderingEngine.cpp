@@ -112,19 +112,22 @@ void RenderingEngine::generateIDs()
 	string shadowFsShader = "res\\Shaders\\basic_fs.glsl";
 	string shadowVsSource = loadShaderStringfromFile(shadowVsShader);
 	string shadowFsSource = loadShaderStringfromFile(shadowFsShader);
-	shadowProgramID = CreateShaderProgram(shadowVsSource, shadowFsSource);
-	glUseProgram(shadowProgramID);
+	basicProgramID = CreateShaderProgram(shadowVsSource, shadowFsSource);
+	glUseProgram(basicProgramID);
 	glGenVertexArrays(1, &sphereVAO);
 	glGenBuffers(1, &sphereVertBuffer);
 	glGenBuffers(1, &sphereColorBuffer);
-	basicmvpID = glGetUniformLocation(shadowProgramID, "MVP");
+	glGenVertexArrays(1, &mmVAO);
+	glGenBuffers(1, &mmVertBuffer);
+	glGenBuffers(1, &mmColorBuffer);
+	basicmvpID = glGetUniformLocation(basicProgramID, "MVP");
 
 
 }
 
 void RenderingEngine::loadProjectionMatrix()
 {
-	P = perspective(1.0472f, (float)1024/768 , 1.0f, 1000.0f);	//radians kek
+	P = perspective(1.0472f, (float)1280/720, 1.0f, 1000.0f);	//radians kek
 	O = glm::ortho(0.0f, 5.0f, 5.0f, 0.0f, 1.0f, 100.0f);
 }
 
@@ -390,7 +393,7 @@ void RenderingEngine::setupMiscBuffers()
 	skyTex = ContentLoading::loadDDS("res\\Textures\\Skybox.DDS");
 
 //Loading shadows
-	glUseProgram(shadowProgramID);
+	glUseProgram(basicProgramID);
 
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals; // Won't be used at the moment.
@@ -446,13 +449,16 @@ void RenderingEngine::setupMiscBuffers()
 		);
 
 	glBindVertexArray(0); // reset to default		
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
 }
 
 void RenderingEngine::drawShadow(glm::vec3 position)
 {
 	//glEnable(GL_DEPTH_TEST);
 	//drawing shadow
-	glUseProgram(shadowProgramID);
+		//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glUseProgram(basicProgramID);
 
 	// Use VAO that holds buffer bindings
 	// and attribute config of buffers
@@ -507,6 +513,8 @@ void RenderingEngine::drawSkybox(glm::vec3 position)
 
 void RenderingEngine::setupMinimap(Map map)
 {
+	glUseProgram(basicProgramID);
+
 	for(int i = 0; i < map.tiles.size(); i++)
 	{
 		for(int j = 0; j < map.tiles[i].size(); j++)
@@ -515,16 +523,177 @@ void RenderingEngine::setupMinimap(Map map)
 
 			//cout << "TEST ";
 			Entity* ground = tile->ground;
-			glm::vec3 pos = ground->getDefaultTranslation();
-
-			cout << pos.x << " " << pos.y << " " << pos.z << " ";
-
+			
 			if(tile->groundModel == "road-straight" || tile->groundModel == "road-turn")
-				cout << "ROAD" << endl;
-		}
+			{
 
-		cout << endl;
+				glm::vec3 pos = ground->getDefaultTranslation();
+				mmVecs.push_back(pos);
+
+				//grey
+				mmColors.push_back(0.6);	//r
+				mmColors.push_back(0.6);	//g
+				mmColors.push_back(0.6);	//b
+			}
+			for(int k = 0; k < tile->entityTemplates.size(); k++)
+			{
+				if(tile->entityTemplates[k].name == "house")
+				{
+
+					glm::vec3 pos = ground->getDefaultTranslation();
+					mmVecs.push_back(pos);
+					//pink
+					mmColors.push_back(1.0);	//r
+					mmColors.push_back(0.68);	//g
+					mmColors.push_back(0.73);	//b
+				}
+				else if(tile->entityTemplates[k].name == "billboard")
+				{
+					glm::vec3 pos = ground->getDefaultTranslation();
+					mmVecs.push_back(pos);
+					//pink
+					mmColors.push_back(1.0);	//r
+					mmColors.push_back(0.55);	//g
+					mmColors.push_back(0.0);	//b
+				}
+			}
+		}
 	}
+
+	//buffering
+	glUseProgram(basicProgramID);
+
+	glBindVertexArray(mmVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmVertBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3) * mmVecs.size(),	// byte size of Vec3f, 4 of them
+		mmVecs.data(),		// pointer (Vec3f*) to contents of verts
+		GL_STATIC_DRAW);	// Usage pattern of GPU buffer
+
+							// RGB values for the 4 vertices of the quad
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(float)*mmColors.size(),
+		mmColors.data(),
+		GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmVertBuffer);
+	glVertexAttribPointer(
+		0,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glEnableVertexAttribArray(1); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmColorBuffer);
+	glVertexAttribPointer(
+		1,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glBindVertexArray(0); // reset to default		
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+	float maxX = 0;
+	float maxY = 0;
+	float maxZ = 0;
+	float minX = 1000;
+	float minY = 1000;
+	float minZ = 1000;
+
+	cout << "size " << mmVecs.size() << endl;
+	for(int i = 0; i < mmVecs.size(); i++)
+	{
+		cout << mmVecs[i].x << " " << mmVecs[i].y << " " << mmVecs[i].z << " " << endl;
+	}
+
+	for(int i = 0; i < mmVecs.size(); i++)
+	{
+
+		if (mmVecs[i].x < minX)
+			minX = mmVecs[i].x;
+		if (mmVecs[i].y < minY)
+			minY = mmVecs[i].y;
+		if (mmVecs[i].z < minZ)
+			minZ = mmVecs[i].z;
+	}
+
+	for (int i = 0; i < mmVecs.size(); i++)
+	{
+		if (mmVecs[i].x > maxX)
+			maxX = mmVecs[i].x;
+		if (mmVecs[i].y > maxY)
+			maxY = mmVecs[i].y;
+		if (mmVecs[i].z > maxZ)
+			maxZ = mmVecs[i].z;
+	}
+
+
+	vec3 diameter(maxX - minX, maxY - minY, maxZ - minZ);
+	float mmRadius = glm::length(diameter)*3;
+	cout << "radius " << mmRadius << endl;
+
+
+	float centerX = (minX + maxX)/2;
+	float centerY = (minY + maxY)/2;
+	float centerZ = (minZ + maxZ)/2;
+
+	mmCenter = vec3(centerX, centerY, centerZ);
+
+	cout << maxX << " " << maxY << " " << maxZ << " max" << endl;
+	cout << minX << " " << minY << " " << minZ << " min" << endl;
+
+	cout << centerX << " " << centerY << " " << centerZ << " cetner" << endl;
+
+	mmV = glm::lookAt(
+		glm::vec3(centerX, mmRadius, centerZ), // Camera is at (4,3,3), in World Space
+		glm::vec3(centerX, centerY, centerZ), // and looks at the origin
+		glm::vec3(0, 0, 1)  // Head is up (set to 0,-1,0 to look upside-down)
+		);
+
+	mmM = mat4(1.0f);
+}
+
+void RenderingEngine::drawMinimap()
+{
+	 glDisable(GL_DEPTH_TEST);
+	glUseProgram(basicProgramID);
+
+	// Use VAO that holds buffer bindings
+	// and attribute config of buffers
+	glBindVertexArray(mmVAO);
+	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
+	
+
+	mmM = mat4(1.0f);
+	//mmM = scale(mmM, vec3(0.5, 0.5, 0.5));
+	mmM = translate(mmM,mmCenter * vec3(4.7, 0.0, -3.0));	//positive X moves it left. Positive Z moves it up
+	mat4 MVP = P * mmV * mmM;
+
+	glUniformMatrix4fv(basicmvpID,		// ID
+		1,		// only 1 matrix
+		GL_FALSE,	// transpose matrix, Mat4f is row major
+		value_ptr(MVP)	// pointer to data in Mat4f
+		);
+
+	GLfloat width = 21;
+	glLineWidth(width);
+	glPointSize(width);
+
+	glDrawArrays(GL_POINTS, 0, mmVecs.size());
+	glBindVertexArray(0);
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

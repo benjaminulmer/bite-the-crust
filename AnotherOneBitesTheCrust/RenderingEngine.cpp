@@ -117,9 +117,17 @@ void RenderingEngine::generateIDs()
 	glGenVertexArrays(1, &sphereVAO);
 	glGenBuffers(1, &sphereVertBuffer);
 	glGenBuffers(1, &sphereColorBuffer);
-	glGenVertexArrays(1, &mmVAO);
-	glGenBuffers(1, &mmVertBuffer);
-	glGenBuffers(1, &mmColorBuffer);
+	glGenVertexArrays(1, &mmRoadVAO);
+	glGenBuffers(1, &mmRoadVertBuffer);
+	glGenBuffers(1, &mmRoadColorBuffer);
+	glGenVertexArrays(1, &mmHouseVAO);
+	glGenBuffers(1, &mmHouseVertBuffer);
+	glGenBuffers(1, &mmHouseColorBuffer);
+	glGenVertexArrays(1, &mmVanVAO);
+	glGenVertexArrays(1, &mmVanVAO2);
+	glGenBuffers(1, &mmVanVertBuffer);
+	glGenBuffers(1, &mmVanColorBuffer);
+	glGenBuffers(1, &mmVanColorBuffer2);
 	basicmvpID = glGetUniformLocation(basicProgramID, "MVP");
 
 
@@ -528,12 +536,12 @@ void RenderingEngine::setupMinimap(Map map)
 			{
 
 				glm::vec3 pos = ground->getDefaultTranslation();
-				mmVecs.push_back(pos);
+				mmRoadVerts.push_back(pos);
 
 				//grey
-				mmColors.push_back(0.6);	//r
-				mmColors.push_back(0.6);	//g
-				mmColors.push_back(0.6);	//b
+				mmRoadColors.push_back(0.6);	//r
+				mmRoadColors.push_back(0.6);	//g
+				mmRoadColors.push_back(0.6);	//b
 			}
 			for(int k = 0; k < tile->entityTemplates.size(); k++)
 			{
@@ -541,46 +549,53 @@ void RenderingEngine::setupMinimap(Map map)
 				{
 
 					glm::vec3 pos = ground->getDefaultTranslation();
-					mmVecs.push_back(pos);
+					mmHouseVerts.push_back(pos);
 					//pink
-					mmColors.push_back(1.0);	//r
-					mmColors.push_back(0.68);	//g
-					mmColors.push_back(0.73);	//b
+					mmHouseColors.push_back(1.0);	//r
+					mmHouseColors.push_back(0.68);	//g
+					mmHouseColors.push_back(0.73);	//b
 				}
 				else if(tile->entityTemplates[k].name == "billboard")
 				{
 					glm::vec3 pos = ground->getDefaultTranslation();
-					mmVecs.push_back(pos);
+					mmRoadVerts.push_back(pos);
 					//pink
-					mmColors.push_back(1.0);	//r
-					mmColors.push_back(0.55);	//g
-					mmColors.push_back(0.0);	//b
+					mmRoadColors.push_back(1.0);	//r
+					mmRoadColors.push_back(0.55);	//g
+					mmRoadColors.push_back(0.0);	//b
 				}
 			}
 		}
 	}
 
+	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec3> normals; // Won't be used at the moment.
+	std::vector<GLuint> faces;
+	std::vector<glm::vec3> raw_verts;
+
+	bool res = ContentLoading::loadOBJ("res\\Models\\mmVan.obj", mmVanVerts, uvs, normals, faces, raw_verts);
+
 	//buffering
 	glUseProgram(basicProgramID);
 
-	glBindVertexArray(mmVAO);
+	glBindVertexArray(mmRoadVAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, mmVertBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mmRoadVertBuffer);
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(vec3) * mmVecs.size(),	// byte size of Vec3f, 4 of them
-		mmVecs.data(),		// pointer (Vec3f*) to contents of verts
+		sizeof(vec3) * mmRoadVerts.size(),	// byte size of Vec3f, 4 of them
+		mmRoadVerts.data(),		// pointer (Vec3f*) to contents of verts
 		GL_STATIC_DRAW);	// Usage pattern of GPU buffer
 
 							// RGB values for the 4 vertices of the quad
 
-	glBindBuffer(GL_ARRAY_BUFFER, mmColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mmRoadColorBuffer);
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(float)*mmColors.size(),
-		mmColors.data(),
+		sizeof(float)*mmRoadColors.size(),
+		mmRoadColors.data(),
 		GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0); // match layout # in shader
-	glBindBuffer(GL_ARRAY_BUFFER, mmVertBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mmRoadVertBuffer);
 	glVertexAttribPointer(
 		0,		// attribute layout # above
 		3,		// # of components (ie XYZ )
@@ -591,7 +606,143 @@ void RenderingEngine::setupMinimap(Map map)
 		);
 
 	glEnableVertexAttribArray(1); // match layout # in shader
-	glBindBuffer(GL_ARRAY_BUFFER, mmColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mmRoadColorBuffer);
+	glVertexAttribPointer(
+		1,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glBindVertexArray(0); // reset to default		
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+	
+	glBindVertexArray(mmHouseVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmHouseVertBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3) * mmHouseVerts.size(),	// byte size of Vec3f, 4 of them
+		mmHouseVerts.data(),		// pointer (Vec3f*) to contents of verts
+		GL_STATIC_DRAW);	// Usage pattern of GPU buffer
+
+							// RGB values for the 4 vertices of the quad
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmHouseColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(float)*mmHouseColors.size(),
+		mmHouseColors.data(),
+		GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmHouseVertBuffer);
+	glVertexAttribPointer(
+		0,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glEnableVertexAttribArray(1); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmHouseColorBuffer);
+	glVertexAttribPointer(
+		1,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glBindVertexArray(0); // reset to default		
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+	
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmVanVertBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3) * mmVanVerts.size(),	// byte size of Vec3f, 4 of them
+		mmVanVerts.data(),		// pointer (Vec3f*) to contents of verts
+		GL_STATIC_DRAW);	// Usage pattern of GPU buffer
+
+							// RGB values for the 4 vertices of the quad
+
+	for(int i = 0; i < mmVanVerts.size(); i++)
+	{
+		mmVanColors.push_back(1.0f);
+		mmVanColors.push_back(0.0f);
+		mmVanColors.push_back(0.0f);
+	}
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmVanColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(float)*mmVanColors.size(),
+		mmVanColors.data(),
+		GL_STATIC_DRAW);
+
+	glBindVertexArray(mmVanVAO);
+	glEnableVertexAttribArray(0); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmVanVertBuffer);
+	glVertexAttribPointer(
+		0,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glEnableVertexAttribArray(1); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmVanColorBuffer);
+	glVertexAttribPointer(
+		1,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+	glBindVertexArray(0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+
+	mmVanColors.clear();
+	for(int i = 0; i < mmVanVerts.size(); i++)
+	{
+		mmVanColors.push_back(0.0f);
+		mmVanColors.push_back(0.0f);
+		mmVanColors.push_back(1.0f);
+	}
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmVanColorBuffer2);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(float)*mmVanColors.size(),
+		mmVanColors.data(),
+		GL_STATIC_DRAW);
+
+	glBindVertexArray(mmVanVAO2);
+	glEnableVertexAttribArray(0); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmVanVertBuffer);
+	glVertexAttribPointer(
+		0,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glEnableVertexAttribArray(1); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmVanColorBuffer2);
 	glVertexAttribPointer(
 		1,		// attribute layout # above
 		3,		// # of components (ie XYZ )
@@ -612,37 +763,37 @@ void RenderingEngine::setupMinimap(Map map)
 	float minY = 1000;
 	float minZ = 1000;
 
-	cout << "size " << mmVecs.size() << endl;
-	for(int i = 0; i < mmVecs.size(); i++)
+	//cout << "size " << mmRoadVerts.size() << endl;
+	for(int i = 0; i < mmRoadVerts.size(); i++)
 	{
-		cout << mmVecs[i].x << " " << mmVecs[i].y << " " << mmVecs[i].z << " " << endl;
+		//cout << mmRoadVerts[i].x << " " << mmRoadVerts[i].y << " " << mmRoadVerts[i].z << " " << endl;
 	}
 
-	for(int i = 0; i < mmVecs.size(); i++)
+	for(int i = 0; i < mmRoadVerts.size(); i++)
 	{
 
-		if (mmVecs[i].x < minX)
-			minX = mmVecs[i].x;
-		if (mmVecs[i].y < minY)
-			minY = mmVecs[i].y;
-		if (mmVecs[i].z < minZ)
-			minZ = mmVecs[i].z;
+		if (mmRoadVerts[i].x < minX)
+			minX = mmRoadVerts[i].x;
+		if (mmRoadVerts[i].y < minY)
+			minY = mmRoadVerts[i].y;
+		if (mmRoadVerts[i].z < minZ)
+			minZ = mmRoadVerts[i].z;
 	}
 
-	for (int i = 0; i < mmVecs.size(); i++)
+	for (int i = 0; i < mmRoadVerts.size(); i++)
 	{
-		if (mmVecs[i].x > maxX)
-			maxX = mmVecs[i].x;
-		if (mmVecs[i].y > maxY)
-			maxY = mmVecs[i].y;
-		if (mmVecs[i].z > maxZ)
-			maxZ = mmVecs[i].z;
+		if (mmRoadVerts[i].x > maxX)
+			maxX = mmRoadVerts[i].x;
+		if (mmRoadVerts[i].y > maxY)
+			maxY = mmRoadVerts[i].y;
+		if (mmRoadVerts[i].z > maxZ)
+			maxZ = mmRoadVerts[i].z;
 	}
 
 
 	vec3 diameter(maxX - minX, maxY - minY, maxZ - minZ);
 	float mmRadius = glm::length(diameter)*3;
-	cout << "radius " << mmRadius << endl;
+	//cout << "radius " << mmRadius << endl;
 
 
 	float centerX = (minX + maxX)/2;
@@ -651,10 +802,10 @@ void RenderingEngine::setupMinimap(Map map)
 
 	mmCenter = vec3(centerX, centerY, centerZ);
 
-	cout << maxX << " " << maxY << " " << maxZ << " max" << endl;
-	cout << minX << " " << minY << " " << minZ << " min" << endl;
+	//cout << maxX << " " << maxY << " " << maxZ << " max" << endl;
+	//cout << minX << " " << minY << " " << minZ << " min" << endl;
 
-	cout << centerX << " " << centerY << " " << centerZ << " cetner" << endl;
+	//cout << centerX << " " << centerY << " " << centerZ << " cetner" << endl;
 
 	mmV = glm::lookAt(
 		glm::vec3(centerX, mmRadius, centerZ), // Camera is at (4,3,3), in World Space
@@ -662,36 +813,87 @@ void RenderingEngine::setupMinimap(Map map)
 		glm::vec3(0, 0, 1)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
 
-	mmM = mat4(1.0f);
+
 }
 
-void RenderingEngine::drawMinimap()
+void RenderingEngine::drawMinimap(vec3 pos, Entity* van1, Entity* van2)
 {
 	 glDisable(GL_DEPTH_TEST);
 	glUseProgram(basicProgramID);
 
 	// Use VAO that holds buffer bindings
 	// and attribute config of buffers
-	glBindVertexArray(mmVAO);
+	glBindVertexArray(mmRoadVAO);
 	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
 	
-
 	mmM = mat4(1.0f);
 	//mmM = scale(mmM, vec3(0.5, 0.5, 0.5));
-	mmM = translate(mmM,mmCenter * vec3(4.7, 0.0, -3.0));	//positive X moves it left. Positive Z moves it up
-	mat4 MVP = P * mmV * mmM;
+	mmM = translate(mmM,mmCenter * vec3(2.0, 0.0, -1.0));	//positive X moves it left. Positive Z moves it up
+
+	mat4 mmMVP = P * mmV * mmM;
 
 	glUniformMatrix4fv(basicmvpID,		// ID
 		1,		// only 1 matrix
 		GL_FALSE,	// transpose matrix, Mat4f is row major
-		value_ptr(MVP)	// pointer to data in Mat4f
+		value_ptr(mmMVP)	// pointer to data in Mat4f
 		);
 
-	GLfloat width = 21;
-	glLineWidth(width);
+	GLfloat width = 25;
 	glPointSize(width);
 
-	glDrawArrays(GL_POINTS, 0, mmVecs.size());
+	glDrawArrays(GL_POINTS, 0, mmRoadVerts.size());
+	glBindVertexArray(0);
+
+	
+	glBindVertexArray(mmHouseVAO);
+	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
+
+	glUniformMatrix4fv(basicmvpID,		// ID
+		1,		// only 1 matrix
+		GL_FALSE,	// transpose matrix, Mat4f is row major
+		value_ptr(mmMVP)	// pointer to data in Mat4f
+		);
+
+	glPointSize(width);
+
+	glDrawArrays(GL_POINTS, 0, mmHouseVerts.size());
+	glBindVertexArray(0);
+
+	glBindVertexArray(mmVanVAO);
+	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
+	mmM = mat4(1.0f);
+	mmM = translate(mmM,mmCenter * vec3(2.0, 0.0, -1.0));
+	mmM = mmM * van1->getModelMatrix();
+	mmM = scale(mmM, vec3(2.0));
+	
+	mmM = rotate(mmM, -1.5708f, glm::vec3(0,1,0));
+
+	//
+	mmMVP = P * mmV * mmM;
+	glUniformMatrix4fv(basicmvpID,		// ID
+		1,		// only 1 matrix
+		GL_FALSE,	// transpose matrix, Mat4f is row major
+		value_ptr(mmMVP)	// pointer to data in Mat4f
+		);
+
+	glDrawArrays(GL_TRIANGLES, 0, mmVanVerts.size());
+	glBindVertexArray(0);
+
+		glBindVertexArray(mmVanVAO2);
+	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
+	mmM = mat4(1.0f);
+	mmM = translate(mmM,mmCenter * vec3(2.0, 0.0, -1.0));
+	mmM = mmM * van2->getModelMatrix();
+	mmM = scale(mmM, vec3(2.0));
+	mmM = rotate(mmM, -1.5708f, glm::vec3(0,1,0));
+	mmMVP = P * mmV * mmM;
+	glUniformMatrix4fv(basicmvpID,		// ID
+		1,		// only 1 matrix
+		GL_FALSE,	// transpose matrix, Mat4f is row major
+		value_ptr(mmMVP)	// pointer to data in Mat4f
+		);
+
+	glDrawArrays(GL_TRIANGLES, 0, mmVanVerts.size());
 	glBindVertexArray(0);
 
 }

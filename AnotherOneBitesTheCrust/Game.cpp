@@ -300,7 +300,7 @@ void Game::mainLoop()
 		renderingEngine->drawShadow(p1Vehicle->getPosition());
 		renderingEngine->drawShadow(p2Vehicle->getPosition());
 		renderingEngine->drawSkybox(p1Vehicle->getPosition());
-		renderingEngine->drawMinimap();
+		renderingEngine->drawMinimap(p1Vehicle->getPosition(), p1Vehicle, p2Vehicle);
 
 		string speed = "Speed: ";
 		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));

@@ -112,12 +112,24 @@ public:
 
 	//minimap stuff
 	void setupMinimap(Map map);
-	void drawMinimap();
-	std::vector<glm::vec3> mmVecs;
-	std::vector<float> mmColors;
-	GLuint mmVAO;
-	GLuint mmVertBuffer;
-	GLuint mmColorBuffer;
+	void drawMinimap(glm::vec3 pos, Entity* van1, Entity* van2);
+	std::vector<glm::vec3> mmRoadVerts;
+	std::vector<float> mmRoadColors;
+	GLuint mmRoadVAO;
+	GLuint mmRoadVertBuffer;
+	GLuint mmRoadColorBuffer;
+	std::vector<glm::vec3> mmHouseVerts;
+	std::vector<float> mmHouseColors;
+	GLuint mmHouseVAO;
+	GLuint mmHouseVertBuffer;
+	GLuint mmHouseColorBuffer;
+	std::vector<glm::vec3> mmVanVerts;
+	std::vector<float> mmVanColors;
+	GLuint mmVanVAO;
+	GLuint mmVanVAO2;
+	GLuint mmVanVertBuffer;
+	GLuint mmVanColorBuffer;
+	GLuint mmVanColorBuffer2;
 	glm::mat4 mmV;
 	glm::mat4 mmM;
 	glm::vec3 mmScale;

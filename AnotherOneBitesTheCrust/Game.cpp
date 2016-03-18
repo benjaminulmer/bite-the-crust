@@ -208,6 +208,7 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 void Game::connectSystems()
 {
 	inputEngine->setInputStruct(&p1Vehicle->input, 0);
+	inputEngine->setCamera(camera, 0);
 
 	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 	p1Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
@@ -223,8 +224,6 @@ void Game::connectSystems()
 	p2Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
 	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);*/
 
-
-	inputEngine->reverseCam.connect(camera, &Camera::setReverseCam);
 	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
 	deliveryManager->addPlayer(p1Vehicle);

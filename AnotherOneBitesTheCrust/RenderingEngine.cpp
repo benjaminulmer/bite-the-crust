@@ -240,7 +240,7 @@ void RenderingEngine::printText2D(const char * text, int x, int y, int size)
 {
 	
 	printText2Doutline(text, x+1, y+1, size+0.5, glm::vec4(0,0,0,1));
-	printText2Doutline(text, x, y, size, glm::vec4(1,1,1,1));
+	printText2Doutline(text, x, y, size, glm::vec4(1,0,0,1));
 }
 
 void RenderingEngine::printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color){

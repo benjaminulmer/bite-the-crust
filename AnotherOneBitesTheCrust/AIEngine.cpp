@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-const int MIN_DIST = 6;
+const int MIN_DIST = 1;
 
 AIEngine::AIEngine(void)
 {
@@ -14,7 +14,7 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 	std::map<graphNode *, double> distances;
 	std::map<graphNode *, double> heuristic;
 	std::map<graphNode *, graphNode *> previous;
-	std::set<graphNode *> toVisit;
+	std::set<graphNode *> toVisit, visited;
 
 	toVisit.insert(start);
 	for(graphNode * n : allNodes)
@@ -45,13 +45,14 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 		
 		graphNode * current = *position;
 		toVisit.erase(position);
+		visited.insert(current);
 		if(current == destination)
 			break;
 
 		for(graphNode * neighbour : current->getNeighbours())
 		{
-			// If the node has been visited, don't check
-			if(distances[neighbour] != DBL_MAX)
+			//// If the node has been visited, don't check
+			if(visited.find(neighbour) != visited.end())
 				continue;
 
 			double distance = 0;
@@ -79,6 +80,7 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 	}
 	std::reverse(path.begin(), path.end());
 
+	int size = path.size();
 	return path; 
 }
 
@@ -179,10 +181,36 @@ void AIEngine::avoid(Vehicle * driver, graphNode * destinationNode)
 		driver->input.steer = 1.0;
 }
 
+graphNode * findClosestNode(Vehicle * toUpdate, Map & map)
+{
+	Tile * currentTile = map.getTile(toUpdate->getPosition());
+	graphNode * closest;
+	std::vector<graphNode*> toSearch;
+
+	if(currentTile->nodes.empty())
+		toSearch = map.allNodes;
+	else
+		toSearch = currentTile->nodes;
+
+	closest = toSearch.at(0);
+	if(!closest)
+		return closest;
+	double minDist = DBL_MAX;
+	for(graphNode * n : toSearch)
+	{
+		double currentDist = glm::length(toUpdate->getPosition() - n->getPosition());
+		if(currentDist < minDist)
+		{
+			closest = n;
+			minDist = currentDist;
+		}
+	}
+
+	return closest;
+}
+
 void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 {
-
-	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
 	graphNode * destinationNode = destination.location->nodes.at(0);
 
@@ -191,22 +219,8 @@ void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 		toUpdate->currentPath.push_back(destinationNode->getPosition());
 	else
 	{
+		graphNode * closest = findClosestNode(toUpdate, map);
 
-		
-		// Find closest node
-		graphNode * closest = currentTile->nodes.at(0);
-		if(!closest)
-			return;
-		double minDist = DBL_MAX;
-		for(graphNode * n : currentTile->nodes)
-		{
-			double currentDist = glm::length(toUpdate->getPosition() - closest->getPosition());
-			if(currentDist < minDist)
-			{
-				closest = n;
-				minDist = currentDist;
-			}
-		}
 		toUpdate->currentPath = aStar(closest, destinationNode, map.allNodes);
 		//toUpdate->currentPath.push_back(destinationNode->getPosition());
 	}
@@ -264,7 +278,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
 	graphNode * destinationNode = destination.location->nodes.at(0);
-	if(obstacle.distance < 2)
+	if(obstacle.entity != nullptr && obstacle.distance < 3)
 	{
 		avoid(toUpdate, destinationNode);
 		return;

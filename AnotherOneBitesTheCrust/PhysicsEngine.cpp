@@ -254,9 +254,12 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 	scene->raycast(origin1, direction, distance, buffer1);
 	scene->raycast(origin2, direction, distance, buffer2);
 
+	AICollisionEntity toReturn = AICollisionEntity();
+	toReturn.entity = nullptr;
+
 	if (buffer1.hasBlock) 
 	{
-		AICollisionEntity toReturn = AICollisionEntity();
+		
 		PxRaycastHit hit = buffer1.block;
 
 		PxVec3 actorCentre = hit.actor->getGlobalPose().p;
@@ -266,11 +269,10 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 		toReturn.entity = (Entity*)hit.actor->userData;
 		toReturn.distance = hit.distance;
 
-		return toReturn;
+
 	}
 	else if (buffer2.hasBlock)
 	{
-		AICollisionEntity toReturn = AICollisionEntity();
 		PxRaycastHit hit = buffer2.block;
 
 		PxVec3 actorCentre = hit.actor->getGlobalPose().p;
@@ -280,8 +282,9 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 		toReturn.entity = (Entity*)hit.actor->userData;
 		toReturn.distance = hit.distance;
 
-		return toReturn;
 	}
+
+	return toReturn;
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs)

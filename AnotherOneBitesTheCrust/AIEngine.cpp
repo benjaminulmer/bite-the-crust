@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-const int MIN_DIST = 1;
+const int MIN_DIST = 15;
 
 AIEngine::AIEngine(void)
 {
@@ -100,10 +100,10 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
 	// TODO: Should divide by half the map or something
-	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)1);
+	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)0.6);
 
 	// TODO: Maybe put these in an init file for tuning purposes?
-	if (gas > 0.3)
+	if (gas > 0.2)
 	{
 		input->forward = gas;
 		input->backward = 0;
@@ -113,18 +113,21 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	
 	input->handBrake = false;
 
-	if(ratio > 0.1)
+	if(ratio > 0.05)
 	{
 		if(leftCosAngle > 0)
 			input->steer = ratio;
 		else
 			input->steer = -ratio;
 	}
-	else
+	else if(distanceToGoal < MIN_DIST)
 	{
 		input->steer = 0;
-		if (rand()%100 < 5)
+		if(!driver->pizzaDelivered)
+		{
 			input->shootPizza = true;
+			driver->pizzaDelivered = true;
+		}
 	}
 }
 
@@ -215,7 +218,7 @@ void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 	graphNode * destinationNode = destination.location->nodes.at(0);
 
 	
-	if(glm::length(destinationNode->getPosition() - toUpdate->getPosition()) <= MIN_DIST)
+	if(glm::length(destinationNode->getPosition() - toUpdate->getPosition()) <= MIN_DIST/2)
 		toUpdate->currentPath.push_back(destinationNode->getPosition());
 	else
 	{
@@ -246,17 +249,18 @@ void AIEngine::brake(Vehicle* toUpdate, const float & amount)
 void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICollisionEntity & obstacle) 
 { 
 	
-	if(toUpdate->currentPath.empty())
-	{
+	/*if(toUpdate->currentPath.empty())
+	{*/
 		updatePath(toUpdate, destination, map);
 		if(toUpdate->currentPath.empty())
 			return;
-	}
+	//}
 
 	// Should be goal node
 	if(!equals(toUpdate->getDestination(), destination.location->nodes.at(0)->getPosition()))
 	{
 		toUpdate->currentPath.clear();
+		toUpdate->pizzaDelivered = false;
 		return;
 	}
 
@@ -268,7 +272,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 		//std::cout << "Waypoint get! Position: "<< toUpdate->currentPath.at(0).x << "," << toUpdate->currentPath.at(0).y << ", " << toUpdate->currentPath.at(0).z << std::endl;
 		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
 
-		if(toUpdate->currentPath.empty())
+		if(toUpdate->currentPath.empty() && distanceToNext < MIN_DIST)
 		{
 			brake(toUpdate, 1);
 			return;

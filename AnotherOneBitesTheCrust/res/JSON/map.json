@@ -6,14 +6,7 @@
             "ground": "road-turn",
             "entities": [
                 {"name": "barrier", "rotation": 35},
-                {"name": "pole", "x": 20, "rotation": 90},
-
-				{"name": "road block", "x":10, "y": 5, "z": 0},
-				{"name": "road block", "x":10, "y": 5, "z": 10},
-				{"name": "road block", "x":0, "y": 5, "z": 0},
-				{"name": "road block", "x":0, "y": 5, "z": 10},
-				{"name": "road block", "x":20, "y": 5, "z": 10},
-				{"name": "road block", "x":10, "y": 5, "z": 20}
+                {"name": "pole", "x": 20, "rotation": 90}
             ],
 			"nodes" : [
 				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
@@ -29,12 +22,6 @@
 			"description": "Straight section of the road",
             "ground": "road-straight",
             "entities": [
-                {"name": "pole"},
-
-				{"name": "road block", "x":0, "y": 5, "z": 10},
-				{"name": "road block", "x":10, "y": 5, "z": 10},
-				{"name": "road block", "x":10, "y": 5, "z": 0},
-				{"name": "road block", "x":20, "y": 5, "z": 10}
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
@@ -50,9 +37,7 @@
 			"deliverable": true,
 			"entities": [
                 {"name": "house", "x": 10, "z": 5},
-                {"name": "trash bin", "x": 6, "z": 8},
-
-				{"name": "fence", "x":10, "y": 5, "z": 20}
+                {"name": "trash bin", "x": 6, "z": 8}
 			],
 			"nodes": [ 
                 {"x": 0.5, "z": 1.0, "neighbours": []}
@@ -76,9 +61,7 @@
 			"entities": [
 				{"name": "fence", "x": 10, "rotation": 270},
 				{"name": "fence", "z": 10},
-                {"name": "house", "x": 10, "z": 10, "rotation": 35},
-
-				{"name": "fence", "x":20, "y": 5, "z": 20}
+                {"name": "house", "x": 10, "z": 10, "rotation": 35}
 			],
 			"nodes": [
 				{"x": 1.0, "z": 1.0, "neighbours": []}

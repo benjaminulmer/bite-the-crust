@@ -120,22 +120,23 @@ void AudioEngine::playBrakeSound(PhysicsEntity * source)
 {
 	glm::vec3 pos = source->getPosition();
 
-	FMOD::Channel * playingOn = loopingSounds[source];
-	FMOD::Sound * currentlyPlaying;  
-	if(playingOn == nullptr)
-	{
-		loopingSounds[source] = playSound(brakeSound, pos, source);
-		loopingSounds[source]->setVolume(0.3);
-		return;
-	}
-	result = playingOn->getCurrentSound(&currentlyPlaying);
-	errorCheck();
-	if(currentlyPlaying == brakeSound && stillPlaying(playingOn))
+	VehicleSounds playing = vehicleLoops[source];
+
+
+	if(playing.brake)
 		return;
 	else
 	{
-		loopingSounds[source] = playSound(brakeSound, pos, source);
-		loopingSounds[source]->setVolume(0.3);
+		if(playing.engineRevChannel != nullptr)
+			playing.engineRevChannel->setPaused(true);
+		if(playing.engineIdleChannel != nullptr)
+			playing.engineIdleChannel->setPaused(false);
+		
+		playing.brake = true;
+		FMOD::Channel * brakeChannel = playSound(brakeSound, pos, source);
+		brakeChannel->setVolume(0.3);
+
+		vehicleLoops[source] = playing;
 	}
 }
 
@@ -146,48 +147,37 @@ void AudioEngine::playBrakeSound(PhysicsEntity * source)
 void AudioEngine::playEngineIdleSound(PhysicsEntity * source)
 {
 	glm::vec3 pos = source->getPosition();
-	playSound(engineIdleSound, pos, source);
+	VehicleSounds playing = vehicleLoops[source];
 
-	//FMOD::Channel * playingOn = loopingSounds[source];
-	//FMOD::Sound * currentlyPlaying;  
-	//if(playingOn == nullptr)
-	//{
-	//	loopingSounds[source] = playSound(engineIdleSound, pos, source);
-	//	return;
-	//}
-	//result = playingOn->getCurrentSound(&currentlyPlaying);
-	//errorCheck();
-	//if(currentlyPlaying == engineIdleSound && stillPlaying(playingOn))
-	//	return;
-	//else
-	//{
-	//	playingOn->setPaused(true);
-	//	loopingSounds[source] = playSound(engineIdleSound, pos, source);
-	//}
+	if(playing.engineRevChannel != nullptr)
+		playing.engineRevChannel->setPaused(true);
+	if(playing.engineIdleChannel != nullptr)
+		playing.engineIdleChannel->setPaused(false);
+	else
+		playing.engineIdleChannel = playSound(engineIdleSound, pos, source);
+
+	vehicleLoops[source] = playing;
+
 }
 
 void AudioEngine::playEngineRevSound(PhysicsEntity * source)
 {
 	glm::vec3 pos = source->getPosition();
 
-	FMOD::Channel * playingOn = loopingSounds[source];
-	FMOD::Sound * currentlyPlaying;  
-	if(playingOn == nullptr)
-	{
-		loopingSounds[source] = playSound(engineRevSound, pos, source);
-		loopingSounds[source]->setVolume(0.3);
-		return;
-	}
-	result = playingOn->getCurrentSound(&currentlyPlaying);
-	errorCheck();
-	if(currentlyPlaying == engineRevSound && stillPlaying(playingOn))
-		return;
+	VehicleSounds playing = vehicleLoops[source];
+
+	if(playing.engineRevChannel != nullptr)
+		playing.engineRevChannel->setPaused(false);
 	else
 	{
-		playingOn->setPaused(true);
-		loopingSounds[source] = playSound(engineRevSound, pos, source);
-		loopingSounds[source]->setVolume(0.3);
+		playing.engineRevChannel = playSound(engineRevSound, pos, source);
+		playing.engineRevChannel->setVolume(0.3);
 	}
+	if(playing.engineIdleChannel != nullptr)
+		playing.engineIdleChannel->setPaused(true);
+	
+
+	vehicleLoops[source] = playing;
 }
 
 void AudioEngine::initStreams()
@@ -220,8 +210,8 @@ bool AudioEngine::stillPlaying(FMOD::Channel * playingOn)
 	result = playingOn->getCurrentSound(&sound);
 	errorCheck();
 
-	// TODO: EngineIdle is being returned as not playing at some point
-	if(sound == engineIdleSound)
+	// TODO: Loops are not working as expected
+	if(sound == engineIdleSound || sound == engineRevSound)
 		return true;
 	
 	result = sound->getLength(&length, FMOD_TIMEUNIT_MS);
@@ -246,7 +236,7 @@ void AudioEngine::update3DPositions()
 				errorCheck();
 
 				if(sound == brakeSound)
-					loopingSounds[s->source] = nullptr;
+					vehicleLoops[s->source].brake = false;
 
 				s->channel = nullptr;
 				s->source = nullptr;

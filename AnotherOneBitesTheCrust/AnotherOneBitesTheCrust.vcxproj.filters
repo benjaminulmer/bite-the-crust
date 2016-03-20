@@ -56,6 +56,7 @@
     <ClInclude Include="SimulationCallback.h" />
     <ClInclude Include="PizzaBox.h" />
     <ClInclude Include="WheelEntity.h" />
+    <ClInclude Include="AICollisionEntity.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\textured-StandardShading.fragmentshader" />

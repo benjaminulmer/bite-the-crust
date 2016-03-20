@@ -5,11 +5,16 @@
 			"description": "Corner of the road",
             "ground": "road-turn",
             "entities": [
+                {"name": "barrier", "rotation": 35},
+                {"name": "pole", "x": 20, "rotation": 90}
             ],
 			"nodes" : [
 				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2]},
-				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]}
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4,5]},
+				{"x" : 1.0, "z" : 1.0, "neighbours" : [1]},
+				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]}
 			]
         },
 		{
@@ -20,7 +25,8 @@
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3]},
+				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
 				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
 			]
         },
@@ -30,7 +36,8 @@
 			"ground": "lawn",
 			"deliverable": true,
 			"entities": [
-                {"name": "house", "x": 10, "z": 5}
+                {"name": "house", "x": 10, "z": 5},
+                {"name": "trash bin", "x": 6, "z": 8}
 			],
 			"nodes": [ 
                 {"x": 0.5, "z": 1.0, "neighbours": []}
@@ -44,9 +51,6 @@
                 {"name": "fence", "x": 10, "rotation": 270}
             ],
             "nodes": [
-                {"x" : 0, "z" : 1.0, "neighbours" : [1]},
-                {"x": 0.5, "z": 1.0, "neighbours": [0,2]},
-                {"x": 1, "z": 1, "neighbours": [1]}
             ]
         },
 		{
@@ -60,9 +64,7 @@
                 {"name": "house", "x": 10, "z": 10, "rotation": 35}
 			],
 			"nodes": [
-				{"x": 0.8, "z": 1.0, "neighbours": [1]},
-				{"x": 0.8, "z": 0.8, "neighbours": [0,2]},
-				{"x": 1.0, "z": 0.8, "neighbours": [1]}
+				{"x": 1.0, "z": 1.0, "neighbours": []}
 			]
 		},
         {
@@ -74,9 +76,6 @@
 				{"name": "fence", "z": 10}
 			],
 			"nodes": [
-				{"x": 0.8, "z": 1.0, "neighbours": [1]},
-				{"x": 0.8, "z": 0.8, "neighbours": [0,2]},
-				{"x": 1.0, "z": 0.8, "neighbours": [1]}
 			]
 		},
 		{
@@ -88,11 +87,6 @@
                 {"name": "billboard", "x": 10, "z": 10, "rotation": 35}
 			],
 			"nodes": [
-				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
-				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]}
 			]
 		},
         {
@@ -102,11 +96,6 @@
 			"entities": [
 			],
 			"nodes": [
-				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
-				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]}
 
 			]
 		},
@@ -115,14 +104,34 @@
 			"description": "Center lawn tile with ramp",
 			"ground": "lawn",
 			"entities": [
-				{"name" : "ramp", "x" : 10, "z" : 10}
+				{"name" : "ramp", "x" : 10, "z" : 10},
+                {"name": "dumpster", "x": 10, "z": 5, "rotation": 90}
 			],
 			"nodes": [
-				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
-				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]}
+			]
+		},
+        		{
+            "id": 10,
+			"description": "Blocked straight section of the road",
+            "ground": "road-straight",
+            "entities": [
+                {"name": "road block", "x": 10, "z": 4, "rotation": 90},        
+                {"name": "road block", "x": 10, "z": 10, "rotation": 90},
+                {"name": "road block", "x": 10, "z": 16, "rotation": 90}
+            ],
+			"nodes" : [
+			]
+        },
+        {
+			"id": 11,
+			"description": "Lawn tile with benches",
+			"ground": "lawn",
+			"entities": [
+                {"name": "bench", "x": 4, "z": 2, "rotation": 90},
+                {"name": "bench", "x": 8, "z": 2, "rotation": 90}            
+			],
+			"nodes": [
+
 			]
 		}
     ],
@@ -132,10 +141,10 @@
         "tiles": [
           ["6",   "4",    "4",    "4",    "4",    "4",    "4",    "4",    "4",    "4",    "6.R"],
 		  ["4.L", "8",    "8",    "3",    "8",    "3",    "8",    "3",    "8",    "8",    "4.R"],
-		  ["4.L", "3.L",  "1.LL", "2",    "2",    "2",    "2",    "2",    "1.L",  "3.R",  "4.R"],
-		  ["4.L", "8",    "2.L",  "8",    "8",    "8",    "8",    "8",    "2.R",  "8",    "4.R"], 
+		  ["4.L", "3.L",  "1.LL", "2",    "10",    "2",    "2",    "2",    "1.L",  "3.R",  "4.R"],
+		  ["4.L", "8",    "2.L",  "8",    "11",    "11",    "8",    "8",    "2.R",  "8",    "4.R"], 
 		  ["4.L", "3.L",  "2.L",  "8",    "9.RR",    "7",    "9",    "8",    "2.R",  "3.R",  "4.R"], 
-		  ["4.L", "8",    "2.L",  "8",    "8",    "8",    "8",    "8",    "2.R",  "8",    "4.R"], 
+		  ["4.L", "8",    "2.L",  "11.RR",    "8",    "8",    "8",    "11.RR",    "2.R",  "8",    "4.R"], 
 		  ["4.L", "3.L",  "1.R",  "2.LL", "2.LL", "2.LL", "2.LL", "2.LL", "1",    "3.R",  "4.R"],
 		  ["4.L", "8",    "3.LL", "8",    "3.LL", "8",    "3.LL", "8",    "8",    "8",    "4.R"],
 		  ["6.L", "4.LL", "4.LL", "4.LL", "4.LL", "4.LL", "4.LL", "4.LL", "4.LL", "4.LL", "6.RR"]

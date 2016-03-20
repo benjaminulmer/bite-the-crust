@@ -203,7 +203,7 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 	entities.push_back(vehicle);
 
 	physx::PxShape* wheels[4];
-	physx::PxRigidDynamic* actor = vehicle->getDynamicActor();
+	physx::PxRigidActor* actor = vehicle->getActor();
 	actor->getShapes(wheels, 4);
 
 	for (unsigned int i = 0; i < 4; i++)
@@ -223,17 +223,17 @@ void Game::connectSystems()
 
 	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 	p1Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-	audioEngine->playEngineIdleSound(p1Vehicle);
-	/*
+	//audioEngine->playEngineIdleSound(p1Vehicle);
+	
 	p1Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
-	p1Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);*/
+	p1Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
 
 	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 	p2Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-	audioEngine->playEngineIdleSound(p2Vehicle);
-	/*
+	//audioEngine->playEngineIdleSound(p2Vehicle);
+	
 	p2Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
-	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);*/
+	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
 
 
 	inputEngine->reverseCam.connect(&camera, &Camera::setReverseCam);
@@ -272,7 +272,9 @@ void Game::mainLoop()
 			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
-			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map);
+			//physicsEngine->AISweep(p1Vehicle);
+			AICollisionEntity closest = physicsEngine->AISweep(p2Vehicle);
+			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map, closest);
 			p1Vehicle->update();
 			p2Vehicle->update();
 		
@@ -372,16 +374,16 @@ void Game::shootPizza(Vehicle* vehicle)
 	pizzaBox->setRenderable(renderablesMap["box"]);
 	pizzaBox->setTexture(textureMap["box"]);
 
-	physx::PxTransform transform = vehicle->getDynamicActor()->getGlobalPose();
+	physx::PxTransform transform = vehicle->getActor()->getGlobalPose();
 	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.25f, 1.0f));
 	transform.p += posOffset;
 
 	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 0.0f, 20.0f));
-	physx::PxVec3 vehicleVelocity = vehicle->getDynamicActor()->getLinearVelocity();
+	physx::PxVec3 vehicleVelocity = vehicle->getRigidDynamic()->getLinearVelocity();
 	velocity += vehicleVelocity;
 
 	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["box"], transform);
-	pizzaBox->getDynamicActor()->setLinearVelocity(velocity);
+	pizzaBox->getRigidDynamic()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
 
@@ -390,8 +392,8 @@ void Game::shootPizza(Vehicle* vehicle)
 
 void Game::unFuckerTheGame()
 {
-	p1Vehicle->getDynamicActor()->setGlobalPose(physx::PxTransform(10, 2, 20));
-	p2Vehicle->getDynamicActor()->setGlobalPose(physx::PxTransform(30, 2, 20));
+	p1Vehicle->getActor()->setGlobalPose(physx::PxTransform(10, 2, 20));
+	p2Vehicle->getActor()->setGlobalPose(physx::PxTransform(30, 2, 20));
 	p1Vehicle->getPhysicsVehicle()->setToRestState();
 	p2Vehicle->getPhysicsVehicle()->setToRestState();
 

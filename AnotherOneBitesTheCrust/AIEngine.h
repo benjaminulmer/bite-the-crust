@@ -9,6 +9,7 @@
 #include "Vehicle.h"
 #include "Map.h"
 #include "DeliveryManager.h"
+#include "AICollisionEntity.h"
 
 using std::vector;
 using glm::vec3;
@@ -46,14 +47,15 @@ public:
 	AIEngine(void);
 	~AIEngine(void);
 
-	void updateAI(Vehicle*, Delivery, Map &);
+	void updateAI(Vehicle*, Delivery, Map &, AICollisionEntity &);
 	
 
 private:
 	void updatePath(Vehicle*, Delivery, Map &);
-	void goToPoint(Vehicle*, const glm::vec3 &);
-	void avoid(Vehicle *, PhysicsEntity*, graphNode*);
-	bool tooClose(Vehicle*, PhysicsEntity*);
+	void goToPoint(Vehicle*, const glm::vec3 &, const float &);
+	void avoid(Vehicle *, graphNode*);
+	bool tooClose(Vehicle*, AICollisionEntity &);
+	void brake(Vehicle*, const float &);
 
 	std::vector<glm::vec3> aStar(graphNode *, graphNode *, std::vector<graphNode*>);
 };

@@ -184,6 +184,7 @@
     <ClCompile Include="WheelEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AICollisionEntity.h" />
     <ClInclude Include="AIEngine.h" />
     <ClInclude Include="AudioEngine.h" />
     <ClInclude Include="Camera.h" />

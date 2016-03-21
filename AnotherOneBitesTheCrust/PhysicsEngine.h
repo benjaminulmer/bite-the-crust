@@ -28,6 +28,7 @@ public:
 
 private:
 	static const int MAX_VEHICLES = 4;
+	static const int MAX_WHEELS = 4;
 	PhysicsHelper* helper;
 	VehicleCreator* vehCreator;
 

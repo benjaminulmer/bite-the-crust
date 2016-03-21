@@ -99,7 +99,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
 	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)1);
-	printf("%f\n", gas);
+	//printf("%f\n", gas);
 
 	if (gas > 0.3)
 	{

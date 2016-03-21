@@ -256,8 +256,9 @@ void Game::mainLoop()
 	unsigned int oldTimeMs = SDL_GetTicks();
 	unsigned int deltaTimeAccMs = 0;
 
+
 	// Game loop
-	while (gameState!= GameState::EXIT)
+	while (gameState == GameState::PLAY)
 	{
 		processSDLEvents();
 

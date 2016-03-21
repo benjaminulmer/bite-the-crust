@@ -820,7 +820,7 @@ void RenderingEngine::setupMinimap(Map map)
 
 }
 
-void RenderingEngine::drawMinimap(vec3 pos, Entity* van1, Entity* van2)
+void RenderingEngine::drawMinimap(Entity* van1, Entity* van2)
 {
 	 glDisable(GL_DEPTH_TEST);
 	glUseProgram(basicProgramID);

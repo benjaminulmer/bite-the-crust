@@ -69,28 +69,29 @@ public:
 	Vehicle(unsigned int stepSizeMS);
 	~Vehicle(void);
 
+	// AI stuff; might be moved into 'Player' class
+	std::vector<glm::vec3> currentPath;
+	bool pizzaDelivered;
+	glm::vec3 getDestination();
+	// END AI stuff
+
 	VehicleInput input;
 	VehicleTuning tuning;
 
 	int pizzaCount;
 	bool isInAir;
 
-	// AI stuff; might be moved into 'Player' class
-	std::vector<glm::vec3> currentPath;
-	bool pizzaDelivered;
-
+	void resetIfNeeded();
 	void update();
-	physx::PxVehicleDrive4W* getPhysicsVehicle();
 	glm::mat4 getModelMatrix();
 
 	void setPhysicsVehicle(physx::PxVehicleDrive4W* vehicle);
+	physx::PxVehicleDrive4W* getPhysicsVehicle();
 
 	sigslot::signal1<Vehicle*> shootPizzaSignal;
 	sigslot::signal1<PhysicsEntity*> brakeSignal;
 	sigslot::signal1<PhysicsEntity*> idleSignal;
 	sigslot::signal1<PhysicsEntity*> gasSignal;
-
-	glm::vec3 getDestination();
 
 private:
 	physx::PxF32 stepSizeS;

@@ -22,8 +22,8 @@ void fatalError(string errorString)
 Game::Game(void)
 {
 	window = nullptr;
-	screenWidth = 1024;		//pro csgo resolution
-	screenHeight = 768;
+	screenWidth = 1280;		//pro csgo resolution
+	screenHeight = 720;
 	gameState = GameState::PLAY;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
@@ -86,6 +86,8 @@ void Game::initSystems()
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
 	renderingEngine->setupMiscBuffers();
+
+
 }
 
 // Create and initialize all loaded entities in the game world
@@ -160,6 +162,7 @@ void Game::setupEntities()
 			}
 		}
 	}
+	renderingEngine->setupMinimap(map);
 	// Create vehicles
 	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
 	setupVehicle(p1Vehicle, physx::PxTransform(10, 2, 20), 0);
@@ -202,6 +205,7 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 		wheel->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 		entities.push_back(wheel);
 	}
+	
 }
 
 // Connects systems together
@@ -212,17 +216,17 @@ void Game::connectSystems()
 
 	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 	p1Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-	audioEngine->playEngineIdleSound(p1Vehicle);
-	/*
+	//audioEngine->playEngineIdleSound(p1Vehicle);
+	
 	p1Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
-	p1Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);*/
+	p1Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
 
 	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
 	p2Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-	audioEngine->playEngineIdleSound(p2Vehicle);
-	/*
+	//audioEngine->playEngineIdleSound(p2Vehicle);
+	
 	p2Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
-	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);*/
+	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
 
 	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
@@ -243,7 +247,7 @@ void Game::mainLoop()
 	unsigned int deltaTimeAccMs = 0;
 
 	// Game loop
-	while (gameState!= GameState::EXIT)
+	while (gameState == GameState::PLAY)
 	{
 		processSDLEvents();
 
@@ -259,9 +263,10 @@ void Game::mainLoop()
 			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
-			physicsEngine->AISweep(p1Vehicle);
-			//physicsEngine->AISweep(p2Vehicle);
-			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map);
+			AICollisionEntity closest = physicsEngine->AISweep(p2Vehicle);
+			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map, closest);
+			renderingEngine->setupNodes(p2Vehicle->currentPath, vec3(1,1,0));
+
 			p1Vehicle->update();
 			p2Vehicle->update();
 		
@@ -279,28 +284,32 @@ void Game::mainLoop()
 		renderingEngine->drawShadow(p1Vehicle->getPosition());
 		renderingEngine->drawShadow(p2Vehicle->getPosition());
 		renderingEngine->drawSkybox(p1Vehicle->getPosition());
+		renderingEngine->drawMinimap(p1Vehicle, p2Vehicle);
 
 		string speed = "Speed: ";
 		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
-		renderingEngine->printText2D(speed.data(), 0, 740, 24);
+		renderingEngine->printText2D(speed.data(), 0, 700, 24);
 
 		string frameRate = "DeltaTime: ";
 		frameRate.append(to_string(deltaTimeMs));
-		renderingEngine->printText2D(frameRate.data(), 0, 700, 20);
+		renderingEngine->printText2D(frameRate.data(), 0, 670, 20);
 
 		string score = "Score: ";
 		score.append(to_string(deliveryManager->getScore(p1Vehicle)));
-		renderingEngine->printText2D(score.data(), 800, 740, 24);
-		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 500, 700, 20);
+		renderingEngine->printText2D(score.data(), 1050, 700, 24);
+		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 725, 670, 20);
 
 		string pizzas = "Pizzas: ";
 		pizzas.append(to_string(p1Vehicle->pizzaCount));
-		renderingEngine->printText2D(pizzas.data(), 800, 680, 24);
+		renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
+		renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
 		//swap buffers
 		SDL_GL_SwapWindow(window);
 		physicsEngine->fetchSimulationResults();
 	}
+
+
 }
 
 // Loop over all SDL events since last frame and call appropriate for each type of event

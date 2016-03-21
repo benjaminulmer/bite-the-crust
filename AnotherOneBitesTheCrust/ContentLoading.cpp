@@ -488,8 +488,9 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				}
 				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
-					pos.x = 1.0f - pos.z;
+					float temp = 1.0f - pos.z;
 					pos.z = pos.x;
+					pos.x = temp;
 					tileNodes[i].position = pos;
 				}
 				tile.groundRotationDeg += -90;
@@ -504,8 +505,9 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				}
 				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
+					float temp = 1.0f - pos.x;
 					pos.x = pos.z;
-					pos.z = 1.0f - pos.x;
+					pos.z = temp;
 					tileNodes[i].position = pos;
 				}
 				tile.groundRotationDeg += 90;

@@ -254,9 +254,12 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 	scene->raycast(origin1, direction, distance, buffer1);
 	scene->raycast(origin2, direction, distance, buffer2);
 
+	AICollisionEntity toReturn = AICollisionEntity();
+	toReturn.entity = nullptr;
+
 	if (buffer1.hasBlock) 
 	{
-		AICollisionEntity toReturn = AICollisionEntity();
+		
 		PxRaycastHit hit = buffer1.block;
 
 		PxVec3 actorCentre = hit.actor->getGlobalPose().p;
@@ -264,12 +267,12 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 		toReturn.radius = (hitPoint - actorCentre).magnitude();
 		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
 		toReturn.entity = (Entity*)hit.actor->userData;
+		toReturn.distance = hit.distance;
 
-		return toReturn;
+
 	}
 	else if (buffer2.hasBlock)
 	{
-		AICollisionEntity toReturn = AICollisionEntity();
 		PxRaycastHit hit = buffer2.block;
 
 		PxVec3 actorCentre = hit.actor->getGlobalPose().p;
@@ -277,9 +280,11 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 		toReturn.radius = (hitPoint - actorCentre).magnitude();
 		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
 		toReturn.entity = (Entity*)hit.actor->userData;
+		toReturn.distance = hit.distance;
 
-		return toReturn;
 	}
+
+	return toReturn;
 }
 
 void PhysicsEngine::simulate(unsigned int deltaTimeMs)
@@ -291,7 +296,7 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 	const PxU32 raycastResultsSize = vehicleSceneQueryData->getRaycastQueryResultBufferSize();
 	PxVehicleSuspensionRaycasts(batchQuery, vehicles.size(), vehicles.data(), raycastResultsSize, raycastResults);
 
-	//Vehicle update
+	// Initialize structures to store results
 	PxVehicleWheelQueryResult results[MAX_VEHICLES];
 	PxWheelQueryResult wheelQueryResult[MAX_VEHICLES][MAX_WHEELS];
 	for (PxU32 i = 0; i < vehicles.size(); i++)
@@ -299,6 +304,7 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 		results[i].nbWheelQueryResults = MAX_WHEELS;
 		results[i].wheelQueryResults = wheelQueryResult[i];
 	}
+	// Vehicle update
 	const PxVec3 grav = scene->getGravity();
 	PxVehicleUpdates(deltaTimeS, grav, *frictionPairs, vehicles.size(), vehicles.data(), results);
 
@@ -313,8 +319,8 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 				inAir = false;
 			}
 		}
-		if (inAir) std::cout << "I'M FLYING " << i << std::endl;
-		else std::cout << "I'M NOT FLYING " << i << std::endl;
+		Vehicle* veh = (Vehicle*)vehicles[i]->getRigidDynamicActor()->userData;
+		veh->isInAir = inAir;
 	}
 	scene->simulate(deltaTimeS);
 }

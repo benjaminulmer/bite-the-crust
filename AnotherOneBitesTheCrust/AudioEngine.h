@@ -16,6 +16,12 @@ struct Sound3D
 	FMOD::Channel * channel;
 	PhysicsEntity * source;
 };
+struct VehicleSounds
+{
+	FMOD::Channel * engineIdleChannel;
+	FMOD::Channel * engineRevChannel;
+	bool brake;
+};
 
 class AudioEngine : public sigslot::has_slots<>
 {
@@ -39,7 +45,7 @@ private:
 	std::list<Sound3D*> playing;
 	std::deque<Sound3D*> availablePointers;
 
-	std::map<PhysicsEntity *, FMOD::Channel *> loopingSounds;
+	std::map<PhysicsEntity *, VehicleSounds> vehicleLoops;
 
 	int numChannels;
 

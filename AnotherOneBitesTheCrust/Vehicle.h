@@ -73,9 +73,11 @@ public:
 	VehicleTuning tuning;
 
 	int pizzaCount;
+	bool isInAir;
 
 	// AI stuff; might be moved into 'Player' class
 	std::vector<glm::vec3> currentPath;
+	bool pizzaDelivered;
 
 	void update();
 	physx::PxVehicleDrive4W* getPhysicsVehicle();

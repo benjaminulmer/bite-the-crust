@@ -6,6 +6,7 @@ struct AICollisionEntity
 {
 	glm::vec3 pos;
 	float radius;
+	float distance;
 
 	Entity* entity;
 };

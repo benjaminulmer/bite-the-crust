@@ -112,7 +112,7 @@ public:
 
 	//minimap stuff
 	void setupMinimap(Map map);
-	void drawMinimap(glm::vec3 pos, Entity* van1, Entity* van2);
+	void drawMinimap(Entity* van1, Entity* van2);
 	std::vector<glm::vec3> mmRoadVerts;
 	std::vector<float> mmRoadColors;
 	GLuint mmRoadVAO;

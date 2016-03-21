@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-const int MIN_DIST = 15;
+const int MIN_DIST = 5;
 
 AIEngine::AIEngine(void)
 {
@@ -282,12 +282,18 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
 	graphNode * destinationNode = destination.location->nodes.at(0);
-	if(obstacle.entity != nullptr && obstacle.distance < 3)
+	if(obstacle.entity != nullptr && obstacle.distance < 3 && obstacle.entity->type != EntityType::DYNAMIC)
 	{
 		avoid(toUpdate, destinationNode);
 		return;
 	}
-	goToPoint(toUpdate, toUpdate->currentPath.at(0), glm::length(destinationNode->getPosition() - toUpdate->getPosition()));
+	glm::vec3 nextPoint;
+	if(toUpdate->currentPath.size() >= 3)
+		nextPoint = toUpdate->currentPath.at(2);
+	else
+		nextPoint = toUpdate->currentPath.at(0);
+
+	goToPoint(toUpdate, nextPoint, glm::length(destinationNode->getPosition() - toUpdate->getPosition()));
 }
 
 AIEngine::~AIEngine(void)

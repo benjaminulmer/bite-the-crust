@@ -134,5 +134,13 @@ public:
 	glm::mat4 mmM;
 	glm::vec3 mmScale;
 	glm::vec3 mmCenter;
+
+
+	//testing stuf for danny
+	void setupNodes(std::vector <glm::vec3> verts, glm::vec3 color);
+	void drawNodes(int size, std::string style);
+	GLuint nodeVAO;
+	GLuint nodeVertBuffer;
+	GLuint nodeColorBuffer;
 };
 

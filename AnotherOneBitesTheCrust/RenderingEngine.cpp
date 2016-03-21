@@ -128,6 +128,10 @@ void RenderingEngine::generateIDs()
 	glGenBuffers(1, &mmVanVertBuffer);
 	glGenBuffers(1, &mmVanColorBuffer);
 	glGenBuffers(1, &mmVanColorBuffer2);
+	
+	glGenVertexArrays(1, &nodeVAO);
+	glGenBuffers(1, &nodeVertBuffer);
+	glGenBuffers(1, &nodeColorBuffer);
 	basicmvpID = glGetUniformLocation(basicProgramID, "MVP");
 
 
@@ -894,6 +898,97 @@ void RenderingEngine::drawMinimap(vec3 pos, Entity* van1, Entity* van2)
 		);
 
 	glDrawArrays(GL_TRIANGLES, 0, mmVanVerts.size());
+	glBindVertexArray(0);
+
+}
+
+void RenderingEngine::setupNodes(vector<glm::vec3> verts, glm::vec3 color)
+{
+
+	vector<float> colors;
+	for(int i = 0; i < verts.size(); i++)
+	{
+		colors.push_back(color.x);
+		colors.push_back(color.y);
+		colors.push_back(color.z);
+	}
+
+	glUseProgram(basicProgramID);
+
+	glBindVertexArray(nodeVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, nodeVertBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3) * verts.size(),	// byte size of Vec3f, 4 of them
+		verts.data(),		// pointer (Vec3f*) to contents of verts
+		GL_STATIC_DRAW);	// Usage pattern of GPU buffer
+
+							// RGB values for the 4 vertices of the quad
+
+	glBindBuffer(GL_ARRAY_BUFFER, nodeColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(float)*colors.size(),
+		colors.data(),
+		GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, nodeVertBuffer);
+	glVertexAttribPointer(
+		0,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glEnableVertexAttribArray(1); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, nodeColorBuffer);
+	glVertexAttribPointer(
+		1,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glBindVertexArray(0); // reset to default		
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+}
+
+void RenderingEngine::drawNodes(int size, string style)
+{
+	glUseProgram(basicProgramID);
+
+	// Use VAO that holds buffer bindings
+	// and attribute config of buffers
+	glBindVertexArray(nodeVAO);
+	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
+	
+
+	M = mat4(1.0f);
+	mat4 MVP = P * V * M;
+
+	glUniformMatrix4fv(basicmvpID,		// ID
+		1,		// only 1 matrix
+		GL_FALSE,	// transpose matrix, Mat4f is row major
+		value_ptr(MVP)	// pointer to data in Mat4f
+		);
+
+	GLfloat width = 30;
+	if(style == "lines")
+	{
+		glLineWidth(width);
+		glDrawArrays(GL_LINE_STRIP, 0, size);
+	}
+	else if(style == "points")
+	{
+		glPointSize(width);
+		glDrawArrays(GL_POINTS, 0, size);
+	}
 	glBindVertexArray(0);
 
 }

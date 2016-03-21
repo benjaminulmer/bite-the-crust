@@ -214,6 +214,14 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 		wheel->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 		entities.push_back(wheel);
 	}
+
+
+	for(int i = 0; i < 10; i++)
+	{
+		stuff.push_back(vec3(i));	
+	}
+
+	renderingEngine->setupNodes(stuff, vec3(1,1,0));
 }
 
 // Connects systems together
@@ -321,7 +329,7 @@ void Game::mainLoop()
 		pizzas.append(to_string(p1Vehicle->pizzaCount));
 		renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
-
+		renderingEngine->drawNodes(10, "points");
 		//swap buffers
 		SDL_GL_SwapWindow(window);
 		physicsEngine->fetchSimulationResults();

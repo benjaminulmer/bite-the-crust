@@ -214,14 +214,7 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 		wheel->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 		entities.push_back(wheel);
 	}
-
-
-	for(int i = 0; i < 10; i++)
-	{
-		stuff.push_back(vec3(i));	
-	}
-
-	renderingEngine->setupNodes(stuff, vec3(1,1,0));
+	
 }
 
 // Connects systems together
@@ -280,9 +273,11 @@ void Game::mainLoop()
 			deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 			// Update the player and AI cars
-			//physicsEngine->AISweep(p1Vehicle);
 			AICollisionEntity closest = physicsEngine->AISweep(p2Vehicle);
 			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map, closest);
+			renderingEngine->setupNodes(p2Vehicle->currentPath, vec3(1,1,0));
+
+
 			p1Vehicle->update();
 			p2Vehicle->update();
 		
@@ -329,7 +324,7 @@ void Game::mainLoop()
 		pizzas.append(to_string(p1Vehicle->pizzaCount));
 		renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
-		renderingEngine->drawNodes(10, "points");
+		renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
 		//swap buffers
 		SDL_GL_SwapWindow(window);
 		physicsEngine->fetchSimulationResults();

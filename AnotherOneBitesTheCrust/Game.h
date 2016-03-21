@@ -13,6 +13,7 @@
 #include <glew.h>
 #include <map>
 
+
 enum class GameState
 {
 	MENU,
@@ -77,5 +78,7 @@ private:
 	static const int CAMERA_POS_BUFFER_SIZE = 10;
 	glm::vec3 cameraPosBuffer[CAMERA_POS_BUFFER_SIZE];
 	int cameraPosBufferIndex;
+
+		vector <glm::vec3> stuff;
 };
 

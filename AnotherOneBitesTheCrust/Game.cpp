@@ -258,79 +258,91 @@ void Game::mainLoop()
 
 
 	// Game loop
-	while (gameState == GameState::PLAY)
+	while (gameState != GameState::EXIT)
 	{
-		processSDLEvents();
+		if(gameState == GameState::PLAY)
+		{
+			processSDLEvents();
 
 		// Figure out timestep and run physics
-		unsigned int newTimeMs = SDL_GetTicks();
-		unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
-		oldTimeMs = newTimeMs;
+			unsigned int newTimeMs = SDL_GetTicks();
+			unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
+			oldTimeMs = newTimeMs;
 
-		deltaTimeAccMs += deltaTimeMs;
-		if (deltaTimeAccMs >= PHYSICS_STEP_MS) 
-		{
-			deltaTimeAccMs -= PHYSICS_STEP_MS;
-			deliveryManager->timePassed(PHYSICS_STEP_MS);
+			deltaTimeAccMs += deltaTimeMs;
+			if (deltaTimeAccMs >= PHYSICS_STEP_MS) 
+			{
+				deltaTimeAccMs -= PHYSICS_STEP_MS;
+				deliveryManager->timePassed(PHYSICS_STEP_MS);
 
-			// Update the player and AI cars
-			AICollisionEntity closest = physicsEngine->AISweep(p2Vehicle);
-			aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map, closest);
-			renderingEngine->setupNodes(p2Vehicle->currentPath, vec3(1,1,0));
+				// Update the player and AI cars
+				AICollisionEntity closest = physicsEngine->AISweep(p2Vehicle);
+				aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map, closest);
+				renderingEngine->setupNodes(p2Vehicle->currentPath, vec3(1,1,0));
 
 
-			p1Vehicle->update();
-			p2Vehicle->update();
+				p1Vehicle->update();
+				p2Vehicle->update();
 		
-			physicsEngine->simulate(PHYSICS_STEP_MS);
+				physicsEngine->simulate(PHYSICS_STEP_MS);
 
-			// Update the camera position buffer with new location
-			if (camera.isReverseCam()) {
-				cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,15,0));
-			}
-			else {
-				cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
-			}
-			cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
+				// Update the camera position buffer with new location
+				if (camera.isReverseCam()) {
+					cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,15,0));
+				}
+				else {
+					cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+				}
+				cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
 
-			// Set camera to look at player with a positional delay
-			camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
-			camera.setLookAtPosition(p1Vehicle->getPosition());
-			renderingEngine->updateView(camera);
+				// Set camera to look at player with a positional delay
+				camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
+				camera.setLookAtPosition(p1Vehicle->getPosition());
+				renderingEngine->updateView(camera);
+			}
+			// Update Sound
+			audioEngine->update(p1Vehicle->getModelMatrix());
+
+			// Display
+			renderingEngine->displayFuncTex(entities);
+			renderingEngine->drawShadow(p1Vehicle->getPosition());
+			renderingEngine->drawShadow(p2Vehicle->getPosition());
+			renderingEngine->drawSkybox(p1Vehicle->getPosition());
+			renderingEngine->drawMinimap(p1Vehicle, p2Vehicle);
+
+			string speed = "Speed: ";
+			speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
+			renderingEngine->printText2D(speed.data(), 0, 700, 24);
+
+			string frameRate = "DeltaTime: ";
+			frameRate.append(to_string(deltaTimeMs));
+			renderingEngine->printText2D(frameRate.data(), 0, 670, 20);
+
+			string score = "Score: ";
+			score.append(to_string(deliveryManager->getScore(p1Vehicle)));
+			renderingEngine->printText2D(score.data(), 1050, 700, 24);
+			renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 725, 670, 20);
+
+			string pizzas = "Pizzas: ";
+			pizzas.append(to_string(p1Vehicle->pizzaCount));
+			renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
+
+			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
+			//swap buffers
+			SDL_GL_SwapWindow(window);
+			physicsEngine->fetchSimulationResults();
 		}
-		// Update Sound
-		audioEngine->update(p1Vehicle->getModelMatrix());
 
-		// Display
-		renderingEngine->displayFuncTex(entities);
-		renderingEngine->drawShadow(p1Vehicle->getPosition());
-		renderingEngine->drawShadow(p2Vehicle->getPosition());
-		renderingEngine->drawSkybox(p1Vehicle->getPosition());
-		renderingEngine->drawMinimap(p1Vehicle, p2Vehicle);
+		else if (gameState == GameState::MENU)
+		{
+			//menu logic
+		}
+		else if(gameState == GameState::PAUSE)
+		{
+			//pause menu logic
+		}
 
-		string speed = "Speed: ";
-		speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
-		renderingEngine->printText2D(speed.data(), 0, 700, 24);
-
-		string frameRate = "DeltaTime: ";
-		frameRate.append(to_string(deltaTimeMs));
-		renderingEngine->printText2D(frameRate.data(), 0, 670, 20);
-
-		string score = "Score: ";
-		score.append(to_string(deliveryManager->getScore(p1Vehicle)));
-		renderingEngine->printText2D(score.data(), 1050, 700, 24);
-		renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 725, 670, 20);
-
-		string pizzas = "Pizzas: ";
-		pizzas.append(to_string(p1Vehicle->pizzaCount));
-		renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
-
-		renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
-		//swap buffers
-		SDL_GL_SwapWindow(window);
-		physicsEngine->fetchSimulationResults();
 	}
-
 
 }
 

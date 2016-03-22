@@ -591,37 +591,18 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 	return true;
 }
 
-
-bool ContentLoading::same(float v1, float v2)
-{
-	return fabs( v1-v2 ) < 0.01f;
-}
-
-bool ContentLoading::getSimilarVertexIndex( 
-	glm::vec3 & in_vertex, 
-	glm::vec2 & in_uv, 
-	glm::vec3 & in_normal, 
-	std::vector<glm::vec3> & out_vertices,
-	std::vector<glm::vec2> & out_uvs,
-	std::vector<glm::vec3> & out_normals,
+bool ContentLoading::getSimilarVertexIndex_fast( 
+	PackedVertex & packed, 
+	std::map<PackedVertex,unsigned short> & VertexToOutIndex,
 	unsigned short & result
 ){
-	for ( unsigned int i=0; i<out_vertices.size(); i++ ){
-		if (
-			ContentLoading::same( in_vertex.x , out_vertices[i].x ) &&
-			ContentLoading::same( in_vertex.y , out_vertices[i].y ) &&
-			ContentLoading::same( in_vertex.z , out_vertices[i].z ) &&
-			ContentLoading::same( in_uv.x     , out_uvs     [i].x ) &&
-			ContentLoading::same( in_uv.y     , out_uvs     [i].y ) &&
-			ContentLoading::same( in_normal.x , out_normals [i].x ) &&
-			ContentLoading::same( in_normal.y , out_normals [i].y ) &&
-			ContentLoading::same( in_normal.z , out_normals [i].z )
-		){
-			result = i;
-			return true;
-		}
+	std::map<PackedVertex,unsigned short>::iterator it = VertexToOutIndex.find(packed);
+	if ( it == VertexToOutIndex.end() ){
+		return false;
+	}else{
+		result = it->second;
+		return true;
 	}
-	return false;
 }
 
 void ContentLoading::indexVBO(
@@ -634,19 +615,31 @@ void ContentLoading::indexVBO(
 	std::vector<glm::vec2> & out_uvs,
 	std::vector<glm::vec3> & out_normals
 ){
+	std::map<PackedVertex,unsigned short> VertexToOutIndex;
+
+	// For each input vertex
 	for ( unsigned int i=0; i<in_vertices.size(); i++ ){
+
+		PackedVertex packed = {in_vertices[i], in_uvs[i], in_normals[i]};
+		
+
+		// Try to find a similar vertex in out_XXXX
 		unsigned short index;
-		bool found = getSimilarVertexIndex(in_vertices[i], in_uvs[i], in_normals[i],     out_vertices, out_uvs, out_normals, index);
-		if ( found ){
+		bool found = getSimilarVertexIndex_fast( packed, VertexToOutIndex, index);
+
+		if ( found ){ // A similar vertex is already in the VBO, use it instead !
 			out_indices.push_back( index );
-		}else{
+		}else{ // If not, it needs to be added in the output data.
 			out_vertices.push_back( in_vertices[i]);
 			out_uvs     .push_back( in_uvs[i]);
 			out_normals .push_back( in_normals[i]);
-			out_indices .push_back( (unsigned short)out_vertices.size() - 1 );
+			unsigned short newindex = (unsigned short)out_vertices.size() - 1;
+			out_indices .push_back( newindex );
+			VertexToOutIndex[ packed ] = newindex;
 		}
 	}
 }
+
 
 
 

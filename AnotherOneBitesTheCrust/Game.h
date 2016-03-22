@@ -42,6 +42,7 @@ public:
 
 private:
 	static const unsigned int PHYSICS_STEP_MS = 16;
+	static const int MAX_PLAYERS = 4;
 
 	void initSystems();
 	void setupEntities();
@@ -64,7 +65,7 @@ private:
 	
 	GameState gameState;
 	Camera camera;
-	Vehicle* p1Vehicle, *p2Vehicle;
+	Vehicle * players [MAX_PLAYERS];
 
 	PhysicsEntityInfo* pizzaInfo;
 

@@ -76,7 +76,7 @@ public:
 
 	// AI stuff; might be moved into 'Player' class
 	std::vector<glm::vec3> currentPath;
-	bool pizzaDelivered;
+	bool pizzaDelivered, isAI;
 
 	void update();
 	physx::PxVehicleDrive4W* getPhysicsVehicle();

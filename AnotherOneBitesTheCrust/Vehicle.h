@@ -89,9 +89,10 @@ public:
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
 
 	sigslot::signal1<Vehicle*> shootPizzaSignal;
-	sigslot::signal1<PhysicsEntity*> brakeSignal;
-	sigslot::signal1<PhysicsEntity*> idleSignal;
-	sigslot::signal1<PhysicsEntity*> gasSignal;
+	sigslot::signal1<Vehicle*> dryFireSignal;
+	sigslot::signal1<Vehicle*> brakeSignal;
+	sigslot::signal1<Vehicle*> idleSignal;
+	sigslot::signal1<Vehicle*> gasSignal;
 
 private:
 	physx::PxF32 stepSizeS;

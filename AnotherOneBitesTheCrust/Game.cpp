@@ -215,16 +215,16 @@ void Game::connectSystems()
 	inputEngine->setCamera(camera, 0);
 
 	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
+	p1Vehicle->shootPizzaSignal.connect(audioEngine, &AudioEngine::playCannonSound);
+	p1Vehicle->dryFireSignal.connect(audioEngine, &AudioEngine::playDryFireSound);
 	p1Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-	//audioEngine->playEngineIdleSound(p1Vehicle);
-	
 	p1Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
 	p1Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
 
 	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
+	p2Vehicle->shootPizzaSignal.connect(audioEngine, &AudioEngine::playCannonSound);
+	p2Vehicle->dryFireSignal.connect(audioEngine, &AudioEngine::playDryFireSound);
 	p2Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-	//audioEngine->playEngineIdleSound(p2Vehicle);
-	
 	p2Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
 	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
 
@@ -238,6 +238,7 @@ void Game::connectSystems()
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
+	physicsEngine->simulationCallback->inPickUpLocation.connect(audioEngine, &AudioEngine::playReloadSound);
 }
 
 // Main loop of the game
@@ -368,8 +369,6 @@ void Game::shootPizza(Vehicle* vehicle)
 	pizzaBox->getRigidDynamic()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
-
-	audioEngine->playCannonSound(vehicle);
 }
 
 void Game::unFuckerTheGame()

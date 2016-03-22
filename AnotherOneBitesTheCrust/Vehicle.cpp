@@ -150,9 +150,14 @@ void Vehicle::update()
 
 	if (input.shootPizza)
 	{ 
-		if (pizzaCount > 0) {
+		if (pizzaCount > 0)
+		{
 			shootPizzaSignal(this);
 			pizzaCount--;
+		}
+		else
+		{
+			dryFireSignal(this);
 		}
 		input.shootPizza = false;
 	}

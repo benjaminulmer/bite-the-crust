@@ -12,7 +12,10 @@ void SimulationCallback::onTrigger(physx::PxTriggerPair *pairs, physx::PxU32 cou
 {
 	for (PxU32 i = 0; i < count; i++) 
 	{
-		inPickUpLocation((Vehicle*)pairs[i].otherActor->userData);
+		if (pairs[i].status == PxPairFlag::eNOTIFY_TOUCH_FOUND)
+		{
+			inPickUpLocation((Vehicle*)pairs[i].otherActor->userData);
+		}
 	}
 }
 

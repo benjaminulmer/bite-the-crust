@@ -254,7 +254,7 @@ void Game::mainLoop()
 		{
 			processSDLEvents();
 
-		// Figure out timestep and run physics
+			// Figure out timestep and run physics
 			unsigned int newTimeMs = SDL_GetTicks();
 			unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 			oldTimeMs = newTimeMs;

@@ -268,8 +268,6 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
 		toReturn.entity = (Entity*)hit.actor->userData;
 		toReturn.distance = hit.distance;
-
-
 	}
 	else if (buffer2.hasBlock)
 	{
@@ -281,7 +279,6 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
 		toReturn.entity = (Entity*)hit.actor->userData;
 		toReturn.distance = hit.distance;
-
 	}
 
 	return toReturn;

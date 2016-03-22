@@ -28,7 +28,7 @@
 	"engineMOI": 0.5,
 	
 	"gearSwitchTime": 0.2,
-	"gearFinalRatio": 2,
+	"gearFinalRatio": 2.5,
 	
 	"clutchStrength": 10
 }

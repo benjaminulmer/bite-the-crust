@@ -50,6 +50,7 @@ private:
 	void mainLoop();
 	void processSDLEvents();
 	void quitGame();
+	void endGame(std::map<Vehicle*, int> scores);
 	void shootPizza(Vehicle* vehicle);
 
 	// Temporary

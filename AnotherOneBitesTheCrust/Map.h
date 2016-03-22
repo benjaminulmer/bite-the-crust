@@ -26,6 +26,7 @@ struct Tile
 	GLuint groundTexture;
 	int groundRotationDeg;
 	bool deliverable;
+	Entity* house; // null if the tile doesn't have a house
 	bool pickup;
 };
 

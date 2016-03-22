@@ -159,6 +159,10 @@ void Game::setupEntities()
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.name], transform);
 				entities.push_back(e);
+
+				if (tileEntity.name == "house") {
+					tile->house = e;
+				}
 			}
 		}
 	}
@@ -166,8 +170,10 @@ void Game::setupEntities()
 	// Create vehicles
 	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
 	setupVehicle(p1Vehicle, physx::PxTransform(10, 2, 20), 0);
+	p1Vehicle->houseTexture = ContentLoading::loadDDS("res\\Textures\\house-delivered-red.DDS");
 	p2Vehicle = new Vehicle(PHYSICS_STEP_MS);
 	setupVehicle(p2Vehicle, physx::PxTransform(30, 2, 20), 1);
+	p2Vehicle->houseTexture = ContentLoading::loadDDS("res\\Textures\\house-delivered-blue.DDS");
 
 	// Initialize player location buffer for camera
 	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
@@ -242,6 +248,8 @@ void Game::connectSystems()
 
 	deliveryManager->addPlayer(p1Vehicle);
 	deliveryManager->addPlayer(p2Vehicle);
+
+	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
 
 	deliveryManager->deliveryTextures[p1Vehicle] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
 	deliveryManager->deliveryTextures[p2Vehicle] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
@@ -381,6 +389,11 @@ void Game::processSDLEvents()
 			// other events, do nothing yet
 		}
 	}
+}
+
+void Game::endGame(std::map<Vehicle*, int> scores) {
+	gameState = GameState::EXIT;
+	fatalError("Game over!");
 }
 
 // Creates and fires a pizza from the provided vehicle

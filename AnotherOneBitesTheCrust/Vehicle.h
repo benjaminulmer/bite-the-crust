@@ -73,6 +73,7 @@ public:
 	VehicleTuning tuning;
 
 	int pizzaCount;
+	GLuint houseTexture;
 
 	// AI stuff; might be moved into 'Player' class
 	std::vector<glm::vec3> currentPath;

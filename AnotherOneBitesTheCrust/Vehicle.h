@@ -10,6 +10,9 @@ struct VehicleInput
 	float backward;
 	bool handBrake;
 	bool shootPizza;
+
+	// inputs for cheats
+	bool jump;
 };
 
 struct VehicleTuning
@@ -73,6 +76,7 @@ public:
 
 	// AI stuff; might be moved into 'Player' class
 	std::vector<glm::vec3> currentPath;
+	bool pizzaDelivered;
 
 	void update();
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
@@ -81,6 +85,9 @@ public:
 	void setPhysicsVehicle(physx::PxVehicleDrive4W* vehicle);
 
 	sigslot::signal1<Vehicle*> shootPizzaSignal;
+	sigslot::signal1<PhysicsEntity*> brakeSignal;
+	sigslot::signal1<PhysicsEntity*> idleSignal;
+	sigslot::signal1<PhysicsEntity*> gasSignal;
 
 	glm::vec3 getDestination();
 

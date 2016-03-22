@@ -21,6 +21,7 @@ void SimulationCallback::onSleep(physx::PxActor **actors, physx::PxU32 count)
 	for (PxU32 i = 0; i < count; i ++)
 	{
 		pizzaBoxSleep((PizzaBox*)actors[i]->userData);
+		//actors[i]->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, false);
 	}
 }
 

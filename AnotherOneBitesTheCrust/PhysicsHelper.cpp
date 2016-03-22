@@ -7,22 +7,6 @@ using namespace physx;
 PhysicsHelper::PhysicsHelper(PxPhysics* physics, PxCooking* cooking)
 	: physics(physics), cooking(cooking) {}
 
-PxActor* PhysicsHelper::createTriggerVolume()
-{
-	PxSphereGeometry geometry(10.0f); 
-	PxTransform transform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat::createIdentity());
-	PxMaterial* material = physics->createMaterial(0.5f, 0.5f, 0.5f);
-
-	PxRigidStatic* actor = PxCreateStatic(*physics, transform, geometry, *material);
-	PxShape* shape;
-	actor->getShapes(&shape, 1);
-	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
-	shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
-
-	return actor;
-}
-
 PxRigidStatic* PhysicsHelper::createDrivablePlane(PxMaterial* material)
 {
 	//Add a plane to the scene.
@@ -99,3 +83,13 @@ std::vector<PxVec3> PhysicsHelper::glmVertsToPhysXVerts(std::vector<glm::vec3> v
 	return toReturn;
 }
 
+std::vector<PxU32> PhysicsHelper::u16ToU32Faces(std::vector<unsigned short> faces)
+{
+	std::vector<PxU32> toReturn = std::vector<PxU32>(); 
+	for (auto face : faces)
+	{
+		toReturn.push_back((PxU32)face);
+	}
+
+	return toReturn;
+}

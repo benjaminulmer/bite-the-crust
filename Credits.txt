@@ -4,7 +4,35 @@ Music (or "8Bit Introduction" song) by Tristan Lohengrin
 cannon.wav
 	http://www.freesound.org/people/ReadeOnly/sounds/186951/ 
 
-Construction Barrier model by PagDev
+Construction Barrier model/texture by PagDev
 	http://opengameart.org/content/construction-barrier-3d
+Road block model/texture by Calinou
+	http://opengameart.org/content/concrete-barrier
+Telephone pole model/texture by Rakshi Games
+	http://opengameart.org/content/free-big-post
+Dumpster model/texture by ulf
+	http://opengameart.org/content/dumpster-3-cubic-yard-capacity
+Trash can model/texture by yethiel
+	http://opengameart.org/content/trashcan
+Bench model/texture by yethiel
+	http://opengameart.org/content/bench-1
 
 The Compressionator
+	http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/the-compressonator/
+
+
+engineRev.wav
+	http://www.freesound.org/people/ReadeOnly/sounds/186960/
+
+engineIdle.wav
+	http://www.freesound.org/people/ReadeOnly/sounds/186939/
+
+brake.wav
+	http://www.freesound.org/people/Iberian_Runa/sounds/217542/
+
+	
+Obj and DDS loading
+	http://www.opengl-tutorial.org/
+
+Textures from
+	http://www.textures.com/

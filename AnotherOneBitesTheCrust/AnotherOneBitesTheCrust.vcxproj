@@ -100,7 +100,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;PhysX3VehicleCHECKED.lib;glew32.lib;freetype.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;PhysX3CHECKED_x86.lib;PhysX3CommonCHECKED_x86.lib;PhysX3ExtensionsCHECKED.lib;PhysXProfileSDKCHECKED.lib;PhysX3CookingCHECKED_x86.lib;PhysX3VehicleCHECKED.lib;glew32.lib;freetype.lib;fmodL_vc.lib;ftgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)\dlls\*" "$(OutDir)" /d /y</Command>
@@ -181,8 +181,10 @@
     <ClCompile Include="ShaderTools.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
+    <ClCompile Include="WheelEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AICollisionEntity.h" />
     <ClInclude Include="AIEngine.h" />
     <ClInclude Include="AudioEngine.h" />
     <ClInclude Include="Camera.h" />
@@ -209,6 +211,7 @@
     <ClInclude Include="ShaderTools.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
+    <ClInclude Include="WheelEntity.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\textured-StandardShading.fragmentshader" />

@@ -9,6 +9,7 @@
 #include "Vehicle.h"
 #include "Map.h"
 #include "DeliveryManager.h"
+#include "AICollisionEntity.h"
 
 using std::vector;
 using glm::vec3;
@@ -22,7 +23,7 @@ struct Player
 
 struct TileAI
 {
-	static const int SIZE = 10;
+	static const int SIZE = 2;
 
 	// Should these coordinates be relative to the tile or the map?
 	// If it's relative to the tile, need a method to get player space -> tile space
@@ -46,12 +47,16 @@ public:
 	AIEngine(void);
 	~AIEngine(void);
 
-	void updateAI(Vehicle*, Delivery, Map &);
+	void updateAI(Vehicle*, Delivery, Map &, AICollisionEntity &);
 	
 
 private:
 	void updatePath(Vehicle*, Delivery, Map &);
-	void goToPoint(Vehicle*, const glm::vec3 &);
-	std::vector<glm::vec3> dijkstras(graphNode *, graphNode *, std::vector<graphNode*>);
+	void goToPoint(Vehicle*, const glm::vec3 &, const float &);
+	void avoid(Vehicle *, graphNode*);
+	bool tooClose(Vehicle*, AICollisionEntity &);
+	void brake(Vehicle*, const float &);
+
+	std::vector<glm::vec3> aStar(graphNode *, graphNode *, std::vector<graphNode*>);
 };
 

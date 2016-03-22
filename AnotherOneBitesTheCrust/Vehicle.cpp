@@ -13,6 +13,7 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	input.steer = 0;
 	input.handBrake = false;
 	input.shootPizza = false;
+	input.jump = false;
 
 	stepSizeS = stepSizeMS/100.0f;
 	tipAngle = 0;
@@ -22,6 +23,8 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	setSteerSpeedData();
 
 	pizzaCount = 3;
+
+	type = EntityType::VEHICLE;
 }
 
 glm::vec3 Vehicle::getDestination()
@@ -51,9 +54,9 @@ void Vehicle::setSteerSpeedData()
 	steerVsSpeedData[4] = 30.0f;         steerVsSpeedData[5] = 0.125f;
 	steerVsSpeedData[6] = 120.0f;        steerVsSpeedData[7] = 0.1f;
 	steerVsSpeedData[8] = PX_MAX_F32;    steerVsSpeedData[9] = PX_MAX_F32;
-	steerVsSpeedData[10] = PX_MAX_F32;    steerVsSpeedData[11] = PX_MAX_F32;
-	steerVsSpeedData[12] = PX_MAX_F32;    steerVsSpeedData[13] = PX_MAX_F32;
-	steerVsSpeedData[14] = PX_MAX_F32;    steerVsSpeedData[15] = PX_MAX_F32;
+	steerVsSpeedData[10] = PX_MAX_F32;   steerVsSpeedData[11] = PX_MAX_F32;
+	steerVsSpeedData[12] = PX_MAX_F32;   steerVsSpeedData[13] = PX_MAX_F32;
+	steerVsSpeedData[14] = PX_MAX_F32;   steerVsSpeedData[15] = PX_MAX_F32;
 	steerVsSpeedTable = PxFixedSizeLookupTable<8>(steerVsSpeedData, 4); 
 }
 
@@ -89,26 +92,45 @@ void Vehicle::update()
 	(input.handBrake) ? handBrake = 1.0f: handBrake = 0.0f;
 
 	// Check if gear should switch from reverse to forward or vise versa
-	if (forwardSpeed == 0 && input.backward > 0)
+	if (forwardSpeed == 0) 
 	{
-		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+		if (input.forward > 0)
+		{
+			physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+		}
+		else if (input.backward > 0) 
+		{
+			physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+		}
 	}
-	else if (forwardSpeed == 0 && input.forward > 0)
+	else if (forwardSpeed < 5 && input.backward > 0)
 	{
-		physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+		physicsVehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eREVERSE);
 	}
+	else if (forwardSpeed > -5 && input.forward > 0)
+	{
+		physicsVehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eFIRST);
+	}	
 
 	// Determine how to apply controller input depending on current gear
 	if (physicsVehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE)
 	{
 		vehicleInput.setAnalogAccel(input.backward);
 		vehicleInput.setAnalogBrake(input.forward);
+		if(input.forward > 0 && forwardSpeed < 0)
+			brakeSignal(this);
 	} 
 	else 
 	{
 		vehicleInput.setAnalogAccel(input.forward);
 		vehicleInput.setAnalogBrake(input.backward);
+		if(input.forward > 0)
+			gasSignal(this);
+		if(input.backward > 0 && forwardSpeed > 0)
+			brakeSignal(this);
 	}
+	if(input.forward == 0 && input.backward == 0)
+		idleSignal(this);
 
 	// Steer and handbrake
 	vehicleInput.setAnalogSteer(input.steer);
@@ -124,12 +146,23 @@ void Vehicle::update()
 		}
 		input.shootPizza = false;
 	}
+
+	if (input.jump)
+	{
+		PxRigidBody* rigid = (PxRigidBody*)actor;
+		rigid->addForce(PxVec3(0, 500, 0), PxForceMode::eACCELERATION);
+		input.jump = false;
+	}
 }
 
 glm::mat4 Vehicle::getModelMatrix()
 {
-	PxF32 alpha = 0.02f;
-	tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.01f);
+	PxF32 alpha = 0.01f;
+	tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.008f);
+	if (tipAngle > PxPi * (45.0f/180.0f))
+	{
+		tipAngle = PxPi * (45.0f/180.0f);
+	}
 
 	PxTransform transform(PxQuat(tipAngle, PxVec3(0, 0, 1)));
 	transform = actor->getGlobalPose() * transform;

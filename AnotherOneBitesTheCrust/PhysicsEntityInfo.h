@@ -74,7 +74,7 @@ struct SphereInfo
 struct CapsuleInfo
 	: public ShapeInfo
 {
-	float raidus;
+	float radius;
 	float halfHeight;
 };
 
@@ -93,7 +93,9 @@ struct TriangleMeshInfo
 
 struct PhysicsEntityInfo
 {
-	std::vector<ShapeInfo*> shapeInfo;
 	PhysicsType type;
 	DynamicInfo* dynamicInfo;
+
+	std::vector<ShapeInfo*> shapeInfo;
+	physx::PxF32 yPosOffset;
 };

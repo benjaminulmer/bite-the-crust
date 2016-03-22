@@ -1,5 +1,10 @@
 #include "Entity.h"
+#include <iostream>
 
+void Entity::testPrint() 
+{
+	std::cout << "I am an entity! " << (int)type << std::endl;
+}
 
 Entity::Entity(void)
 {
@@ -9,8 +14,8 @@ Entity::Entity(void)
 	defaultScale = glm::vec3(1,1,1);
 	renderable = nullptr;
 
+	type = EntityType::BASE;
 }
-
 
 Entity::~Entity(void)
 {

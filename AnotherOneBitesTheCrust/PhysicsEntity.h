@@ -10,15 +10,12 @@ public:
 	PhysicsEntity(void);
 	~PhysicsEntity(void);
 
+	void setPosition(glm::vec3);
 	glm::vec3 getPosition();
+	virtual glm::mat4 getModelMatrix();
 
 	virtual void setActor(physx::PxRigidActor* a);
 	virtual physx::PxRigidActor* getActor();
-
-	void setPosition(glm::vec3);
-	virtual glm::mat4 getModelMatrix();
-
-	virtual void onSleep();
 
 protected:
 	physx::PxRigidActor* actor;

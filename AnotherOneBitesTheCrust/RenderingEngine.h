@@ -19,9 +19,6 @@
 #include "Camera.h"
 #include "ContentLoading.h"
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
 class RenderingEngine
 {
 public:
@@ -45,13 +42,6 @@ public:
 	void testDraw();
 	void testOBJLoading();
 	GLuint textureProgramID;
-	
-	bool loadOBJ(
-	const char * path, 
-	std::vector<glm::vec3> & out_vertices, 
-	std::vector<glm::vec2> & out_uvs,
-	std::vector<glm::vec3> & out_normals
-	);
 
 	std::vector <glm::vec3> textureVerts;
 	std::vector <glm::vec3> textureNorms;
@@ -61,27 +51,44 @@ public:
 	GLuint TextureID;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//////////////////////BLOB SHADOWS////////////////////////////////////
+	//////////////////////MISC////////////////////////////////////
 	GLuint shadowProgramID;
 	GLuint sphereVAO;
 	GLuint sphereVertBuffer;
 	GLuint sphereColorBuffer;
 	std::vector<glm::vec3> shadowVertices;
-	void setupShadowBuffers();
-	void drawShadow(glm::vec3 position);
 
-	//int init_resourses();
-	//void render_text(const std::string &str, FT_Face face, float x, float y, float sx, float sy);
-	//void displayText();
+	GLuint skyVAO;
+	GLuint skyVertBuffer;
+	GLuint skyUVBuffer;
+	GLuint skyNormalBuffer;
+	std::vector<glm::vec3> skyVertices;
+	std::vector <glm::vec3> skyNorms;
+	std::vector <glm::vec2> skyUVs;
+	GLuint skyTex;
+	void setupMiscBuffers();
+	void drawShadow(glm::vec3 position);
+	void drawSkybox(glm::vec3 position);
 
 	void initText2D(const char * texturePath);
 	void printText2D(const char * text, int x, int y, int size);
+	void printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color);
 	void cleanupText2D();
 
 	GLuint textProgramID;			//shader
+	GLuint colorID;
 	GLuint textTextureID;			//texture
 	GLuint Text2DVertexBufferID;	//vertex buffer
 	GLuint Text2DUVBufferID;		//UV buffer
+	GLuint mvpID;
+	GLuint vID;
+	GLuint mID;
+	GLuint tID;
+	GLuint normalID;
+	GLuint lightPos;
+	GLuint lightPow;
+	GLuint ambientScale;
+	GLint basicmvpID;
 
 	GLuint basicProgramID;		//shader program 
 
@@ -100,8 +107,40 @@ public:
 	glm::mat4 P;
 	glm::mat4 O;
 
-	void renderText();
 
 	GLuint textVAO;
+
+	//minimap stuff
+	void setupMinimap(Map map);
+	void drawMinimap(Entity* van1, Entity* van2);
+	std::vector<glm::vec3> mmRoadVerts;
+	std::vector<float> mmRoadColors;
+	GLuint mmRoadVAO;
+	GLuint mmRoadVertBuffer;
+	GLuint mmRoadColorBuffer;
+	std::vector<glm::vec3> mmHouseVerts;
+	std::vector<float> mmHouseColors;
+	GLuint mmHouseVAO;
+	GLuint mmHouseVertBuffer;
+	GLuint mmHouseColorBuffer;
+	std::vector<glm::vec3> mmVanVerts;
+	std::vector<float> mmVanColors;
+	GLuint mmVanVAO;
+	GLuint mmVanVAO2;
+	GLuint mmVanVertBuffer;
+	GLuint mmVanColorBuffer;
+	GLuint mmVanColorBuffer2;
+	glm::mat4 mmV;
+	glm::mat4 mmM;
+	glm::vec3 mmScale;
+	glm::vec3 mmCenter;
+
+
+	//testing stuf for danny
+	void setupNodes(std::vector <glm::vec3> verts, glm::vec3 color);
+	void drawNodes(int size, std::string style);
+	GLuint nodeVAO;
+	GLuint nodeVertBuffer;
+	GLuint nodeColorBuffer;
 };
 

@@ -2,6 +2,9 @@
 
 namespace ContentLoading {
 
+	std::map<std::string, Renderable*> loadedModels;
+	std::map<std::string, GLuint> loadedTextures;
+
 // Loads and stores tuning data for vehicle from provided file
 bool loadVehicleData(char* filename, Vehicle* vehicle) {
 	FILE* filePointer;
@@ -145,8 +148,14 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 
 		std::string renderableModelFile = entitiesArray[i]["model"].GetString();
 		renderableModelFile.insert(0, "res\\Models\\");
-		Renderable* r = createRenderable(renderableModelFile);
-		modelMap[name] = r;
+		Renderable* r;
+		if (loadedModels.find(renderableModelFile) == loadedModels.end()) {
+			r = createRenderable(renderableModelFile);
+			loadedModels[renderableModelFile] = r;
+			modelMap[name] = r;
+		} else {
+			modelMap[name] = loadedModels[renderableModelFile];
+		}
 
 		std::string physicsDataName = entitiesArray[i]["physics"].GetString();
 		physicsDataName.insert(0, "res\\JSON\\Physics\\");
@@ -156,7 +165,13 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 		if (entitiesArray[i].HasMember("texture")) {
 			std::string textureName = entitiesArray[i]["texture"].GetString();
 			textureName.insert(0, "res\\Textures\\");
-			textureMap[name] = loadDDS(textureName.c_str());
+			if (loadedTextures.find(textureName) == loadedTextures.end()) {
+				GLuint texture = loadDDS(textureName.c_str());
+				loadedTextures[textureName] = texture;
+				textureMap[name] = texture;
+			} else {
+				textureMap[name] = loadedTextures[textureName];
+			}
 		}
 	}
 
@@ -175,10 +190,17 @@ Renderable* createRenderable(std::string modelFile) {
 
 	bool res = ContentLoading::loadOBJ(modelFile.c_str(), verts, uvs, normals, faces, raw_verts);
 
-	r->setVerts(verts);
-	r->setUVs(uvs);
-	r->setNorms(normals);
-	r->setFaces(faces);
+	std::vector<unsigned short> indices;
+	std::vector<glm::vec3> indexed_vertices;
+	std::vector<glm::vec2> indexed_uvs;
+	std::vector<glm::vec3> indexed_normals;
+	ContentLoading::indexVBO(verts, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
+	r->verts = indexed_vertices;
+	r->raw_verts = raw_verts;
+	r->uvs = indexed_uvs;
+	r->norms = indexed_normals;
+	r->drawFaces = indices;
+	r->faces = faces;
 
 	return r;
 }
@@ -221,6 +243,10 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			info->dynamicInfo->angularDamping = (float)dynamicInfo["angularDamping"].GetDouble();
 		}
 	}
+
+	glm::vec3 dims = model->getDimensions();
+	info->yPosOffset = dims.y * 0.5f;
+
 	if (d.HasMember("geometry")) {
 		const rapidjson::Value& geometry = d["geometry"];
 		for (rapidjson::SizeType i = 0; i < geometry.Size(); i++) {
@@ -230,10 +256,9 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 				BoxInfo* box = new BoxInfo();
 				box->geometry = Geometry::BOX;
 				// Use the model dimensions by default
-				glm::vec3 d = model->getDimensions();
-				box->halfX = d.x * 0.5f;
-				box->halfY = d.y * 0.5f;
-				box->halfZ = d.z * 0.5f;
+				box->halfX = dims.x * 0.5f;
+				box->halfY = dims.y * 0.5f;
+				box->halfZ = dims.z * 0.5f;
 				// Overwrite with specifics if they're there
 				if (geometry[i].HasMember("halfX"))
 					box->halfX = (float)geometry[i]["halfX"].GetDouble();
@@ -243,38 +268,46 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 					box->halfZ = (float)geometry[i]["halfZ"].GetDouble();
 				shape = box;
 			}
-
-			// Added by Ben for testing
-			else if (shapeName == "convexMesh")
-			{
+			else if (shapeName == "sphere") {
+				SphereInfo* sphere = new SphereInfo();
+				if (geometry[i].HasMember("radius"))
+					sphere->radius = (float)geometry[i]["radius"].GetDouble();
+			}
+			else if (shapeName == "capsule") {
+				CapsuleInfo* capsule = new CapsuleInfo();
+				if (geometry[i].HasMember("radius"))
+					capsule->radius = (float)geometry[i]["radius"].GetDouble();
+				if (geometry[i].HasMember("halfHeight"))
+					capsule->halfHeight= (float)geometry[i]["halfHeight"].GetDouble();
+			}
+			else if (shapeName == "convexMesh") {
 				ConvexMeshInfo* convexMesh = new ConvexMeshInfo();
 				convexMesh->geometry = Geometry::CONVEX_MESH;
-				convexMesh->verts = model->getVertices();
+				convexMesh->verts = model->verts;
 				shape = convexMesh;
 			}
-			else if (shapeName == "triangleMesh")
-			{
+			else if (shapeName == "triangleMesh") {
 				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
 				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
-				triangleMesh->verts = model->getVertices();
-				triangleMesh->faces = model->getFaces();
+				triangleMesh->verts = model->raw_verts;
+				triangleMesh->faces = model->faces;
 				shape = triangleMesh;
 			}
 			
-			
 			if (geometry[i].HasMember("flag0")) {
 				shape->filterFlag0 = stringToFlag(geometry[i]["flag0"].GetString());
-			} else {
-				shape->filterFlag0 = FilterFlag::OBSTACLE;
 			}
 			if (geometry[i].HasMember("flag1")) {
 				shape->filterFlag1 = stringToFlag(geometry[i]["flag1"].GetString());
-			} else {
-				shape->filterFlag1 = FilterFlag::OBSTACLE_AGAINST;
+			}
+			if (geometry[i].HasMember("flag2")) {
+				shape->filterFlag0 = stringToFlag(geometry[i]["flag2"].GetString());
+			}
+			if (geometry[i].HasMember("flag3")) {
+				shape->filterFlag1 = stringToFlag(geometry[i]["flag3"].GetString());
 			}
 			if (geometry[i].HasMember("isDrivable")) {
 				shape->isDrivable = (geometry[i]["isDrivable"].GetInt() != 0);
-				std::cout << "TEST: " << geometry[i]["isDrivable"].GetInt() << std::endl;
 			}
 			info->shapeInfo.push_back(shape);
 		}
@@ -316,8 +349,8 @@ bool validateMap(rapidjson::Document &d) {
 			return false;
 		}
 		for (rapidjson::SizeType j = 0; j < entry["entities"].Size(); j++) {
-			if (!entry["entities"][j].HasMember("model")) {
-				printf("Entity %d in tile %d is missing a model.", j, entry["id"]);
+			if (!entry["entities"][j].HasMember("name")) {
+				printf("Entity %d in tile %d is missing a name.", j, entry["id"]);
 				return false;
 			}
 		}
@@ -338,7 +371,7 @@ bool validateMap(rapidjson::Document &d) {
 	return true;
 }
 
-//todo, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
+//TODO, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
 bool ContentLoading::loadMap(char* filename, Map &map) {
 	FILE* filePointer;
 	errno_t err = fopen_s(&filePointer, filename, "rb");
@@ -366,9 +399,19 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		std::string ground = tileArray[i]["ground"].GetString();
 		Tile t;
 		t.groundModel = ground;
+		if (tileArray[i].HasMember("deliverable")) {
+			t.deliverable = tileArray[i]["deliverable"].GetBool();
+		} else {
+			t.deliverable = false;
+		}
+		if (tileArray[i].HasMember("pickup")) {
+			t.pickup = tileArray[i]["pickup"].GetBool();
+		} else {
+			t.pickup = false;
+		}
 		const rapidjson::Value& entityArray = tileArray[i]["entities"];
 		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
-			std::string model = entityArray[j]["model"].GetString();
+			std::string name = entityArray[j]["name"].GetString();
 			double x = 0;
 			double y = 0;
 			double z = 0;
@@ -379,11 +422,16 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			if (entityArray[j].HasMember("z"))
 				z = entityArray[j]["z"].GetDouble();
 
-
 			TileEntity e;
-			e.model = model;
+			e.name = name;
 			e.position = glm::vec3(x, y, z);
-			t.entities.push_back(e);
+
+			if (entityArray[j].HasMember("rotation"))
+				e.rotationDeg = (float)entityArray[j]["rotation"].GetDouble();
+			else
+				e.rotationDeg = 0;
+
+			t.entityTemplates.push_back(e);
 		}
 
 		const rapidjson::Value& nodeArray = tileArray[i]["nodes"];
@@ -428,48 +476,57 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			Tile tile = tiles[id];
 			std::vector<NodeTemplate> tileNodes = nodes[id];
 
+			tile.groundRotationDeg = 0;
 			// Handle rotations
 			if (rotation == "R") {
-				for (int i = 0; i < tile.entities.size(); i++) {
-					int x = tile.entities[i].position.x;
-					int z = tile.entities[i].position.z;
-					tile.entities[i].position.x = tileSize - z;
-					tile.entities[i].position.z = x;
+				for (unsigned int i = 0; i < tile.entityTemplates.size(); i++) {
+					int x = (int)tile.entityTemplates[i].position.x;
+					int z = (int)tile.entityTemplates[i].position.z;
+					tile.entityTemplates[i].position.x = (float)(tileSize - z);
+					tile.entityTemplates[i].position.z = (float)x;
+					tile.entityTemplates[i].rotationDeg += -90;
 				}
-				for (int i = 0; i < tileNodes.size(); i++) {
+				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
-					pos.x = 1.0 - pos.z;
+					float temp = 1.0f - pos.z;
 					pos.z = pos.x;
+					pos.x = temp;
 					tileNodes[i].position = pos;
 				}
+				tile.groundRotationDeg += -90;
 			}
 			if (rotation == "L") {
-				for (int i = 0; i < tile.entities.size(); i++) {
-					int x = tile.entities[i].position.x;
-					int z = tile.entities[i].position.z;
-					tile.entities[i].position.x = z;
-					tile.entities[i].position.z = tileSize - x;
+				for (unsigned int i = 0; i < tile.entityTemplates.size(); i++) {
+					int x = (int)tile.entityTemplates[i].position.x;
+					int z = (int)tile.entityTemplates[i].position.z;
+					tile.entityTemplates[i].position.x = (float)z;
+					tile.entityTemplates[i].position.z = (float)(tileSize - x);
+					tile.entityTemplates[i].rotationDeg += 90;
 				}
-				for (int i = 0; i < tileNodes.size(); i++) {
+				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
+					float temp = 1.0f - pos.x;
 					pos.x = pos.z;
-					pos.z = 1.0 - pos.x;
+					pos.z = temp;
 					tileNodes[i].position = pos;
 				}
+				tile.groundRotationDeg += 90;
 			}
 			if (rotation == "RR" || rotation == "LL") {
-				for (int i = 0; i < tile.entities.size(); i++) {
-					int x = tile.entities[i].position.x;
-					int z = tile.entities[i].position.z;
-					tile.entities[i].position.x = tileSize - x;
-					tile.entities[i].position.z = tileSize - z;
+				for (unsigned int i = 0; i < tile.entityTemplates.size(); i++) {
+					int x = (int)tile.entityTemplates[i].position.x;
+					int z = (int)tile.entityTemplates[i].position.z;
+					tile.entityTemplates[i].position.x = (float)(tileSize - x);
+					tile.entityTemplates[i].position.z = (float)(tileSize - z);
+					tile.entityTemplates[i].rotationDeg += 180;
 				}
-				for (int i = 0; i < tileNodes.size(); i++) {
+				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
-					pos.x = 1.0 - pos.x;
-					pos.z = 1.0 - pos.z;
+					pos.x = 1.0f - pos.x;
+					pos.z = 1.0f - pos.z;
 					tileNodes[i].position = pos;
 				}
+				tile.groundRotationDeg += 180;
 			}
 
 			// Positions of nodes
@@ -487,10 +544,10 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			}
 
 			// Local Connections
-			for(int k = 0; k < tileNodes.size(); k++)
+			for(unsigned int k = 0; k < tileNodes.size(); k++)
 			{
 				NodeTemplate current = tileNodes.at(k);
-				for(int l = 0; l < current.neighbours.size(); l++)
+				for(unsigned int l = 0; l < current.neighbours.size(); l++)
 				{
 					int index = current.neighbours[l];
 					tile.nodes.at(k)->addNeighbour(tile.nodes.at(index));
@@ -511,11 +568,11 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			allNodes.insert(allNodes.begin(), t.nodes.begin(), t.nodes.end());
 		}
 	}
-	for(int i = 0; i < allNodes.size(); i++)
+	for(unsigned int i = 0; i < allNodes.size(); i++)
 	{
 		graphNode * current = allNodes.at(i);
 
-		for(int j = i+1; j < allNodes.size(); j++)
+		for(unsigned int j = i+1; j < allNodes.size(); j++)
 		{
 			graphNode * comparing = allNodes.at(j);
 
@@ -533,6 +590,58 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 	fclose(filePointer);
 	return true;
 }
+
+bool ContentLoading::getSimilarVertexIndex_fast( 
+	PackedVertex & packed, 
+	std::map<PackedVertex,unsigned short> & VertexToOutIndex,
+	unsigned short & result
+){
+	std::map<PackedVertex,unsigned short>::iterator it = VertexToOutIndex.find(packed);
+	if ( it == VertexToOutIndex.end() ){
+		return false;
+	}else{
+		result = it->second;
+		return true;
+	}
+}
+
+void ContentLoading::indexVBO(
+	std::vector<glm::vec3> & in_vertices,
+	std::vector<glm::vec2> & in_uvs,
+	std::vector<glm::vec3> & in_normals,
+
+	std::vector<unsigned short> & out_indices,
+	std::vector<glm::vec3> & out_vertices,
+	std::vector<glm::vec2> & out_uvs,
+	std::vector<glm::vec3> & out_normals
+){
+	std::map<PackedVertex,unsigned short> VertexToOutIndex;
+
+	// For each input vertex
+	for ( unsigned int i=0; i<in_vertices.size(); i++ ){
+
+		PackedVertex packed = {in_vertices[i], in_uvs[i], in_normals[i]};
+		
+
+		// Try to find a similar vertex in out_XXXX
+		unsigned short index;
+		bool found = getSimilarVertexIndex_fast( packed, VertexToOutIndex, index);
+
+		if ( found ){ // A similar vertex is already in the VBO, use it instead !
+			out_indices.push_back( index );
+		}else{ // If not, it needs to be added in the output data.
+			out_vertices.push_back( in_vertices[i]);
+			out_uvs     .push_back( in_uvs[i]);
+			out_normals .push_back( in_normals[i]);
+			unsigned short newindex = (unsigned short)out_vertices.size() - 1;
+			out_indices .push_back( newindex );
+			VertexToOutIndex[ packed ] = newindex;
+		}
+	}
+}
+
+
+
 
 bool ContentLoading::loadOBJ(
 	const char * path, 
@@ -574,7 +683,7 @@ bool ContentLoading::loadOBJ(
 		}else if ( strcmp( lineHeader, "vt" ) == 0 ){
 			glm::vec2 uv;
 			fscanf_s(file, "%f %f\n", &uv.x, &uv.y );
-			uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
+			uv.y = -uv.y; 
 			temp_uvs.push_back(uv);
 		}else if ( strcmp( lineHeader, "vn" ) == 0 ){
 			glm::vec3 normal;
@@ -584,10 +693,7 @@ bool ContentLoading::loadOBJ(
 			std::string vertex1, vertex2, vertex3;
 			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
 			int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
-			if (matches != 9){
-				printf("File can't be read by our simple parser :-( Try exporting with other options\n");
-				return false;
-			}
+
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
 			vertexIndices.push_back(vertexIndex[2]);
@@ -600,7 +706,6 @@ bool ContentLoading::loadOBJ(
 			out_faces.push_back(vertexIndex[0]-1);
 			out_faces.push_back(vertexIndex[1]-1);
 			out_faces.push_back(vertexIndex[2]-1);
-			raw_verts = temp_vertices;
 		}else{
 			// Probably a comment, eat up the rest of the line
 			char stupidBuffer[1000];
@@ -608,6 +713,7 @@ bool ContentLoading::loadOBJ(
 		}
 
 	}
+	raw_verts = temp_vertices;
 
 	// For each vertex of each triangle
 	for( unsigned int i=0; i<vertexIndices.size(); i++ ){
@@ -628,7 +734,6 @@ bool ContentLoading::loadOBJ(
 		out_normals .push_back(normal);
 	
 	}
-
 	fclose(file);
 	return true;
 }

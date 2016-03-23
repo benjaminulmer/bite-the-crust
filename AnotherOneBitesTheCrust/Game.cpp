@@ -85,8 +85,6 @@ void Game::initSystems()
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
 	renderingEngine->setupMiscBuffers();
-
-
 }
 
 // Create and initialize all loaded entities in the game world
@@ -166,7 +164,7 @@ void Game::setupEntities()
 	for(int i = 0; i < MAX_PLAYERS/2; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
-		setupVehicle(players[i], physx::PxTransform(10 + 10*i, 2, 20), i);
+		setupVehicle(players[i], physx::PxTransform(10 + 10.0f*i, 2, 20), i);
 
 		// TODO: get info from menu selection (ie. number of player characters)
 		if(i > 0)
@@ -400,7 +398,7 @@ void Game::unFuckerTheGame()
 {
 	for(int i =0 ; i < MAX_PLAYERS/2; i++)
 	{
-		players[i]->getActor()->setGlobalPose(physx::PxTransform(10 + i*10, 2, 20));
+		players[i]->getActor()->setGlobalPose(physx::PxTransform(10 + i*10.0f, 2, 20));
 		players[i]->getPhysicsVehicle()->setToRestState();
 	}
 

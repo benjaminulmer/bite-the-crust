@@ -139,7 +139,7 @@ inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, c
 	float a = glm::dot(raydir,raydir);
 	float b = glm::dot(raydir,  (2.0f * posToRay));
 	float c = glm::dot(posToRay, posToRay) - radius2;
-	float D = b * b - (4.0 * a * c);
+	float D = b * b - (4.0f * a * c);
 
 	// If ray can not intersect then stop
 	if (D < 0)

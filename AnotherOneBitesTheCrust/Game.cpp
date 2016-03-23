@@ -86,7 +86,7 @@ void Game::initSystems()
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
 	renderingEngine->setupMiscBuffers();
-
+	renderingEngine->setupIntro();
 
 }
 
@@ -163,6 +163,7 @@ void Game::setupEntities()
 		}
 	}
 	renderingEngine->setupMinimap(map);
+
 	// Create vehicles
 	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
 	setupVehicle(p1Vehicle, physx::PxTransform(10, 2, 20), 0);
@@ -328,6 +329,7 @@ void Game::mainLoop()
 			renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
 			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
+			renderingEngine->displayIntro();
 			//swap buffers
 			SDL_GL_SwapWindow(window);
 			physicsEngine->fetchSimulationResults();

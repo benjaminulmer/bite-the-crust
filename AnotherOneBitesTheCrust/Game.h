@@ -28,7 +28,7 @@ class Game :
 public:
 	Game(void);
 	~Game(void);
-
+	
 	AIEngine *aiEngine;
 	AudioEngine *audioEngine;
 	InputEngine *inputEngine;
@@ -79,6 +79,8 @@ private:
 	glm::vec3 cameraPosBuffer[CAMERA_POS_BUFFER_SIZE];
 	int cameraPosBufferIndex;
 
-		vector <glm::vec3> stuff;
+	vector <glm::vec3> stuff;
+
+	std::vector<Entity*> introEntities;
 };
 

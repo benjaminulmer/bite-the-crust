@@ -327,9 +327,9 @@ void Game::mainLoop()
 			string pizzas = "Pizzas: ";
 			pizzas.append(to_string(p1Vehicle->pizzaCount));
 			renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
-
-			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
 			renderingEngine->displayIntro();
+			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
+
 			//swap buffers
 			SDL_GL_SwapWindow(window);
 			physicsEngine->fetchSimulationResults();

@@ -42,6 +42,7 @@ public:
 
 private:
 	static const unsigned int PHYSICS_STEP_MS = 16;
+	static const int MAX_PLAYERS = 4;
 
 	void initSystems();
 	void setupEntities();
@@ -63,8 +64,10 @@ private:
 	SDL_Surface *text;
 	
 	GameState gameState;
+
+	// TODO support for more cameras (one per player)
 	Camera* camera;
-	Vehicle* p1Vehicle, *p2Vehicle;
+	Vehicle * players [MAX_PLAYERS];
 
 	PhysicsEntityInfo* pizzaInfo;
 

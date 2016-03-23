@@ -54,7 +54,6 @@ private:
 	void updatePath(Vehicle*, Delivery, Map &);
 	void goToPoint(Vehicle*, const glm::vec3 &, const float &);
 	void avoid(Vehicle *, graphNode*);
-	bool tooClose(Vehicle*, AICollisionEntity &);
 	void brake(Vehicle*, const float &);
 
 	std::vector<glm::vec3> aStar(graphNode *, graphNode *, std::vector<graphNode*>);

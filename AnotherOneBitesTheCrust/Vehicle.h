@@ -71,7 +71,7 @@ public:
 
 	// AI stuff; might be moved into 'Player' class
 	std::vector<glm::vec3> currentPath;
-	bool pizzaDelivered;
+	bool pizzaDelivered, isAI;
 	glm::vec3 getDestination();
 	// END AI stuff
 
@@ -81,7 +81,6 @@ public:
 	int pizzaCount;
 	bool isInAir;
 
-	void resetIfNeeded();
 	void update();
 	glm::mat4 getModelMatrix();
 
@@ -106,6 +105,7 @@ private:
 	physx::PxF32 steerVsSpeedData[2*8];
 	physx::PxFixedSizeLookupTable<8> steerVsSpeedTable;
 
+	void resetIfNeeded();
 	void setSmoothingData();
 	void setSteerSpeedData();
 };

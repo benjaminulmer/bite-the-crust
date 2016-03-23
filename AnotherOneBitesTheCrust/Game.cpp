@@ -1,8 +1,8 @@
 #include "Game.h"
 #include "PizzaBox.h"
 #include "WheelEntity.h"
-#include "Camera.h"
 #include "ContentLoading.h"
+#include "StaticEntity.h"
 
 #include <iostream>
 #include <string>
@@ -85,8 +85,6 @@ void Game::initSystems()
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
 	renderingEngine->setupMiscBuffers();
-
-
 }
 
 // Create and initialize all loaded entities in the game world
@@ -142,7 +140,7 @@ void Game::setupEntities()
 				if (physicsEntityInfoMap[tileEntity.name]->type == PhysicsType::DYNAMIC) {
 					e = new DynamicEntity();
 				} else {
-					e = new PhysicsEntity();
+					e = new StaticEntity();
 					tile->staticEntities.push_back(e);
 				}
 
@@ -166,7 +164,7 @@ void Game::setupEntities()
 	for(int i = 0; i < MAX_PLAYERS/2; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
-		setupVehicle(players[i], physx::PxTransform(10 + 10*i, 2, 20), i);
+		setupVehicle(players[i], physx::PxTransform(10 + 10.0f*i, 2, 20), i);
 
 		// TODO: get info from menu selection (ie. number of player characters)
 		if(i > 0)
@@ -175,17 +173,8 @@ void Game::setupEntities()
 			players[i]->isAI = false;
 	}
 
-	// Initialize player location buffer for camera
-	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
-	{
-		cameraPosBuffer[i] = players[0]->getPosition() + glm::vec3(players[0]->getModelMatrix() * glm::vec4(0,8,-15,0));
-	}
-	cameraPosBufferIndex = 0;
-	camera.setPosition(cameraPosBuffer[CAMERA_POS_BUFFER_SIZE]);
-	camera.setLookAtPosition(players[0]->getPosition());
-	camera.setUpVector(glm::vec3(0,1,0));
-	renderingEngine->updateView(camera);
-	
+	camera = new Camera(players[0]);
+	renderingEngine->updateView(*camera);
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
@@ -227,20 +216,22 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 void Game::connectSystems()
 {
 	inputEngine->setInputStruct(&players[0]->input, 0);
+	inputEngine->setCamera(camera, 0);
+
+	inputEngine->setInputStruct(&players[0]->input, 0);
 
 	for(int i = 0; i < MAX_PLAYERS/2; i++)
 	{
 		players[i]->shootPizzaSignal.connect(this, &Game::shootPizza);
+		players[i]->shootPizzaSignal.connect(audioEngine, &AudioEngine::playCannonSound);
+		players[i]->dryFireSignal.connect(audioEngine, &AudioEngine::playDryFireSound);
 		players[i]->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-		//audioEngine->playEngineIdleSound(p1Vehicle);
-	
 		players[i]->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
 		players[i]->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
 
 		deliveryManager->addPlayer(players[i]);
 	}
 
-	inputEngine->reverseCam.connect(&camera, &Camera::setReverseCam);
 	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
 	// TODO: Should have a textures array or something that corresponds to each player so we can add this to above loop
@@ -251,6 +242,7 @@ void Game::connectSystems()
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
+	physicsEngine->simulationCallback->inPickUpLocation.connect(audioEngine, &AudioEngine::playReloadSound);
 }
 
 // Main loop of the game
@@ -259,7 +251,6 @@ void Game::mainLoop()
 	unsigned int oldTimeMs = SDL_GetTicks();
 	unsigned int deltaTimeAccMs = 0;
 
-
 	// Game loop
 	while (gameState != GameState::EXIT)
 	{
@@ -267,7 +258,7 @@ void Game::mainLoop()
 		{
 			processSDLEvents();
 
-		// Figure out timestep and run physics
+			// Figure out timestep and run physics
 			unsigned int newTimeMs = SDL_GetTicks();
 			unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 			oldTimeMs = newTimeMs;
@@ -288,26 +279,13 @@ void Game::mainLoop()
 						renderingEngine->setupNodes(players[i]->currentPath, vec3(1,1,0)); // TODO: Remove when adding multiple AIs, otherwise will be very confusing (or change colours to match AI)
 				
 					}
-
 					players[i]->update();
 				}
-		
 				physicsEngine->simulate(PHYSICS_STEP_MS);
 
-				// Update the camera position buffer with new location
-				// TODO: Hardcoded for one camera, should draw scene from each player's camera to their corresponding viewport
-				if (camera.isReverseCam()) {
-					cameraPosBuffer[cameraPosBufferIndex] = players[0]->getPosition() + glm::vec3(players[0]->getModelMatrix() * glm::vec4(0,8,15,0));
-				}
-				else {
-					cameraPosBuffer[cameraPosBufferIndex] = players[0]->getPosition() + glm::vec3(players[0]->getModelMatrix() * glm::vec4(0,8,-15,0));
-				}
-				cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
-
-				// Set camera to look at player with a positional delay
-				camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
-				camera.setLookAtPosition(players[0]->getPosition());
-				renderingEngine->updateView(camera);
+				// Update the camera
+				camera->update();
+				renderingEngine->updateView(*camera);		
 			}
 			// Update Sound
 			// TODO: update audioengine to support multiple listeners
@@ -414,24 +392,20 @@ void Game::shootPizza(Vehicle* vehicle)
 	pizzaBox->getRigidDynamic()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
-
-	audioEngine->playCannonSound(vehicle);
 }
 
 void Game::unFuckerTheGame()
 {
 	for(int i =0 ; i < MAX_PLAYERS/2; i++)
 	{
-		players[i]->getActor()->setGlobalPose(physx::PxTransform(10 + i*10, 2, 20));
+		players[i]->getActor()->setGlobalPose(physx::PxTransform(10 + i*10.0f, 2, 20));
 		players[i]->getPhysicsVehicle()->setToRestState();
 	}
 
-	// TODO: Reset for each player character (if we're keeping this function)
-	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
+	for (unsigned int i = 0; i < 10; i++) 
 	{
-		cameraPosBuffer[i] = players[0]->getPosition() + glm::vec3(players[0]->getModelMatrix() * glm::vec4(0,8,-15,0));
+		camera->update();
 	}
-	cameraPosBufferIndex = 0;
 }
 
 Game::~Game(void)

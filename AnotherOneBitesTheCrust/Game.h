@@ -64,7 +64,9 @@ private:
 	SDL_Surface *text;
 	
 	GameState gameState;
-	Camera camera;
+
+	// TODO support for more cameras (one per player)
+	Camera* camera;
 	Vehicle * players [MAX_PLAYERS];
 
 	PhysicsEntityInfo* pizzaInfo;
@@ -74,12 +76,5 @@ private:
 	std::map<std::string, PhysicsEntityInfo*> physicsEntityInfoMap;
 	std::map<std::string, GLuint> textureMap;
 	Map map;
-
-	// vehicle location for previous frames 
-	static const int CAMERA_POS_BUFFER_SIZE = 10;
-	glm::vec3 cameraPosBuffer[CAMERA_POS_BUFFER_SIZE];
-	int cameraPosBufferIndex;
-
-		vector <glm::vec3> stuff;
 };
 

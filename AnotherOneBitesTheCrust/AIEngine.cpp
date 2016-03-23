@@ -139,7 +139,7 @@ inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, c
 	float a = glm::dot(raydir,raydir);
 	float b = glm::dot(raydir,  (2.0f * posToRay));
 	float c = glm::dot(posToRay, posToRay) - radius2;
-	float D = b * b - (4.0 * a * c);
+	float D = b * b - (4.0f * a * c);
 
 	// If ray can not intersect then stop
 	if (D < 0)
@@ -294,7 +294,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
 	graphNode * destinationNode = destination.location->nodes.at(0);
-	if(obstacle.entity != nullptr && obstacle.distance < 3 && obstacle.entity->type != EntityType::DYNAMIC)
+	if(obstacle.entity != nullptr && obstacle.distance < 3 && obstacle.entity->type == EntityType::STATIC)
 	{
 		avoid(toUpdate, destinationNode);
 		return;

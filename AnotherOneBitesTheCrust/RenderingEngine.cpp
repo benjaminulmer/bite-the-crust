@@ -37,7 +37,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 
 	glUniform3f(lightPos, 100.0f, 100.0f, 100.0f);
 	glUniform1f(lightPow, 5000.0f);
-	glUniform3f(ambientScale, 0.6, 0.6, 0.6);
+	glUniform3f(ambientScale, 0.6f, 0.6f, 0.6f);
 
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
@@ -242,8 +242,7 @@ void RenderingEngine::initText2D(const char * texturePath){
 
 void RenderingEngine::printText2D(const char * text, int x, int y, int size)
 {
-	
-	printText2Doutline(text, x+1, y+1, size+0.5, glm::vec4(0,0,0,1));
+	printText2Doutline(text, x+1, y+1, (int)(size+0.5f), glm::vec4(0,0,0,1));
 	printText2Doutline(text, x, y, size, glm::vec4(1,0,0,1));
 }
 
@@ -527,9 +526,9 @@ void RenderingEngine::setupMinimap(Map map)
 {
 	glUseProgram(basicProgramID);
 
-	for(int i = 0; i < map.tiles.size(); i++)
+	for(unsigned int i = 0; i < map.tiles.size(); i++)
 	{
-		for(int j = 0; j < map.tiles[i].size(); j++)
+		for(unsigned int j = 0; j < map.tiles[i].size(); j++)
 		{
 			Tile* tile = &map.tiles[i][j];
 
@@ -543,11 +542,11 @@ void RenderingEngine::setupMinimap(Map map)
 				mmRoadVerts.push_back(pos);
 
 				//grey
-				mmRoadColors.push_back(0.6);	//r
-				mmRoadColors.push_back(0.6);	//g
-				mmRoadColors.push_back(0.6);	//b
+				mmRoadColors.push_back(0.6f);	//r
+				mmRoadColors.push_back(0.6f);	//g
+				mmRoadColors.push_back(0.6f);	//b
 			}
-			for(int k = 0; k < tile->entityTemplates.size(); k++)
+			for(unsigned int k = 0; k < tile->entityTemplates.size(); k++)
 			{
 				if(tile->entityTemplates[k].name == "house")
 				{
@@ -555,18 +554,18 @@ void RenderingEngine::setupMinimap(Map map)
 					glm::vec3 pos = ground->getDefaultTranslation();
 					mmHouseVerts.push_back(pos);
 					//pink
-					mmHouseColors.push_back(1.0);	//r
-					mmHouseColors.push_back(0.68);	//g
-					mmHouseColors.push_back(0.73);	//b
+					mmHouseColors.push_back(1.0f);	//r
+					mmHouseColors.push_back(0.68f);	//g
+					mmHouseColors.push_back(0.73f);	//b
 				}
 				else if(tile->entityTemplates[k].name == "billboard")
 				{
 					glm::vec3 pos = ground->getDefaultTranslation();
 					mmRoadVerts.push_back(pos);
 					//pink
-					mmRoadColors.push_back(1.0);	//r
-					mmRoadColors.push_back(0.55);	//g
-					mmRoadColors.push_back(0.0);	//b
+					mmRoadColors.push_back(1.0f);	//r
+					mmRoadColors.push_back(0.55f);	//g
+					mmRoadColors.push_back(0.0f);	//b
 				}
 			}
 		}
@@ -677,7 +676,7 @@ void RenderingEngine::setupMinimap(Map map)
 
 							// RGB values for the 4 vertices of the quad
 
-	for(int i = 0; i < mmVanVerts.size(); i++)
+	for(unsigned int i = 0; i < mmVanVerts.size(); i++)
 	{
 		mmVanColors.push_back(1.0f);
 		mmVanColors.push_back(0.0f);
@@ -719,7 +718,7 @@ void RenderingEngine::setupMinimap(Map map)
 
 
 	mmVanColors.clear();
-	for(int i = 0; i < mmVanVerts.size(); i++)
+	for(unsigned int i = 0; i < mmVanVerts.size(); i++)
 	{
 		mmVanColors.push_back(0.0f);
 		mmVanColors.push_back(0.0f);
@@ -768,12 +767,12 @@ void RenderingEngine::setupMinimap(Map map)
 	float minZ = 1000;
 
 	//cout << "size " << mmRoadVerts.size() << endl;
-	for(int i = 0; i < mmRoadVerts.size(); i++)
+	for(unsigned int i = 0; i < mmRoadVerts.size(); i++)
 	{
 		//cout << mmRoadVerts[i].x << " " << mmRoadVerts[i].y << " " << mmRoadVerts[i].z << " " << endl;
 	}
 
-	for(int i = 0; i < mmRoadVerts.size(); i++)
+	for(unsigned int i = 0; i < mmRoadVerts.size(); i++)
 	{
 
 		if (mmRoadVerts[i].x < minX)
@@ -784,7 +783,7 @@ void RenderingEngine::setupMinimap(Map map)
 			minZ = mmRoadVerts[i].z;
 	}
 
-	for (int i = 0; i < mmRoadVerts.size(); i++)
+	for (unsigned int i = 0; i < mmRoadVerts.size(); i++)
 	{
 		if (mmRoadVerts[i].x > maxX)
 			maxX = mmRoadVerts[i].x;
@@ -906,7 +905,7 @@ void RenderingEngine::setupNodes(vector<glm::vec3> verts, glm::vec3 color)
 {
 
 	vector<float> colors;
-	for(int i = 0; i < verts.size(); i++)
+	for(unsigned int i = 0; i < verts.size(); i++)
 	{
 		colors.push_back(color.x);
 		colors.push_back(color.y);

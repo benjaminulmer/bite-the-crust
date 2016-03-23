@@ -1,5 +1,5 @@
 #pragma once
-#include "Entity.h"
+#include "Vehicle.h"
 #include "glm.hpp"
 #include <sigslot.h>
 
@@ -7,15 +7,21 @@ class Camera
 	: public Entity, public sigslot::has_slots<>
 {
 public:
-	Camera(void);
+	Camera(Vehicle* vehicle);
 	~Camera(void);
+
+	static const int BUFFER_SIZE = 10;
 
 	void setPosition(glm::vec3 v);
 	glm::vec3 getPosition();
-	void setUpVector(glm::vec3 v);
 	glm::vec3 getUpVector();
-	void setLookAtPosition(glm::vec3 v);
 	glm::vec3 getLookAtPosition();
+
+	glm::vec3 posBufferForward[BUFFER_SIZE];
+	glm::vec3 posBufferReverse[BUFFER_SIZE];
+	int posBufferIndex;
+
+	void update();
 
 	void setReverseCam(bool val);
 	bool isReverseCam();
@@ -25,5 +31,7 @@ private:
 	glm::vec3 upVector;
 	glm::vec3 lookAtPosition;
 	bool reverseCam;
+
+	Vehicle* vehicle;
 };
 

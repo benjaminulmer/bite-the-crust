@@ -69,27 +69,29 @@ public:
 	Vehicle(unsigned int stepSizeMS);
 	~Vehicle(void);
 
+	// AI stuff; might be moved into 'Player' class
+	std::vector<glm::vec3> currentPath;
+	bool pizzaDelivered, isAI;
+	glm::vec3 getDestination();
+	// END AI stuff
+
 	VehicleInput input;
 	VehicleTuning tuning;
 
 	int pizzaCount;
-
-	// AI stuff; might be moved into 'Player' class
-	std::vector<glm::vec3> currentPath;
-	bool pizzaDelivered;
+	bool isInAir;
 
 	void update();
-	physx::PxVehicleDrive4W* getPhysicsVehicle();
 	glm::mat4 getModelMatrix();
 
 	void setPhysicsVehicle(physx::PxVehicleDrive4W* vehicle);
+	physx::PxVehicleDrive4W* getPhysicsVehicle();
 
 	sigslot::signal1<Vehicle*> shootPizzaSignal;
-	sigslot::signal1<PhysicsEntity*> brakeSignal;
-	sigslot::signal1<PhysicsEntity*> idleSignal;
-	sigslot::signal1<PhysicsEntity*> gasSignal;
-
-	glm::vec3 getDestination();
+	sigslot::signal1<Vehicle*> dryFireSignal;
+	sigslot::signal1<Vehicle*> brakeSignal;
+	sigslot::signal1<Vehicle*> idleSignal;
+	sigslot::signal1<Vehicle*> gasSignal;
 
 private:
 	physx::PxF32 stepSizeS;
@@ -103,6 +105,7 @@ private:
 	physx::PxF32 steerVsSpeedData[2*8];
 	physx::PxFixedSizeLookupTable<8> steerVsSpeedTable;
 
+	void resetIfNeeded();
 	void setSmoothingData();
 	void setSteerSpeedData();
 };

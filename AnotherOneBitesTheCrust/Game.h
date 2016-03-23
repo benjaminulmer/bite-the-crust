@@ -42,6 +42,7 @@ public:
 
 private:
 	static const unsigned int PHYSICS_STEP_MS = 16;
+	static const int MAX_PLAYERS = 4;
 
 	void initSystems();
 	void setupEntities();
@@ -63,8 +64,10 @@ private:
 	SDL_Surface *text;
 	
 	GameState gameState;
-	Camera camera;
-	Vehicle* p1Vehicle, *p2Vehicle;
+
+	// TODO support for more cameras (one per player)
+	Camera* camera;
+	Vehicle * players [MAX_PLAYERS];
 
 	PhysicsEntityInfo* pizzaInfo;
 
@@ -74,13 +77,5 @@ private:
 	std::map<std::string, GLuint> textureMap;
 	Map map;
 
-	// vehicle location for previous frames 
-	static const int CAMERA_POS_BUFFER_SIZE = 10;
-	glm::vec3 cameraPosBuffer[CAMERA_POS_BUFFER_SIZE];
-	int cameraPosBufferIndex;
-
-	vector <glm::vec3> stuff;
-
-	std::vector<Entity*> introEntities;
 };
 

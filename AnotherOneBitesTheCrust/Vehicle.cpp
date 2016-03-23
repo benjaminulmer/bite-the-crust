@@ -32,6 +32,7 @@ glm::vec3 Vehicle::getDestination()
 	return currentPath.back();
 }
 
+// Init smoothing data for input fall on and off
 void Vehicle::setSmoothingData()
 {
 	smoothingData.mRiseRates[0] = 6.0f;
@@ -47,11 +48,12 @@ void Vehicle::setSmoothingData()
 	smoothingData.mFallRates[4] = 5.0f;
 }
 
+// Init table for speed vs steer ratio
 void Vehicle::setSteerSpeedData()
 {
-	steerVsSpeedData[0] = 0.0f;          steerVsSpeedData[1] = 0.75f;
-	steerVsSpeedData[2] = 5.0f;          steerVsSpeedData[3] = 0.75f;
-	steerVsSpeedData[4] = 30.0f;         steerVsSpeedData[5] = 0.125f;
+	steerVsSpeedData[0] = 0.0f;          steerVsSpeedData[1] = 1.0f;
+	steerVsSpeedData[2] = 5.0f;          steerVsSpeedData[3] = 0.7f;
+	steerVsSpeedData[4] = 30.0f;         steerVsSpeedData[5] = 0.2f;
 	steerVsSpeedData[6] = 120.0f;        steerVsSpeedData[7] = 0.1f;
 	steerVsSpeedData[8] = PX_MAX_F32;    steerVsSpeedData[9] = PX_MAX_F32;
 	steerVsSpeedData[10] = PX_MAX_F32;   steerVsSpeedData[11] = PX_MAX_F32;
@@ -70,7 +72,8 @@ physx::PxVehicleDrive4W* Vehicle::getPhysicsVehicle()
 	return physicsVehicle;
 }
 
-void Vehicle::update()
+// Logic to determine if vehicle needs to be reset and does so if needed
+void Vehicle::resetIfNeeded()
 {
 	PxVec3 up(0, 1, 0);
 	PxVec3 vehUp = actor->getGlobalPose().rotate(up);
@@ -86,12 +89,18 @@ void Vehicle::update()
 		PxTransform cur = actor->getGlobalPose();
 		actor->setGlobalPose(PxTransform(PxVec3(cur.p.x, cur.p.y + 0.5f, cur.p.z), PxQuat(-angleRad, up)));
 	}
+}
+
+// Called every frame for vehicle
+void Vehicle::update()
+{
+	resetIfNeeded();
 
 	float handBrake = 0;
 	float forwardSpeed = physicsVehicle->computeForwardSpeed();
 	(input.handBrake) ? handBrake = 1.0f: handBrake = 0.0f;
 
-	// Check if gear should switch from reverse to forward or vise versa
+	// Force gear change if speed is 0 (works, not sure why)
 	if (forwardSpeed == 0) 
 	{
 		if (input.forward > 0)
@@ -103,6 +112,7 @@ void Vehicle::update()
 			physicsVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 		}
 	}
+	// If speed is close to 0 set new target gear
 	else if (forwardSpeed < 5 && input.backward > 0)
 	{
 		physicsVehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eREVERSE);
@@ -136,13 +146,18 @@ void Vehicle::update()
 	vehicleInput.setAnalogSteer(input.steer);
 	vehicleInput.setAnalogHandbrake(handBrake);
 
-	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(smoothingData, steerVsSpeedTable, vehicleInput, stepSizeS, false, *physicsVehicle);
+	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(smoothingData, steerVsSpeedTable, vehicleInput, stepSizeS, isInAir, *physicsVehicle);
 
 	if (input.shootPizza)
 	{ 
-		if (pizzaCount > 0) {
+		if (pizzaCount > 0)
+		{
 			shootPizzaSignal(this);
 			pizzaCount--;
+		}
+		else
+		{
+			dryFireSignal(this);
 		}
 		input.shootPizza = false;
 	}
@@ -155,13 +170,17 @@ void Vehicle::update()
 	}
 }
 
+// Returns model matrix with tipping factor
 glm::mat4 Vehicle::getModelMatrix()
 {
-	PxF32 alpha = 0.01f;
-	tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.008f);
-	if (tipAngle > PxPi * (45.0f/180.0f))
+	if (!isInAir)
 	{
-		tipAngle = PxPi * (45.0f/180.0f);
+		PxF32 alpha = 0.01f;
+		tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.008f);
+		if (tipAngle > PxPi * (45.0f/180.0f))
+		{
+			tipAngle = PxPi * (45.0f/180.0f);
+		}
 	}
 
 	PxTransform transform(PxQuat(tipAngle, PxVec3(0, 0, 1)));

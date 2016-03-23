@@ -5,8 +5,10 @@
 enum class EntityType
 {
 	BASE,
+	CAMERA,
 	PHYSICS,
 	DYNAMIC,
+	STATIC,
 	PIZZABOX,
 	VEHICLE,
 	WHEEL

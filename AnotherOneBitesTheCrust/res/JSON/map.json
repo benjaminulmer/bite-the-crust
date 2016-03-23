@@ -35,6 +35,7 @@
 			"description": "House",
 			"ground": "lawn",
 			"deliverable": true,
+			"goal": {"x": 10, "z": 10},
 			"entities": [
                 {"name": "house", "x": 10, "z": 5},
                 {"name": "trash bin", "x": 6, "z": 8}
@@ -58,6 +59,7 @@
 			"description": "Lawn tile corner, with house",
 			"ground": "lawn",
             "deliverable": true,
+			"goal": {"x": 10, "z": 10},
 			"entities": [
 				{"name": "fence", "x": 10, "rotation": 270},
 				{"name": "fence", "z": 10},

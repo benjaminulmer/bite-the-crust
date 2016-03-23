@@ -230,18 +230,54 @@ void AIEngine::brake(Vehicle* toUpdate, const float & amount)
 		toUpdate->input.forward = 0;
 }
 
+void AIEngine::trimPath(Vehicle* toUpdate)
+{
+	if(toUpdate->currentPath.size() < 2)
+		return;
+
+
+	int closestIndex;
+	double minDist = DBL_MAX;
+	for(int i = 0; i < toUpdate->currentPath.size(); i++)
+	{
+		double currentDistance = glm::length(toUpdate->currentPath[i] - toUpdate->getPosition());
+
+		if( currentDistance < minDist)
+		{
+			closestIndex = i;
+			minDist = currentDistance;
+		}
+	}
+
+	for(int i = 0; i < closestIndex; i++)
+		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
+}
+
 void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICollisionEntity & obstacle) 
 { 
 	
-	/*if(toUpdate->currentPath.empty())
-	{*/
+	if(toUpdate->currentPath.empty())
+	{
 		updatePath(toUpdate, destination, map);
 		if(toUpdate->currentPath.empty())
 			return;
-	//}
+	}
+	else
+		trimPath(toUpdate);
+
+
+	glm::vec3 goal = destination.location->goal;
+	// Should be goal node
+	if(!equals(toUpdate->getDestination() - glm::vec3(0,1,0), destination.location->nodes.at(0)->getPosition()))
+	{
+		toUpdate->currentPath.clear();
+		toUpdate->pizzaDelivered = false;
+		return;
+	}
 
 	// May want to consider something more efficient, uses square root in here
 	float distanceToNext = glm::length(toUpdate->currentPath.at(0) - toUpdate->getPosition());
+
 
 	if(distanceToNext < MIN_DIST)
 	{

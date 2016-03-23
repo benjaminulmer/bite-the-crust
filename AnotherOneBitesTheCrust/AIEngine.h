@@ -55,6 +55,7 @@ private:
 	void goToPoint(Vehicle*, const glm::vec3 &, const float &);
 	void avoid(Vehicle *, graphNode*);
 	void brake(Vehicle*, const float &);
+	void trimPath(Vehicle*);
 
 	std::vector<glm::vec3> aStar(graphNode *, graphNode *, std::vector<graphNode*>);
 };

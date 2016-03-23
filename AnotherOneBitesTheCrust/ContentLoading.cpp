@@ -401,6 +401,19 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		t.groundModel = ground;
 		if (tileArray[i].HasMember("deliverable")) {
 			t.deliverable = tileArray[i]["deliverable"].GetBool();
+			if (!tileArray[i].HasMember("goal"))
+			{
+				printf("Error, deliverable tile must have goal node.");
+				return false;
+			}
+			const rapidjson::Value& goalNode = tileArray[i]["goal"];
+			if (goalNode.HasMember("x"))
+				t.goal.x = goalNode["x"].GetDouble();
+			if (goalNode.HasMember("y"))
+				t.goal.y = goalNode["y"].GetDouble();
+			if (goalNode.HasMember("z"))
+				t.goal.z = goalNode["z"].GetDouble();
+			
 		} else {
 			t.deliverable = false;
 		}
@@ -528,7 +541,12 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				}
 				tile.groundRotationDeg += 180;
 			}
-
+			// Setup goal
+			if(tile.deliverable)
+			{
+				tile.goal.x += tileSize * j;
+				tile.goal.z += tileSize * i;
+			}
 			// Positions of nodes
 			for(NodeTemplate n : tileNodes)
 			{

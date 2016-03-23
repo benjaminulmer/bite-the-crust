@@ -22,6 +22,7 @@ struct Tile
 	std::vector<TileEntity> entityTemplates;
 	std::vector<PhysicsEntity*> staticEntities;
 	std::vector<graphNode*> nodes;
+	glm::vec3 goal;
 	Entity* ground;
 	GLuint groundTexture;
 	int groundRotationDeg;

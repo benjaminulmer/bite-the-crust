@@ -277,7 +277,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	toUpdate->input.shootPizza = false;
 	glm::vec3 goal = destination.location->goal;
 
-	// TODO: Change so doesn't clear every time
+	// Should pathfind to pickup followed by pathfinding to destination
 	if(toUpdate->pizzaCount == 0)
 		goal = map.pickup;	
 	if(toUpdate->currentPath.empty())

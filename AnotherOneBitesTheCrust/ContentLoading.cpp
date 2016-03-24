@@ -489,6 +489,9 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			Tile tile = tiles[id];
 			std::vector<NodeTemplate> tileNodes = nodes[id];
 
+			// Currently setting to center of tile; may be better to have in front of so drivebys are easier
+			// TODO: may be better to change to a node or something, need to be able to pathfind to it
+			// ALTERNATIVE: add way to pathfind 'near' a location
 			if(tile.pickup)
 				map.pickup = glm::vec3(((float)tileSize / 2) + (j)*tileSize, 0,  ((float)tileSize / 2) + (i)*tileSize);
 

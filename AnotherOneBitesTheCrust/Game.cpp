@@ -32,6 +32,8 @@ Game::Game(void)
 	audioEngine = nullptr;
 	screen = nullptr;
 	deliveryManager = nullptr;
+	std::random_device rd;
+	generator.seed(rd());
 }
 
 // The entry point of the game
@@ -138,8 +140,11 @@ void Game::setupEntities()
 			{
 				TileEntity tileEntity = tile->entityTemplates[k];
 
+				std::uniform_int_distribution<int> dist(0, tileEntity.names.size()-1);
+				std::string name = tileEntity.names[dist(generator)];
+
 				PhysicsEntity* e;
-				if (physicsEntityInfoMap[tileEntity.name]->type == PhysicsType::DYNAMIC) {
+				if (physicsEntityInfoMap[name]->type == PhysicsType::DYNAMIC) {
 					e = new DynamicEntity();
 				} else {
 					e = new StaticEntity();
@@ -147,8 +152,8 @@ void Game::setupEntities()
 				}
 
 				// TODO, error check that these models do exist, instead of just break
-				e->setRenderable(renderablesMap[tileEntity.name]);
-				e->setTexture(textureMap[tileEntity.name]);
+				e->setRenderable(renderablesMap[name]);
+				e->setTexture(textureMap[name]);
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
@@ -156,10 +161,10 @@ void Game::setupEntities()
 				float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
 
-				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.name], transform);
+				physicsEngine->createEntity(e, physicsEntityInfoMap[name], transform);
 				entities.push_back(e);
 
-				if (tileEntity.name == "house") {
+				if (name.find("house") != std::string::npos) {
 					tile->house = e;
 				}
 			}

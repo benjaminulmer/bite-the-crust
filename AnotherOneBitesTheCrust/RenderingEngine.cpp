@@ -549,7 +549,7 @@ void RenderingEngine::setupMinimap(Map map)
 			}
 			for(unsigned int k = 0; k < tile->entityTemplates.size(); k++)
 			{
-				if(tile->entityTemplates[k].name == "house")
+				if (tile->house)
 				{
 
 					glm::vec3 pos = ground->getDefaultTranslation();
@@ -559,7 +559,7 @@ void RenderingEngine::setupMinimap(Map map)
 					mmHouseColors.push_back(0.68f);	//g
 					mmHouseColors.push_back(0.73f);	//b
 				}
-				else if(tile->entityTemplates[k].name == "billboard")
+				else if(tile->pickup)
 				{
 					glm::vec3 pos = ground->getDefaultTranslation();
 					mmRoadVerts.push_back(pos);

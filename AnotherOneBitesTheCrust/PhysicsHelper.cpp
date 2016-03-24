@@ -71,25 +71,3 @@ PxTriangleMesh* PhysicsHelper::createTriangleMesh(const PxVec3* verts, const PxU
 
 	return triangleMesh;
 }
-
-std::vector<PxVec3> PhysicsHelper::glmVertsToPhysXVerts(std::vector<glm::vec3> verts)
-{
-	std::vector<PxVec3> toReturn = std::vector<PxVec3>(); 
-	for (auto vert : verts)
-	{
-		toReturn.push_back(PxVec3(vert.x, vert.y, vert.z));
-	}
-
-	return toReturn;
-}
-
-std::vector<PxU32> PhysicsHelper::u16ToU32Faces(std::vector<unsigned short> faces)
-{
-	std::vector<PxU32> toReturn = std::vector<PxU32>(); 
-	for (auto face : faces)
-	{
-		toReturn.push_back((PxU32)face);
-	}
-
-	return toReturn;
-}

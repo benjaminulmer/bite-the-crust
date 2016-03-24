@@ -180,7 +180,7 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 }
 
 // Create renderable from obj file
-Renderable* createRenderable(std::string modelFile) {
+Renderable* ContentLoading::createRenderable(std::string modelFile) {
 	Renderable * r = new Renderable();
 	std::vector<glm::vec3> verts;
 	std::vector<glm::vec2> uvs;
@@ -853,6 +853,8 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 
 	free(buffer); 
 	fclose(fp);
+
+	printf("%s loaded successfully\n", imagepath);
 
 	return textureID;
 }

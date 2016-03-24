@@ -180,8 +180,8 @@ void Game::setupEntities()
 			players[i]->isAI = false;
 	}
 	// hard code textures for now
-	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\house-delivered-red.DDS");
-	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\house-delivered-blue.DDS");
+	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-red.DDS");
+	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-blue.DDS");
 
 	camera = new Camera(players[0]);
 	renderingEngine->updateView(*camera);

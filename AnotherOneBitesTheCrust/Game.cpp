@@ -32,6 +32,8 @@ Game::Game(void)
 	audioEngine = nullptr;
 	screen = nullptr;
 	deliveryManager = nullptr;
+	std::random_device rd;
+	generator.seed(rd());
 }
 
 // The entry point of the game
@@ -138,8 +140,11 @@ void Game::setupEntities()
 			{
 				TileEntity tileEntity = tile->entityTemplates[k];
 
+				std::uniform_int_distribution<int> dist(0, tileEntity.names.size()-1);
+				std::string name = tileEntity.names[dist(generator)];
+
 				PhysicsEntity* e;
-				if (physicsEntityInfoMap[tileEntity.name]->type == PhysicsType::DYNAMIC) {
+				if (physicsEntityInfoMap[name]->type == PhysicsType::DYNAMIC) {
 					e = new DynamicEntity();
 				} else {
 					e = new StaticEntity();
@@ -147,8 +152,8 @@ void Game::setupEntities()
 				}
 
 				// TODO, error check that these models do exist, instead of just break
-				e->setRenderable(renderablesMap[tileEntity.name]);
-				e->setTexture(textureMap[tileEntity.name]);
+				e->setRenderable(renderablesMap[name]);
+				e->setTexture(textureMap[name]);
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
@@ -156,10 +161,10 @@ void Game::setupEntities()
 				float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
 				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
 
-				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.name], transform);
+				physicsEngine->createEntity(e, physicsEntityInfoMap[name], transform);
 				entities.push_back(e);
 
-				if (tileEntity.name == "house") {
+				if (name.find("house") != std::string::npos) {
 					tile->house = e;
 				}
 			}
@@ -245,14 +250,14 @@ void Game::connectSystems()
 	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
 	// TODO: Should have a textures array or something that corresponds to each player so we can add this to above loop
-	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
-	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
+	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-red.DDS");
+	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
 
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
 
-	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
-	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
+	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-red.DDS");
+	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
 
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
@@ -276,6 +281,8 @@ void Game::mainLoop()
 
 			//swap buffers
 			SDL_GL_SwapWindow(window);
+			SDL_Delay(5000);
+			gameState = GameState::PLAY;
 			
 		}
 		else if(gameState == GameState::PLAY)

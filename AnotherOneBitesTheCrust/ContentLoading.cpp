@@ -411,7 +411,15 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		}
 		const rapidjson::Value& entityArray = tileArray[i]["entities"];
 		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
-			std::string name = entityArray[j]["name"].GetString();
+			std::vector<std::string> names;
+			if (entityArray[j]["name"].IsString()) {
+				names.push_back(entityArray[j]["name"].GetString());
+			} else if (entityArray[j]["name"].IsArray()) {
+				const rapidjson::Value& namesArray = entityArray[j]["name"];
+				for (rapidjson::SizeType k = 0; k < namesArray.Size(); k++) {
+					names.push_back(namesArray[k].GetString());
+				}
+			}
 			double x = 0;
 			double y = 0;
 			double z = 0;
@@ -423,7 +431,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				z = entityArray[j]["z"].GetDouble();
 
 			TileEntity e;
-			e.name = name;
+			e.names = names;
 			e.position = glm::vec3(x, y, z);
 
 			if (entityArray[j].HasMember("rotation"))

@@ -36,7 +36,7 @@
 			"ground": "lawn",
 			"deliverable": true,
 			"entities": [
-                {"name": "house", "x": 10, "z": 5},
+                {"name": ["house", "house 2", "house 3"], "x": 10, "z": 5},
                 {"name": "trash bin", "x": 6, "z": 8}
 			],
 			"nodes": [ 

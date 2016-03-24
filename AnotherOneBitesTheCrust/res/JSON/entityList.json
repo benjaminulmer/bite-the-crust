@@ -10,12 +10,19 @@
         {"name": "aivan", "model": "Van-centered.obj", "physics": "default.json", "texture": "Van-blue.DDS"},
 		{"name": "fence", "model": "fence.obj", "physics": "static-box.json", "texture": "fence-colored.DDS"},
 		{"name": "house", "model": "SmallHouse2.obj", "physics": "static-box.json", "texture": "HouseTexture.DDS"},
+		{"name": "house 2", "model": "SmallHouse.obj", "physics": "static-box.json", "texture": "HouseTexture.DDS"},
+		{"name": "house 3", "model": "MediumHouse.obj", "physics": "static-box.json", "texture": "HouseTexture.DDS"},
         {"name": "billboard", "model": "billboard.obj", "physics": "static-convex.json", "texture": "billboard-colored.DDS"},
         {"name": "barrier", "model": "barrier.obj", "physics": "default.json", "texture": "barrierTexture.DDS"},
         {"name": "road block", "model": "block.obj", "physics": "static-box.json", "texture": "RoadBlocker_diffuse.DDS"},
         {"name": "pole", "model": "post.obj", "physics": "static-box.json", "texture": "post.DDS"},
         {"name": "dumpster", "model": "dumpster_3yard.obj", "physics": "static-box.json", "texture": "dumpster_3yard_dif.DDS"},
         {"name": "trash bin", "model": "trash.obj", "physics": "default.json", "texture": "trash.DDS"},
-        {"name": "bench", "model": "bench.obj", "physics": "default.json", "texture": "bench.DDS"}
+        {"name": "bench", "model": "bench.obj", "physics": "default.json", "texture": "bench.DDS"},
+		{"name": "aspen", "model": "AspenTree.obj", "physics": "static-box.json", "texture": "TreeTexture.DDS"},
+		{"name": "birch", "model": "BirchTree.obj", "physics": "static-box.json", "texture": "TreeTexture.DDS"},
+		{"name": "oak", "model": "OakTree.obj", "physics": "static-box.json", "texture": "TreeTexture.DDS"},
+		{"name": "big bush", "model": "BigBush.obj", "physics": "static-box.json", "texture": "BushTexture.DDS"},
+		{"name": "small bush", "model": "SmallBush.obj", "physics": "static-box.json", "texture": "BushTexture.DDS"}
     ]
 }

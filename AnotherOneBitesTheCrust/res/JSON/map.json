@@ -127,8 +127,8 @@
 			"description": "Lawn tile with benches",
 			"ground": "lawn",
 			"entities": [
-                {"name": "bench", "x": 4, "z": 2, "rotation": 90},
-                {"name": "bench", "x": 8, "z": 2, "rotation": 90}            
+                {"name": ["bench", "birch", "oak", "aspen"], "x": 4, "z": 2, "rotation": 90},
+                {"name": ["bench", "big bush", "small bush"], "x": 8, "z": 2, "rotation": 90}            
 			],
 			"nodes": [
 

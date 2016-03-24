@@ -489,6 +489,9 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			Tile tile = tiles[id];
 			std::vector<NodeTemplate> tileNodes = nodes[id];
 
+			if(tile.pickup)
+				map.pickup = glm::vec3(((float)tileSize / 2) + (j)*tileSize, 0,  ((float)tileSize / 2) + (i)*tileSize);
+
 			tile.groundRotationDeg = 0;
 			// Handle rotations
 			if (rotation == "R") {

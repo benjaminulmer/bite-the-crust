@@ -100,16 +100,16 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
 	// TODO: Should divide by half the map or something
-	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)0.65);
+	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)0.60);
 
 	// TODO: Maybe put these in an init file for tuning purposes?
-	if (gas > 0.2)
+	if (gas > 0.1)
 	{
 		input->forward = gas;
 		input->backward = 0;
 	}
 	else
-		brake(driver, 1 - gas);
+		brake(driver, 1 -gas);
 	
 	input->handBrake = false;
 
@@ -158,12 +158,15 @@ void AIEngine::fireAt(Vehicle * driver, const glm::vec3 & goal)
 
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
-	if(ratio > 0.05)
+	if(driver->getPhysicsVehicle()->computeForwardSpeed() > 0.1)
+		brake(driver, 1);
+	else if(ratio > 0.05)
 		facePoint(driver, goal);
-	else
+	else if(driver->pizzaDelivered == false)
 	{
 		driver->pizzaDelivered = true;
 		driver->input.shootPizza = true;
+		brake(driver, 1);
 	}
 
 
@@ -231,11 +234,6 @@ void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 		graphNode * closest = findClosestNode(toUpdate, map);
 
 		toUpdate->currentPath = aStar(closest, destinationNode, map.allNodes);
-		if(!equals(toUpdate->getDestination(), destination.location->nodes.at(0)->getPosition()))
-		{
-			toUpdate->pizzaDelivered = false;
-			return;
-		}
 	}
 }
 
@@ -275,8 +273,13 @@ void AIEngine::trimPath(Vehicle* toUpdate)
 }
 
 void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICollisionEntity & obstacle) 
-{ 
-	
+{
+	toUpdate->input.shootPizza = false;
+	glm::vec3 goal = destination.location->goal;
+
+	// TODO: Change so doesn't clear every time
+	if(toUpdate->pizzaCount == 0)
+		goal = map.pickup;	
 	if(toUpdate->currentPath.empty())
 	{
 		updatePath(toUpdate, destination, map);
@@ -287,47 +290,55 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 		trimPath(toUpdate);
 
 
-	glm::vec3 goal = destination.location->goal;
+	
 	// Should be goal node
-	if(!equals(toUpdate->getDestination() - glm::vec3(0,1,0), destination.location->nodes.at(0)->getPosition()))
+	if(toUpdate->newDestination)
 	{
 		toUpdate->currentPath.clear();
 		toUpdate->pizzaDelivered = false;
+		toUpdate->newDestination = false;
 		return;
 	}
 
-	// May want to consider something more efficient, uses square root in here
-	float distanceToNext = glm::length(toUpdate->currentPath.at(0) - toUpdate->getPosition());
+	glm::vec3 nextPoint;
+	if(toUpdate->pizzaCount == 0)
+		nextPoint = goal;
+	else if(toUpdate->currentPath.size() >= 3)
+		nextPoint = toUpdate->currentPath.at(2);
+	else
+		nextPoint = toUpdate->currentPath.at(0);
 
+	// May want to consider something more efficient, uses square root in here
+	float distanceToNext = glm::length(nextPoint - toUpdate->getPosition());
+	float distanceToGoal = glm::length(toUpdate->getPosition() - goal);
+
+	if(distanceToGoal < MIN_DIST * 5 && toUpdate->pizzaCount != 0)
+	{
+			fireAt(toUpdate, destination.location->goal);
+			return;
+	}
 
 	if(distanceToNext < MIN_DIST)
 	{
 		//std::cout << "Waypoint get! Position: "<< toUpdate->currentPath.at(0).x << "," << toUpdate->currentPath.at(0).y << ", " << toUpdate->currentPath.at(0).z << std::endl;
 		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
 
-		if(toUpdate->currentPath.empty() && distanceToNext < MIN_DIST * 3)
+		if(toUpdate->currentPath.empty() && distanceToNext < MIN_DIST * 5)
 		{
-			//brake(toUpdate, 1);
-			fireAt(toUpdate, destination.location->goal);
+			brake(toUpdate, 1);
 			return;
 		} 
 	}
 
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
-	graphNode * destinationNode = destination.location->nodes.at(0);
-	if(obstacle.entity != nullptr && obstacle.distance < 3 && obstacle.entity->type == EntityType::STATIC)
+	if(obstacle.entity != nullptr && obstacle.distance < 2 && obstacle.entity->type == EntityType::STATIC)
 	{
-		facePoint(toUpdate, destinationNode->getPosition());
+		facePoint(toUpdate, goal);
 		return;
 	}
-	glm::vec3 nextPoint;
-	if(toUpdate->currentPath.size() >= 3)
-		nextPoint = toUpdate->currentPath.at(2);
-	else
-		nextPoint = toUpdate->currentPath.at(0);
 
-	goToPoint(toUpdate, nextPoint, glm::length(destinationNode->getPosition() - toUpdate->getPosition()));
+	goToPoint(toUpdate, nextPoint, glm::length(goal - toUpdate->getPosition()));
 }
 
 AIEngine::~AIEngine(void)

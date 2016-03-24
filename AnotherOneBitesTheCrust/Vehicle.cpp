@@ -14,6 +14,7 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	input.handBrake = false;
 	input.shootPizza = false;
 	input.jump = false;
+	pizzaDelivered = false;
 
 	stepSizeS = stepSizeMS/100.0f;
 	tipAngle = 0;

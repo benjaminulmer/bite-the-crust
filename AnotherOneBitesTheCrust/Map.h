@@ -41,6 +41,7 @@ public:
 
 	std::vector<graphNode *> allNodes;
 	std::vector<std::vector<Tile>> tiles;
+	glm::vec3 pickup;
 
 	Tile* getTile(glm::vec3 position);
 	//void offsetPosition(Tile* tile, glm::vec3 &position);

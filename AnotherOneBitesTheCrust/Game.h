@@ -16,6 +16,7 @@
 
 enum class GameState
 {
+	INTRO,
 	MENU,
 	PLAY,
 	PAUSE,

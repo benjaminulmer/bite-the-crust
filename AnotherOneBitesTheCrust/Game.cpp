@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::PLAY;
+	gameState = GameState::INTRO;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -75,7 +75,7 @@ void Game::initSystems()
 		printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 	}
 
-	glClearColor(0.2f, 0.2f, 0.5f, 1.0f);				//blue background
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
 
 	aiEngine = new AIEngine();
 	audioEngine = new AudioEngine();
@@ -257,7 +257,16 @@ void Game::mainLoop()
 	// Game loop
 	while (gameState != GameState::EXIT)
 	{
-		if(gameState == GameState::PLAY)
+		if (gameState == GameState::INTRO)
+		{
+			processSDLEvents();
+			renderingEngine->displayIntro();
+
+			//swap buffers
+			SDL_GL_SwapWindow(window);
+			
+		}
+		else if(gameState == GameState::PLAY)
 		{
 			processSDLEvents();
 
@@ -321,18 +330,17 @@ void Game::mainLoop()
 			pizzas.append(to_string(players[0]->pizzaCount));
 			renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
-			renderingEngine->displayIntro();
 //			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
 
 
 			//swap buffers
 			SDL_GL_SwapWindow(window);
 			physicsEngine->fetchSimulationResults();
+			//gameState = GameState::INTRO;
 		}
-
-		else if (gameState == GameState::MENU)
+		else if(gameState == GameState::MENU)
 		{
-			//menu logic
+			//menyoo logic
 		}
 		else if(gameState == GameState::PAUSE)
 		{

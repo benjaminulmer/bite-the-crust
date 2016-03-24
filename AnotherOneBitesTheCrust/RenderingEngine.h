@@ -148,6 +148,8 @@ public:
 	void setupIntro();
 	void displayIntro();
 	std::vector<Entity*> introEntities;
+	glm::mat4 introM;
+	glm::mat4 introV;
 
 };
 

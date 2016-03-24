@@ -30,6 +30,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	//glClearDepth(1.0);
 
 	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
@@ -882,7 +883,7 @@ void RenderingEngine::drawMinimap(Entity* van1, Entity* van2)
 	glDrawArrays(GL_TRIANGLES, 0, mmVanVerts.size());
 	glBindVertexArray(0);
 
-		glBindVertexArray(mmVanVAO2);
+	glBindVertexArray(mmVanVAO2);
 	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
 	mmM = mat4(1.0f);
 	mmM = translate(mmM,mmCenter * vec3(2.0, 0.0, -1.0));
@@ -1012,12 +1013,19 @@ void RenderingEngine::setupIntro()
 	Entity *eGameBy = new Entity();
 	eGameBy->setRenderable(gameBy);
 	eGameBy->setTexture(introTexture);
-	introEntities.push_back(eGameBy);
+	//introEntities.push_back(eGameBy);
 
 	Entity *eNames = new Entity();
 	eNames->setRenderable(names);
 	eNames->setTexture(introTexture);
-	introEntities.push_back(eNames);
+	//introEntities.push_back(eNames);
+
+	introM = mat4(1.0f);
+	introV = glm::lookAt(
+			glm::vec3(0,0,7), 
+			glm::vec3(0,0,0), 
+			glm::vec3(0,1,0)
+		);
 
 }
 
@@ -1025,31 +1033,30 @@ void RenderingEngine::displayIntro()
 {
 
 	glEnable(GL_DEPTH_TEST);
-	//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	//glDisable(GL_DEPTH_TEST);
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
 
 
-	glUniform3f(lightPos, 100.0f, 100.0f, 100.0f);
-	glUniform1f(lightPow, 5000.0f);
-	glUniform3f(ambientScale, 0.6, 0.6, 0.6);
+	glUniform3f(lightPos, 0.0f, 4.0f, 1.0f);
+	glUniform1f(lightPow, 0.0f);
+	glUniform3f(ambientScale, 0.0, 0.0, 0.0);
 
 	for (int i = 0; i < (int)introEntities.size(); i++) {
 		if (!introEntities[i]->hasRenderable())
 			continue;
-		M = mat4(1.0f);
+		introM = mat4(1.0f);
 
 		//Translations done here. Order of translations is scale, rotate, translate
-		M = introEntities[i]->getModelMatrix();
-		M = calculateDefaultModel(M, introEntities[i]);
+		introM = introEntities[i]->getModelMatrix();
+		introM = calculateDefaultModel(introM, introEntities[i]);
 
-		mat4 MVP = P * V * M;
-		mat4 normal = glm::transpose(glm::inverse(V * M));
+		mat4 MVP = P * introV * introM;
 
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
-		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(V));
-		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(M));
-		glUniformMatrix4fv(normalID, 1, GL_FALSE, value_ptr(normal));
+		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
+		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
 
 		glBindVertexArray(introEntities[i]->getRenderable()->vao);
 		GLuint tex = introEntities[i]->getTexture();

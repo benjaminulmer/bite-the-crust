@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::PLAY;
+	gameState = GameState::INTRO;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -276,6 +276,8 @@ void Game::mainLoop()
 
 			//swap buffers
 			SDL_GL_SwapWindow(window);
+			SDL_Delay(5000);
+			gameState = GameState::PLAY;
 			
 		}
 		else if(gameState == GameState::PLAY)

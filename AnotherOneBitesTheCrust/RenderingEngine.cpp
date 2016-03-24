@@ -1040,8 +1040,8 @@ void RenderingEngine::displayIntro()
 
 
 	glUniform3f(lightPos, 0.0f, 4.0f, 1.0f);
-	glUniform1f(lightPow, 0.0f);
-	glUniform3f(ambientScale, 0.0, 0.0, 0.0);
+	glUniform1f(lightPow, 50.0f);
+	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
 
 	for (int i = 0; i < (int)introEntities.size(); i++) {
 		if (!introEntities[i]->hasRenderable())

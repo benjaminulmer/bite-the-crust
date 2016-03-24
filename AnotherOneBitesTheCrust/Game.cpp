@@ -269,18 +269,18 @@ void Game::mainLoop()
 	// Game loop
 	while (gameState != GameState::EXIT)
 	{
-		if (gameState == GameState::INTRO)
-		{
-			processSDLEvents();
-			renderingEngine->displayIntro();
+		//if (gameState == GameState::INTRO)
+		//{
+		//	processSDLEvents();
+		//	renderingEngine->displayIntro();
 
-			//swap buffers
-			SDL_GL_SwapWindow(window);
-			SDL_Delay(5000);
+		//	//swap buffers
+		//	SDL_GL_SwapWindow(window);
+		//	SDL_Delay(5000);
 			gameState = GameState::PLAY;
-			
-		}
-		else if(gameState == GameState::PLAY)
+		//	
+		//}
+		/*else*/ if(gameState == GameState::PLAY)
 		{
 			processSDLEvents();
 

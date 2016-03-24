@@ -39,7 +39,7 @@ PxConvexMesh* PhysicsHelper::createConvexMesh(const PxVec3* verts, const PxU32 n
 	meshDesc.points.data		= verts;
 	meshDesc.flags				= PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eINFLATE_CONVEX;
 
-	PxConvexMesh* convexMesh = NULL;
+	PxConvexMesh* convexMesh = nullptr;
 	PxDefaultMemoryOutputStream buf;
 	if(cooking->cookConvexMesh(meshDesc, buf))
 	{
@@ -61,8 +61,9 @@ PxTriangleMesh* PhysicsHelper::createTriangleMesh(const PxVec3* verts, const PxU
 	meshDesc.triangles.stride       = 3*sizeof(PxU32);
 	meshDesc.triangles.data         = faces;
 
-	PxTriangleMesh* triangleMesh = NULL;
+	PxTriangleMesh* triangleMesh = nullptr;
 	PxDefaultMemoryOutputStream buf;
+	cooking->validateTriangleMesh(meshDesc);
 	if (cooking->cookTriangleMesh(meshDesc, buf))
 	{
 		PxDefaultMemoryInputData id(buf.getData(), buf.getSize());

@@ -148,7 +148,7 @@ void AudioEngine::playBrakeSound(Vehicle * source)
 		
 		playing.brake = true;
 		FMOD::Channel * brakeChannel = playSound(brakeSound, pos, source);
-		brakeChannel->setVolume(0.3);
+		brakeChannel->setVolume(0.3f);
 
 		vehicleLoops[source] = playing;
 	}
@@ -185,7 +185,7 @@ void AudioEngine::playEngineRevSound(Vehicle * source)
 	else
 	{
 		playing.engineRevChannel = playSound(engineRevSound, pos, source);
-		playing.engineRevChannel->setVolume(0.3);
+		playing.engineRevChannel->setVolume(0.3f);
 	}
 	if(playing.engineIdleChannel != nullptr)
 		playing.engineIdleChannel->setPaused(true);

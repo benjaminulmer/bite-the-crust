@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::PLAY;
+	gameState = GameState::INTRO;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -75,7 +75,7 @@ void Game::initSystems()
 		printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 	}
 
-	glClearColor(0.2f, 0.2f, 0.5f, 1.0f);				//blue background
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
 
 	aiEngine = new AIEngine();
 	audioEngine = new AudioEngine();
@@ -85,7 +85,7 @@ void Game::initSystems()
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
 	renderingEngine->setupMiscBuffers();
-
+	renderingEngine->setupIntro();
 
 }
 
@@ -158,15 +158,20 @@ void Game::setupEntities()
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.name], transform);
 				entities.push_back(e);
+
+				if (tileEntity.name == "house") {
+					tile->house = e;
+				}
 			}
 		}
 	}
 	renderingEngine->setupMinimap(map);
+
 	// Create vehicles
 	for(int i = 0; i < MAX_PLAYERS/2; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
-		setupVehicle(players[i], physx::PxTransform(10 + 10*i, 2, 20), i);
+		setupVehicle(players[i], physx::PxTransform(10 + 10.0f*i, 2, 20), i);
 
 		// TODO: get info from menu selection (ie. number of player characters)
 		if(i > 0)
@@ -174,6 +179,9 @@ void Game::setupEntities()
 		else
 			players[i]->isAI = false;
 	}
+	// hard code textures for now
+	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-red.DDS");
+	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-blue.DDS");
 
 	camera = new Camera(players[0]);
 	renderingEngine->updateView(*camera);
@@ -241,6 +249,11 @@ void Game::connectSystems()
 	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
 
 
+	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
+
+	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
+	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
+
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
@@ -256,7 +269,18 @@ void Game::mainLoop()
 	// Game loop
 	while (gameState != GameState::EXIT)
 	{
-		if(gameState == GameState::PLAY)
+		if (gameState == GameState::INTRO)
+		{
+			processSDLEvents();
+			renderingEngine->displayIntro();
+
+			//swap buffers
+			SDL_GL_SwapWindow(window);
+			SDL_Delay(5000);
+			gameState = GameState::PLAY;
+			
+		}
+		else if(gameState == GameState::PLAY)
 		{
 			processSDLEvents();
 
@@ -320,14 +344,17 @@ void Game::mainLoop()
 			pizzas.append(to_string(players[0]->pizzaCount));
 			renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
+//			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
+
+
 			//swap buffers
 			SDL_GL_SwapWindow(window);
 			physicsEngine->fetchSimulationResults();
+			//gameState = GameState::INTRO;
 		}
-
-		else if (gameState == GameState::MENU)
+		else if(gameState == GameState::MENU)
 		{
-			//menu logic
+			//menyoo logic
 		}
 		else if(gameState == GameState::PAUSE)
 		{
@@ -375,6 +402,11 @@ void Game::processSDLEvents()
 	}
 }
 
+void Game::endGame(std::map<Vehicle*, int> scores) {
+	gameState = GameState::EXIT;
+	fatalError("Game over!");
+}
+
 // Creates and fires a pizza from the provided vehicle
 void Game::shootPizza(Vehicle* vehicle)
 {
@@ -400,7 +432,7 @@ void Game::unFuckerTheGame()
 {
 	for(int i =0 ; i < MAX_PLAYERS/2; i++)
 	{
-		players[i]->getActor()->setGlobalPose(physx::PxTransform(10 + i*10, 2, 20));
+		players[i]->getActor()->setGlobalPose(physx::PxTransform(10 + i*10.0f, 2, 20));
 		players[i]->getPhysicsVehicle()->setToRestState();
 	}
 

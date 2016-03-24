@@ -8,6 +8,7 @@
 #include <sigslot.h>
 #include <string>
 #include <random>
+#include <algorithm>
 
 struct Delivery {
 	Tile* location;
@@ -31,6 +32,7 @@ public:
 	std::map<Vehicle*, Delivery> deliveries;
 	std::map<Vehicle*, int> scores;
 	std::map<Vehicle*, GLuint> deliveryTextures;
+	sigslot::signal1<std::map<Vehicle*, int>> gameOverSignal;
 	
 	void addDeliveryLocation(Tile* location);
 	void addPlayer(Vehicle* player);

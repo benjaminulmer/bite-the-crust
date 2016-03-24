@@ -158,6 +158,10 @@ void Game::setupEntities()
 
 				physicsEngine->createEntity(e, physicsEntityInfoMap[tileEntity.name], transform);
 				entities.push_back(e);
+
+				if (tileEntity.name == "house") {
+					tile->house = e;
+				}
 			}
 		}
 	}
@@ -175,6 +179,9 @@ void Game::setupEntities()
 		else
 			players[i]->isAI = false;
 	}
+	// hard code textures for now
+	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\house-delivered-red.DDS");
+	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\house-delivered-blue.DDS");
 
 	camera = new Camera(players[0]);
 	renderingEngine->updateView(*camera);
@@ -241,6 +248,11 @@ void Game::connectSystems()
 	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
 	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
 
+
+	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
+
+	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
+	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
 
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
@@ -386,6 +398,11 @@ void Game::processSDLEvents()
 			// other events, do nothing yet
 		}
 	}
+}
+
+void Game::endGame(std::map<Vehicle*, int> scores) {
+	gameState = GameState::EXIT;
+	fatalError("Game over!");
 }
 
 // Creates and fires a pizza from the provided vehicle

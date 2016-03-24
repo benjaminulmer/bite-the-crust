@@ -21,7 +21,7 @@ void PhysicsEngine::initSimulationData()
 	defaultErrorCallback = new PxDefaultErrorCallback();
 	defaultAllocator = new PxDefaultAllocator();
 
-	numWorkers = 8;
+	numWorkers = 1;
 }
 
 void PhysicsEngine::initPhysXSDK()

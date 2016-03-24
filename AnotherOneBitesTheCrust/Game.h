@@ -16,6 +16,7 @@
 
 enum class GameState
 {
+	INTRO,
 	MENU,
 	PLAY,
 	PAUSE,
@@ -28,7 +29,7 @@ class Game :
 public:
 	Game(void);
 	~Game(void);
-
+	
 	AIEngine *aiEngine;
 	AudioEngine *audioEngine;
 	InputEngine *inputEngine;
@@ -77,5 +78,6 @@ private:
 	std::map<std::string, PhysicsEntityInfo*> physicsEntityInfoMap;
 	std::map<std::string, GLuint> textureMap;
 	Map map;
+
 };
 

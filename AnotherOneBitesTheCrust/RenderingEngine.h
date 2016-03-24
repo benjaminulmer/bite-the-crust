@@ -18,6 +18,7 @@
 #include "Renderable.h"
 #include "Camera.h"
 #include "ContentLoading.h"
+#include "Entity.h"
 
 class RenderingEngine
 {
@@ -33,8 +34,6 @@ public:
 	void deleteIDs();
 	void loadProjectionMatrix();
 	void updateView(Camera& c);
-
-	void assignBuffers(Renderable* r);
 	void assignBuffersTex(Renderable* r);
 	void deleteBuffers(Renderable* r);
 
@@ -80,6 +79,8 @@ public:
 	GLuint textTextureID;			//texture
 	GLuint Text2DVertexBufferID;	//vertex buffer
 	GLuint Text2DUVBufferID;		//UV buffer
+
+	//IDs for shaders
 	GLuint mvpID;
 	GLuint vID;
 	GLuint mID;
@@ -142,5 +143,13 @@ public:
 	GLuint nodeVAO;
 	GLuint nodeVertBuffer;
 	GLuint nodeColorBuffer;
+
+	//intro stuff
+	void setupIntro();
+	void displayIntro();
+	std::vector<Entity*> introEntities;
+	glm::mat4 introM;
+	glm::mat4 introV;
+
 };
 

@@ -70,12 +70,12 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 			
 		}
 	}
-
+	// Constructing path
 	std::vector<glm::vec3> path;
 	graphNode * current = destination;
 	while(current != nullptr)
 	{	
-		path.push_back(current->getPosition());
+		path.push_back(current->getPosition() + glm::vec3(0,1,0));
 		current = previous[current];
 	}
 	std::reverse(path.begin(), path.end());
@@ -113,7 +113,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	
 	input->handBrake = false;
 
-	if(ratio > 0.05)
+	if(ratio > 0.1)
 	{
 		if(leftCosAngle > 0)
 			input->steer = ratio;
@@ -139,34 +139,13 @@ inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, c
 	float a = glm::dot(raydir,raydir);
 	float b = glm::dot(raydir,  (2.0f * posToRay));
 	float c = glm::dot(posToRay, posToRay) - radius2;
-	float D = b * b - (4.0 * a * c);
+	float D = b * b - (4.0f * a * c);
 
 	// If ray can not intersect then stop
 	if (D < 0)
 			return false;
 
 	return true;
-}
-
-bool AIEngine::tooClose(Vehicle * avoider, AICollisionEntity & avoiding)
-{
-	//// Should be able to get this from the vehicle / house somehow
-	//float carLength = 2.5; 
-	//float objectWidth = 4.5;
-
-	//glm::vec3 forward(glm::normalize(avoider->getModelMatrix() * glm::vec4(0,0,1,0)));
-
-	//if(sphereIntersect(forward, avoider->getPosition(), avoiding->getPosition(), objectWidth))
-	//{
-	//	float distanceToCenter = glm::length(avoider->getPosition() - avoiding->getPosition()) - carLength;
-	//	float objectCarRadius = (carLength + objectWidth);
-
-	//	if(distanceToCenter < objectCarRadius)
-	//		return true;
-
-	//}
-
-	return false;
 }
 
 void AIEngine::avoid(Vehicle * driver, graphNode * destinationNode)
@@ -212,26 +191,31 @@ graphNode * findClosestNode(Vehicle * toUpdate, Map & map)
 	return closest;
 }
 
+
+inline bool equals(glm::vec3 x, glm::vec3 y)
+{
+	return x.x == y.x && x.y == y.y && x.z == y.z;
+}
+
 void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 {
 	// Should be 'goal node' of this tile
 	graphNode * destinationNode = destination.location->nodes.at(0);
 
 	
-	if(glm::length(destinationNode->getPosition() - toUpdate->getPosition()) <= MIN_DIST/2)
+	if(glm::length(destinationNode->getPosition() - toUpdate->getPosition()) <= MIN_DIST)
 		toUpdate->currentPath.push_back(destinationNode->getPosition());
 	else
 	{
 		graphNode * closest = findClosestNode(toUpdate, map);
 
 		toUpdate->currentPath = aStar(closest, destinationNode, map.allNodes);
-		//toUpdate->currentPath.push_back(destinationNode->getPosition());
+		if(!equals(toUpdate->getDestination(), destination.location->nodes.at(0)->getPosition()))
+		{
+			toUpdate->pizzaDelivered = false;
+			return;
+		}
 	}
-}
-
-inline bool equals(glm::vec3 x, glm::vec3 y)
-{
-	return x.x == y.x && x.y == y.y && x.z == y.z;
 }
 
 void AIEngine::brake(Vehicle* toUpdate, const float & amount)
@@ -256,14 +240,6 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 			return;
 	//}
 
-	// Should be goal node
-	if(!equals(toUpdate->getDestination(), destination.location->nodes.at(0)->getPosition()))
-	{
-		toUpdate->currentPath.clear();
-		toUpdate->pizzaDelivered = false;
-		return;
-	}
-
 	// May want to consider something more efficient, uses square root in here
 	float distanceToNext = glm::length(toUpdate->currentPath.at(0) - toUpdate->getPosition());
 
@@ -282,7 +258,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
 	graphNode * destinationNode = destination.location->nodes.at(0);
-	if(obstacle.entity != nullptr && obstacle.distance < 3 && obstacle.entity->type != EntityType::DYNAMIC)
+	if(obstacle.entity != nullptr && obstacle.distance < 3 && obstacle.entity->type == EntityType::STATIC)
 	{
 		avoid(toUpdate, destinationNode);
 		return;

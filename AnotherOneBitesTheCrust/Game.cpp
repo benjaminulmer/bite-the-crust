@@ -1,8 +1,8 @@
 #include "Game.h"
 #include "PizzaBox.h"
 #include "WheelEntity.h"
-#include "Camera.h"
 #include "ContentLoading.h"
+#include "StaticEntity.h"
 
 #include <iostream>
 #include <string>
@@ -31,7 +31,6 @@ Game::Game(void)
 	aiEngine = nullptr;
 	audioEngine = nullptr;
 	screen = nullptr;
-	p1Vehicle = nullptr;
 	deliveryManager = nullptr;
 }
 
@@ -86,8 +85,6 @@ void Game::initSystems()
 	deliveryManager = new DeliveryManager();
 	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
 	renderingEngine->setupMiscBuffers();
-
-
 }
 
 // Create and initialize all loaded entities in the game world
@@ -143,7 +140,7 @@ void Game::setupEntities()
 				if (physicsEntityInfoMap[tileEntity.name]->type == PhysicsType::DYNAMIC) {
 					e = new DynamicEntity();
 				} else {
-					e = new PhysicsEntity();
+					e = new StaticEntity();
 					tile->staticEntities.push_back(e);
 				}
 
@@ -168,24 +165,23 @@ void Game::setupEntities()
 	}
 	renderingEngine->setupMinimap(map);
 	// Create vehicles
-	p1Vehicle = new Vehicle(PHYSICS_STEP_MS);
-	setupVehicle(p1Vehicle, physx::PxTransform(10, 2, 20), 0);
-	p1Vehicle->houseTexture = ContentLoading::loadDDS("res\\Textures\\house-delivered-red.DDS");
-	p2Vehicle = new Vehicle(PHYSICS_STEP_MS);
-	setupVehicle(p2Vehicle, physx::PxTransform(30, 2, 20), 1);
-	p2Vehicle->houseTexture = ContentLoading::loadDDS("res\\Textures\\house-delivered-blue.DDS");
-
-	// Initialize player location buffer for camera
-	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
+	for(int i = 0; i < MAX_PLAYERS/2; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
 	{
-		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+		players[i] = new Vehicle(PHYSICS_STEP_MS);
+		setupVehicle(players[i], physx::PxTransform(10 + 10.0f*i, 2, 20), i);
+
+		// TODO: get info from menu selection (ie. number of player characters)
+		if(i > 0)
+			players[i]->isAI = true;
+		else
+			players[i]->isAI = false;
 	}
-	cameraPosBufferIndex = 0;
-	camera.setPosition(cameraPosBuffer[CAMERA_POS_BUFFER_SIZE]);
-	camera.setLookAtPosition(p1Vehicle->getPosition());
-	camera.setUpVector(glm::vec3(0,1,0));
-	renderingEngine->updateView(camera);
-	
+	// hard code textures for now
+	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\house-delivered-red.DDS");
+	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\house-delivered-blue.DDS");
+
+	camera = new Camera(players[0]);
+	renderingEngine->updateView(*camera);
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
@@ -226,36 +222,39 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 // Connects systems together
 void Game::connectSystems()
 {
-	inputEngine->setInputStruct(&p1Vehicle->input, 0);
+	inputEngine->setInputStruct(&players[0]->input, 0);
+	inputEngine->setCamera(camera, 0);
 
-	p1Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
-	p1Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-	//audioEngine->playEngineIdleSound(p1Vehicle);
-	
-	p1Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
-	p1Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
+	inputEngine->setInputStruct(&players[0]->input, 0);
 
-	p2Vehicle->shootPizzaSignal.connect(this, &Game::shootPizza);
-	p2Vehicle->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
-	//audioEngine->playEngineIdleSound(p2Vehicle);
-	
-	p2Vehicle->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
-	p2Vehicle->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
+	for(int i = 0; i < MAX_PLAYERS/2; i++)
+	{
+		players[i]->shootPizzaSignal.connect(this, &Game::shootPizza);
+		players[i]->shootPizzaSignal.connect(audioEngine, &AudioEngine::playCannonSound);
+		players[i]->dryFireSignal.connect(audioEngine, &AudioEngine::playDryFireSound);
+		players[i]->brakeSignal.connect(audioEngine, &AudioEngine::playBrakeSound);
+		players[i]->idleSignal.connect(audioEngine, &AudioEngine::playEngineIdleSound);
+		players[i]->gasSignal.connect(audioEngine, &AudioEngine::playEngineRevSound);
 
+		deliveryManager->addPlayer(players[i]);
+	}
 
-	inputEngine->reverseCam.connect(&camera, &Camera::setReverseCam);
 	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
-	deliveryManager->addPlayer(p1Vehicle);
-	deliveryManager->addPlayer(p2Vehicle);
+	// TODO: Should have a textures array or something that corresponds to each player so we can add this to above loop
+	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
+	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
+
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
 
-	deliveryManager->deliveryTextures[p1Vehicle] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
-	deliveryManager->deliveryTextures[p2Vehicle] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
+	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
+	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
+
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
+	physicsEngine->simulationCallback->inPickUpLocation.connect(audioEngine, &AudioEngine::playReloadSound);
 }
 
 // Main loop of the game
@@ -264,7 +263,6 @@ void Game::mainLoop()
 	unsigned int oldTimeMs = SDL_GetTicks();
 	unsigned int deltaTimeAccMs = 0;
 
-
 	// Game loop
 	while (gameState != GameState::EXIT)
 	{
@@ -272,7 +270,7 @@ void Game::mainLoop()
 		{
 			processSDLEvents();
 
-		// Figure out timestep and run physics
+			// Figure out timestep and run physics
 			unsigned int newTimeMs = SDL_GetTicks();
 			unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 			oldTimeMs = newTimeMs;
@@ -284,42 +282,39 @@ void Game::mainLoop()
 				deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 				// Update the player and AI cars
-				AICollisionEntity closest = physicsEngine->AISweep(p2Vehicle);
-				aiEngine->updateAI(p2Vehicle, deliveryManager->deliveries[p2Vehicle], map, closest);
-				renderingEngine->setupNodes(p2Vehicle->currentPath, vec3(1,1,0));
-
-
-				p1Vehicle->update();
-				p2Vehicle->update();
-		
+				for(int i = 0; i < MAX_PLAYERS/2; i++)
+				{
+					if(players[i]->isAI)
+					{
+						AICollisionEntity closest = physicsEngine->AISweep(players[i]);
+						aiEngine->updateAI(players[i], deliveryManager->deliveries[players[i]], map, closest);
+						renderingEngine->setupNodes(players[i]->currentPath, vec3(1,1,0)); // TODO: Remove when adding multiple AIs, otherwise will be very confusing (or change colours to match AI)
+				
+					}
+					players[i]->update();
+				}
 				physicsEngine->simulate(PHYSICS_STEP_MS);
 
-				// Update the camera position buffer with new location
-				if (camera.isReverseCam()) {
-					cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,15,0));
-				}
-				else {
-					cameraPosBuffer[cameraPosBufferIndex] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
-				}
-				cameraPosBufferIndex = (cameraPosBufferIndex + 1) % CAMERA_POS_BUFFER_SIZE;
-
-				// Set camera to look at player with a positional delay
-				camera.setPosition(cameraPosBuffer[cameraPosBufferIndex]);
-				camera.setLookAtPosition(p1Vehicle->getPosition());
-				renderingEngine->updateView(camera);
+				// Update the camera
+				camera->update();
+				renderingEngine->updateView(*camera);		
 			}
 			// Update Sound
-			audioEngine->update(p1Vehicle->getModelMatrix());
+			// TODO: update audioengine to support multiple listeners
+			audioEngine->update(players[0]->getModelMatrix());
 
 			// Display
 			renderingEngine->displayFuncTex(entities);
-			renderingEngine->drawShadow(p1Vehicle->getPosition());
-			renderingEngine->drawShadow(p2Vehicle->getPosition());
-			renderingEngine->drawSkybox(p1Vehicle->getPosition());
-			renderingEngine->drawMinimap(p1Vehicle, p2Vehicle);
+			for(int i = 0 ; i < MAX_PLAYERS/2; i++)
+				renderingEngine->drawShadow(players[i]->getPosition());
+			
+			renderingEngine->drawNodes(players[1]->currentPath.size(), "lines");
+			renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
+			renderingEngine->drawMinimap(players[0], players[1]); // TODO: Should support arbitrary number of vans
 
+			// TODO: Broken record, but should draw to corresponding player's viewport
 			string speed = "Speed: ";
-			speed.append(to_string(p1Vehicle->getPhysicsVehicle()->computeForwardSpeed()));
+			speed.append(to_string(players[0]->getPhysicsVehicle()->computeForwardSpeed()));
 			renderingEngine->printText2D(speed.data(), 0, 700, 24);
 
 			string frameRate = "DeltaTime: ";
@@ -327,15 +322,14 @@ void Game::mainLoop()
 			renderingEngine->printText2D(frameRate.data(), 0, 670, 20);
 
 			string score = "Score: ";
-			score.append(to_string(deliveryManager->getScore(p1Vehicle)));
+			score.append(to_string(deliveryManager->getScore(players[0])));
 			renderingEngine->printText2D(score.data(), 1050, 700, 24);
-			renderingEngine->printText2D(deliveryManager->getDeliveryText(p1Vehicle).data(), 725, 670, 20);
+			renderingEngine->printText2D(deliveryManager->getDeliveryText(players[0]).data(), 725, 670, 20);
 
 			string pizzas = "Pizzas: ";
-			pizzas.append(to_string(p1Vehicle->pizzaCount));
+			pizzas.append(to_string(players[0]->pizzaCount));
 			renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
-			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
 			//swap buffers
 			SDL_GL_SwapWindow(window);
 			physicsEngine->fetchSimulationResults();
@@ -415,34 +409,31 @@ void Game::shootPizza(Vehicle* vehicle)
 	pizzaBox->getRigidDynamic()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
-
-	audioEngine->playCannonSound(vehicle);
 }
 
 void Game::unFuckerTheGame()
 {
-	p1Vehicle->getActor()->setGlobalPose(physx::PxTransform(10, 2, 20));
-	p2Vehicle->getActor()->setGlobalPose(physx::PxTransform(30, 2, 20));
-	p1Vehicle->getPhysicsVehicle()->setToRestState();
-	p2Vehicle->getPhysicsVehicle()->setToRestState();
-
-	for (unsigned int i = 0; i < CAMERA_POS_BUFFER_SIZE; i++)
+	for(int i =0 ; i < MAX_PLAYERS/2; i++)
 	{
-		cameraPosBuffer[i] = p1Vehicle->getPosition() + glm::vec3(p1Vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+		players[i]->getActor()->setGlobalPose(physx::PxTransform(10 + i*10.0f, 2, 20));
+		players[i]->getPhysicsVehicle()->setToRestState();
 	}
-	cameraPosBufferIndex = 0;
+
+	for (unsigned int i = 0; i < 10; i++) 
+	{
+		camera->update();
+	}
 }
 
 Game::~Game(void)
 {
-	p1Vehicle->shootPizzaSignal.disconnect_all();
-	p2Vehicle->shootPizzaSignal.disconnect_all();
+	for(int i = 0 ; i < MAX_PLAYERS/2; i++)
+		players[i]->shootPizzaSignal.disconnect_all();
+
 	for (unsigned int i = 0; i < entities.size(); i++)
-	{
 		delete entities[i];
-	}
+
 	std::map<std::string, Renderable*>::iterator it;
-	for (it = ContentLoading::loadedModels.begin(); it != ContentLoading::loadedModels.end(); ++it) {
+	for (it = ContentLoading::loadedModels.begin(); it != ContentLoading::loadedModels.end(); ++it)
 		delete it->second;
-	}
 }

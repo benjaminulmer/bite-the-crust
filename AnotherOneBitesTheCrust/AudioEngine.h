@@ -9,7 +9,7 @@
 #include <map>
 #include <sigslot.h>
 
-#include "PhysicsEntity.h"
+#include "Vehicle.h"
 
 struct Sound3D
 {
@@ -30,16 +30,18 @@ public:
 	~AudioEngine(void);
 
 	void startBackgroundMusic();
-	void playCannonSound(PhysicsEntity * playing);
-	void playBrakeSound(PhysicsEntity * playing);
-	void playEngineIdleSound(PhysicsEntity*);
-	void playEngineRevSound(PhysicsEntity*);
+	void playReloadSound(Vehicle * source);
+	void playDryFireSound(Vehicle * source);
+	void playCannonSound(Vehicle * source);
+	void playBrakeSound(Vehicle * source);
+	void playEngineIdleSound(Vehicle * source);
+	void playEngineRevSound(Vehicle * source);
 	FMOD::Channel * playSound(FMOD::Sound *, glm::vec3, PhysicsEntity *);
 	void update(glm::mat4);
 
 private:
 	FMOD::System *fmodSystem;
-	FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound;
+	FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound, *reloadSound, *dryFireSound;
 	FMOD::Channel *backgroundChannel, *engineChannel;
 	FMOD_RESULT result;
 	std::list<Sound3D*> playing;

@@ -109,14 +109,28 @@ FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, Physi
 	return playingOn->channel;
 }
 
-void AudioEngine::playCannonSound(PhysicsEntity * source)
+void AudioEngine::playReloadSound(Vehicle * source)
+{
+	glm::vec3 pos = source->getPosition();
+
+	playSound(reloadSound, pos, source);
+}
+
+void AudioEngine::playDryFireSound(Vehicle * source)
+{
+	glm::vec3 pos = source->getPosition();
+
+	playSound(dryFireSound, pos, source);
+}
+
+void AudioEngine::playCannonSound(Vehicle * source)
 {
 	glm::vec3 pos = source->getPosition();
 
 	playSound(cannonSound, pos, source);
 }
 
-void AudioEngine::playBrakeSound(PhysicsEntity * source)
+void AudioEngine::playBrakeSound(Vehicle * source)
 {
 	glm::vec3 pos = source->getPosition();
 
@@ -134,7 +148,7 @@ void AudioEngine::playBrakeSound(PhysicsEntity * source)
 		
 		playing.brake = true;
 		FMOD::Channel * brakeChannel = playSound(brakeSound, pos, source);
-		brakeChannel->setVolume(0.3);
+		brakeChannel->setVolume(0.3f);
 
 		vehicleLoops[source] = playing;
 	}
@@ -144,7 +158,7 @@ void AudioEngine::playBrakeSound(PhysicsEntity * source)
 /*
 * TODO: Work on state machine for car noises
 */
-void AudioEngine::playEngineIdleSound(PhysicsEntity * source)
+void AudioEngine::playEngineIdleSound(Vehicle * source)
 {
 	glm::vec3 pos = source->getPosition();
 	VehicleSounds playing = vehicleLoops[source];
@@ -160,7 +174,7 @@ void AudioEngine::playEngineIdleSound(PhysicsEntity * source)
 
 }
 
-void AudioEngine::playEngineRevSound(PhysicsEntity * source)
+void AudioEngine::playEngineRevSound(Vehicle * source)
 {
 	glm::vec3 pos = source->getPosition();
 
@@ -171,7 +185,7 @@ void AudioEngine::playEngineRevSound(PhysicsEntity * source)
 	else
 	{
 		playing.engineRevChannel = playSound(engineRevSound, pos, source);
-		playing.engineRevChannel->setVolume(0.3);
+		playing.engineRevChannel->setVolume(0.3f);
 	}
 	if(playing.engineIdleChannel != nullptr)
 		playing.engineIdleChannel->setPaused(true);
@@ -186,6 +200,12 @@ void AudioEngine::initStreams()
     errorCheck();
 
 	result = fmodSystem->createSound("res\\Audio\\cannon.wav", FMOD_3D, 0, &cannonSound);
+    errorCheck();
+
+	result = fmodSystem->createSound("res\\Audio\\reload.wav", FMOD_3D, 0, &reloadSound);
+    errorCheck();
+
+	result = fmodSystem->createSound("res\\Audio\\dryFire.wav", FMOD_3D, 0, &dryFireSound);
     errorCheck();
 
 	result = fmodSystem->createSound("res\\Audio\\engineIdle.wav", FMOD_LOOP_NORMAL | FMOD_3D, 0, &engineIdleSound);

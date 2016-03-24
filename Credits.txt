@@ -1,9 +1,6 @@
 Music (or "8Bit Introduction" song) by Tristan Lohengrin
 	http://www.freesound.org/people/Tristan_Lohengrin/sounds/273539/
 
-cannon.wav
-	http://www.freesound.org/people/ReadeOnly/sounds/186951/ 
-
 Construction Barrier model/texture by PagDev
 	http://opengameart.org/content/construction-barrier-3d
 Road block model/texture by Calinou
@@ -30,6 +27,15 @@ engineIdle.wav
 brake.wav
 	http://www.freesound.org/people/Iberian_Runa/sounds/217542/
 
+cannon.wav
+	http://www.freesound.org/people/ReadeOnly/sounds/186951/ 
+	
+reload.wav
+	https://www.freesound.org/people/Paul368/sounds/200966/
+	
+dryFire.wav
+	https://www.freesound.org/people/PhreaKsAccount/sounds/46265/
+	
 	
 Obj and DDS loading
 	http://www.opengl-tutorial.org/

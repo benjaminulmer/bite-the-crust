@@ -66,7 +66,7 @@ void PhysicsEngine::initVehicleSDK()
 	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
 	// Allocate buffers and stuff? for raycasts
-	vehicleSceneQueryData = VehicleSceneQueryData::allocate(MAX_VEHICLES, PX_MAX_NB_WHEELS, MAX_VEHICLES, *defaultAllocator);
+	vehicleSceneQueryData = VehicleSceneQueryData::allocate(MAX_VEHICLES, MAX_WHEELS, MAX_VEHICLES, *defaultAllocator);
 	batchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *vehicleSceneQueryData, scene);
 
 	drivingSurfaces[0] = physics->createMaterial(0.8f, 0.8f, 0.6f);
@@ -268,8 +268,6 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
 		toReturn.entity = (Entity*)hit.actor->userData;
 		toReturn.distance = hit.distance;
-
-
 	}
 	else if (buffer2.hasBlock)
 	{
@@ -281,7 +279,6 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 		toReturn.pos = glm::vec3(hitPoint.x, hitPoint.y, hitPoint.z);
 		toReturn.entity = (Entity*)hit.actor->userData;
 		toReturn.distance = hit.distance;
-
 	}
 
 	return toReturn;
@@ -292,15 +289,36 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 	PxF32 deltaTimeS = deltaTimeMs/1000.0f;
 
 	// Wheel raycasts
-	PxVehicleWheels** vehiclesPointer = vehicles.data();
 	PxRaycastQueryResult* raycastResults = vehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = vehicleSceneQueryData->getRaycastQueryResultBufferSize();
-	PxVehicleSuspensionRaycasts(batchQuery, vehicles.size(), vehiclesPointer, raycastResultsSize, raycastResults);
+	PxVehicleSuspensionRaycasts(batchQuery, vehicles.size(), vehicles.data(), raycastResultsSize, raycastResults);
 
-	//Vehicle update.
+	// Initialize structures to store results
+	PxVehicleWheelQueryResult results[MAX_VEHICLES];
+	PxWheelQueryResult wheelQueryResult[MAX_VEHICLES][MAX_WHEELS];
+	for (PxU32 i = 0; i < vehicles.size(); i++)
+	{
+		results[i].nbWheelQueryResults = MAX_WHEELS;
+		results[i].wheelQueryResults = wheelQueryResult[i];
+	}
+	// Vehicle update
 	const PxVec3 grav = scene->getGravity();
-	PxVehicleUpdates(deltaTimeS, grav, *frictionPairs, vehicles.size(), vehiclesPointer, nullptr);
+	PxVehicleUpdates(deltaTimeS, grav, *frictionPairs, vehicles.size(), vehicles.data(), results);
 
+	// Check if vehiles are in air
+	for (PxU32 i = 0; i < vehicles.size(); i++)
+	{
+		bool inAir = true;
+		for (PxU32 j = 0; j < results[i].nbWheelQueryResults; j++)
+		{
+			if (!results[i].wheelQueryResults[j].isInAir)
+			{
+				inAir = false;
+			}
+		}
+		Vehicle* veh = (Vehicle*)vehicles[i]->getRigidDynamicActor()->userData;
+		veh->isInAir = inAir;
+	}
 	scene->simulate(deltaTimeS);
 }
 

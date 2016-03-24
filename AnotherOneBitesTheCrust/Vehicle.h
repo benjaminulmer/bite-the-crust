@@ -79,6 +79,8 @@ public:
 	VehicleTuning tuning;
 
 	int pizzaCount;
+	GLuint houseTexture;
+
 	bool isInAir;
 
 	void update();

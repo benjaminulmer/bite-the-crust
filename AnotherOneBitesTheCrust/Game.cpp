@@ -250,14 +250,14 @@ void Game::connectSystems()
 	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
 	// TODO: Should have a textures array or something that corresponds to each player so we can add this to above loop
-	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
-	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
+	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-red.DDS");
+	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
 
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
 
-	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRedDeliver.DDS");
-	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlueDeliver.DDS");
+	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-red.DDS");
+	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
 
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);

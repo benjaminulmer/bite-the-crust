@@ -100,7 +100,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
 	// TODO: Should divide by half the map or something
-	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)0.6);
+	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)0.65);
 
 	// TODO: Maybe put these in an init file for tuning purposes?
 	if (gas > 0.2)
@@ -113,7 +113,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	
 	input->handBrake = false;
 
-	if(ratio > 0.1)
+	if(ratio > 0.05)
 	{
 		if(leftCosAngle > 0)
 			input->steer = ratio;
@@ -123,11 +123,11 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	else if(distanceToGoal < MIN_DIST)
 	{
 		input->steer = 0;
-		if(!driver->pizzaDelivered)
+		/*if(!driver->pizzaDelivered)
 		{
 			input->shootPizza = true;
 			driver->pizzaDelivered = true;
-		}
+		}*/
 	}
 }
 
@@ -148,9 +148,30 @@ inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, c
 	return true;
 }
 
-void AIEngine::avoid(Vehicle * driver, graphNode * destinationNode)
+void AIEngine::fireAt(Vehicle * driver, const glm::vec3 & goal)
 {
-	glm::vec3 desiredDirection = glm::normalize(destinationNode->getPosition() - driver->getPosition());
+	glm::vec3 desiredDirection = glm::normalize(goal - driver->getPosition());
+	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
+	glm::vec3 forward(glm::normalize(driver->getModelMatrix() * glm::vec4(0,0,1,0)));
+	float leftCosAngle = glm::dot(desiredDirection, left);
+	float cosAngle = glm::dot(desiredDirection, forward);
+
+	float ratio = glm::acos(cosAngle) / glm::pi<float>();
+
+	if(ratio > 0.05)
+		facePoint(driver, goal);
+	else
+	{
+		driver->pizzaDelivered = true;
+		driver->input.shootPizza = true;
+	}
+
+
+}
+
+void AIEngine::facePoint(Vehicle * driver, const glm::vec3 & pointTo)
+{
+	glm::vec3 desiredDirection = glm::normalize(pointTo - driver->getPosition());
 	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
 	float leftCosAngle = glm::dot(desiredDirection, left);
 
@@ -284,9 +305,10 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 		//std::cout << "Waypoint get! Position: "<< toUpdate->currentPath.at(0).x << "," << toUpdate->currentPath.at(0).y << ", " << toUpdate->currentPath.at(0).z << std::endl;
 		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
 
-		if(toUpdate->currentPath.empty() && distanceToNext < MIN_DIST)
+		if(toUpdate->currentPath.empty() && distanceToNext < MIN_DIST * 3)
 		{
-			brake(toUpdate, 1);
+			//brake(toUpdate, 1);
+			fireAt(toUpdate, destination.location->goal);
 			return;
 		} 
 	}
@@ -296,7 +318,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	graphNode * destinationNode = destination.location->nodes.at(0);
 	if(obstacle.entity != nullptr && obstacle.distance < 3 && obstacle.entity->type == EntityType::STATIC)
 	{
-		avoid(toUpdate, destinationNode);
+		facePoint(toUpdate, destinationNode->getPosition());
 		return;
 	}
 	glm::vec3 nextPoint;

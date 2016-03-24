@@ -14,33 +14,6 @@
 using std::vector;
 using glm::vec3;
 
-struct Player
-{
-	vec3 position;
-
-	// TODO: Need a way to store current path + how long since last updated
-};
-
-struct TileAI
-{
-	static const int SIZE = 2;
-
-	// Should these coordinates be relative to the tile or the map?
-	// If it's relative to the tile, need a method to get player space -> tile space
-	vec3 entrance, exit;
-};
-
-struct MapAI
-{
-	
-	static const int MAP_SIZE = 70;
-	static const int WIDTH = MAP_SIZE/TileAI::SIZE;
-	static const int DEPTH = MAP_SIZE/TileAI::SIZE;
-
-	TileAI tiles[WIDTH][DEPTH];
-
-};
-
 class AIEngine
 {
 public:
@@ -53,9 +26,10 @@ public:
 private:
 	void updatePath(Vehicle*, Delivery, Map &);
 	void goToPoint(Vehicle*, const glm::vec3 &, const float &);
-	void avoid(Vehicle *, graphNode*);
+	void facePoint(Vehicle *, const glm::vec3&);
 	void brake(Vehicle*, const float &);
 	void trimPath(Vehicle*);
+	void fireAt(Vehicle*, const glm::vec3 &);
 
 	std::vector<glm::vec3> aStar(graphNode *, graphNode *, std::vector<graphNode*>);
 };

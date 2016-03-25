@@ -106,7 +106,7 @@ void Game::setupEntities()
 	}
 
 	// Load the map
-	if (!ContentLoading::loadMap("res\\JSON\\map.json", map))
+	if (!ContentLoading::loadMap("res\\JSON\\tiles.json", "res\\JSON\\map.json", map))
 		fatalError("Could not load map file.");
 	deliveryManager->map = &map;
 

@@ -329,7 +329,7 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 	return info;
 }
 
-bool validateMap(rapidjson::Document &d) {
+bool validateTiles(rapidjson::Document &d) {
 	if (!d.HasMember("tiles")) {
 		printf("Map file missing tiles array.");
 		return false;
@@ -356,6 +356,10 @@ bool validateMap(rapidjson::Document &d) {
 		}
 
 	}
+	return true;
+}
+
+bool validateMap(rapidjson::Document &d) {
 	if (!d.HasMember("map")) {
 		printf("Map file missing map member.");
 		return false;
@@ -372,18 +376,18 @@ bool validateMap(rapidjson::Document &d) {
 }
 
 //TODO, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
-bool ContentLoading::loadMap(char* filename, Map &map) {
-	FILE* filePointer;
-	errno_t err = fopen_s(&filePointer, filename, "rb");
+bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
+	FILE* tileFilePointer;
+	errno_t err = fopen_s(&tileFilePointer, tilesFilename, "rb");
 	if (err != 0) {
 		printf("Error, map file couldn't load.");
 		return false;
 	}
 	char readBuffer[10000];
-	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
+	rapidjson::FileReadStream reader(tileFilePointer, readBuffer, sizeof(readBuffer));
 	rapidjson::Document d;
 	d.ParseStream(reader);
-	if (!validateMap(d))
+	if (!validateTiles(d))
 		return false;
 
 	// Read in the tiles array
@@ -468,7 +472,20 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		nodes[id] = tileNodes;
 		tiles[id] = t;
 	}
+	fclose(tileFilePointer);
 
+	FILE* mapFilePointer;
+	err = fopen_s(&mapFilePointer, mapFilename, "rb");
+	if (err != 0) {
+		printf("Error, map file couldn't load.");
+		return false;
+	}
+	
+	char mapBuffer[10000];
+	rapidjson::FileReadStream mapReader(mapFilePointer, mapBuffer, sizeof(mapBuffer));
+	d.ParseStream(mapReader);
+	if (!validateMap(d))
+		return false;
 	// Construct the map 
 	int tileSize = d["map"]["tile size"].GetInt();
 	map.tileSize = tileSize;
@@ -595,7 +612,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 
 
 	map.allNodes.insert(map.allNodes.end(), allNodes.begin(), allNodes.end());
-	fclose(filePointer);
+	fclose(mapFilePointer);
 	return true;
 }
 

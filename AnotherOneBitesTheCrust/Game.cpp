@@ -336,7 +336,7 @@ void Game::mainLoop()
 			for(int i = 0 ; i < MAX_PLAYERS/2; i++)
 				renderingEngine->drawShadow(players[i]->getPosition());
 			
-			renderingEngine->drawNodes(players[1]->currentPath.size(), "lines");
+			renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
 			renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
 			renderingEngine->drawMinimap(players[0], players[1]); // TODO: Should support arbitrary number of vans
 

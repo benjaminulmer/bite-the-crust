@@ -403,6 +403,19 @@ bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
 		t.groundModel = ground;
 		if (tileArray[i].HasMember("deliverable")) {
 			t.deliverable = tileArray[i]["deliverable"].GetBool();
+			if (!tileArray[i].HasMember("goal"))
+			{
+				printf("Error, deliverable tile must have goal node.");
+				return false;
+			}
+			const rapidjson::Value& goalNode = tileArray[i]["goal"];
+			if (goalNode.HasMember("x"))
+				t.goal.x = goalNode["x"].GetDouble();
+			if (goalNode.HasMember("y"))
+				t.goal.y = goalNode["y"].GetDouble();
+			if (goalNode.HasMember("z"))
+				t.goal.z = goalNode["z"].GetDouble();
+			
 		} else {
 			t.deliverable = false;
 		}
@@ -499,6 +512,12 @@ bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
 			Tile tile = tiles[id];
 			std::vector<NodeTemplate> tileNodes = nodes[id];
 
+			// Currently setting to center of tile; may be better to have in front of so drivebys are easier
+			// TODO: may be better to change to a node or something, need to be able to pathfind to it
+			// ALTERNATIVE: add way to pathfind 'near' a location
+			if(tile.pickup)
+				map.pickup = glm::vec3(((float)tileSize / 2) + (j)*tileSize, 0,  ((float)tileSize / 2) + (i)*tileSize);
+
 			tile.groundRotationDeg = 0;
 			// Handle rotations
 			if (rotation == "R") {
@@ -551,7 +570,12 @@ bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
 				}
 				tile.groundRotationDeg += 180;
 			}
-
+			// Setup goal
+			if(tile.deliverable)
+			{
+				tile.goal.x += tileSize * j;
+				tile.goal.z += tileSize * i;
+			}
 			// Positions of nodes
 			for(NodeTemplate n : tileNodes)
 			{

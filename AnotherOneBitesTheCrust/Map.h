@@ -22,6 +22,7 @@ struct Tile
 	std::vector<TileEntity> entityTemplates;
 	std::vector<PhysicsEntity*> staticEntities;
 	std::vector<graphNode*> nodes;
+	glm::vec3 goal;
 	Entity* ground;
 	GLuint groundTexture;
 	int groundRotationDeg;
@@ -45,6 +46,7 @@ public:
 
 	std::vector<graphNode *> allNodes;
 	std::vector<std::vector<Tile>> tiles;
+	glm::vec3 pickup;
 
 	Tile* getTile(glm::vec3 position);
 	//void offsetPosition(Tile* tile, glm::vec3 &position);

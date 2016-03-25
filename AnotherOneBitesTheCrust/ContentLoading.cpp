@@ -116,10 +116,6 @@ bool verifyEntityList(const rapidjson::Document &d) {
 			printf("Entry %d is missing a model.", i);
 			return false;
 		}
-		if (!entry.HasMember("physics")) {
-			printf("Entry %d is missing a physics file.", i);
-			return false;
-		}
 	}
 	return true;
 }
@@ -157,10 +153,12 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 			modelMap[name] = loadedModels[renderableModelFile];
 		}
 
-		std::string physicsDataName = entitiesArray[i]["physics"].GetString();
-		physicsDataName.insert(0, "res\\JSON\\Physics\\");
-		PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
-		physicsMap[name] = info;
+		if (entitiesArray[i].HasMember("physics")) {
+			std::string physicsDataName = entitiesArray[i]["physics"].GetString();
+			physicsDataName.insert(0, "res\\JSON\\Physics\\");
+			PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
+			physicsMap[name] = info;
+		}
 
 		if (entitiesArray[i].HasMember("texture")) {
 			std::string textureName = entitiesArray[i]["texture"].GetString();

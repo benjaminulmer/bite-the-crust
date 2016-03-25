@@ -143,29 +143,38 @@ void Game::setupEntities()
 				std::uniform_int_distribution<int> dist(0, tileEntity.names.size()-1);
 				std::string name = tileEntity.names[dist(generator)];
 
-				PhysicsEntity* e;
-				if (physicsEntityInfoMap[name]->type == PhysicsType::DYNAMIC) {
-					e = new DynamicEntity();
-				} else {
-					e = new StaticEntity();
-					tile->staticEntities.push_back(e);
-				}
-
-				// TODO, error check that these models do exist, instead of just break
-				e->setRenderable(renderablesMap[name]);
-				e->setTexture(textureMap[name]);
-
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
+				if (physicsEntityInfoMap.count(name) == 0) {
+					Entity* e = new Entity();
+					e->setRenderable(renderablesMap[name]);
+					e->setTexture(textureMap[name]);
 
-				float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
-				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
+					e->setDefaultRotation(physx::PxPi *(tile->groundRotationDeg) / 180.0f, glm::vec3(0,1,0));
+					e->setDefaultTranslation(pos);
+					entities.push_back(e);
+				} else {
+					PhysicsEntity* e;
+					if (physicsEntityInfoMap[name]->type == PhysicsType::DYNAMIC) {
+						e = new DynamicEntity();
+					} else {
+						e = new StaticEntity();
+						tile->staticEntities.push_back(e);
+					}
 
-				physicsEngine->createEntity(e, physicsEntityInfoMap[name], transform);
-				entities.push_back(e);
+					// TODO, error check that these models do exist, instead of just break
+					e->setRenderable(renderablesMap[name]);
+					e->setTexture(textureMap[name]);
 
-				if (name.find("house") != std::string::npos) {
-					tile->house = e;
+					float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
+					physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
+
+					physicsEngine->createEntity(e, physicsEntityInfoMap[name], transform);
+					entities.push_back(e);
+
+					if (name.find("house") != std::string::npos) {
+						tile->house = e;
+					}
 				}
 			}
 		}

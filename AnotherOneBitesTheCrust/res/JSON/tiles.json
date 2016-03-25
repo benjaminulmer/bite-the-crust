@@ -105,7 +105,8 @@
 			"ground": "lawn",
 			"entities": [
 				{"name" : "ramp", "x" : 10, "z" : 10},
-                {"name": "dumpster", "x": 10, "z": 5, "rotation": 90}
+                {"name": ["flower 1", "flower 2", "flower 3"], "x": 10, "z": 5, "rotation": 90},
+                {"name": ["rock 1", "rock 2", "rock 3"], "x": 2, "z": 4}
 			],
 			"nodes": [
 			]

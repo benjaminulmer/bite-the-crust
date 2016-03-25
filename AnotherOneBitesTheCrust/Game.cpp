@@ -125,13 +125,17 @@ void Game::setupEntities()
 				physicsEngine->createPizzaPickup(physx::PxVec3((float)j*map.tileSize + map.tileSize/2, 0, (float)i*map.tileSize + map.tileSize/2), 8.0f);
 			}
 
-			Entity* ground = new Entity();
+			StaticEntity* ground = new StaticEntity();
 			ground->setRenderable(renderablesMap[tile->groundModel]);
 			ground->setTexture(textureMap[tile->groundModel]);
 
-			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
-			ground->setDefaultRotation(physx::PxPi * (tile->groundRotationDeg) / 180.0f, glm::vec3(0,1,0));
-			ground->setDefaultTranslation(glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2));
+			// Offset by tileSize/2 so that the corner of the map starts at 0,0
+			glm::vec3 pos = glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2);
+
+			float rotationRad = physx::PxPi * (tile->groundRotationDeg / 180.0f);
+			physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
+
+			physicsEngine->createEntity(ground, physicsEntityInfoMap[tile->groundModel], transform);
 			tile->ground = ground;
 			tile->groundTexture = textureMap[tile->groundModel];
 			entities.push_back(ground);
@@ -280,21 +284,26 @@ void Game::mainLoop()
 	unsigned int oldTimeMs = SDL_GetTicks();
 	unsigned int deltaTimeAccMs = 0;
 
+	std::vector<glm::vec3> allNodes;
+	for(graphNode * node : map.allNodes)
+		allNodes.push_back(node->getPosition());
+	//renderingEngine->setupNodes(allNodes, vec3(1,1,0));
+
 	// Game loop
 	while (gameState != GameState::EXIT)
 	{
-		if (gameState == GameState::INTRO)
-		{
-			processSDLEvents();
-			renderingEngine->displayIntro();
+		//if (gameState == GameState::INTRO)
+		//{
+		//	processSDLEvents();
+		//	renderingEngine->displayIntro();
 
-			//swap buffers
-			SDL_GL_SwapWindow(window);
-			SDL_Delay(5000);
+		//	//swap buffers
+		//	SDL_GL_SwapWindow(window);
+		//	SDL_Delay(5000);
 			gameState = GameState::PLAY;
-			
-		}
-		else if(gameState == GameState::PLAY)
+		//	
+		//}
+		/*else*/ if(gameState == GameState::PLAY)
 		{
 			processSDLEvents();
 
@@ -317,7 +326,7 @@ void Game::mainLoop()
 						AICollisionEntity closest = physicsEngine->AISweep(players[i]);
 						aiEngine->updateAI(players[i], deliveryManager->deliveries[players[i]], map, closest);
 						renderingEngine->setupNodes(players[i]->currentPath, vec3(1,1,0)); // TODO: Remove when adding multiple AIs, otherwise will be very confusing (or change colours to match AI)
-				
+						
 					}
 					players[i]->update();
 				}
@@ -337,6 +346,7 @@ void Game::mainLoop()
 				renderingEngine->drawShadow(players[i]->getPosition());
 			
 			renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
+			//renderingEngine->drawNodes(map.allNodes.size(), "points");
 			renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
 			renderingEngine->drawMinimap(players[0], players[1]); // TODO: Should support arbitrary number of vans
 
@@ -349,7 +359,7 @@ void Game::mainLoop()
 			frameRate.append(to_string(deltaTimeMs));
 			renderingEngine->printText2D(frameRate.data(), 0, 670, 20);
 
-			string score = "Score: ";
+			string score = "Tips: $";
 			score.append(to_string(deliveryManager->getScore(players[0])));
 			renderingEngine->printText2D(score.data(), 1050, 700, 24);
 			renderingEngine->printText2D(deliveryManager->getDeliveryText(players[0]).data(), 725, 670, 20);

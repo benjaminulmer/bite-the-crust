@@ -173,7 +173,7 @@
 				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
 				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]},
 				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
-                {"x" : 0.0, "z" : 0.0, "neighbours" : [1]}
+                {"x" : 0.0, "z" : 0.5, "neighbours" : [1]}
             ]
         },
         {
@@ -218,6 +218,15 @@
                 {"name": ["rock 1", "rock 2", "rock 3"], "x": 17, "z": 3},
                 {"name": ["birch", "oak", "dead tree", "aspen", "pine"], "x": 4, "z": 2},
                 {"name": ["birch", "oak", "dead tree", "aspen", "pine"], "x": 14, "z": 18}
+            ]
+        },
+        {
+            "id": 18,
+            "description": "Lawn with some flowers and rocks",
+            "ground": "lawn",
+            "entities": [
+                {"name": ["flower 1", "flower 2", "flower 3", "rock 1", "small bush"], "x": 1, "z": 17},
+                {"name": ["flower 1", "flower 2", "flower 3", "rock 1", "small bush"], "x": 17, "z": 8}
             ]
         }
     ]

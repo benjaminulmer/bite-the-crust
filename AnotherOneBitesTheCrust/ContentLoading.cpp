@@ -281,13 +281,13 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			else if (shapeName == "convexMesh") {
 				ConvexMeshInfo* convexMesh = new ConvexMeshInfo();
 				convexMesh->geometry = Geometry::CONVEX_MESH;
-				convexMesh->verts = model->verts;
+				convexMesh->vertsFromGLMVerts(model->raw_verts);
 				shape = convexMesh;
 			}
 			else if (shapeName == "triangleMesh") {
 				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
 				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
-				triangleMesh->verts = model->raw_verts;
+				triangleMesh->vertsFromGLMVerts(model->raw_verts);
 				triangleMesh->faces = model->faces;
 				shape = triangleMesh;
 			}

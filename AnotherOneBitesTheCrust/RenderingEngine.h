@@ -135,6 +135,7 @@ public:
 	glm::mat4 mmM;
 	glm::vec3 mmScale;
 	glm::vec3 mmCenter;
+	glm::vec3 shift;
 
 
 	//testing stuf for danny

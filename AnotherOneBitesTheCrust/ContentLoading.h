@@ -10,6 +10,7 @@
 #include "Map.h"
 #include "PhysicsEngine.h"
 #include "graphNode.h"
+#include <random>
 
 struct NodeTemplate
 {

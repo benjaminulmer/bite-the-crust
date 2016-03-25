@@ -12,6 +12,7 @@
 #include <SDL.h>
 #include <glew.h>
 #include <map>
+#include <random>
 
 
 enum class GameState
@@ -79,5 +80,6 @@ private:
 	std::map<std::string, GLuint> textureMap;
 	Map map;
 
+	std::mt19937 generator;
 };
 

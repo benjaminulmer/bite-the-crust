@@ -37,7 +37,7 @@
 			"deliverable": true,
 			"goal": {"x": 10, "z": 10},
 			"entities": [
-                {"name": "house", "x": 10, "z": 5},
+                {"name": ["house", "house 2", "house 3"], "x": 10, "z": 5},
                 {"name": "trash bin", "x": 6, "z": 8}
 			],
 			"nodes": [ 
@@ -129,8 +129,8 @@
 			"description": "Lawn tile with benches",
 			"ground": "lawn",
 			"entities": [
-                {"name": "bench", "x": 4, "z": 2, "rotation": 90},
-                {"name": "bench", "x": 8, "z": 2, "rotation": 90}            
+                {"name": ["bench", "birch", "oak", "aspen"], "x": 4, "z": 2, "rotation": 90},
+                {"name": ["bench", "big bush", "small bush"], "x": 8, "z": 2, "rotation": 90}            
 			],
 			"nodes": [
 

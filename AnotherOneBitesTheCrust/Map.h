@@ -8,7 +8,7 @@
 // I think we'll want to add some kind of 'type' field to distinguish between static and dynamic entities later
 struct TileEntity 
 {
-	std::string name;
+	std::vector<std::string> names; // Multiple because it can be a random choice between multiple entities
 	glm::vec3 position;
 	float rotationDeg;
 };
@@ -29,6 +29,11 @@ struct Tile
 	bool deliverable;
 	Entity* house; // null if the tile doesn't have a house
 	bool pickup;
+
+	Tile() {
+		house = nullptr;
+		ground = nullptr;
+	}
 };
 
 class Map

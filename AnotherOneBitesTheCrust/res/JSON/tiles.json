@@ -19,7 +19,7 @@
         },
 		{
             "id": 2,
-			"description": "Straight section of the road",
+			"description": "Straight section of the road, one node to connect",
             "ground": "road-straight",
             "entities": [
             ],
@@ -53,8 +53,21 @@
             "nodes": [
             ]
         },
+        {
+            "id": 5,
+            "description": "Lawn tile with fence and house",
+            "ground": "lawn",
+            "deliverable": true,
+            "entities": [
+                {"name": "fence", "x": 10, "rotation": 270},
+                {"name": ["house", "house 2", "house 3", "house 4"], "x": 10, "z": 6}
+            ],
+            "nodes": [
+                {"x": 0.5, "z": 1.0, "neighbours": []}
+            ]
+        },
 		{
-			"id": 5,
+			"id": 6,
 			"description": "Lawn tile corner, with house",
 			"ground": "lawn",
             "deliverable": true,
@@ -68,7 +81,7 @@
 			]
 		},
         {
-			"id": 6,
+			"id": 7,
 			"description": "Lawn tile corner, no house",
 			"ground": "lawn",
 			"entities": [
@@ -79,7 +92,7 @@
 			]
 		},
 		{
-			"id": 7,
+			"id": 8,
 			"description": "Center lawn tile with no fences, pickup zone",
 			"pickup": true,
 			"ground": "lawn",
@@ -90,7 +103,7 @@
 			]
 		},
         {
-			"id": 8,
+			"id": 9,
 			"description": "Center lawn tile with no fences",
 			"ground": "lawn",
 			"entities": [
@@ -100,7 +113,7 @@
 			]
 		},
 		{
-			"id": 9,
+			"id": 10,
 			"description": "Center lawn tile with ramp",
 			"ground": "lawn",
 			"entities": [
@@ -112,7 +125,7 @@
 			]
 		},
         		{
-            "id": 10,
+            "id": 11,
 			"description": "Blocked straight section of the road",
             "ground": "road-straight",
             "entities": [
@@ -124,7 +137,7 @@
 			]
         },
         {
-			"id": 11,
+			"id": 12,
 			"description": "Lawn tile with benches",
 			"ground": "lawn",
 			"entities": [
@@ -134,6 +147,75 @@
 			"nodes": [
 
 			]
-		}
+		},
+        {
+            "id": 13,
+            "description": "3 way road",
+            "ground": "road-threeway",
+            "entities": [],
+            "nodes": [
+                {"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3]},
+				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
+            ]
+        },
+        {
+            "id": 14,
+            "description": "4 way road",
+            "ground": "road-fourway",
+            "entities": [],
+            "nodes": [
+                {"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
+				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+                {"x" : 0.0, "z" : 0.0, "neighbours" : [1]}
+            ]
+        },
+        {
+            "id": 15,
+			"description": "Straight section of the road, no connecting nodes",
+            "ground": "road-straight",
+            "entities": [
+            ],
+			"nodes" : [
+				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
+			]
+        },
+        {
+            "id": 16,
+			"description": "Straight section of the road, connecting nodes on both sides",
+            "ground": "road-straight",
+            "entities": [
+            ],
+			"nodes" : [
+				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
+				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+                {"x" : 0.5, "z" : 1.0, "neighbours" : [1]}
+			]
+        },
+        {
+            "id": 17,
+            "description": "Park tile",
+            "ground": "lawn",
+            "entities": [
+                {"name": ["flower 1", "flower 2", "flower 3"], "x": 3, "z": 7, "rotation": 90},
+                {"name": ["flower 1", "flower 2", "flower 3"], "x": 2, "z": 19},
+                {"name": ["flower 1", "flower 2", "flower 3"], "x": 8, "z": 5},
+                {"name": ["flower 1", "flower 2", "flower 3"], "x": 13, "z": 2, "rotation": 45},
+                {"name": ["flower 1", "flower 2", "flower 3"], "x": 15, "z": 10, "rotation": 25},
+                {"name": ["flower 1", "flower 2", "flower 3"], "x": 10, "z": 14, "rotation": 30},
+                {"name": ["rock 1", "rock 2", "rock 3"], "x": 3, "z": 5},
+                {"name": ["rock 1", "rock 2", "rock 3"], "x": 5, "z": 16, "rotation": 20},
+                {"name": ["rock 1", "rock 2", "rock 3"], "x": 17, "z": 3},
+                {"name": ["birch", "oak", "dead tree", "aspen", "pine"], "x": 4, "z": 2},
+                {"name": ["birch", "oak", "dead tree", "aspen", "pine"], "x": 14, "z": 18}
+            ]
+        }
     ]
 }

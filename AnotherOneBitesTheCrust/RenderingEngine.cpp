@@ -505,7 +505,7 @@ void RenderingEngine::drawSkybox(glm::vec3 position)
 	M = mat4(1.0f);
 	
 	M = translate(M, position);
-	M = scale(M, vec3(1.5));
+	M = scale(M, vec3(1.75));
 	mat4 MVP = P * V * M;
 
 	glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));

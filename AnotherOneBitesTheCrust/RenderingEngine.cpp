@@ -140,7 +140,7 @@ void RenderingEngine::generateIDs()
 
 void RenderingEngine::loadProjectionMatrix()
 {
-	P = perspective(1.0472f, (float)1280/720, 1.0f, 1000.0f);	//radians kek
+	P = perspective(1.0472f, (float)1280/(float)720, 1.0f, 1000.0f);	//radians kek
 	O = glm::ortho(0.0f, 5.0f, 5.0f, 0.0f, 1.0f, 100.0f);
 }
 
@@ -503,8 +503,11 @@ void RenderingEngine::drawSkybox(glm::vec3 position)
 
 
 	M = mat4(1.0f);
+	
 	M = translate(M, position);
+	M = scale(M, vec3(1.75));
 	mat4 MVP = P * V * M;
+
 	glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
 	glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(V));
 	glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(M));
@@ -536,10 +539,10 @@ void RenderingEngine::setupMinimap(Map map)
 			//cout << "TEST ";
 			Entity* ground = tile->ground;
 			
-			if(tile->groundModel == "road-straight" || tile->groundModel == "road-turn")
+			if(tile->groundModel == "road-straight" || tile->groundModel == "road-turn" || tile->groundModel == "road-threeway" || tile->groundModel == "road-fourway")
 			{
 
-				glm::vec3 pos = ground->getDefaultTranslation();
+				glm::vec3 pos = ground->getPosition();
 				mmRoadVerts.push_back(pos);
 
 				//grey
@@ -552,7 +555,7 @@ void RenderingEngine::setupMinimap(Map map)
 				if (tile->house)
 				{
 
-					glm::vec3 pos = ground->getDefaultTranslation();
+					glm::vec3 pos = ground->getPosition();
 					mmHouseVerts.push_back(pos);
 					//pink
 					mmHouseColors.push_back(1.0f);	//r
@@ -561,7 +564,7 @@ void RenderingEngine::setupMinimap(Map map)
 				}
 				else if(tile->pickup)
 				{
-					glm::vec3 pos = ground->getDefaultTranslation();
+					glm::vec3 pos = ground->getPosition();
 					mmRoadVerts.push_back(pos);
 					//pink
 					mmRoadColors.push_back(1.0f);	//r
@@ -796,7 +799,7 @@ void RenderingEngine::setupMinimap(Map map)
 
 
 	vec3 diameter(maxX - minX, maxY - minY, maxZ - minZ);
-	float mmRadius = glm::length(diameter)*3;
+	float mmRadius = glm::length(diameter)*1.6;
 	//cout << "radius " << mmRadius << endl;
 
 
@@ -817,7 +820,7 @@ void RenderingEngine::setupMinimap(Map map)
 		glm::vec3(0, 0, 1)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
 
-
+	shift = vec3(2.38, 0.0, -1.7);
 }
 
 void RenderingEngine::drawMinimap(Entity* van1, Entity* van2)
@@ -832,7 +835,7 @@ void RenderingEngine::drawMinimap(Entity* van1, Entity* van2)
 	
 	mmM = mat4(1.0f);
 	//mmM = scale(mmM, vec3(0.5, 0.5, 0.5));
-	mmM = translate(mmM,mmCenter * vec3(2.0, 0.0, -1.0));	//positive X moves it left. Positive Z moves it up
+	mmM = translate(mmM,mmCenter * shift);	//positive X moves it left. Positive Z moves it up
 
 	mat4 mmMVP = P * mmV * mmM;
 
@@ -842,7 +845,7 @@ void RenderingEngine::drawMinimap(Entity* van1, Entity* van2)
 		value_ptr(mmMVP)	// pointer to data in Mat4f
 		);
 
-	GLfloat width = 25;
+	GLfloat width = 20;
 	glPointSize(width);
 
 	glDrawArrays(GL_POINTS, 0, mmRoadVerts.size());
@@ -866,7 +869,7 @@ void RenderingEngine::drawMinimap(Entity* van1, Entity* van2)
 	glBindVertexArray(mmVanVAO);
 	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
 	mmM = mat4(1.0f);
-	mmM = translate(mmM,mmCenter * vec3(2.0, 0.0, -1.0));
+	mmM = translate(mmM,mmCenter * shift);
 	mmM = mmM * van1->getModelMatrix();
 	mmM = scale(mmM, vec3(2.0));
 	
@@ -886,7 +889,7 @@ void RenderingEngine::drawMinimap(Entity* van1, Entity* van2)
 	glBindVertexArray(mmVanVAO2);
 	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
 	mmM = mat4(1.0f);
-	mmM = translate(mmM,mmCenter * vec3(2.0, 0.0, -1.0));
+	mmM = translate(mmM,mmCenter * shift);
 	mmM = mmM * van2->getModelMatrix();
 	mmM = scale(mmM, vec3(2.0));
 	mmM = rotate(mmM, -1.5708f, glm::vec3(0,1,0));

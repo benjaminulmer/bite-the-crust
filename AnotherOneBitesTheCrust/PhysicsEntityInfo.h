@@ -47,9 +47,9 @@ struct ShapeInfo
 
 	bool isDrivable;
 
-	float staticFriction;
-	float dynamicFriction;
-	float restitution;
+	physx::PxF32 staticFriction;
+	physx::PxF32 dynamicFriction;
+	physx::PxF32 restitution;
 
 	FilterFlag filterFlag0;
 	FilterFlag filterFlag1;
@@ -60,35 +60,42 @@ struct ShapeInfo
 struct BoxInfo
 	: public ShapeInfo
 {
-	float halfX;
-	float halfY;
-	float halfZ;
+	physx::PxF32 halfX;
+	physx::PxF32 halfY;
+	physx::PxF32 halfZ;
 };
 
 struct SphereInfo
 	: public ShapeInfo
 {
-	float radius;
+	physx::PxF32 radius;
 };
 
 struct CapsuleInfo
 	: public ShapeInfo
 {
-	float radius;
-	float halfHeight;
+	physx::PxF32 radius;
+	physx::PxF32 halfHeight;
 };
 
 struct ConvexMeshInfo
 	: public ShapeInfo
 {
-	std::vector<glm::vec3> verts;
+	std::vector<physx::PxVec3> verts;
+
+	void vertsFromGLMVerts(std::vector<glm::vec3> glmVerts) 
+	{
+		for (auto glmVert : glmVerts)
+		{
+			verts.push_back(physx::PxVec3(glmVert.x, glmVert.y, glmVert.z));
+		}
+	}
 };
 
 struct TriangleMeshInfo
-	: public ShapeInfo
+	: public ConvexMeshInfo
 {
-	std::vector<glm::vec3> verts;
-	std::vector<unsigned int> faces;
+	std::vector<physx::PxU32> faces;
 };
 
 struct PhysicsEntityInfo

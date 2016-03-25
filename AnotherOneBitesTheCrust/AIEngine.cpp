@@ -11,7 +11,7 @@ AIEngine::AIEngine(void)
 }
 
 std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destination, vector<graphNode *> allNodes)
-{
+ {
 	std::map<graphNode *, double> distances;
 	std::map<graphNode *, double> heuristic;
 	std::map<graphNode *, graphNode *> previous;
@@ -40,7 +40,7 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 			if(heuristic[*i] < minDist)
 			{
 				position = i;
-				minDist = distances[*i];
+				minDist = heuristic[*i];
 			}
 		}
 		

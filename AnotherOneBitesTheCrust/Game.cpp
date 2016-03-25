@@ -284,6 +284,11 @@ void Game::mainLoop()
 	unsigned int oldTimeMs = SDL_GetTicks();
 	unsigned int deltaTimeAccMs = 0;
 
+	std::vector<glm::vec3> allNodes;
+	for(graphNode * node : map.allNodes)
+		allNodes.push_back(node->getPosition());
+	//renderingEngine->setupNodes(allNodes, vec3(1,1,0));
+
 	// Game loop
 	while (gameState != GameState::EXIT)
 	{
@@ -321,7 +326,7 @@ void Game::mainLoop()
 						AICollisionEntity closest = physicsEngine->AISweep(players[i]);
 						aiEngine->updateAI(players[i], deliveryManager->deliveries[players[i]], map, closest);
 						renderingEngine->setupNodes(players[i]->currentPath, vec3(1,1,0)); // TODO: Remove when adding multiple AIs, otherwise will be very confusing (or change colours to match AI)
-				
+						
 					}
 					players[i]->update();
 				}
@@ -341,6 +346,7 @@ void Game::mainLoop()
 				renderingEngine->drawShadow(players[i]->getPosition());
 			
 			renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
+			//renderingEngine->drawNodes(map.allNodes.size(), "points");
 			renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
 			renderingEngine->drawMinimap(players[0], players[1]); // TODO: Should support arbitrary number of vans
 

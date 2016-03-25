@@ -42,6 +42,6 @@
         
         {"name": "rock 1", "model" :"Rock1.obj", "texture": "RockTexture.DDS"},
         {"name": "rock 2", "model" :"Rock2.obj", "physics": "default.json", "texture": "RockTexture.DDS"},
-        {"name": "rock 3", "model" :"Rock3.obj", "physics": "static-box.json", "texture": "RockTexture.DDS"}
+        {"name": "rock 3", "model" :"Rock3.obj", "physics": "static-triangle.json", "texture": "RockTexture.DDS"}
     ]
 }

@@ -85,7 +85,7 @@ void Game::initSystems()
 	physicsEngine = new PhysicsEngine();
 	renderingEngine = new RenderingEngine();
 	deliveryManager = new DeliveryManager();
-	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
+	renderingEngine->initText2D("res\\Fonts\\Carbon.DDS");
 	renderingEngine->setupMiscBuffers();
 	renderingEngine->setupIntro();
 

@@ -353,7 +353,7 @@ void Game::mainLoop()
 			frameRate.append(to_string(deltaTimeMs));
 			renderingEngine->printText2D(frameRate.data(), 0, 670, 20);
 
-			string score = "Score: ";
+			string score = "Tips: $";
 			score.append(to_string(deliveryManager->getScore(players[0])));
 			renderingEngine->printText2D(score.data(), 1050, 700, 24);
 			renderingEngine->printText2D(deliveryManager->getDeliveryText(players[0]).data(), 725, 670, 20);

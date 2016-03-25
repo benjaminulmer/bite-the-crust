@@ -1,10 +1,10 @@
 {
     "entities": [
-        {"name": "road-straight", "model": "Straight.obj", "physics": "default.json", "texture": "Straight-new.DDS"},
-        {"name": "road-turn", "model": "Turn.obj", "physics": "default.json", "texture": "Turn-new.DDS"},
-        {"name": "road-threeway", "model": "Threeway.obj", "physics": "default.json", "texture": "Threeway.DDS"},
-        {"name": "road-fourway", "model": "Fourway.obj", "physics": "default.json", "texture": "Fourway.DDS"},
-		{"name": "lawn", "model": "Lawn.obj", "physics": "default.json", "texture": "SeamlessGrass.DDS"},
+        {"name": "road-straight", "model": "Straight.obj", "physics": "tile.json", "texture": "Straight-new.DDS"},
+        {"name": "road-turn", "model": "Turn.obj", "physics": "tile.json", "texture": "Turn-new.DDS"},
+        {"name": "road-threeway", "model": "Threeway.obj", "physics": "tile.json", "texture": "Threeway.DDS"},
+        {"name": "road-fourway", "model": "Fourway.obj", "physics": "tile.json", "texture": "Fourway.DDS"},
+		{"name": "lawn", "model": "Lawn.obj", "physics": "tile.json", "texture": "SeamlessGrass.DDS"},
         {"name": "box", "model": "PizzaBox-centered.obj", "physics": "box.json", "texture": "PizzaBox-colored.DDS"},
 		{"name": "wheel", "model": "NewWheel.obj", "physics": "default.json", "texture": "CarTexture-red.DDS"},
         {"name": "ramp", "model": "bigramp.obj", "physics": "ramp.json", "texture": "ramp.DDS"},

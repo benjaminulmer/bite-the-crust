@@ -71,10 +71,6 @@ void PhysicsEngine::initVehicleSDK()
 
 	drivingSurfaces[0] = physics->createMaterial(0.8f, 0.8f, 0.6f);
 	frictionPairs = FrictionPairs::createFrictionPairs(drivingSurfaces[0]);
-
-	// Create a plane and add it to the scene
-	groundPlane = helper->createDrivablePlane(drivingSurfaces[0]);
-	scene->addActor(*groundPlane);
 }
 
 // Creates an physics entity from an entity info structure and a starting transform

@@ -542,7 +542,7 @@ void RenderingEngine::setupMinimap(Map map)
 			if(tile->groundModel == "road-straight" || tile->groundModel == "road-turn" || tile->groundModel == "road-threeway" || tile->groundModel == "road-fourway")
 			{
 
-				glm::vec3 pos = ground->getDefaultTranslation();
+				glm::vec3 pos = ground->getPosition();
 				mmRoadVerts.push_back(pos);
 
 				//grey
@@ -555,7 +555,7 @@ void RenderingEngine::setupMinimap(Map map)
 				if (tile->house)
 				{
 
-					glm::vec3 pos = ground->getDefaultTranslation();
+					glm::vec3 pos = ground->getPosition();
 					mmHouseVerts.push_back(pos);
 					//pink
 					mmHouseColors.push_back(1.0f);	//r
@@ -564,7 +564,7 @@ void RenderingEngine::setupMinimap(Map map)
 				}
 				else if(tile->pickup)
 				{
-					glm::vec3 pos = ground->getDefaultTranslation();
+					glm::vec3 pos = ground->getPosition();
 					mmRoadVerts.push_back(pos);
 					//pink
 					mmRoadColors.push_back(1.0f);	//r

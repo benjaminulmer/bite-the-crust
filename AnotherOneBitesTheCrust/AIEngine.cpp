@@ -100,20 +100,20 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
 	// TODO: Should divide by half the map or something
-	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)0.6);
+	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)0.60);
 
 	// TODO: Maybe put these in an init file for tuning purposes?
-	if (gas > 0.2)
+	if (gas > 0.1)
 	{
 		input->forward = gas;
 		input->backward = 0;
 	}
 	else
-		brake(driver, 1 - gas);
+		brake(driver, 1 -gas);
 	
 	input->handBrake = false;
 
-	if(ratio > 0.1)
+	if(ratio > 0.05)
 	{
 		if(leftCosAngle > 0)
 			input->steer = ratio;
@@ -123,11 +123,11 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	else if(distanceToGoal < MIN_DIST)
 	{
 		input->steer = 0;
-		if(!driver->pizzaDelivered)
+		/*if(!driver->pizzaDelivered)
 		{
 			input->shootPizza = true;
 			driver->pizzaDelivered = true;
-		}
+		}*/
 	}
 }
 
@@ -148,9 +148,33 @@ inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, c
 	return true;
 }
 
-void AIEngine::avoid(Vehicle * driver, graphNode * destinationNode)
+void AIEngine::fireAt(Vehicle * driver, const glm::vec3 & goal)
 {
-	glm::vec3 desiredDirection = glm::normalize(destinationNode->getPosition() - driver->getPosition());
+	glm::vec3 desiredDirection = glm::normalize(goal - driver->getPosition());
+	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
+	glm::vec3 forward(glm::normalize(driver->getModelMatrix() * glm::vec4(0,0,1,0)));
+	float leftCosAngle = glm::dot(desiredDirection, left);
+	float cosAngle = glm::dot(desiredDirection, forward);
+
+	float ratio = glm::acos(cosAngle) / glm::pi<float>();
+
+	if(driver->getPhysicsVehicle()->computeForwardSpeed() > 0.1)
+		brake(driver, 1);
+	else if(ratio > 0.05)
+		facePoint(driver, goal);
+	else if(driver->pizzaDelivered == false)
+	{
+		driver->pizzaDelivered = true;
+		driver->input.shootPizza = true;
+		brake(driver, 1);
+	}
+
+
+}
+
+void AIEngine::facePoint(Vehicle * driver, const glm::vec3 & pointTo)
+{
+	glm::vec3 desiredDirection = glm::normalize(pointTo - driver->getPosition());
 	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
 	float leftCosAngle = glm::dot(desiredDirection, left);
 
@@ -210,11 +234,6 @@ void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 		graphNode * closest = findClosestNode(toUpdate, map);
 
 		toUpdate->currentPath = aStar(closest, destinationNode, map.allNodes);
-		if(!equals(toUpdate->getDestination(), destination.location->nodes.at(0)->getPosition()))
-		{
-			toUpdate->pizzaDelivered = false;
-			return;
-		}
 	}
 }
 
@@ -230,25 +249,81 @@ void AIEngine::brake(Vehicle* toUpdate, const float & amount)
 		toUpdate->input.forward = 0;
 }
 
+void AIEngine::trimPath(Vehicle* toUpdate)
+{
+	if(toUpdate->currentPath.size() < 2)
+		return;
+
+
+	int closestIndex;
+	double minDist = DBL_MAX;
+	for(int i = 0; i < toUpdate->currentPath.size(); i++)
+	{
+		double currentDistance = glm::length(toUpdate->currentPath[i] - toUpdate->getPosition());
+
+		if( currentDistance < minDist)
+		{
+			closestIndex = i;
+			minDist = currentDistance;
+		}
+	}
+
+	for(int i = 0; i < closestIndex; i++)
+		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
+}
+
 void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICollisionEntity & obstacle) 
-{ 
-	
-	/*if(toUpdate->currentPath.empty())
-	{*/
+{
+	toUpdate->input.shootPizza = false;
+	glm::vec3 goal = destination.location->goal;
+
+	// Should pathfind to pickup followed by pathfinding to destination
+	if(toUpdate->pizzaCount == 0)
+		goal = map.pickup;	
+	if(toUpdate->currentPath.empty())
+	{
 		updatePath(toUpdate, destination, map);
 		if(toUpdate->currentPath.empty())
 			return;
-	//}
+	}
+	else
+		trimPath(toUpdate);
+
+
+	
+	// Should be goal node
+	if(toUpdate->newDestination)
+	{
+		toUpdate->currentPath.clear();
+		toUpdate->pizzaDelivered = false;
+		toUpdate->newDestination = false;
+		return;
+	}
+
+	glm::vec3 nextPoint;
+	if(toUpdate->pizzaCount == 0)
+		nextPoint = goal;
+	else if(toUpdate->currentPath.size() >= 3)
+		nextPoint = toUpdate->currentPath.at(2);
+	else
+		nextPoint = toUpdate->currentPath.at(0);
 
 	// May want to consider something more efficient, uses square root in here
-	float distanceToNext = glm::length(toUpdate->currentPath.at(0) - toUpdate->getPosition());
+	float distanceToNext = glm::length(nextPoint - toUpdate->getPosition());
+	float distanceToGoal = glm::length(toUpdate->getPosition() - goal);
+
+	if(distanceToGoal < MIN_DIST * 5 && toUpdate->pizzaCount != 0)
+	{
+			fireAt(toUpdate, destination.location->goal);
+			return;
+	}
 
 	if(distanceToNext < MIN_DIST)
 	{
 		//std::cout << "Waypoint get! Position: "<< toUpdate->currentPath.at(0).x << "," << toUpdate->currentPath.at(0).y << ", " << toUpdate->currentPath.at(0).z << std::endl;
 		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
 
-		if(toUpdate->currentPath.empty() && distanceToNext < MIN_DIST)
+		if(toUpdate->currentPath.empty() && distanceToNext < MIN_DIST * 5)
 		{
 			brake(toUpdate, 1);
 			return;
@@ -257,19 +332,13 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
-	graphNode * destinationNode = destination.location->nodes.at(0);
-	if(obstacle.entity != nullptr && obstacle.distance < 3 && obstacle.entity->type == EntityType::STATIC)
+	if(obstacle.entity != nullptr && obstacle.distance < 2 && obstacle.entity->type == EntityType::STATIC)
 	{
-		avoid(toUpdate, destinationNode);
+		facePoint(toUpdate, goal);
 		return;
 	}
-	glm::vec3 nextPoint;
-	if(toUpdate->currentPath.size() >= 3)
-		nextPoint = toUpdate->currentPath.at(2);
-	else
-		nextPoint = toUpdate->currentPath.at(0);
 
-	goToPoint(toUpdate, nextPoint, glm::length(destinationNode->getPosition() - toUpdate->getPosition()));
+	goToPoint(toUpdate, nextPoint, glm::length(goal - toUpdate->getPosition()));
 }
 
 AIEngine::~AIEngine(void)

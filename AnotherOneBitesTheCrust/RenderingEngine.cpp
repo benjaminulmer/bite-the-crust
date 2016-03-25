@@ -12,7 +12,7 @@ RenderingEngine::RenderingEngine()
 	//glEnable(GL_MULTISAMPLE);
 	//glDepthFunc(GL_LESS);
 
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 	generateIDs();
 	loadProjectionMatrix();

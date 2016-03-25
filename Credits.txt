@@ -42,3 +42,6 @@ Obj and DDS loading
 
 Textures from
 	http://www.textures.com/
+
+Low poly models by Quaternius
+	https://twitter.com/quaternius

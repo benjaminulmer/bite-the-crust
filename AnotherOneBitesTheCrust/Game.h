@@ -12,10 +12,12 @@
 #include <SDL.h>
 #include <glew.h>
 #include <map>
+#include <random>
 
 
 enum class GameState
 {
+	INTRO,
 	MENU,
 	PLAY,
 	PAUSE,
@@ -28,7 +30,7 @@ class Game :
 public:
 	Game(void);
 	~Game(void);
-
+	
 	AIEngine *aiEngine;
 	AudioEngine *audioEngine;
 	InputEngine *inputEngine;
@@ -77,5 +79,7 @@ private:
 	std::map<std::string, PhysicsEntityInfo*> physicsEntityInfoMap;
 	std::map<std::string, GLuint> textureMap;
 	Map map;
+
+	std::mt19937 generator;
 };
 

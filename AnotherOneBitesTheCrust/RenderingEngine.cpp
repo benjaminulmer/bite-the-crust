@@ -30,6 +30,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	//glClearDepth(1.0);
 
 	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
@@ -548,7 +549,7 @@ void RenderingEngine::setupMinimap(Map map)
 			}
 			for(unsigned int k = 0; k < tile->entityTemplates.size(); k++)
 			{
-				if(tile->entityTemplates[k].name == "house")
+				if (tile->house)
 				{
 
 					glm::vec3 pos = ground->getDefaultTranslation();
@@ -558,7 +559,7 @@ void RenderingEngine::setupMinimap(Map map)
 					mmHouseColors.push_back(0.68f);	//g
 					mmHouseColors.push_back(0.73f);	//b
 				}
-				else if(tile->entityTemplates[k].name == "billboard")
+				else if(tile->pickup)
 				{
 					glm::vec3 pos = ground->getDefaultTranslation();
 					mmRoadVerts.push_back(pos);
@@ -882,7 +883,7 @@ void RenderingEngine::drawMinimap(Entity* van1, Entity* van2)
 	glDrawArrays(GL_TRIANGLES, 0, mmVanVerts.size());
 	glBindVertexArray(0);
 
-		glBindVertexArray(mmVanVAO2);
+	glBindVertexArray(mmVanVAO2);
 	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
 	mmM = mat4(1.0f);
 	mmM = translate(mmM,mmCenter * vec3(2.0, 0.0, -1.0));
@@ -960,6 +961,7 @@ void RenderingEngine::setupNodes(vector<glm::vec3> verts, glm::vec3 color)
 
 void RenderingEngine::drawNodes(int size, string style)
 {
+	glEnable(GL_DEPTH_TEST);
 	glUseProgram(basicProgramID);
 
 	// Use VAO that holds buffer bindings
@@ -992,6 +994,87 @@ void RenderingEngine::drawNodes(int size, string style)
 
 }
 
+void RenderingEngine::setupIntro()
+{
+	Renderable *logo = ContentLoading::createRenderable("res\\Models\\deliverers.obj");
+	Renderable *gameBy = ContentLoading::createRenderable("res\\Models\\gameby.obj");
+	Renderable *names = ContentLoading::createRenderable("res\\Models\\names.obj");
+	GLuint introTexture = ContentLoading::loadDDS("res\\Textures\\intro-colored.DDS");
+
+	assignBuffersTex(logo);
+	assignBuffersTex(gameBy);
+	assignBuffersTex(names);
+
+	Entity *eLogo = new Entity();
+	eLogo->setRenderable(logo);
+	eLogo->setTexture(introTexture);
+	introEntities.push_back(eLogo);
+	
+	Entity *eGameBy = new Entity();
+	eGameBy->setRenderable(gameBy);
+	eGameBy->setTexture(introTexture);
+	//introEntities.push_back(eGameBy);
+
+	Entity *eNames = new Entity();
+	eNames->setRenderable(names);
+	eNames->setTexture(introTexture);
+	//introEntities.push_back(eNames);
+
+	introM = mat4(1.0f);
+	introV = glm::lookAt(
+			glm::vec3(0,0,7), 
+			glm::vec3(0,0,0), 
+			glm::vec3(0,1,0)
+		);
+
+}
+
+void RenderingEngine::displayIntro()
+{
+
+	glEnable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glDisable(GL_BLEND);
+	glUseProgram(textureProgramID);
+
+
+	glUniform3f(lightPos, 0.0f, 4.0f, 1.0f);
+	glUniform1f(lightPow, 50.0f);
+	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
+
+	for (int i = 0; i < (int)introEntities.size(); i++) {
+		if (!introEntities[i]->hasRenderable())
+			continue;
+		introM = mat4(1.0f);
+
+		//Translations done here. Order of translations is scale, rotate, translate
+		introM = introEntities[i]->getModelMatrix();
+		introM = calculateDefaultModel(introM, introEntities[i]);
+
+		mat4 MVP = P * introV * introM;
+
+		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
+		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
+		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
+
+		glBindVertexArray(introEntities[i]->getRenderable()->vao);
+		GLuint tex = introEntities[i]->getTexture();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
+
+	// Set our "myTextureSampler" sampler to user Texture Unit 0
+		glUniform1i(tID, 0);
+		//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+		
+		glDrawElements(GL_TRIANGLES, introEntities[i]->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
+
+		glBindVertexArray(0);
+	}
+
+
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TESTING STUFF BELOW
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

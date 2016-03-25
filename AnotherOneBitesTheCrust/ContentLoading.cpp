@@ -180,7 +180,7 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 }
 
 // Create renderable from obj file
-Renderable* createRenderable(std::string modelFile) {
+Renderable* ContentLoading::createRenderable(std::string modelFile) {
 	Renderable * r = new Renderable();
 	std::vector<glm::vec3> verts;
 	std::vector<glm::vec2> uvs;
@@ -411,7 +411,15 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		}
 		const rapidjson::Value& entityArray = tileArray[i]["entities"];
 		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
-			std::string name = entityArray[j]["name"].GetString();
+			std::vector<std::string> names;
+			if (entityArray[j]["name"].IsString()) {
+				names.push_back(entityArray[j]["name"].GetString());
+			} else if (entityArray[j]["name"].IsArray()) {
+				const rapidjson::Value& namesArray = entityArray[j]["name"];
+				for (rapidjson::SizeType k = 0; k < namesArray.Size(); k++) {
+					names.push_back(namesArray[k].GetString());
+				}
+			}
 			double x = 0;
 			double y = 0;
 			double z = 0;
@@ -423,7 +431,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				z = entityArray[j]["z"].GetDouble();
 
 			TileEntity e;
-			e.name = name;
+			e.names = names;
 			e.position = glm::vec3(x, y, z);
 
 			if (entityArray[j].HasMember("rotation"))
@@ -829,6 +837,8 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 
 	free(buffer); 
 	fclose(fp);
+
+	printf("%s loaded successfully\n", imagepath);
 
 	return textureID;
 }

@@ -71,7 +71,7 @@ public:
 
 	// AI stuff; might be moved into 'Player' class
 	std::vector<glm::vec3> currentPath;
-	bool pizzaDelivered, isAI;
+	bool pizzaDelivered, isAI, newDestination;
 	glm::vec3 getDestination();
 	// END AI stuff
 

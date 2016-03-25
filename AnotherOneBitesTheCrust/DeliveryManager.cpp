@@ -63,9 +63,10 @@ Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	std::uniform_int_distribution<int> dist(0, freeLocations.size()-1);
 	int randomTile = dist(generator);
 	d.location = freeLocations[randomTile];
-	d.time = 1000.0 * 10.0; // 10 seconds
+	d.time = 1000.0 * 20.0; // 20 seconds
 	d.location->ground->setTexture(deliveryTextures[player]);
 	//freeLocations.erase(freeLocations.begin() + randomTile); // Don't erase, so players can both be assigned the same tile
+	player->newDestination = true;
 	return d;
 }
 
@@ -81,6 +82,8 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 		//freeLocations.push_back(tile); // Free the tile back up for now, not Splatoon yet
 		deliveries[pizza->owner] = newDelivery(pizza->owner);
 	}
+	else
+		pizza->owner->pizzaDelivered = false;
 }
 
 void DeliveryManager::refillPizza(Vehicle* player) {

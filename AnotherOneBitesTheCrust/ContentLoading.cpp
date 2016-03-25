@@ -116,10 +116,6 @@ bool verifyEntityList(const rapidjson::Document &d) {
 			printf("Entry %d is missing a model.", i);
 			return false;
 		}
-		if (!entry.HasMember("physics")) {
-			printf("Entry %d is missing a physics file.", i);
-			return false;
-		}
 	}
 	return true;
 }
@@ -157,10 +153,12 @@ bool ContentLoading::loadEntityList(char* filename, std::map<std::string, Render
 			modelMap[name] = loadedModels[renderableModelFile];
 		}
 
-		std::string physicsDataName = entitiesArray[i]["physics"].GetString();
-		physicsDataName.insert(0, "res\\JSON\\Physics\\");
-		PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
-		physicsMap[name] = info;
+		if (entitiesArray[i].HasMember("physics")) {
+			std::string physicsDataName = entitiesArray[i]["physics"].GetString();
+			physicsDataName.insert(0, "res\\JSON\\Physics\\");
+			PhysicsEntityInfo* info = createPhysicsInfo(physicsDataName.c_str(), r);
+			physicsMap[name] = info;
+		}
 
 		if (entitiesArray[i].HasMember("texture")) {
 			std::string textureName = entitiesArray[i]["texture"].GetString();
@@ -329,7 +327,7 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 	return info;
 }
 
-bool validateMap(rapidjson::Document &d) {
+bool validateTiles(rapidjson::Document &d) {
 	if (!d.HasMember("tiles")) {
 		printf("Map file missing tiles array.");
 		return false;
@@ -356,6 +354,10 @@ bool validateMap(rapidjson::Document &d) {
 		}
 
 	}
+	return true;
+}
+
+bool validateMap(rapidjson::Document &d) {
 	if (!d.HasMember("map")) {
 		printf("Map file missing map member.");
 		return false;
@@ -372,18 +374,18 @@ bool validateMap(rapidjson::Document &d) {
 }
 
 //TODO, proper error checking for the json file format, right now it just blows up 95% of the time if you got it wrong
-bool ContentLoading::loadMap(char* filename, Map &map) {
-	FILE* filePointer;
-	errno_t err = fopen_s(&filePointer, filename, "rb");
+bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
+	FILE* tileFilePointer;
+	errno_t err = fopen_s(&tileFilePointer, tilesFilename, "rb");
 	if (err != 0) {
 		printf("Error, map file couldn't load.");
 		return false;
 	}
 	char readBuffer[10000];
-	rapidjson::FileReadStream reader(filePointer, readBuffer, sizeof(readBuffer));
+	rapidjson::FileReadStream reader(tileFilePointer, readBuffer, sizeof(readBuffer));
 	rapidjson::Document d;
 	d.ParseStream(reader);
-	if (!validateMap(d))
+	if (!validateTiles(d))
 		return false;
 
 	// Read in the tiles array
@@ -401,6 +403,19 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		t.groundModel = ground;
 		if (tileArray[i].HasMember("deliverable")) {
 			t.deliverable = tileArray[i]["deliverable"].GetBool();
+			if (!tileArray[i].HasMember("goal"))
+			{
+				printf("Error, deliverable tile must have goal node.");
+				return false;
+			}
+			const rapidjson::Value& goalNode = tileArray[i]["goal"];
+			if (goalNode.HasMember("x"))
+				t.goal.x = goalNode["x"].GetDouble();
+			if (goalNode.HasMember("y"))
+				t.goal.y = goalNode["y"].GetDouble();
+			if (goalNode.HasMember("z"))
+				t.goal.z = goalNode["z"].GetDouble();
+			
 		} else {
 			t.deliverable = false;
 		}
@@ -468,7 +483,20 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 		nodes[id] = tileNodes;
 		tiles[id] = t;
 	}
+	fclose(tileFilePointer);
 
+	FILE* mapFilePointer;
+	err = fopen_s(&mapFilePointer, mapFilename, "rb");
+	if (err != 0) {
+		printf("Error, map file couldn't load.");
+		return false;
+	}
+	
+	char mapBuffer[10000];
+	rapidjson::FileReadStream mapReader(mapFilePointer, mapBuffer, sizeof(mapBuffer));
+	d.ParseStream(mapReader);
+	if (!validateMap(d))
+		return false;
 	// Construct the map 
 	int tileSize = d["map"]["tile size"].GetInt();
 	map.tileSize = tileSize;
@@ -483,6 +511,12 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 			std::string rotation = tileString.substr(splitPoint+1);
 			Tile tile = tiles[id];
 			std::vector<NodeTemplate> tileNodes = nodes[id];
+
+			// Currently setting to center of tile; may be better to have in front of so drivebys are easier
+			// TODO: may be better to change to a node or something, need to be able to pathfind to it
+			// ALTERNATIVE: add way to pathfind 'near' a location
+			if(tile.pickup)
+				map.pickup = glm::vec3(((float)tileSize / 2) + (j)*tileSize, 0,  ((float)tileSize / 2) + (i)*tileSize);
 
 			tile.groundRotationDeg = 0;
 			// Handle rotations
@@ -536,7 +570,12 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 				}
 				tile.groundRotationDeg += 180;
 			}
-
+			// Setup goal
+			if(tile.deliverable)
+			{
+				tile.goal.x += tileSize * j;
+				tile.goal.z += tileSize * i;
+			}
 			// Positions of nodes
 			for(NodeTemplate n : tileNodes)
 			{
@@ -595,7 +634,7 @@ bool ContentLoading::loadMap(char* filename, Map &map) {
 
 
 	map.allNodes.insert(map.allNodes.end(), allNodes.begin(), allNodes.end());
-	fclose(filePointer);
+	fclose(mapFilePointer);
 	return true;
 }
 

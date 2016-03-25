@@ -132,7 +132,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		{
 			TriangleMeshInfo* tmInfo = (TriangleMeshInfo*)sInfo;
 
-			PxTriangleMesh* mesh = helper->createTriangleMesh(tmInfo->verts.data(), tmInfo->verts.size(), tmInfo->faces.data(), tmInfo->faces.size());
+			PxTriangleMesh* mesh = helper->createTriangleMesh(tmInfo->verts.data(), tmInfo->verts.size(), tmInfo->faces.data(), tmInfo->faces.size()/3);
 			geometry = new PxTriangleMeshGeometry(mesh);
 		}
 		PxShape* shape = actor->createShape(*geometry, *material); // TODO support shape flags

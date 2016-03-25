@@ -186,7 +186,7 @@ void Game::setupEntities()
 	renderingEngine->setupMinimap(map);
 
 	// Create vehicles
-	for(int i = 0; i < MAX_PLAYERS/2; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
+	for(int i = 0; i < MAX_PLAYERS; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
 		setupVehicle(players[i], physx::PxTransform(10 + 10.0f*i, 2, 20), i);
@@ -200,6 +200,8 @@ void Game::setupEntities()
 	// hard code textures for now
 	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-red.DDS");
 	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-blue.DDS");
+	players[2]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-green.DDS");
+	players[3]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-yellow.DDS");
 
 	camera = new Camera(players[0]);
 	renderingEngine->updateView(*camera);
@@ -209,17 +211,24 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 {
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", vehicle);
 	vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
-	if(num == 0)
-	{
-		vehicle->setRenderable(renderablesMap["van"]);
-		vehicle->setTexture(textureMap["van"]);
+	switch(num) {
+		case 0:
+			vehicle->setRenderable(renderablesMap["van"]);
+			vehicle->setTexture(textureMap["van"]);
+			break;
+		case 1:
+			vehicle->setRenderable(renderablesMap["blue van"]);
+			vehicle->setTexture(textureMap["blue van"]);
+			break;
+		case 2:
+			vehicle->setRenderable(renderablesMap["green van"]);
+			vehicle->setTexture(textureMap["green van"]);
+			break;
+		case 3:
+			vehicle->setRenderable(renderablesMap["yellow van"]);
+			vehicle->setTexture(textureMap["yellow van"]);
+			break;
 	}
-	else if(num == 1)
-	{
-		vehicle->setRenderable(renderablesMap["aivan"]);
-		vehicle->setTexture(textureMap["aivan"]);
-	}
-
 	// TODO get dimensions working properly for vehicle
 	vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
 	physicsEngine->createVehicle(vehicle, transform);
@@ -248,7 +257,7 @@ void Game::connectSystems()
 
 	inputEngine->setInputStruct(&players[0]->input, 0);
 
-	for(int i = 0; i < MAX_PLAYERS/2; i++)
+	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		players[i]->shootPizzaSignal.connect(this, &Game::shootPizza);
 		players[i]->shootPizzaSignal.connect(audioEngine, &AudioEngine::playCannonSound);
@@ -265,12 +274,10 @@ void Game::connectSystems()
 	// TODO: Should have a textures array or something that corresponds to each player so we can add this to above loop
 	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-red.DDS");
 	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
-
+	deliveryManager->deliveryTextures[players[2]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
+	deliveryManager->deliveryTextures[players[3]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
-
-	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-red.DDS");
-	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
 
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
@@ -319,13 +326,13 @@ void Game::mainLoop()
 				deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 				// Update the player and AI cars
-				for(int i = 0; i < MAX_PLAYERS/2; i++)
+				for(int i = 0; i < MAX_PLAYERS; i++)
 				{
 					if(players[i]->isAI)
 					{
 						AICollisionEntity closest = physicsEngine->AISweep(players[i]);
 						aiEngine->updateAI(players[i], deliveryManager->deliveries[players[i]], map, closest);
-						renderingEngine->setupNodes(players[i]->currentPath, vec3(1,1,0)); // TODO: Remove when adding multiple AIs, otherwise will be very confusing (or change colours to match AI)
+						//renderingEngine->setupNodes(players[i]->currentPath, vec3(1,1,0)); // TODO: Remove when adding multiple AIs, otherwise will be very confusing (or change colours to match AI)
 						
 					}
 					players[i]->update();
@@ -342,13 +349,13 @@ void Game::mainLoop()
 
 			// Display
 			renderingEngine->displayFuncTex(entities);
-			for(int i = 0 ; i < MAX_PLAYERS/2; i++)
+			for(int i = 0 ; i < MAX_PLAYERS; i++)
 				renderingEngine->drawShadow(players[i]->getPosition());
 			
-			renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
+			//renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
 			//renderingEngine->drawNodes(map.allNodes.size(), "points");
 			renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
-			renderingEngine->drawMinimap(players[0], players[1]); // TODO: Should support arbitrary number of vans
+			renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
 
 			// TODO: Broken record, but should draw to corresponding player's viewport
 			string speed = "Speed: ";
@@ -454,7 +461,7 @@ void Game::shootPizza(Vehicle* vehicle)
 
 void Game::unFuckerTheGame()
 {
-	for(int i =0 ; i < MAX_PLAYERS/2; i++)
+	for(int i =0 ; i < MAX_PLAYERS; i++)
 	{
 		players[i]->getActor()->setGlobalPose(physx::PxTransform(10 + i*10.0f, 2, 20));
 		players[i]->getPhysicsVehicle()->setToRestState();
@@ -468,7 +475,7 @@ void Game::unFuckerTheGame()
 
 Game::~Game(void)
 {
-	for(int i = 0 ; i < MAX_PLAYERS/2; i++)
+	for(int i = 0 ; i < MAX_PLAYERS; i++)
 		players[i]->shootPizzaSignal.disconnect_all();
 
 	for (unsigned int i = 0; i < entities.size(); i++)

@@ -11,7 +11,9 @@
 		{"name": "wheel", "model": "NewWheel.obj", "physics": "default.json", "texture": "CarTexture-red.DDS"},
         {"name": "ramp", "model": "bigramp.obj", "physics": "ramp.json", "texture": "ramp.DDS"},
         {"name": "van", "model": "newVan.obj", "physics": "default.json", "texture": "CarTexture-red.DDS"},
-        {"name": "aivan", "model": "newVan.obj", "physics": "default.json", "texture": "CarTexture-blue.DDS"},
+        {"name": "blue van", "model": "newVan.obj", "physics": "default.json", "texture": "CarTexture-blue.DDS"},
+        {"name": "green van", "model": "newVan.obj", "physics": "default.json", "texture": "CarTexture-green.DDS"},
+        {"name": "yellow van", "model": "newVan.obj", "physics": "default.json", "texture": "CarTexture-yellow.DDS"},
 		{"name": "fence", "model": "fence.obj", "physics": "static-box.json", "texture": "fence-colored.DDS"},
 
 		{"name": "house", "model": "SmallHouse2.obj", "physics": "static-triangle.json", "texture": "HouseTexture.DDS"},

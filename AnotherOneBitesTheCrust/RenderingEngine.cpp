@@ -558,9 +558,7 @@ void RenderingEngine::setupMinimap(Map map)
 					glm::vec3 pos = ground->getPosition();
 					mmHouseVerts.push_back(pos);
 					//pink
-					mmHouseColors.push_back(1.0f);	//r
-					mmHouseColors.push_back(0.68f);	//g
-					mmHouseColors.push_back(0.73f);	//b
+					mmHouseColors.push_back(vec3(1.0, 0.68, 0.73));
 				}
 				else if(tile->pickup)
 				{
@@ -640,7 +638,7 @@ void RenderingEngine::setupMinimap(Map map)
 
 	glBindBuffer(GL_ARRAY_BUFFER, mmHouseColorBuffer);
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(float)*mmHouseColors.size(),
+		sizeof(vec3)*mmHouseColors.size(),
 		mmHouseColors.data(),
 		GL_STATIC_DRAW);
 

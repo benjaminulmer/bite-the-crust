@@ -120,7 +120,7 @@ public:
 	GLuint mmRoadVertBuffer;
 	GLuint mmRoadColorBuffer;
 	std::vector<glm::vec3> mmHouseVerts;
-	std::vector<float> mmHouseColors;
+	std::vector<glm::vec3> mmHouseColors;
 	GLuint mmHouseVAO;
 	GLuint mmHouseVertBuffer;
 	GLuint mmHouseColorBuffer;

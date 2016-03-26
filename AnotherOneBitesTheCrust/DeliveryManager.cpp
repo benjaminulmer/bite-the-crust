@@ -85,5 +85,7 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 }
 
 void DeliveryManager::refillPizza(Vehicle* player) {
+	if (player->pizzaCount < 3)
+		pizzasRefilled(player);
 	player->pizzaCount = 3;
 }

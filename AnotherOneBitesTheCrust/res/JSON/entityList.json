@@ -21,6 +21,7 @@
 		{"name": "house 3", "model": "MediumHouse.obj", "physics": "static-triangle.json", "texture": "HouseTexture.DDS"},
 		{"name": "house 4", "model": "HouseWithFlatRoof.obj", "physics": "static-triangle.json", "texture": "HouseTexture.DDS"},
         {"name": "billboard", "model": "billboard.obj", "physics": "static-triangle.json", "texture": "billboard-colored.DDS"},
+        {"name": "strip mall", "model": "StripMallSmaller.obj", "physics": "static-triangle.json", "texture": "StripMall.DDS"},
 
         {"name": "barrier", "model": "barrier.obj", "physics": "default.json", "texture": "barrierTexture.DDS"},
         {"name": "road block", "model": "block.obj", "physics": "static-triangle.json", "texture": "RoadBlocker_diffuse.DDS"},

@@ -539,7 +539,7 @@ void RenderingEngine::setupMinimap(Map map)
 			//cout << "TEST ";
 			Entity* ground = tile->ground;
 			
-			if(tile->groundModel == "road-straight" || tile->groundModel == "road-turn" || tile->groundModel == "road-threeway" || tile->groundModel == "road-fourway")
+			if(tile->groundModel == "straightRoad" || tile->groundModel == "turnRoad" || tile->groundModel == "threewayRoad" || tile->groundModel == "fourwayRoad")
 			{
 
 				glm::vec3 pos = ground->getPosition();

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 const int MIN_DIST = 5;
+const int MAX_ATTEMPTS = 60;
 
 AIEngine::AIEngine(void)
 {
@@ -272,10 +273,36 @@ void AIEngine::trimPath(Vehicle* toUpdate)
 		toUpdate->currentPath.erase(toUpdate->currentPath.begin());
 }
 
+bool AIEngine::isStuck(Vehicle * driver)
+{
+	float sigma = 0.1;
+
+	if(driver->getPhysicsVehicle()->computeForwardSpeed() < sigma && driver->input.forward > 0)
+		driver->stuckDuration++;
+	else
+		driver->stuckDuration = 0;
+
+	return driver->stuckDuration > MAX_ATTEMPTS*2;
+}
+
 void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICollisionEntity & obstacle) 
 {
 	toUpdate->input.shootPizza = false;
 	glm::vec3 goal = destination.location->goal;
+
+	if(toUpdate->avoiding)
+	{
+		toUpdate->avoidAttempts++;
+		if(toUpdate->avoidAttempts > MAX_ATTEMPTS)
+		{
+			toUpdate->avoiding = false;
+			toUpdate->avoidAttempts = 0;
+		}
+
+		facePoint(toUpdate, goal);
+		return;
+	}
+
 
 	// Should pathfind to pickup followed by pathfinding to destination
 	if(toUpdate->pizzaCount == 0)
@@ -332,11 +359,8 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
-	if(obstacle.entity != nullptr && obstacle.distance < 2 && obstacle.entity->type == EntityType::STATIC)
-	{
-		facePoint(toUpdate, goal);
-		return;
-	}
+	if((obstacle.entity != nullptr && obstacle.distance < 1 && obstacle.entity->type == EntityType::STATIC) || isStuck(toUpdate))
+		toUpdate->avoiding = true;
 
 	goToPoint(toUpdate, nextPoint, glm::length(goal - toUpdate->getPosition()));
 }

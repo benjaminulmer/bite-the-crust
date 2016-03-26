@@ -352,7 +352,7 @@ void RenderingEngine::setupMiscBuffers()
 	std::vector<GLuint> skyfaces;
 	std::vector<glm::vec3> skyraw_verts;
 
-	ContentLoading::loadOBJ("res\\Models\\Skybox.obj", skyVertices, skyUVs, skyNorms, skyfaces, skyraw_verts);
+	ContentLoading::loadOBJ("res\\Models\\skybox.obj", skyVertices, skyUVs, skyNorms, skyfaces, skyraw_verts);
 
 	glGenVertexArrays(1, &skyVAO);
 	glBindVertexArray(skyVAO);
@@ -402,7 +402,7 @@ void RenderingEngine::setupMiscBuffers()
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
 
-	skyTex = ContentLoading::loadDDS("res\\Textures\\Skybox.DDS");
+	skyTex = ContentLoading::loadDDS("res\\Textures\\skybox.DDS");
 
 //Loading shadows
 	glUseProgram(basicProgramID);

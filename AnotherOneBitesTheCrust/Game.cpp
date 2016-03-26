@@ -198,10 +198,10 @@ void Game::setupEntities()
 			players[i]->isAI = false;
 	}
 	// hard code textures for now
-	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-red.DDS");
-	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-blue.DDS");
-	players[2]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-green.DDS");
-	players[3]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-yellow.DDS");
+	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseRed.DDS");
+	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseBlue.DDS");
+	players[2]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseGreen.DDS");
+	players[3]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseYellow.DDS");
 
 	camera = new Camera(players[0]);
 	renderingEngine->updateView(*camera);
@@ -213,20 +213,20 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 	vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 	switch(num) {
 		case 0:
-			vehicle->setRenderable(renderablesMap["van"]);
-			vehicle->setTexture(textureMap["van"]);
+			vehicle->setRenderable(renderablesMap["redVan"]);
+			vehicle->setTexture(textureMap["redVan"]);
 			break;
 		case 1:
-			vehicle->setRenderable(renderablesMap["blue van"]);
-			vehicle->setTexture(textureMap["blue van"]);
+			vehicle->setRenderable(renderablesMap["blueVan"]);
+			vehicle->setTexture(textureMap["blueVan"]);
 			break;
 		case 2:
-			vehicle->setRenderable(renderablesMap["green van"]);
-			vehicle->setTexture(textureMap["green van"]);
+			vehicle->setRenderable(renderablesMap["greenVan"]);
+			vehicle->setTexture(textureMap["greenVan"]);
 			break;
 		case 3:
-			vehicle->setRenderable(renderablesMap["yellow van"]);
-			vehicle->setTexture(textureMap["yellow van"]);
+			vehicle->setRenderable(renderablesMap["yellowVan"]);
+			vehicle->setTexture(textureMap["yellowVan"]);
 			break;
 	}
 	// TODO get dimensions working properly for vehicle
@@ -272,10 +272,10 @@ void Game::connectSystems()
 	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
 	// TODO: Should have a textures array or something that corresponds to each player so we can add this to above loop
-	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-red.DDS");
-	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
-	deliveryManager->deliveryTextures[players[2]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
-	deliveryManager->deliveryTextures[players[3]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
+	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRed.DDS");
+	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
+	deliveryManager->deliveryTextures[players[2]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
+	deliveryManager->deliveryTextures[players[3]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
 
@@ -283,7 +283,6 @@ void Game::connectSystems()
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
 	deliveryManager->pizzasRefilled.connect(audioEngine, &AudioEngine::playReloadSound);
-	//physicsEngine->simulationCallback->inPickUpLocation.connect(audioEngine, &AudioEngine::playReloadSound);
 }
 
 // Main loop of the game
@@ -443,8 +442,8 @@ void Game::endGame(std::map<Vehicle*, int> scores) {
 void Game::shootPizza(Vehicle* vehicle)
 {
 	PizzaBox* pizzaBox = new PizzaBox(vehicle);
-	pizzaBox->setRenderable(renderablesMap["box"]);
-	pizzaBox->setTexture(textureMap["box"]);
+	pizzaBox->setRenderable(renderablesMap["pizzaBox"]);
+	pizzaBox->setTexture(textureMap["pizzaBox"]);
 
 	physx::PxTransform transform = vehicle->getActor()->getGlobalPose();
 	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.25f, 1.0f));
@@ -454,7 +453,7 @@ void Game::shootPizza(Vehicle* vehicle)
 	physx::PxVec3 vehicleVelocity = vehicle->getRigidDynamic()->getLinearVelocity();
 	velocity += vehicleVelocity;
 
-	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["box"], transform);
+	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["pizzaBox"], transform);
 	pizzaBox->getRigidDynamic()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);

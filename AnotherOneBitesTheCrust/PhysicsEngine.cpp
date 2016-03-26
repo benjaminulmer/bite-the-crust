@@ -18,6 +18,9 @@ PhysicsEngine::PhysicsEngine(void)
 void PhysicsEngine::initSimulationData()
 {
 	scale = PxTolerancesScale();
+	scale.speed = 20;
+	scale.length = 2;
+	std::cout << "SCALE SIZE: " << scale.length << std::endl;
 	defaultErrorCallback = new PxDefaultErrorCallback();
 	defaultAllocator = new PxDefaultAllocator();
 
@@ -44,7 +47,7 @@ void PhysicsEngine::initPhysXSDK()
 
 	// Create scene
 	cpuDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
-	PxSceneDesc sceneDesc(physics->getTolerancesScale());
+	PxSceneDesc sceneDesc(scale);
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher = cpuDispatcher;
 

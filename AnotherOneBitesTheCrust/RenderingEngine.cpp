@@ -36,7 +36,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	glUseProgram(textureProgramID);
 
 
-	glUniform3f(lightPos, 100.0f, 100.0f, 100.0f);
+	glUniform3f(lightPos, mmCenter.x, 100.0f, mmCenter.z);
 	glUniform1f(lightPow, 5000.0f);
 	glUniform3f(ambientScale, 0.6f, 0.6f, 0.6f);
 

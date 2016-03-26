@@ -1,9 +1,9 @@
 {
     "entities": [
-        {"name": "road-straight", "model": "Straight.obj", "physics": "tile.json", "texture": "Straight-new.DDS"},
-        {"name": "road-turn", "model": "Turn.obj", "physics": "tile.json", "texture": "Turn-new.DDS"},
-        {"name": "road-threeway", "model": "Threeway.obj", "physics": "tile.json", "texture": "Threeway.DDS"},
-        {"name": "road-fourway", "model": "Fourway.obj", "physics": "tile.json", "texture": "Fourway.DDS"},
+        {"name": "road-straight", "model": "Straight-Curb.obj", "physics": "tile.json", "texture": "Straight-new.DDS"},
+        {"name": "road-turn", "model": "Turn-Curb.obj", "physics": "tile.json", "texture": "Turn-new.DDS"},
+        {"name": "road-threeway", "model": "Threeway-Curb.obj", "physics": "tile.json", "texture": "Threeway.DDS"},
+        {"name": "road-fourway", "model": "Fourway-Curb.obj", "physics": "tile.json", "texture": "Fourway.DDS"},
 		{"name": "lawn", "model": "Lawn.obj", "physics": "tile.json", "texture": "SeamlessGrass.DDS"},
         {"name": "parking lot", "model": "ParkingLot.obj", "physics": "tile.json", "texture": "ParkingLot.DDS"},
 

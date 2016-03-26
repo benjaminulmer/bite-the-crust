@@ -52,7 +52,7 @@ public:
 
 	//////////////////////MISC////////////////////////////////////
 	GLuint shadowProgramID;
-	GLuint sphereVAO;
+	GLuint sphereVAO; asdfadfasdfasdf
 	GLuint sphereVertBuffer;
 	GLuint sphereColorBuffer;
 	std::vector<glm::vec3> shadowVertices;

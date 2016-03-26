@@ -449,7 +449,7 @@ void Game::shootPizza(Vehicle* vehicle)
 	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.25f, 1.0f));
 	transform.p += posOffset;
 
-	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 0.0f, 20.0f));
+	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 2, 17));
 	physx::PxVec3 vehicleVelocity = vehicle->getRigidDynamic()->getLinearVelocity();
 	velocity += vehicleVelocity;
 

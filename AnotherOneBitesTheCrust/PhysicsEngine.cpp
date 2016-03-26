@@ -101,8 +101,8 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 	for (auto sInfo : info->shapeInfo)
 	{
 		// Create material and geometry for shape and add it to actor
-		PxMaterial* material = physics->createMaterial(sInfo->dynamicFriction, sInfo->staticFriction, sInfo->restitution);
 		PxGeometry* geometry;
+		PxMaterial* material;
 		if (sInfo->geometry == Geometry::SPHERE)
 		{
 			SphereInfo* sphInfo = (SphereInfo*)sInfo;
@@ -133,12 +133,13 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 			PxTriangleMesh* mesh = helper->createTriangleMesh(tmInfo->verts.data(), tmInfo->verts.size(), tmInfo->faces.data(), tmInfo->faces.size()/3);
 			geometry = new PxTriangleMeshGeometry(mesh);
 		}
+		material = (sInfo->isDrivable) ? drivingSurfaces[0] : physics->createMaterial(sInfo->dynamicFriction, sInfo->staticFriction, sInfo->restitution);
 		PxShape* shape = actor->createShape(*geometry, *material); // TODO support shape flags
 		shape->setLocalPose(sInfo->transform);
 
 		// Set up querry filter data for shape
 		PxFilterData qryFilterData;
-		(sInfo->isDrivable) ? qryFilterData.word3 = (PxU32)Surface::DRIVABLE : qryFilterData.word3 = (PxU32)Surface::UNDRIVABLE;
+		qryFilterData.word3 = (sInfo->isDrivable) ? (PxU32)Surface::DRIVABLE : (PxU32)Surface::UNDRIVABLE;
 		shape->setQueryFilterData(qryFilterData);
 
 		// Set up simulation filter data for shape

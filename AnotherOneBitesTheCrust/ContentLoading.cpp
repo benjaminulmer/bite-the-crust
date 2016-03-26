@@ -307,6 +307,15 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			if (geometry[i].HasMember("isDrivable")) {
 				shape->isDrivable = (geometry[i]["isDrivable"].GetInt() != 0);
 			}
+			if (geometry[i].HasMember("staticFriction")) {
+				shape->staticFriction = geometry[i]["staticFriction"].GetDouble();
+			}
+			if (geometry[i].HasMember("dynamicFriction")) {
+				shape->dynamicFriction = geometry[i]["dynamicFriction"].GetDouble();
+			}
+			if (geometry[i].HasMember("restitution")) {
+				shape->restitution = geometry[i]["restitution"].GetDouble();
+			}
 			info->shapeInfo.push_back(shape);
 		}
 

@@ -46,7 +46,6 @@ void DeliveryManager::timePassed(double timeMs) {
 		d->time = d->time - timeMs;
 		if (d->time <= 0.0) {
 			d->location->ground->setTexture(d->location->groundTexture);
-			scores[players[i]]--; // Decrement score for now, while testing things out
 			deliveries[players[i]] = newDelivery(players[i]);
 			freeLocations.push_back(d->location); // Free the tile back up, since it wasn't claimed
 			// Free the location after assigning delivery, so you don't get the same location twice
@@ -65,7 +64,6 @@ Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	d.location = freeLocations[randomTile];
 	d.time = 1000.0 * 20.0; // 20 seconds
 	d.location->ground->setTexture(deliveryTextures[player]);
-	//freeLocations.erase(freeLocations.begin() + randomTile); // Don't erase, so players can both be assigned the same tile
 	player->newDestination = true;
 	return d;
 }
@@ -77,9 +75,9 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 	if (tile == deliveries[pizza->owner].location) {
 		tile->ground->setTexture(tile->groundTexture);
 		tile->house->setTexture(pizza->owner->houseTexture);
-		scores[pizza->owner]++;
+		int score = 5 + (int)(ceil(deliveries[pizza->owner].time / 1000.0f / 3)); // Bonus of remaining time in seconds, divided by 3
+		scores[pizza->owner] += score;
 		freeLocations.erase(std::remove(freeLocations.begin(), freeLocations.end(), deliveries[pizza->owner].location), freeLocations.end());
-		//freeLocations.push_back(tile); // Free the tile back up for now, not Splatoon yet
 		deliveries[pizza->owner] = newDelivery(pizza->owner);
 	}
 	else
@@ -87,5 +85,7 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 }
 
 void DeliveryManager::refillPizza(Vehicle* player) {
+	if (player->pizzaCount < 3)
+		pizzasRefilled(player);
 	player->pizzaCount = 3;
 }

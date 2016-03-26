@@ -11,7 +11,7 @@ AIEngine::AIEngine(void)
 }
 
 std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destination, vector<graphNode *> allNodes)
-{
+ {
 	std::map<graphNode *, double> distances;
 	std::map<graphNode *, double> heuristic;
 	std::map<graphNode *, graphNode *> previous;
@@ -40,7 +40,7 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 			if(heuristic[*i] < minDist)
 			{
 				position = i;
-				minDist = distances[*i];
+				minDist = heuristic[*i];
 			}
 		}
 		
@@ -159,16 +159,19 @@ void AIEngine::fireAt(Vehicle * driver, const glm::vec3 & goal)
 
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
-	if(driver->getPhysicsVehicle()->computeForwardSpeed() > 0.1)
-		brake(driver, 1);
-	else if(ratio > 0.05)
-		facePoint(driver, goal);
-	else if(driver->pizzaDelivered == false)
+	if(driver->pizzaDelivered == false && ratio < 0.05)
 	{
 		driver->pizzaDelivered = true;
 		driver->input.shootPizza = true;
 		brake(driver, 1);
 	}
+
+
+	if(driver->getPhysicsVehicle()->computeForwardSpeed() > 0.2)
+		brake(driver, 1);
+	else
+		facePoint(driver, goal);
+	
 
 
 }
@@ -359,8 +362,27 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
+<<<<<<< HEAD
 	if((obstacle.entity != nullptr && obstacle.distance < 1 && obstacle.entity->type == EntityType::STATIC) || isStuck(toUpdate))
 		toUpdate->avoiding = true;
+=======
+	if(obstacle.entity != nullptr && obstacle.distance < 1 && obstacle.entity->type == EntityType::STATIC)
+		toUpdate->avoiding = true;
+
+	if(toUpdate->avoiding)
+	{
+		toUpdate->avoidAttempts++;
+		if(obstacle.entity == nullptr || obstacle.distance > 4 || toUpdate->avoidAttempts > MAX_ATTEMPTS)
+		{
+			toUpdate->avoiding = false;
+			toUpdate->avoidAttempts = 0;
+		}
+
+		facePoint(toUpdate, goal);
+		return;
+	}
+>>>>>>> 2c38cad3927752b04b90bc4937d0232b84d1d944
+
 
 	goToPoint(toUpdate, nextPoint, glm::length(goal - toUpdate->getPosition()));
 }

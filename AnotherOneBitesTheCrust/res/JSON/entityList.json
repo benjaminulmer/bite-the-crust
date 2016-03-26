@@ -1,30 +1,50 @@
 {
     "entities": [
-        {"name": "road-straight", "model": "Straight.obj", "physics": "default.json", "texture": "Straight-new.DDS"},
-        {"name": "road-turn", "model": "Turn.obj", "physics": "default.json", "texture": "Turn-new.DDS"},
-        {"name": "road-threeway", "model": "Threeway.obj", "physics": "default.json", "texture": "Threeway.DDS"},
-        {"name": "road-fourway", "model": "Fourway.obj", "physics": "default.json", "texture": "Fourway.DDS"},
-		{"name": "lawn", "model": "Lawn.obj", "physics": "default.json", "texture": "SeamlessGrass.DDS"},
+        {"name": "road-straight", "model": "Straight-Curb.obj", "physics": "tile.json", "texture": "Straight-new.DDS"},
+        {"name": "road-turn", "model": "Turn-Curb.obj", "physics": "tile.json", "texture": "Turn-new.DDS"},
+        {"name": "road-threeway", "model": "Threeway-Curb.obj", "physics": "tile.json", "texture": "Threeway.DDS"},
+        {"name": "road-fourway", "model": "Fourway-Curb.obj", "physics": "tile.json", "texture": "Fourway.DDS"},
+		{"name": "lawn", "model": "Lawn.obj", "physics": "tile.json", "texture": "SeamlessGrass.DDS"},
+        {"name": "parking lot", "model": "ParkingLot.obj", "physics": "tile.json", "texture": "ParkingLot.DDS"},
+
         {"name": "box", "model": "PizzaBox-centered.obj", "physics": "box.json", "texture": "PizzaBox-colored.DDS"},
 		{"name": "wheel", "model": "NewWheel.obj", "physics": "default.json", "texture": "CarTexture-red.DDS"},
         {"name": "ramp", "model": "bigramp.obj", "physics": "ramp.json", "texture": "ramp.DDS"},
         {"name": "van", "model": "newVan.obj", "physics": "default.json", "texture": "CarTexture-red.DDS"},
-        {"name": "aivan", "model": "newVan.obj", "physics": "default.json", "texture": "CarTexture-blue.DDS"},
+        {"name": "blue van", "model": "newVan.obj", "physics": "default.json", "texture": "CarTexture-blue.DDS"},
+        {"name": "green van", "model": "newVan.obj", "physics": "default.json", "texture": "CarTexture-green.DDS"},
+        {"name": "yellow van", "model": "newVan.obj", "physics": "default.json", "texture": "CarTexture-yellow.DDS"},
 		{"name": "fence", "model": "fence.obj", "physics": "static-box.json", "texture": "fence-colored.DDS"},
-		{"name": "house", "model": "SmallHouse2.obj", "physics": "static-box.json", "texture": "HouseTexture.DDS"},
-		{"name": "house 2", "model": "SmallHouse.obj", "physics": "static-box.json", "texture": "HouseTexture.DDS"},
-		{"name": "house 3", "model": "MediumHouse.obj", "physics": "static-box.json", "texture": "HouseTexture.DDS"},
-        {"name": "billboard", "model": "billboard.obj", "physics": "static-convex.json", "texture": "billboard-colored.DDS"},
+
+		{"name": "house", "model": "SmallHouse2.obj", "physics": "static-triangle.json", "texture": "HouseTexture.DDS"},
+		{"name": "house 2", "model": "SmallHouse.obj", "physics": "static-triangle.json", "texture": "HouseTexture.DDS"},
+		{"name": "house 3", "model": "MediumHouse.obj", "physics": "static-triangle.json", "texture": "HouseTexture.DDS"},
+		{"name": "house 4", "model": "HouseWithFlatRoof.obj", "physics": "static-triangle.json", "texture": "HouseTexture.DDS"},
+        {"name": "billboard", "model": "billboard.obj", "physics": "static-triangle.json", "texture": "billboard-colored.DDS"},
+        {"name": "strip mall", "model": "StripMall.obj", "physics": "static-triangle.json", "texture": "StripMall.DDS"},
+
         {"name": "barrier", "model": "barrier.obj", "physics": "default.json", "texture": "barrierTexture.DDS"},
-        {"name": "road block", "model": "block.obj", "physics": "static-box.json", "texture": "RoadBlocker_diffuse.DDS"},
-        {"name": "pole", "model": "post.obj", "physics": "static-box.json", "texture": "post.DDS"},
-        {"name": "dumpster", "model": "dumpster_3yard.obj", "physics": "static-box.json", "texture": "dumpster_3yard_dif.DDS"},
+        {"name": "road block", "model": "block.obj", "physics": "static-triangle.json", "texture": "RoadBlocker_diffuse.DDS"},
+        {"name": "pole", "model": "post.obj", "physics": "static-triangle.json", "texture": "post.DDS"},
+        {"name": "dumpster", "model": "dumpster_3yard.obj", "physics": "static-triangle.json", "texture": "dumpster_3yard_dif.DDS"},
         {"name": "trash bin", "model": "trash.obj", "physics": "default.json", "texture": "trash.DDS"},
-        {"name": "bench", "model": "bench.obj", "physics": "default.json", "texture": "bench.DDS"},
-		{"name": "aspen", "model": "AspenTree.obj", "physics": "static-box.json", "texture": "TreeTexture.DDS"},
-		{"name": "birch", "model": "BirchTree.obj", "physics": "static-box.json", "texture": "TreeTexture.DDS"},
-		{"name": "oak", "model": "OakTree.obj", "physics": "static-box.json", "texture": "TreeTexture.DDS"},
-		{"name": "big bush", "model": "BigBush.obj", "physics": "default.json", "texture": "BushTexture.DDS"},
-		{"name": "small bush", "model": "SmallBush.obj", "physics": "default.json", "texture": "BushTexture.DDS"}
+
+        {"name": "bench", "model": "bench.obj", "physics": "default.json", "texture": "bench.DDS"},	
+        {"name": "aspen", "model": "AspenTree.obj", "physics": "static-triangle.json", "texture": "TreeTexture.DDS"},
+		{"name": "birch", "model": "BirchTree.obj", "physics": "static-triangle.json", "texture": "TreeTexture.DDS"},
+		{"name": "oak", "model": "OakTree.obj", "physics": "static-triangle.json", "texture": "TreeTexture.DDS"},
+		{"name": "dead tree", "model": "DeadTree.obj", "physics": "static-triangle.json", "texture": "TreeTexture.DDS"},
+        {"name": "pine", "model": "PineTree.obj", "physics": "static-triangle.json", "texture": "TreeTexture.DDS"},
+     
+        {"name": "big bush", "model": "BigBush.obj", "physics": "default.json", "texture": "BushTexture.DDS"},
+		{"name": "small bush", "model": "SmallBush.obj", "physics": "default.json", "texture": "BushTexture.DDS"},
+        
+        {"name": "flower 1", "model" :"Flower.obj", "texture": "FlowerTexture1.DDS"},
+        {"name": "flower 2", "model" :"Flower2.obj", "texture": "FlowerTexture2.DDS"},
+        {"name": "flower 3", "model" :"Flower3.obj", "texture": "FlowerTexture1.DDS"},
+        
+        {"name": "rock 1", "model" :"Rock1.obj", "texture": "RockTexture.DDS"},
+        {"name": "rock 2", "model" :"Rock2.obj", "physics": "default.json", "texture": "RockTexture.DDS"},
+        {"name": "rock 3", "model" :"Rock3.obj", "physics": "static-triangle.json", "texture": "RockTexture.DDS"}
     ]
 }

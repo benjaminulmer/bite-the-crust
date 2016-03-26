@@ -85,7 +85,7 @@ void Game::initSystems()
 	physicsEngine = new PhysicsEngine();
 	renderingEngine = new RenderingEngine();
 	deliveryManager = new DeliveryManager();
-	renderingEngine->initText2D("res\\Fonts\\Holstein.DDS");
+	renderingEngine->initText2D("res\\Fonts\\Carbon.DDS");
 	renderingEngine->setupMiscBuffers();
 	renderingEngine->setupIntro();
 
@@ -106,7 +106,7 @@ void Game::setupEntities()
 	}
 
 	// Load the map
-	if (!ContentLoading::loadMap("res\\JSON\\map.json", map))
+	if (!ContentLoading::loadMap("res\\JSON\\tiles.json", "res\\JSON\\map.json", map))
 		fatalError("Could not load map file.");
 	deliveryManager->map = &map;
 
@@ -125,13 +125,17 @@ void Game::setupEntities()
 				physicsEngine->createPizzaPickup(physx::PxVec3((float)j*map.tileSize + map.tileSize/2, 0, (float)i*map.tileSize + map.tileSize/2), 8.0f);
 			}
 
-			Entity* ground = new Entity();
+			StaticEntity* ground = new StaticEntity();
 			ground->setRenderable(renderablesMap[tile->groundModel]);
 			ground->setTexture(textureMap[tile->groundModel]);
 
-			// Offset by tileSize/2 so that the corner of the map starts at 0,0 instead of -35,-35.
-			ground->setDefaultRotation(physx::PxPi * (tile->groundRotationDeg) / 180.0f, glm::vec3(0,1,0));
-			ground->setDefaultTranslation(glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2));
+			// Offset by tileSize/2 so that the corner of the map starts at 0,0
+			glm::vec3 pos = glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2);
+
+			float rotationRad = physx::PxPi * (tile->groundRotationDeg / 180.0f);
+			physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
+
+			physicsEngine->createEntity(ground, physicsEntityInfoMap[tile->groundModel], transform);
 			tile->ground = ground;
 			tile->groundTexture = textureMap[tile->groundModel];
 			entities.push_back(ground);
@@ -143,29 +147,38 @@ void Game::setupEntities()
 				std::uniform_int_distribution<int> dist(0, tileEntity.names.size()-1);
 				std::string name = tileEntity.names[dist(generator)];
 
-				PhysicsEntity* e;
-				if (physicsEntityInfoMap[name]->type == PhysicsType::DYNAMIC) {
-					e = new DynamicEntity();
-				} else {
-					e = new StaticEntity();
-					tile->staticEntities.push_back(e);
-				}
-
-				// TODO, error check that these models do exist, instead of just break
-				e->setRenderable(renderablesMap[name]);
-				e->setTexture(textureMap[name]);
-
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
+				if (physicsEntityInfoMap.count(name) == 0) {
+					Entity* e = new Entity();
+					e->setRenderable(renderablesMap[name]);
+					e->setTexture(textureMap[name]);
 
-				float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
-				physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
+					e->setDefaultRotation(physx::PxPi *(tile->groundRotationDeg) / 180.0f, glm::vec3(0,1,0));
+					e->setDefaultTranslation(pos);
+					entities.push_back(e);
+				} else {
+					PhysicsEntity* e;
+					if (physicsEntityInfoMap[name]->type == PhysicsType::DYNAMIC) {
+						e = new DynamicEntity();
+					} else {
+						e = new StaticEntity();
+						tile->staticEntities.push_back(e);
+					}
 
-				physicsEngine->createEntity(e, physicsEntityInfoMap[name], transform);
-				entities.push_back(e);
+					// TODO, error check that these models do exist, instead of just break
+					e->setRenderable(renderablesMap[name]);
+					e->setTexture(textureMap[name]);
 
-				if (name.find("house") != std::string::npos) {
-					tile->house = e;
+					float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
+					physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
+
+					physicsEngine->createEntity(e, physicsEntityInfoMap[name], transform);
+					entities.push_back(e);
+
+					if (name.find("house") != std::string::npos) {
+						tile->house = e;
+					}
 				}
 			}
 		}
@@ -173,7 +186,7 @@ void Game::setupEntities()
 	renderingEngine->setupMinimap(map);
 
 	// Create vehicles
-	for(int i = 0; i < MAX_PLAYERS/2; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
+	for(int i = 0; i < MAX_PLAYERS; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
 		setupVehicle(players[i], physx::PxTransform(10 + 10.0f*i, 2, 20), i);
@@ -187,6 +200,8 @@ void Game::setupEntities()
 	// hard code textures for now
 	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-red.DDS");
 	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-blue.DDS");
+	players[2]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-green.DDS");
+	players[3]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-yellow.DDS");
 
 	camera = new Camera(players[0]);
 	renderingEngine->updateView(*camera);
@@ -196,17 +211,24 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 {
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", vehicle);
 	vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
-	if(num == 0)
-	{
-		vehicle->setRenderable(renderablesMap["van"]);
-		vehicle->setTexture(textureMap["van"]);
+	switch(num) {
+		case 0:
+			vehicle->setRenderable(renderablesMap["van"]);
+			vehicle->setTexture(textureMap["van"]);
+			break;
+		case 1:
+			vehicle->setRenderable(renderablesMap["blue van"]);
+			vehicle->setTexture(textureMap["blue van"]);
+			break;
+		case 2:
+			vehicle->setRenderable(renderablesMap["green van"]);
+			vehicle->setTexture(textureMap["green van"]);
+			break;
+		case 3:
+			vehicle->setRenderable(renderablesMap["yellow van"]);
+			vehicle->setTexture(textureMap["yellow van"]);
+			break;
 	}
-	else if(num == 1)
-	{
-		vehicle->setRenderable(renderablesMap["aivan"]);
-		vehicle->setTexture(textureMap["aivan"]);
-	}
-
 	// TODO get dimensions working properly for vehicle
 	vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
 	physicsEngine->createVehicle(vehicle, transform);
@@ -235,7 +257,7 @@ void Game::connectSystems()
 
 	inputEngine->setInputStruct(&players[0]->input, 0);
 
-	for(int i = 0; i < MAX_PLAYERS/2; i++)
+	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		players[i]->shootPizzaSignal.connect(this, &Game::shootPizza);
 		players[i]->shootPizzaSignal.connect(audioEngine, &AudioEngine::playCannonSound);
@@ -252,17 +274,16 @@ void Game::connectSystems()
 	// TODO: Should have a textures array or something that corresponds to each player so we can add this to above loop
 	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-red.DDS");
 	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
-
+	deliveryManager->deliveryTextures[players[2]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
+	deliveryManager->deliveryTextures[players[3]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
-
-	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-red.DDS");
-	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
 
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
-	physicsEngine->simulationCallback->inPickUpLocation.connect(audioEngine, &AudioEngine::playReloadSound);
+	deliveryManager->pizzasRefilled.connect(audioEngine, &AudioEngine::playReloadSound);
+	//physicsEngine->simulationCallback->inPickUpLocation.connect(audioEngine, &AudioEngine::playReloadSound);
 }
 
 // Main loop of the game
@@ -271,21 +292,26 @@ void Game::mainLoop()
 	unsigned int oldTimeMs = SDL_GetTicks();
 	unsigned int deltaTimeAccMs = 0;
 
+	std::vector<glm::vec3> allNodes;
+	for(graphNode * node : map.allNodes)
+		allNodes.push_back(node->getPosition());
+	//renderingEngine->setupNodes(allNodes, vec3(1,1,0));
+
 	// Game loop
 	while (gameState != GameState::EXIT)
 	{
-		if (gameState == GameState::INTRO)
-		{
-			processSDLEvents();
-			renderingEngine->displayIntro();
+		//if (gameState == GameState::INTRO)
+		//{
+		//	processSDLEvents();
+		//	renderingEngine->displayIntro();
 
-			//swap buffers
-			SDL_GL_SwapWindow(window);
-			SDL_Delay(5000);
+		//	//swap buffers
+		//	SDL_GL_SwapWindow(window);
+		//	SDL_Delay(5000);
 			gameState = GameState::PLAY;
-			
-		}
-		else if(gameState == GameState::PLAY)
+		//	
+		//}
+		/*else*/ if(gameState == GameState::PLAY)
 		{
 			processSDLEvents();
 
@@ -301,14 +327,14 @@ void Game::mainLoop()
 				deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 				// Update the player and AI cars
-				for(int i = 0; i < MAX_PLAYERS/2; i++)
+				for(int i = 0; i < MAX_PLAYERS; i++)
 				{
 					if(players[i]->isAI)
 					{
 						AICollisionEntity closest = physicsEngine->AISweep(players[i]);
 						aiEngine->updateAI(players[i], deliveryManager->deliveries[players[i]], map, closest);
-						renderingEngine->setupNodes(players[i]->currentPath, vec3(1,1,0)); // TODO: Remove when adding multiple AIs, otherwise will be very confusing (or change colours to match AI)
-				
+						//renderingEngine->setupNodes(players[i]->currentPath, vec3(1,1,0)); // TODO: Remove when adding multiple AIs, otherwise will be very confusing (or change colours to match AI)
+						
 					}
 					players[i]->update();
 				}
@@ -324,12 +350,13 @@ void Game::mainLoop()
 
 			// Display
 			renderingEngine->displayFuncTex(entities);
-			for(int i = 0 ; i < MAX_PLAYERS/2; i++)
+			for(int i = 0 ; i < MAX_PLAYERS; i++)
 				renderingEngine->drawShadow(players[i]->getPosition());
 			
-			renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
+			//renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
+			//renderingEngine->drawNodes(map.allNodes.size(), "points");
 			renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
-			renderingEngine->drawMinimap(players[0], players[1]); // TODO: Should support arbitrary number of vans
+			renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
 
 			// TODO: Broken record, but should draw to corresponding player's viewport
 			string speed = "Speed: ";
@@ -340,7 +367,7 @@ void Game::mainLoop()
 			frameRate.append(to_string(deltaTimeMs));
 			renderingEngine->printText2D(frameRate.data(), 0, 670, 20);
 
-			string score = "Score: ";
+			string score = "Tips: $";
 			score.append(to_string(deliveryManager->getScore(players[0])));
 			renderingEngine->printText2D(score.data(), 1050, 700, 24);
 			renderingEngine->printText2D(deliveryManager->getDeliveryText(players[0]).data(), 725, 670, 20);
@@ -435,7 +462,7 @@ void Game::shootPizza(Vehicle* vehicle)
 
 void Game::unFuckerTheGame()
 {
-	for(int i =0 ; i < MAX_PLAYERS/2; i++)
+	for(int i =0 ; i < MAX_PLAYERS; i++)
 	{
 		players[i]->getActor()->setGlobalPose(physx::PxTransform(10 + i*10.0f, 2, 20));
 		players[i]->getPhysicsVehicle()->setToRestState();
@@ -449,7 +476,7 @@ void Game::unFuckerTheGame()
 
 Game::~Game(void)
 {
-	for(int i = 0 ; i < MAX_PLAYERS/2; i++)
+	for(int i = 0 ; i < MAX_PLAYERS; i++)
 		players[i]->shootPizzaSignal.disconnect_all();
 
 	for (unsigned int i = 0; i < entities.size(); i++)

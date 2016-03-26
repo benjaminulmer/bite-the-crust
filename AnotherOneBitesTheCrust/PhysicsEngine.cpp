@@ -71,10 +71,6 @@ void PhysicsEngine::initVehicleSDK()
 
 	drivingSurfaces[0] = physics->createMaterial(0.8f, 0.8f, 0.6f);
 	frictionPairs = FrictionPairs::createFrictionPairs(drivingSurfaces[0]);
-
-	// Create a plane and add it to the scene
-	groundPlane = helper->createDrivablePlane(drivingSurfaces[0]);
-	scene->addActor(*groundPlane);
 }
 
 // Creates an physics entity from an entity info structure and a starting transform
@@ -123,19 +119,16 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		else if (sInfo->geometry == Geometry::CONVEX_MESH)
 		{
 			ConvexMeshInfo* cmInfo = (ConvexMeshInfo*)sInfo;
-			std::vector<PxVec3> verts = helper->glmVertsToPhysXVerts(cmInfo->verts);
 
-			PxConvexMesh* mesh = helper->createConvexMesh(verts.data(), verts.size());
+			PxConvexMesh* mesh = helper->createConvexMesh(cmInfo->verts.data(), cmInfo->verts.size());
 			geometry = new PxConvexMeshGeometry(mesh);
 		}
 		// Not working until index drawing is set up
 		else if (sInfo->geometry == Geometry::TRIANGLE_MESH)
 		{
 			TriangleMeshInfo* tmInfo = (TriangleMeshInfo*)sInfo;
-			std::vector<PxVec3> verts = helper->glmVertsToPhysXVerts(tmInfo->verts);
-			std::vector<PxU32> faces = tmInfo->faces;
 
-			PxTriangleMesh* mesh = helper->createTriangleMesh(verts.data(), verts.size(), faces.data(), faces.size());
+			PxTriangleMesh* mesh = helper->createTriangleMesh(tmInfo->verts.data(), tmInfo->verts.size(), tmInfo->faces.data(), tmInfo->faces.size()/3);
 			geometry = new PxTriangleMeshGeometry(mesh);
 		}
 		PxShape* shape = actor->createShape(*geometry, *material); // TODO support shape flags

@@ -7,29 +7,6 @@ using namespace physx;
 PhysicsHelper::PhysicsHelper(PxPhysics* physics, PxCooking* cooking)
 	: physics(physics), cooking(cooking) {}
 
-PxRigidStatic* PhysicsHelper::createDrivablePlane(PxMaterial* material)
-{
-	//Add a plane to the scene.
-	PxRigidStatic* groundPlane = PxCreatePlane(*physics, PxPlane(0,1,0,0), *material);
-
-	//Get the plane shape so we can set query and simulation filter data.
-	PxShape* shape;
-	groundPlane->getShapes(&shape, 1);
-
-	//Set the query filter data of the ground plane so that the vehicle raycasts can hit the ground.
-	PxFilterData qryFilterData;
-	qryFilterData.word3 = (PxU32)Surface::DRIVABLE;
-	shape->setQueryFilterData(qryFilterData);
-
-	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
-	PxFilterData simFilterData;
-	simFilterData.word0 = (PxU32)FilterFlag::GROUND;
-	simFilterData.word1 = (PxU32)FilterFlag::GROUND_AGAINST;
-	shape->setSimulationFilterData(simFilterData);
-
-	return groundPlane;
-}
-
 PxConvexMesh* PhysicsHelper::createConvexMesh(const PxVec3* verts, const PxU32 numVerts)
 {
 	// Create descriptor for convex mesh
@@ -39,7 +16,7 @@ PxConvexMesh* PhysicsHelper::createConvexMesh(const PxVec3* verts, const PxU32 n
 	meshDesc.points.data		= verts;
 	meshDesc.flags				= PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eINFLATE_CONVEX;
 
-	PxConvexMesh* convexMesh = NULL;
+	PxConvexMesh* convexMesh = nullptr;
 	PxDefaultMemoryOutputStream buf;
 	if(cooking->cookConvexMesh(meshDesc, buf))
 	{
@@ -61,8 +38,9 @@ PxTriangleMesh* PhysicsHelper::createTriangleMesh(const PxVec3* verts, const PxU
 	meshDesc.triangles.stride       = 3*sizeof(PxU32);
 	meshDesc.triangles.data         = faces;
 
-	PxTriangleMesh* triangleMesh = NULL;
+	PxTriangleMesh* triangleMesh = nullptr;
 	PxDefaultMemoryOutputStream buf;
+	cooking->validateTriangleMesh(meshDesc);
 	if (cooking->cookTriangleMesh(meshDesc, buf))
 	{
 		PxDefaultMemoryInputData id(buf.getData(), buf.getSize());
@@ -70,26 +48,4 @@ PxTriangleMesh* PhysicsHelper::createTriangleMesh(const PxVec3* verts, const PxU
 	}
 
 	return triangleMesh;
-}
-
-std::vector<PxVec3> PhysicsHelper::glmVertsToPhysXVerts(std::vector<glm::vec3> verts)
-{
-	std::vector<PxVec3> toReturn = std::vector<PxVec3>(); 
-	for (auto vert : verts)
-	{
-		toReturn.push_back(PxVec3(vert.x, vert.y, vert.z));
-	}
-
-	return toReturn;
-}
-
-std::vector<PxU32> PhysicsHelper::u16ToU32Faces(std::vector<unsigned short> faces)
-{
-	std::vector<PxU32> toReturn = std::vector<PxU32>(); 
-	for (auto face : faces)
-	{
-		toReturn.push_back((PxU32)face);
-	}
-
-	return toReturn;
 }

@@ -113,28 +113,27 @@ public:
 
 	//minimap stuff
 	void setupMinimap(Map map);
-	void drawMinimap(Entity* van1, Entity* van2);
+	void drawMinimap(Vehicle* vans[4]);
 	std::vector<glm::vec3> mmRoadVerts;
 	std::vector<float> mmRoadColors;
 	GLuint mmRoadVAO;
 	GLuint mmRoadVertBuffer;
 	GLuint mmRoadColorBuffer;
 	std::vector<glm::vec3> mmHouseVerts;
-	std::vector<float> mmHouseColors;
+	std::vector<glm::vec3> mmHouseColors;
 	GLuint mmHouseVAO;
 	GLuint mmHouseVertBuffer;
 	GLuint mmHouseColorBuffer;
 	std::vector<glm::vec3> mmVanVerts;
 	std::vector<float> mmVanColors;
-	GLuint mmVanVAO;
-	GLuint mmVanVAO2;
+	GLuint mmVanVAOs[4];
 	GLuint mmVanVertBuffer;
-	GLuint mmVanColorBuffer;
-	GLuint mmVanColorBuffer2;
+	GLuint mmVanColorBuffers[4];
 	glm::mat4 mmV;
 	glm::mat4 mmM;
 	glm::vec3 mmScale;
 	glm::vec3 mmCenter;
+	glm::vec3 shift;
 
 
 	//testing stuf for danny

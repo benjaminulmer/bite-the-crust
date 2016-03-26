@@ -86,10 +86,10 @@ void InputEngine::controllerButtonDown(SDL_Event e)
 	{
 		inputs[e.cdevice.which]->jump = true;
 	}
-	else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+	/*else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSTICK)
 	{
-		(mode == InputMode::NORMAL) ? mode = InputMode::DEBUG : mode = InputMode::NORMAL; 
-	}
+		mode = (mode == InputMode::NORMAL) ? InputMode::DEBUG : InputMode::NORMAL; 
+	}*/
 }
 
 void InputEngine::controllerButtonUp(SDL_Event e)

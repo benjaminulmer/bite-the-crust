@@ -36,7 +36,7 @@ void Camera::update()
 	posBufferIndex = (posBufferIndex + 1) % BUFFER_SIZE;
 
 	// Set location based on which mode (forward vs reverse)
-	(reverseCam) ? position = posBufferReverse[posBufferIndex] : position = posBufferForward[posBufferIndex];
+	position = (reverseCam) ? posBufferReverse[posBufferIndex] : posBufferForward[posBufferIndex];
 	lookAtPosition = vehicle->getPosition();
 }
 

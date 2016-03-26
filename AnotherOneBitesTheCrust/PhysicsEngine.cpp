@@ -18,9 +18,8 @@ PhysicsEngine::PhysicsEngine(void)
 void PhysicsEngine::initSimulationData()
 {
 	scale = PxTolerancesScale();
-	scale.speed = 20;
+	scale.speed = 50;
 	scale.length = 2;
-	std::cout << "SCALE SIZE: " << scale.length << std::endl;
 	defaultErrorCallback = new PxDefaultErrorCallback();
 	defaultAllocator = new PxDefaultAllocator();
 

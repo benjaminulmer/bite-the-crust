@@ -25,7 +25,7 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	setSmoothingData();
 	setSteerSpeedData();
 
-	pizzaCount = 5000;
+	pizzaCount = MAX_PIZZAS;
 
 	type = EntityType::VEHICLE;
 }

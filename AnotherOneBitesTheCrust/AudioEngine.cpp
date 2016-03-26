@@ -8,6 +8,9 @@ AudioEngine::AudioEngine(void)
 	backgroundChannel = nullptr;
 	numChannels = 0;
 
+	std::random_device rd;
+	generator.seed(rd());
+
 	result = FMOD::System_Create(&fmodSystem);      // Create the main system object.
 	errorCheck();
 	
@@ -55,7 +58,9 @@ FMOD_VECTOR AudioEngine::glmVec3ToFmodVec(glm::vec3 vector)
 
 void AudioEngine::startBackgroundMusic()
 {
-    result = fmodSystem->playSound(backgroundMusic, 0, false, &backgroundChannel);
+	std::uniform_int_distribution<int> dist(0, backgroundSongs.size()-1);
+	backgroundSongChoice = dist(generator);
+    result = fmodSystem->playSound(backgroundSongs[backgroundSongChoice], 0, false, &backgroundChannel);
     errorCheck();
 	result = backgroundChannel->setVolume(0.5);
 	errorCheck();
@@ -196,8 +201,20 @@ void AudioEngine::playEngineRevSound(Vehicle * source)
 
 void AudioEngine::initStreams()
 {
-	result = fmodSystem->createSound("res\\Audio\\8BitIntro.wav", FMOD_LOOP_NORMAL | FMOD_2D, 0, &backgroundMusic);
+	// This can probably be done in a less hard-coded fashion, but it's not too bad...
+	FMOD::Sound *background;
+	result = fmodSystem->createSound("res\\Audio\\Cyborg Ninja.mp3", FMOD_LOOP_NORMAL | FMOD_2D, 0, &background);
     errorCheck();
+	backgroundSongs.push_back(background);
+	result = fmodSystem->createSound("res\\Audio\\8BitIntro.wav", FMOD_LOOP_NORMAL | FMOD_2D, 0, &background);
+    errorCheck();
+	backgroundSongs.push_back(background);
+	result = fmodSystem->createSound("res\\Audio\\Ouroboros.mp3", FMOD_LOOP_NORMAL | FMOD_2D, 0, &background);
+    errorCheck();
+	backgroundSongs.push_back(background);
+	result = fmodSystem->createSound("res\\Audio\\Wagon Wheel - Electronic.mp3", FMOD_LOOP_NORMAL | FMOD_2D, 0, &background);
+    errorCheck();
+	backgroundSongs.push_back(background);
 
 	result = fmodSystem->createSound("res\\Audio\\cannon.wav", FMOD_3D, 0, &cannonSound);
     errorCheck();
@@ -317,7 +334,7 @@ void AudioEngine::update(glm::mat4 listenerModelMatrix)
             errorCheck();
         }
                
-        result = backgroundMusic->getLength(&lenms, FMOD_TIMEUNIT_MS);
+        result = backgroundSongs[backgroundSongChoice]->getLength(&lenms, FMOD_TIMEUNIT_MS);
         if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE))
         {
             errorCheck();

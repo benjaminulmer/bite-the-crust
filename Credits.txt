@@ -1,5 +1,21 @@
-Music (or "8Bit Introduction" song) by Tristan Lohengrin
+Background Songs:
+
+8Bit Introduction" song by Tristan Lohengrin
 	http://www.freesound.org/people/Tristan_Lohengrin/sounds/273539/
+
+"Cyborg Ninja" by Kevin MacLeod (incompetech.com)
+ 	Licensed under Creative Commons: By Attribution 3.0 Licenses
+	http://creativecommons.org/licenses/by/3.0/
+
+"Ouroboros" by Kevin MacLeod (incompetech.com)
+ 	Licensed under Creative Commons: By Attribution 3.0 Licenses
+	http://creativecommons.org/licenses/by/3.0/
+
+"Wagon Wheel - Electronic" by Kevin MacLeod (incompetech.com)
+ 	Licensed under Creative Commons: By Attribution 3.0 Licenses
+	http://creativecommons.org/licenses/by/3.0/
+
+Models:
 
 Construction Barrier model/texture by PagDev
 	http://opengameart.org/content/construction-barrier-3d

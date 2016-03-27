@@ -119,6 +119,7 @@ void Game::setupEntities()
 
 			if (tile->deliverable) {
 				deliveryManager->addDeliveryLocation(tile);
+				map.deliveryTiles.push_back(tile);
 			}
 			if (tile->pickup) {
 				// TODO make this better/less hardcoded
@@ -216,18 +217,22 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 		case 0:
 			vehicle->setRenderable(renderablesMap["redVan"]);
 			vehicle->setTexture(textureMap["redVan"]);
+			vehicle->color = glm::vec3(1,0,0);
 			break;
 		case 1:
 			vehicle->setRenderable(renderablesMap["blueVan"]);
 			vehicle->setTexture(textureMap["blueVan"]);
+			vehicle->color = glm::vec3(0,0,1);
 			break;
 		case 2:
 			vehicle->setRenderable(renderablesMap["greenVan"]);
 			vehicle->setTexture(textureMap["greenVan"]);
+			vehicle->color = glm::vec3(0,1,0);
 			break;
 		case 3:
 			vehicle->setRenderable(renderablesMap["yellowVan"]);
 			vehicle->setTexture(textureMap["yellowVan"]);
+			vehicle->color = glm::vec3(1,1,0);
 			break;
 	}
 	// TODO get dimensions working properly for vehicle
@@ -280,6 +285,7 @@ void Game::connectSystems()
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
 	deliveryManager->deliveryLocationUpdate.connect(renderingEngine, &RenderingEngine::updateDeliveryLocation);
+	deliveryManager->houseColorSignal.connect(renderingEngine, &RenderingEngine::updateHouseColor);
 
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);

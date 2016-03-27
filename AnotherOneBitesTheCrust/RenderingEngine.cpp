@@ -560,25 +560,22 @@ void RenderingEngine::setupMinimap(Map map)
 				mmRoadColors.push_back(0.6f);	//g
 				mmRoadColors.push_back(0.6f);	//b
 			}
-			for(unsigned int k = 0; k < tile->entityTemplates.size(); k++)
+			if (tile->house)
 			{
-				if (tile->house)
-				{
 
-					glm::vec3 pos = vec3((float)ground->getPosition().x, (float)ground->getPosition().y, (float)ground->getPosition().z);
-					mmHouseVerts.push_back(pos);
-					//pink
-					mmHouseColors.push_back(vec3(1.0f, 0.68f, 0.73f));
-				}
-				else if(tile->pickup)
-				{
-					glm::vec3 pos = vec3((float)ground->getPosition().x, (float)ground->getPosition().y, (float)ground->getPosition().z);
-					mmRoadVerts.push_back(pos);
-					//pink
-					mmRoadColors.push_back(1.0f);	//r
-					mmRoadColors.push_back(0.55f);	//g
-					mmRoadColors.push_back(0.0f);	//b
-				}
+				glm::vec3 pos = vec3((float)ground->getPosition().x, (float)ground->getPosition().y, (float)ground->getPosition().z);
+				mmHouseVerts.push_back(pos);
+				//pink
+				mmHouseColors.push_back(vec3(1.0f, 0.68f, 0.73f));
+			}
+			else if(tile->pickup)
+			{
+				glm::vec3 pos = vec3((float)ground->getPosition().x, (float)ground->getPosition().y, (float)ground->getPosition().z);
+				mmRoadVerts.push_back(pos);
+				//pink
+				mmRoadColors.push_back(1.0f);	//r
+				mmRoadColors.push_back(0.55f);	//g
+				mmRoadColors.push_back(0.0f);	//b
 			}
 		}
 	}
@@ -962,6 +959,20 @@ void RenderingEngine::drawDelivery()
 
 void RenderingEngine::updateDeliveryLocation(glm::vec3 pos) {
 	deliveryPosition = pos;
+}
+
+void RenderingEngine::updateHouseColor(Map *map, Tile* tile, glm::vec3 color) {
+	for (unsigned int i = 0; i < map->deliveryTiles.size(); i++) {
+		if (map->deliveryTiles[i] == tile) {
+			mmHouseColors[i] = color;
+			glBindBuffer(GL_ARRAY_BUFFER, mmHouseColorBuffer);
+			glBufferData(GL_ARRAY_BUFFER,
+				sizeof(vec3)*mmHouseColors.size(),
+				mmHouseColors.data(),
+				GL_STATIC_DRAW);
+			break;
+		}
+	}
 }
 
 void RenderingEngine::setupNodes(vector<glm::vec3> verts, glm::vec3 color)

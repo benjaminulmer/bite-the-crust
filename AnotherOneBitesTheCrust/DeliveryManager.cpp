@@ -81,6 +81,7 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 		if (!pizza->owner->isAI)
 			tile->ground->setTexture(tile->groundTexture);
 		tile->house->setTexture(pizza->owner->houseTexture);
+		houseColorSignal(map, tile, pizza->owner->color);
 		int score = 5 + (int)(ceil(deliveries[pizza->owner].time / 1000.0f / 3)); // Bonus of remaining time in seconds, divided by 3
 		scores[pizza->owner] += score;
 		freeLocations.erase(std::remove(freeLocations.begin(), freeLocations.end(), deliveries[pizza->owner].location), freeLocations.end());

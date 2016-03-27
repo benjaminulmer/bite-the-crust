@@ -46,6 +46,7 @@ public:
 
 	std::vector<graphNode *> allNodes;
 	std::vector<std::vector<Tile>> tiles;
+	std::vector<Tile*> deliveryTiles;
 	glm::vec3 pickup;
 
 	Tile* getTile(glm::vec3 position);

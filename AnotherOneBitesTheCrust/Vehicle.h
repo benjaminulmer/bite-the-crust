@@ -83,6 +83,7 @@ public:
 	VehicleTuning tuning;
 
 	GLuint houseTexture;
+	glm::vec3 color;
 
 	bool isInAir;
 

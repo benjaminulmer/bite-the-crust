@@ -116,6 +116,7 @@ public:
 	void setupMinimap(Map map);
 	void drawMinimap(Vehicle* vans[4]);
 	void setupDelivery();
+	void updateHouseColor(Map *map, Tile* tile, glm::vec3 color);
 	void updateDeliveryLocation(glm::vec3 pos);
 	void drawDelivery();
 	std::vector<glm::vec3> mmRoadVerts;

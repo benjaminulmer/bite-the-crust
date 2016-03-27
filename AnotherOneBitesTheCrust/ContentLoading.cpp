@@ -307,6 +307,15 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			if (geometry[i].HasMember("isDrivable")) {
 				shape->isDrivable = (geometry[i]["isDrivable"].GetInt() != 0);
 			}
+			if (geometry[i].HasMember("staticFriction")) {
+				shape->staticFriction = geometry[i]["staticFriction"].GetDouble();
+			}
+			if (geometry[i].HasMember("dynamicFriction")) {
+				shape->dynamicFriction = geometry[i]["dynamicFriction"].GetDouble();
+			}
+			if (geometry[i].HasMember("restitution")) {
+				shape->restitution = geometry[i]["restitution"].GetDouble();
+			}
 			info->shapeInfo.push_back(shape);
 		}
 
@@ -821,7 +830,7 @@ GLuint ContentLoading::loadDDS(const char * imagepath)
 	unsigned char * buffer;
 	unsigned int bufsize;
 	/* how big is it going to be including all mipmaps? */ 
-	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize; 
+	bufsize = (mipMapCount > 1) ? linearSize * 2 : linearSize; 
 	buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char)); 
 	int read = fread(buffer, 1, bufsize, fp); 
 	/* close the file pointer */ 

@@ -1,0 +1,9 @@
+{
+    "geometry": [
+        {"shape":"box", "flag0": "DRIVABLE_OBSTACLE", "flag1": "DRIVABLE_OBSTACLE_AGAINST", "staticFriction": 1.5, "dynamicFriction": 1.5}
+    ],
+    "type": "dynamic",
+    "dynamicInfo": {
+        "density": 1.0
+    }
+}

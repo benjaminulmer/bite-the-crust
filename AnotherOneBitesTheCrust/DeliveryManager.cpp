@@ -45,7 +45,8 @@ void DeliveryManager::timePassed(double timeMs) {
 		Delivery* d = &deliveries[players[i]];
 		d->time = d->time - timeMs;
 		if (d->time <= 0.0) {
-			d->location->ground->setTexture(d->location->groundTexture);
+			if (!players[i]->isAI)
+				d->location->ground->setTexture(d->location->groundTexture);
 			deliveries[players[i]] = newDelivery(players[i]);
 			freeLocations.push_back(d->location); // Free the tile back up, since it wasn't claimed
 			// Free the location after assigning delivery, so you don't get the same location twice
@@ -63,8 +64,12 @@ Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	int randomTile = dist(generator);
 	d.location = freeLocations[randomTile];
 	d.time = 1000.0 * 20.0; // 20 seconds
-	d.location->ground->setTexture(deliveryTextures[player]);
+	// Only draw delivery tile for player
+	if (!player->isAI)
+		d.location->ground->setTexture(deliveryTextures[player]);
 	player->newDestination = true;
+	if (!player->isAI)
+		deliveryLocationUpdate(map->getTileLocation(d.location));
 	return d;
 }
 
@@ -73,8 +78,10 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 	if (tile == nullptr) // The pizza right now can land outside the tiles
 		return;
 	if (tile == deliveries[pizza->owner].location) {
-		tile->ground->setTexture(tile->groundTexture);
+		if (!pizza->owner->isAI)
+			tile->ground->setTexture(tile->groundTexture);
 		tile->house->setTexture(pizza->owner->houseTexture);
+		houseColorSignal(map, tile, pizza->owner->color);
 		int score = 5 + (int)(ceil(deliveries[pizza->owner].time / 1000.0f / 3)); // Bonus of remaining time in seconds, divided by 3
 		scores[pizza->owner] += score;
 		freeLocations.erase(std::remove(freeLocations.begin(), freeLocations.end(), deliveries[pizza->owner].location), freeLocations.end());
@@ -85,5 +92,7 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 }
 
 void DeliveryManager::refillPizza(Vehicle* player) {
-	player->pizzaCount = 3;
+	if (player->pizzaCount < Vehicle::MAX_PIZZAS)
+		pizzasRefilled(player);
+	player->pizzaCount = Vehicle::MAX_PIZZAS;
 }

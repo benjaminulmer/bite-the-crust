@@ -25,7 +25,7 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	setSmoothingData();
 	setSteerSpeedData();
 
-	pizzaCount = 3;
+	pizzaCount = MAX_PIZZAS;
 
 	type = EntityType::VEHICLE;
 }
@@ -183,6 +183,10 @@ glm::mat4 Vehicle::getModelMatrix()
 		if (tipAngle > PxPi * (45.0f/180.0f))
 		{
 			tipAngle = PxPi * (45.0f/180.0f);
+		}
+		else if (tipAngle < -PxPi * (45.0f/180.0f))
+		{
+			tipAngle = -PxPi * (45.0f/180.0f);
 		}
 	}
 

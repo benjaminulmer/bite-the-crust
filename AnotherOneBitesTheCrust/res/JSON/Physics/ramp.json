@@ -1,6 +1,0 @@
-{
-	"geometry": [
-        {"shape":"convexMesh", "flag0": "DRIVABLE_OBSTACLE", "flag1": "DRIVABLE_OBSTACLE_AGAINST", "isDrivable": 1}
-    ],
-    "type": "static"
-}

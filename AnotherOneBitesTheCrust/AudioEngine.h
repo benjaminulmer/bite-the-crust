@@ -8,6 +8,7 @@
 #include <list>
 #include <map>
 #include <sigslot.h>
+#include <random>
 
 #include "Vehicle.h"
 
@@ -42,6 +43,7 @@ public:
 private:
 	FMOD::System *fmodSystem;
 	FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound, *reloadSound, *dryFireSound;
+	std::vector<FMOD::Sound*> backgroundSongs;
 	FMOD::Channel *backgroundChannel, *engineChannel;
 	FMOD_RESULT result;
 	std::list<Sound3D*> playing;
@@ -50,6 +52,9 @@ private:
 	std::map<PhysicsEntity *, VehicleSounds> vehicleLoops;
 
 	int numChannels;
+	int backgroundSongChoice;
+
+	std::mt19937 generator;
 
 	void initStreams();
 	FMOD_VECTOR glmVec3ToFmodVec(glm::vec3);

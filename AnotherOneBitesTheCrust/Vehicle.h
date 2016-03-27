@@ -69,6 +69,9 @@ public:
 	Vehicle(unsigned int stepSizeMS);
 	~Vehicle(void);
 
+	static const int MAX_PIZZAS = 3;
+	int pizzaCount;
+
 	// AI stuff; might be moved into 'Player' class
 	std::vector<glm::vec3> currentPath;
 	bool pizzaDelivered, isAI, newDestination, avoiding;
@@ -79,8 +82,8 @@ public:
 	VehicleInput input;
 	VehicleTuning tuning;
 
-	int pizzaCount;
 	GLuint houseTexture;
+	glm::vec3 color;
 
 	bool isInAir;
 
@@ -97,10 +100,9 @@ public:
 	sigslot::signal1<Vehicle*> gasSignal;
 
 private:
-	physx::PxF32 stepSizeS;
-
 	physx::PxF32 tipAngle;
 
+	physx::PxF32 stepSizeS;
 	physx::PxVehicleDrive4W* physicsVehicle;
 	physx::PxVehicleDrive4WRawInputData vehicleInput;
 

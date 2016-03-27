@@ -1082,12 +1082,12 @@ void RenderingEngine::setupIntro()
 	Entity *eGameBy = new Entity();
 	eGameBy->setRenderable(gameBy);
 	eGameBy->setTexture(introTexture);
-	//introEntities.push_back(eGameBy);
+	introEntities.push_back(eGameBy);
 
 	Entity *eNames = new Entity();
 	eNames->setRenderable(names);
 	eNames->setTexture(introTexture);
-	//introEntities.push_back(eNames);
+	introEntities.push_back(eNames);
 
 	introM = mat4(1.0f);
 	introV = glm::lookAt(
@@ -1098,7 +1098,7 @@ void RenderingEngine::setupIntro()
 
 }
 
-void RenderingEngine::displayIntro()
+void RenderingEngine::displayIntro(int index)
 {
 
 	glEnable(GL_DEPTH_TEST);
@@ -1112,37 +1112,33 @@ void RenderingEngine::displayIntro()
 	glUniform1f(lightPow, 50.0f);
 	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
 
-	for (int i = 0; i < (int)introEntities.size(); i++) {
-		if (!introEntities[i]->hasRenderable())
-			continue;
-		introM = mat4(1.0f);
+
+	introM = mat4(1.0f);
 
 		//Translations done here. Order of translations is scale, rotate, translate
-		introM = introEntities[i]->getModelMatrix();
-		introM = calculateDefaultModel(introM, introEntities[i]);
+	introM = introEntities[index]->getModelMatrix();
+	introM = calculateDefaultModel(introM, introEntities[index]);
 
-		mat4 MVP = P * introV * introM;
+	mat4 MVP = P * introV * introM;
+	
+	glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
+	glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
+	glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
 
-		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
-		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
-		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
-
-		glBindVertexArray(introEntities[i]->getRenderable()->vao);
-		GLuint tex = introEntities[i]->getTexture();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex);
-		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
+	glBindVertexArray(introEntities[index]->getRenderable()->vao);
+	GLuint tex = introEntities[index]->getTexture();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
 
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
-		glUniform1i(tID, 0);
-		//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+	glUniform1i(tID, 0);
+	//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
 		
-		glDrawElements(GL_TRIANGLES, introEntities[i]->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
+	glDrawElements(GL_TRIANGLES, introEntities[index]->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
 
-		glBindVertexArray(0);
-	}
-
-
+	glBindVertexArray(0);
+	
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TESTING STUFF BELOW

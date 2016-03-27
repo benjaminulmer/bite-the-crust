@@ -155,7 +155,7 @@ public:
 
 	//intro stuff
 	void setupIntro();
-	void displayIntro();
+	void displayIntro(int index);
 	std::vector<Entity*> introEntities;
 	glm::mat4 introM;
 	glm::mat4 introV;

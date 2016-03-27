@@ -191,7 +191,8 @@ void Game::setupEntities()
 	for(int i = 0; i < MAX_PLAYERS; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
-		setupVehicle(players[i], physx::PxTransform(10 + 10.0f*i, 2, 20), i);
+		float rotationRad = physx::PxPi * 0.5f;
+		setupVehicle(players[i], physx::PxTransform(physx::PxVec3(20, 2, 135 - 15.0*i), physx::PxQuat(rotationRad, physx::PxVec3(0,1,0))), i);
 
 		// TODO: get info from menu selection (ie. number of player characters)
 		if(i > 0)

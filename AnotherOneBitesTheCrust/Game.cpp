@@ -184,6 +184,7 @@ void Game::setupEntities()
 		}
 	}
 	renderingEngine->setupMinimap(map);
+	renderingEngine->setupDelivery();
 
 	// Create vehicles
 	for(int i = 0; i < MAX_PLAYERS; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
@@ -375,6 +376,7 @@ void Game::mainLoop()
 			pizzas.append(to_string(players[0]->pizzaCount));
 			renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
+			renderingEngine->drawDelivery(vec3(10,0,30));
 //			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
 
 

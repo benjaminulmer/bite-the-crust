@@ -114,6 +114,8 @@ public:
 	//minimap stuff
 	void setupMinimap(Map map);
 	void drawMinimap(Vehicle* vans[4]);
+	void setupDelivery();
+	void drawDelivery(glm::vec3 pos);
 	std::vector<glm::vec3> mmRoadVerts;
 	std::vector<float> mmRoadColors;
 	GLuint mmRoadVAO;
@@ -129,6 +131,12 @@ public:
 	GLuint mmVanVAOs[4];
 	GLuint mmVanVertBuffer;
 	GLuint mmVanColorBuffers[4];
+	std::vector<glm::vec3> mmDeliveryVerts;
+	std::vector<glm::vec3> mmDeliveryColors;
+	GLuint mmDeliveryVAO;
+	GLuint mmDeliveryVertBuffer;
+	GLuint mmDeliveryColorBuffer;
+	
 	glm::mat4 mmV;
 	glm::mat4 mmM;
 	glm::vec3 mmScale;

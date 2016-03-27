@@ -5,7 +5,6 @@
 			"description": "Corner of the road",
             "ground": "turnRoad",
             "entities": [
-                {"name": "barrier", "rotation": 35},
                 {"name": "pole", "x": 20, "rotation": 90}
             ],
 			"nodes" : [

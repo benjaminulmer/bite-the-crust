@@ -134,7 +134,7 @@ void RenderingEngine::generateIDs()
 	glGenBuffers(1, &nodeVertBuffer);
 	glGenBuffers(1, &nodeColorBuffer);
 
-	glGenBuffers(1, &mmDeliveryVAO);
+	glGenVertexArrays(1, &mmDeliveryVAO);
 	glGenBuffers(1, &mmDeliveryVertBuffer);
 	glGenBuffers(1, &mmDeliveryColorBuffer);
 
@@ -886,6 +886,7 @@ void RenderingEngine::setupDelivery()
 	mmDeliveryVerts.push_back(vec3(-10.0f, 0.0f, 10.0f));
 	mmDeliveryVerts.push_back(vec3(-10.0f, 0.0f, -10.0f));
 	mmDeliveryVerts.push_back(vec3(10.0f, 0.0f, -10.0f));
+
 
 
 	for(int i = 0; i < mmDeliveryVerts.size(); i++)

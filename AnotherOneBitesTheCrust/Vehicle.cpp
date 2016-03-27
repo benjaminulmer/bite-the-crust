@@ -16,6 +16,7 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	input.jump = false;
 	pizzaDelivered = false;
 	avoiding = false;
+	pickingUp = false;
 	avoidAttempts = 0;
 
 	stepSizeS = stepSizeMS/100.0f;

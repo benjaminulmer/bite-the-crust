@@ -10,12 +10,25 @@ AIEngine::AIEngine(void)
 	srand((int)time(0));
 }
 
-std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destination, vector<graphNode *> allNodes)
+
+inline bool equals(glm::vec3 x, glm::vec3 y)
+{
+	return x.x == y.x && x.y == y.y && x.z == y.z;
+}
+
+std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destination, vector<graphNode *> allNodes, glm::vec3 posDestination = glm::vec3(0,0,0))
  {
 	std::map<graphNode *, double> distances;
 	std::map<graphNode *, double> heuristic;
 	std::map<graphNode *, graphNode *> previous;
 	std::set<graphNode *> toVisit, visited;
+	bool travelingToPoint = false;
+
+	if(equals(posDestination, glm::vec3(0,0,0)))
+		posDestination = destination->getPosition();
+	else
+		travelingToPoint = true;
+
 
 	toVisit.insert(start);
 	for(graphNode * n : allNodes)
@@ -26,7 +39,7 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 
 	
 	distances[start] = 0;
-	heuristic[start] = glm::length(start->getPosition() - destination->getPosition());
+	heuristic[start] = glm::length(start->getPosition() - posDestination);
 
 	previous[start] = nullptr;
 
@@ -47,6 +60,10 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 		graphNode * current = *position;
 		toVisit.erase(position);
 		visited.insert(current);
+
+		if(glm::length(current->getPosition() - posDestination) < MIN_DIST * 5 && travelingToPoint)
+			destination = current;
+
 		if(current == destination)
 			break;
 
@@ -67,7 +84,7 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 
 			previous[neighbour] = current;
 			distances[neighbour] = distance;
-			heuristic[neighbour] = distances[neighbour] + glm::length(neighbour->getPosition() - destination->getPosition());
+			heuristic[neighbour] = distances[neighbour] + glm::length(neighbour->getPosition() - posDestination);
 			
 		}
 	}
@@ -81,7 +98,9 @@ std::vector<glm::vec3> AIEngine::aStar(graphNode * start, graphNode * destinatio
 	}
 	std::reverse(path.begin(), path.end());
 
-	int size = path.size();
+	if(travelingToPoint)
+		path.push_back(posDestination);
+
 	return path; 
 }
 
@@ -191,9 +210,9 @@ void AIEngine::facePoint(Vehicle * driver, const glm::vec3 & pointTo)
 		driver->input.steer = 1.0;
 }
 
-graphNode * findClosestNode(Vehicle * toUpdate, Map & map)
+graphNode * findClosestNode(glm::vec3 position, Map & map)
 {
-	Tile * currentTile = map.getTile(toUpdate->getPosition());
+	Tile * currentTile = map.getTile(position);
 	graphNode * closest;
 	std::vector<graphNode*> toSearch;
 
@@ -208,7 +227,7 @@ graphNode * findClosestNode(Vehicle * toUpdate, Map & map)
 	double minDist = DBL_MAX;
 	for(graphNode * n : toSearch)
 	{
-		double currentDist = glm::length(toUpdate->getPosition() - n->getPosition());
+		double currentDist = glm::length(position - n->getPosition());
 		if(currentDist < minDist)
 		{
 			closest = n;
@@ -220,10 +239,6 @@ graphNode * findClosestNode(Vehicle * toUpdate, Map & map)
 }
 
 
-inline bool equals(glm::vec3 x, glm::vec3 y)
-{
-	return x.x == y.x && x.y == y.y && x.z == y.z;
-}
 
 void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 {
@@ -235,7 +250,7 @@ void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 		toUpdate->currentPath.push_back(destinationNode->getPosition());
 	else
 	{
-		graphNode * closest = findClosestNode(toUpdate, map);
+		graphNode * closest = findClosestNode(toUpdate->getPosition(), map);
 
 		toUpdate->currentPath = aStar(closest, destinationNode, map.allNodes);
 	}
@@ -309,7 +324,22 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 
 	// Should pathfind to pickup followed by pathfinding to destination
 	if(toUpdate->pizzaCount == 0)
-		goal = map.pickup;	
+	{	
+		goal = map.pickup;
+
+		if(!toUpdate->pickingUp)
+		{
+			toUpdate->pickingUp = true;
+			std::vector<glm::vec3> pathToPickup = aStar(findClosestNode(toUpdate->getPosition(), map), nullptr, map.allNodes, map.pickup);
+			if(pathToPickup.size() > 0 && toUpdate->currentPath.size() > 0)
+			{
+				std::vector<glm::vec3> pathBack = aStar(findClosestNode(pathToPickup.back(), map), findClosestNode(toUpdate->currentPath.front(),map), map.allNodes);
+				pathToPickup.insert(pathToPickup.end(), pathBack.begin(), pathBack.end());
+			}
+
+			toUpdate->currentPath.insert(toUpdate->currentPath.begin(), pathToPickup.begin(), pathToPickup.end());
+		}
+	}
 	if(toUpdate->currentPath.empty())
 	{
 		updatePath(toUpdate, destination, map);
@@ -331,9 +361,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	}
 
 	glm::vec3 nextPoint;
-	if(toUpdate->pizzaCount == 0)
-		nextPoint = goal;
-	else if(toUpdate->currentPath.size() >= 3)
+	if(toUpdate->currentPath.size() >= 3)
 		nextPoint = toUpdate->currentPath.at(2);
 	else
 		nextPoint = toUpdate->currentPath.at(0);
@@ -362,26 +390,8 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
-<<<<<<< HEAD
 	if((obstacle.entity != nullptr && obstacle.distance < 1 && obstacle.entity->type == EntityType::STATIC) || isStuck(toUpdate))
 		toUpdate->avoiding = true;
-=======
-	if(obstacle.entity != nullptr && obstacle.distance < 1 && obstacle.entity->type == EntityType::STATIC)
-		toUpdate->avoiding = true;
-
-	if(toUpdate->avoiding)
-	{
-		toUpdate->avoidAttempts++;
-		if(obstacle.entity == nullptr || obstacle.distance > 4 || toUpdate->avoidAttempts > MAX_ATTEMPTS)
-		{
-			toUpdate->avoiding = false;
-			toUpdate->avoidAttempts = 0;
-		}
-
-		facePoint(toUpdate, goal);
-		return;
-	}
->>>>>>> 2c38cad3927752b04b90bc4937d0232b84d1d944
 
 
 	goToPoint(toUpdate, nextPoint, glm::length(goal - toUpdate->getPosition()));

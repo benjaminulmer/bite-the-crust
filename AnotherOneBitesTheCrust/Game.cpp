@@ -119,6 +119,7 @@ void Game::setupEntities()
 
 			if (tile->deliverable) {
 				deliveryManager->addDeliveryLocation(tile);
+				map.deliveryTiles.push_back(tile);
 			}
 			if (tile->pickup) {
 				// TODO make this better/less hardcoded
@@ -189,7 +190,8 @@ void Game::setupEntities()
 	for(int i = 0; i < MAX_PLAYERS; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
-		setupVehicle(players[i], physx::PxTransform(10 + 10.0f*i, 2, 20), i);
+		float rotationRad = physx::PxPi * 0.5f;
+		setupVehicle(players[i], physx::PxTransform(physx::PxVec3(20, 2, 135 - 15.0*i), physx::PxQuat(rotationRad, physx::PxVec3(0,1,0))), i);
 
 		// TODO: get info from menu selection (ie. number of player characters)
 		if(i > 0)
@@ -198,10 +200,10 @@ void Game::setupEntities()
 			players[i]->isAI = false;
 	}
 	// hard code textures for now
-	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-red.DDS");
-	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-blue.DDS");
-	players[2]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-green.DDS");
-	players[3]->houseTexture = ContentLoading::loadDDS("res\\Textures\\HouseTexture-yellow.DDS");
+	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseRed.DDS");
+	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseBlue.DDS");
+	players[2]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseGreen.DDS");
+	players[3]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseYellow.DDS");
 
 	camera = new Camera(players[0]);
 	renderingEngine->updateView(*camera);
@@ -213,20 +215,24 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 	vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 	switch(num) {
 		case 0:
-			vehicle->setRenderable(renderablesMap["van"]);
-			vehicle->setTexture(textureMap["van"]);
+			vehicle->setRenderable(renderablesMap["redVan"]);
+			vehicle->setTexture(textureMap["redVan"]);
+			vehicle->color = glm::vec3(1,0,0);
 			break;
 		case 1:
-			vehicle->setRenderable(renderablesMap["blue van"]);
-			vehicle->setTexture(textureMap["blue van"]);
+			vehicle->setRenderable(renderablesMap["blueVan"]);
+			vehicle->setTexture(textureMap["blueVan"]);
+			vehicle->color = glm::vec3(0,0,1);
 			break;
 		case 2:
-			vehicle->setRenderable(renderablesMap["green van"]);
-			vehicle->setTexture(textureMap["green van"]);
+			vehicle->setRenderable(renderablesMap["greenVan"]);
+			vehicle->setTexture(textureMap["greenVan"]);
+			vehicle->color = glm::vec3(0,1,0);
 			break;
 		case 3:
-			vehicle->setRenderable(renderablesMap["yellow van"]);
-			vehicle->setTexture(textureMap["yellow van"]);
+			vehicle->setRenderable(renderablesMap["yellowVan"]);
+			vehicle->setTexture(textureMap["yellowVan"]);
+			vehicle->color = glm::vec3(1,1,0);
 			break;
 	}
 	// TODO get dimensions working properly for vehicle
@@ -272,18 +278,19 @@ void Game::connectSystems()
 	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
 	// TODO: Should have a textures array or something that corresponds to each player so we can add this to above loop
-	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-red.DDS");
-	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
-	deliveryManager->deliveryTextures[players[2]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
-	deliveryManager->deliveryTextures[players[3]] = ContentLoading::loadDDS("res\\Textures\\SeamlessGrass-blue.DDS");
+	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRed.DDS");
+	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
+	deliveryManager->deliveryTextures[players[2]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
+	deliveryManager->deliveryTextures[players[3]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
+	deliveryManager->deliveryLocationUpdate.connect(renderingEngine, &RenderingEngine::updateDeliveryLocation);
+	deliveryManager->houseColorSignal.connect(renderingEngine, &RenderingEngine::updateHouseColor);
 
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
 	deliveryManager->pizzasRefilled.connect(audioEngine, &AudioEngine::playReloadSound);
-	//physicsEngine->simulationCallback->inPickUpLocation.connect(audioEngine, &AudioEngine::playReloadSound);
 }
 
 // Main loop of the game
@@ -300,18 +307,27 @@ void Game::mainLoop()
 	// Game loop
 	while (gameState != GameState::EXIT)
 	{
-		//if (gameState == GameState::INTRO)
-		//{
-		//	processSDLEvents();
-		//	renderingEngine->displayIntro();
+		//TODO: Skipable intros
+		if (gameState == GameState::INTRO)
+		{
+			processSDLEvents();
 
-		//	//swap buffers
-		//	SDL_GL_SwapWindow(window);
-		//	SDL_Delay(5000);
+			renderingEngine->displayIntro(0);
+			SDL_GL_SwapWindow(window);
+			SDL_Delay(5000);
+
+			renderingEngine->displayIntro(1);
+			SDL_GL_SwapWindow(window);
+			SDL_Delay(5000);
+
+			renderingEngine->displayIntro(2);
+			SDL_GL_SwapWindow(window);
+			SDL_Delay(5000);
+
 			gameState = GameState::PLAY;
-		//	
-		//}
-		/*else*/ if(gameState == GameState::PLAY)
+			
+		}
+		else if(gameState == GameState::PLAY)
 		{
 			processSDLEvents();
 
@@ -376,6 +392,7 @@ void Game::mainLoop()
 			pizzas.append(to_string(players[0]->pizzaCount));
 			renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
+			renderingEngine->drawDelivery();
 //			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
 
 
@@ -443,18 +460,18 @@ void Game::endGame(std::map<Vehicle*, int> scores) {
 void Game::shootPizza(Vehicle* vehicle)
 {
 	PizzaBox* pizzaBox = new PizzaBox(vehicle);
-	pizzaBox->setRenderable(renderablesMap["box"]);
-	pizzaBox->setTexture(textureMap["box"]);
+	pizzaBox->setRenderable(renderablesMap["pizzaBox"]);
+	pizzaBox->setTexture(textureMap["pizzaBox"]);
 
 	physx::PxTransform transform = vehicle->getActor()->getGlobalPose();
 	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.25f, 1.0f));
 	transform.p += posOffset;
 
-	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 0.0f, 20.0f));
+	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 2, 17));
 	physx::PxVec3 vehicleVelocity = vehicle->getRigidDynamic()->getLinearVelocity();
 	velocity += vehicleVelocity;
 
-	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["box"], transform);
+	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["pizzaBox"], transform);
 	pizzaBox->getRigidDynamic()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);

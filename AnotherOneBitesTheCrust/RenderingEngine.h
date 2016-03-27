@@ -20,7 +20,8 @@
 #include "ContentLoading.h"
 #include "Entity.h"
 
-class RenderingEngine
+class RenderingEngine :
+	public sigslot::has_slots<>
 {
 public:
 	RenderingEngine(void);
@@ -114,6 +115,9 @@ public:
 	//minimap stuff
 	void setupMinimap(Map map);
 	void drawMinimap(Vehicle* vans[4]);
+	void updateHouseColor(Map *map, Tile* tile, glm::vec3 color);
+	void updateDeliveryLocation(glm::vec3 pos);
+	void drawDelivery();
 	std::vector<glm::vec3> mmRoadVerts;
 	std::vector<float> mmRoadColors;
 	GLuint mmRoadVAO;
@@ -129,12 +133,18 @@ public:
 	GLuint mmVanVAOs[4];
 	GLuint mmVanVertBuffer;
 	GLuint mmVanColorBuffers[4];
+	std::vector<glm::vec3> mmDeliveryVerts;
+	std::vector<glm::vec3> mmDeliveryColors;
+	GLuint mmDeliveryVAO;
+	GLuint mmDeliveryVertBuffer;
+	GLuint mmDeliveryColorBuffer;
+	
 	glm::mat4 mmV;
 	glm::mat4 mmM;
 	glm::vec3 mmScale;
 	glm::vec3 mmCenter;
 	glm::vec3 shift;
-
+	glm::vec3 deliveryPosition;
 
 	//testing stuf for danny
 	void setupNodes(std::vector <glm::vec3> verts, glm::vec3 color);
@@ -145,7 +155,7 @@ public:
 
 	//intro stuff
 	void setupIntro();
-	void displayIntro();
+	void displayIntro(int index);
 	std::vector<Entity*> introEntities;
 	glm::mat4 introM;
 	glm::mat4 introV;

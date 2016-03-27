@@ -133,6 +133,11 @@ void RenderingEngine::generateIDs()
 	glGenVertexArrays(1, &nodeVAO);
 	glGenBuffers(1, &nodeVertBuffer);
 	glGenBuffers(1, &nodeColorBuffer);
+
+	glGenVertexArrays(1, &mmDeliveryVAO);
+	glGenBuffers(1, &mmDeliveryVertBuffer);
+	glGenBuffers(1, &mmDeliveryColorBuffer);
+
 	basicmvpID = glGetUniformLocation(basicProgramID, "MVP");
 
 
@@ -222,6 +227,10 @@ void RenderingEngine::assignBuffersTex(Renderable* r)
 
 	r->vao = vao;
 	glBindVertexArray(0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+
 }
 
 
@@ -352,7 +361,7 @@ void RenderingEngine::setupMiscBuffers()
 	std::vector<GLuint> skyfaces;
 	std::vector<glm::vec3> skyraw_verts;
 
-	ContentLoading::loadOBJ("res\\Models\\Skybox.obj", skyVertices, skyUVs, skyNorms, skyfaces, skyraw_verts);
+	ContentLoading::loadOBJ("res\\Models\\skybox.obj", skyVertices, skyUVs, skyNorms, skyfaces, skyraw_verts);
 
 	glGenVertexArrays(1, &skyVAO);
 	glBindVertexArray(skyVAO);
@@ -402,7 +411,7 @@ void RenderingEngine::setupMiscBuffers()
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
 
-	skyTex = ContentLoading::loadDDS("res\\Textures\\Skybox.DDS");
+	skyTex = ContentLoading::loadDDS("res\\Textures\\skybox.DDS");
 
 //Loading shadows
 	glUseProgram(basicProgramID);
@@ -530,6 +539,7 @@ void RenderingEngine::setupMinimap(Map map)
 {
 	glUseProgram(basicProgramID);
 
+	//push back tiles and colors
 	for(unsigned int i = 0; i < map.tiles.size(); i++)
 	{
 		for(unsigned int j = 0; j < map.tiles[i].size(); j++)
@@ -539,10 +549,10 @@ void RenderingEngine::setupMinimap(Map map)
 			//cout << "TEST ";
 			Entity* ground = tile->ground;
 			
-			if(tile->groundModel == "road-straight" || tile->groundModel == "road-turn" || tile->groundModel == "road-threeway" || tile->groundModel == "road-fourway")
+			if(tile->groundModel == "straightRoad" || tile->groundModel == "turnRoad" || tile->groundModel == "threewayRoad" || tile->groundModel == "fourwayRoad")
 			{
 
-				glm::vec3 pos = ground->getPosition();
+				glm::vec3 pos = vec3((float)ground->getPosition().x, (float)ground->getPosition().y, (float)ground->getPosition().z);
 				mmRoadVerts.push_back(pos);
 
 				//grey
@@ -550,25 +560,22 @@ void RenderingEngine::setupMinimap(Map map)
 				mmRoadColors.push_back(0.6f);	//g
 				mmRoadColors.push_back(0.6f);	//b
 			}
-			for(unsigned int k = 0; k < tile->entityTemplates.size(); k++)
+			if (tile->house)
 			{
-				if (tile->house)
-				{
 
-					glm::vec3 pos = ground->getPosition();
-					mmHouseVerts.push_back(pos);
-					//pink
-					mmHouseColors.push_back(vec3(1.0, 0.68, 0.73));
-				}
-				else if(tile->pickup)
-				{
-					glm::vec3 pos = ground->getPosition();
-					mmRoadVerts.push_back(pos);
-					//pink
-					mmRoadColors.push_back(1.0f);	//r
-					mmRoadColors.push_back(0.55f);	//g
-					mmRoadColors.push_back(0.0f);	//b
-				}
+				glm::vec3 pos = vec3((float)ground->getPosition().x, (float)ground->getPosition().y, (float)ground->getPosition().z);
+				mmHouseVerts.push_back(pos);
+				//pink
+				mmHouseColors.push_back(vec3(1.0f, 0.68f, 0.73f));
+			}
+			else if(tile->pickup)
+			{
+				glm::vec3 pos = vec3((float)ground->getPosition().x, (float)ground->getPosition().y, (float)ground->getPosition().z);
+				mmRoadVerts.push_back(pos);
+				//pink
+				mmRoadColors.push_back(1.0f);	//r
+				mmRoadColors.push_back(0.55f);	//g
+				mmRoadColors.push_back(0.0f);	//b
 			}
 		}
 	}
@@ -581,7 +588,7 @@ void RenderingEngine::setupMinimap(Map map)
 	bool res = ContentLoading::loadOBJ("res\\Models\\mmVan.obj", mmVanVerts, uvs, normals, faces, raw_verts);
 
 	//buffering
-	glUseProgram(basicProgramID);
+	//glUseProgram(basicProgramID);
 
 	glBindVertexArray(mmRoadVAO);
 
@@ -745,6 +752,64 @@ void RenderingEngine::setupMinimap(Map map)
 		glDisableVertexAttribArray(1);
 	}
 
+	//cout << map.tileSize << " SIZE TILE " << endl;
+
+	mmDeliveryVerts.push_back(vec3(10.0f, 0.0f, 10.0f));
+	mmDeliveryVerts.push_back(vec3(-10.0f, 0.0f, 10.0f));
+	mmDeliveryVerts.push_back(vec3(-10.0f, 0.0f, -10.0f));
+	mmDeliveryVerts.push_back(vec3(10.0f, 0.0f, -10.0f));
+
+
+
+	for(int i = 0; i < mmDeliveryVerts.size(); i++)
+	{
+		//cout << mmDeliveryVerts[i].x << " " << mmDeliveryVerts[i].y << " " << mmDeliveryVerts[i].z << " " << endl;
+		mmDeliveryColors.push_back(vec3(1.0f,0.0f,0.0f));
+	}
+
+	glUseProgram(basicProgramID);
+	glBindVertexArray(mmDeliveryVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryVertBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3) * mmDeliveryVerts.size(),	// byte size of Vec3f, 4 of them
+		mmDeliveryVerts.data(),		// pointer (Vec3f*) to contents of verts
+		GL_STATIC_DRAW);	// Usage pattern of GPU buffer
+
+							// RGB values for the 4 vertices of the quad
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3)*mmDeliveryColors.size(),
+		mmDeliveryColors.data(),
+		GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryVertBuffer);
+	glVertexAttribPointer(
+		0,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glEnableVertexAttribArray(1); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryColorBuffer);
+	glVertexAttribPointer(
+		1,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glBindVertexArray(0); // reset to default		
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
 	float maxX = 0;
 	float maxY = 0;
 	float maxZ = 0;
@@ -867,6 +932,45 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 	}
 }
 
+void RenderingEngine::drawDelivery()
+{
+	glUseProgram(basicProgramID);
+	glBindVertexArray(mmDeliveryVAO);
+
+	mmM = mat4(1.0f);
+	mmM = translate(mmM,mmCenter * shift);
+	mmM = translate(mmM, deliveryPosition);
+
+	mat4 mmMVP = P * mmV * mmM;
+	glUniformMatrix4fv(basicmvpID,
+			1,
+			GL_FALSE,
+			value_ptr(mmMVP)
+			);
+	GLfloat width = 5;
+	glLineWidth(width);
+	glDrawArrays(GL_LINE_LOOP, 0, mmDeliveryVerts.size());
+	glBindVertexArray(0);
+}
+
+void RenderingEngine::updateDeliveryLocation(glm::vec3 pos) {
+	deliveryPosition = pos;
+}
+
+void RenderingEngine::updateHouseColor(Map *map, Tile* tile, glm::vec3 color) {
+	for (unsigned int i = 0; i < map->deliveryTiles.size(); i++) {
+		if (map->deliveryTiles[i] == tile) {
+			mmHouseColors[i] = color;
+			glBindBuffer(GL_ARRAY_BUFFER, mmHouseColorBuffer);
+			glBufferData(GL_ARRAY_BUFFER,
+				sizeof(vec3)*mmHouseColors.size(),
+				mmHouseColors.data(),
+				GL_STATIC_DRAW);
+			break;
+		}
+	}
+}
+
 void RenderingEngine::setupNodes(vector<glm::vec3> verts, glm::vec3 color)
 {
 
@@ -978,12 +1082,12 @@ void RenderingEngine::setupIntro()
 	Entity *eGameBy = new Entity();
 	eGameBy->setRenderable(gameBy);
 	eGameBy->setTexture(introTexture);
-	//introEntities.push_back(eGameBy);
+	introEntities.push_back(eGameBy);
 
 	Entity *eNames = new Entity();
 	eNames->setRenderable(names);
 	eNames->setTexture(introTexture);
-	//introEntities.push_back(eNames);
+	introEntities.push_back(eNames);
 
 	introM = mat4(1.0f);
 	introV = glm::lookAt(
@@ -994,7 +1098,7 @@ void RenderingEngine::setupIntro()
 
 }
 
-void RenderingEngine::displayIntro()
+void RenderingEngine::displayIntro(int index)
 {
 
 	glEnable(GL_DEPTH_TEST);
@@ -1008,37 +1112,33 @@ void RenderingEngine::displayIntro()
 	glUniform1f(lightPow, 50.0f);
 	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
 
-	for (int i = 0; i < (int)introEntities.size(); i++) {
-		if (!introEntities[i]->hasRenderable())
-			continue;
-		introM = mat4(1.0f);
+
+	introM = mat4(1.0f);
 
 		//Translations done here. Order of translations is scale, rotate, translate
-		introM = introEntities[i]->getModelMatrix();
-		introM = calculateDefaultModel(introM, introEntities[i]);
+	introM = introEntities[index]->getModelMatrix();
+	introM = calculateDefaultModel(introM, introEntities[index]);
 
-		mat4 MVP = P * introV * introM;
+	mat4 MVP = P * introV * introM;
+	
+	glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
+	glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
+	glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
 
-		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
-		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
-		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
-
-		glBindVertexArray(introEntities[i]->getRenderable()->vao);
-		GLuint tex = introEntities[i]->getTexture();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex);
-		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
+	glBindVertexArray(introEntities[index]->getRenderable()->vao);
+	GLuint tex = introEntities[index]->getTexture();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
 
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
-		glUniform1i(tID, 0);
-		//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+	glUniform1i(tID, 0);
+	//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
 		
-		glDrawElements(GL_TRIANGLES, introEntities[i]->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
+	glDrawElements(GL_TRIANGLES, introEntities[index]->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
 
-		glBindVertexArray(0);
-	}
-
-
+	glBindVertexArray(0);
+	
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TESTING STUFF BELOW

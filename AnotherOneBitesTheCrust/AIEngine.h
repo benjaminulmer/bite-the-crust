@@ -30,7 +30,8 @@ private:
 	void brake(Vehicle*, const float &);
 	void trimPath(Vehicle*);
 	void fireAt(Vehicle*, const glm::vec3 &);
+	bool isStuck(Vehicle *);
 
-	std::vector<glm::vec3> aStar(graphNode *, graphNode *, std::vector<graphNode*>);
+	std::vector<glm::vec3> aStar(graphNode *, graphNode *, std::vector<graphNode*>, glm::vec3);
 };
 

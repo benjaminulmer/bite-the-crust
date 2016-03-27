@@ -37,6 +37,7 @@ public:
 	PhysicsEngine *physicsEngine;
 	RenderingEngine *renderingEngine;
 	DeliveryManager* deliveryManager;
+	static const int MAX_PLAYERS = 4;
 	
 	void run();
 
@@ -44,7 +45,7 @@ public:
 
 private:
 	static const unsigned int PHYSICS_STEP_MS = 16;
-	static const int MAX_PLAYERS = 4;
+	
 
 	void initSystems();
 	void setupEntities();

@@ -185,7 +185,6 @@ void Game::setupEntities()
 		}
 	}
 	renderingEngine->setupMinimap(map);
-	renderingEngine->setupDelivery();
 
 	// Create vehicles
 	for(int i = 0; i < MAX_PLAYERS; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle

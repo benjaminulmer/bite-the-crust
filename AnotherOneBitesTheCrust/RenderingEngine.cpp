@@ -754,6 +754,62 @@ void RenderingEngine::setupMinimap(Map map)
 
 	//cout << map.tileSize << " SIZE TILE " << endl;
 
+	mmDeliveryVerts.push_back(vec3(10.0f, 0.0f, 10.0f));
+	mmDeliveryVerts.push_back(vec3(-10.0f, 0.0f, 10.0f));
+	mmDeliveryVerts.push_back(vec3(-10.0f, 0.0f, -10.0f));
+	mmDeliveryVerts.push_back(vec3(10.0f, 0.0f, -10.0f));
+
+
+
+	for(int i = 0; i < mmDeliveryVerts.size(); i++)
+	{
+		//cout << mmDeliveryVerts[i].x << " " << mmDeliveryVerts[i].y << " " << mmDeliveryVerts[i].z << " " << endl;
+		mmDeliveryColors.push_back(vec3(1.0f,0.0f,0.0f));
+	}
+
+	glUseProgram(basicProgramID);
+	glBindVertexArray(mmDeliveryVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryVertBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3) * mmDeliveryVerts.size(),	// byte size of Vec3f, 4 of them
+		mmDeliveryVerts.data(),		// pointer (Vec3f*) to contents of verts
+		GL_STATIC_DRAW);	// Usage pattern of GPU buffer
+
+							// RGB values for the 4 vertices of the quad
+
+	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3)*mmDeliveryColors.size(),
+		mmDeliveryColors.data(),
+		GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryVertBuffer);
+	glVertexAttribPointer(
+		0,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glEnableVertexAttribArray(1); // match layout # in shader
+	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryColorBuffer);
+	glVertexAttribPointer(
+		1,		// attribute layout # above
+		3,		// # of components (ie XYZ )
+		GL_FLOAT,	// type of components
+		GL_FALSE,	// need to be normalized?
+		0,		// stride
+		(void*)0	// array buffer offset
+		);
+
+	glBindVertexArray(0); // reset to default		
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
 	float maxX = 0;
 	float maxY = 0;
 	float maxZ = 0;
@@ -874,66 +930,6 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 		glDrawArrays(GL_TRIANGLES, 0, mmVanVerts.size());
 		glBindVertexArray(0);
 	}
-}
-
-void RenderingEngine::setupDelivery()
-{
-	
-	mmDeliveryVerts.push_back(vec3(10.0f, 0.0f, 10.0f));
-	mmDeliveryVerts.push_back(vec3(-10.0f, 0.0f, 10.0f));
-	mmDeliveryVerts.push_back(vec3(-10.0f, 0.0f, -10.0f));
-	mmDeliveryVerts.push_back(vec3(10.0f, 0.0f, -10.0f));
-
-
-
-	for(int i = 0; i < mmDeliveryVerts.size(); i++)
-	{
-		//cout << mmDeliveryVerts[i].x << " " << mmDeliveryVerts[i].y << " " << mmDeliveryVerts[i].z << " " << endl;
-		mmDeliveryColors.push_back(vec3(1.0f,0.0f,0.0f));
-	}
-
-	glUseProgram(basicProgramID);
-	glBindVertexArray(mmDeliveryVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryVertBuffer);
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(vec3) * mmDeliveryVerts.size(),	// byte size of Vec3f, 4 of them
-		mmDeliveryVerts.data(),		// pointer (Vec3f*) to contents of verts
-		GL_STATIC_DRAW);	// Usage pattern of GPU buffer
-
-							// RGB values for the 4 vertices of the quad
-
-	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryColorBuffer);
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(vec3)*mmDeliveryColors.size(),
-		mmDeliveryColors.data(),
-		GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0); // match layout # in shader
-	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryVertBuffer);
-	glVertexAttribPointer(
-		0,		// attribute layout # above
-		3,		// # of components (ie XYZ )
-		GL_FLOAT,	// type of components
-		GL_FALSE,	// need to be normalized?
-		0,		// stride
-		(void*)0	// array buffer offset
-		);
-
-	glEnableVertexAttribArray(1); // match layout # in shader
-	glBindBuffer(GL_ARRAY_BUFFER, mmDeliveryColorBuffer);
-	glVertexAttribPointer(
-		1,		// attribute layout # above
-		3,		// # of components (ie XYZ )
-		GL_FLOAT,	// type of components
-		GL_FALSE,	// need to be normalized?
-		0,		// stride
-		(void*)0	// array buffer offset
-		);
-
-	glBindVertexArray(0); // reset to default		
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
 }
 
 void RenderingEngine::drawDelivery()

@@ -939,14 +939,14 @@ void RenderingEngine::setupDelivery()
 	glDisableVertexAttribArray(1);
 }
 
-void RenderingEngine::drawDelivery(glm::vec3 pos)
+void RenderingEngine::drawDelivery()
 {
 	glUseProgram(basicProgramID);
 	glBindVertexArray(mmDeliveryVAO);
 
 	mmM = mat4(1.0f);
 	mmM = translate(mmM,mmCenter * shift);
-	mmM = translate(mmM, pos);
+	mmM = translate(mmM, deliveryPosition);
 
 	mat4 mmMVP = P * mmV * mmM;
 	glUniformMatrix4fv(basicmvpID,
@@ -958,6 +958,10 @@ void RenderingEngine::drawDelivery(glm::vec3 pos)
 	glLineWidth(width);
 	glDrawArrays(GL_LINE_LOOP, 0, mmDeliveryVerts.size());
 	glBindVertexArray(0);
+}
+
+void RenderingEngine::updateDeliveryLocation(glm::vec3 pos) {
+	deliveryPosition = pos;
 }
 
 void RenderingEngine::setupNodes(vector<glm::vec3> verts, glm::vec3 color)

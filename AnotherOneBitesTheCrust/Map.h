@@ -49,6 +49,7 @@ public:
 	glm::vec3 pickup;
 
 	Tile* getTile(glm::vec3 position);
+	glm::vec3 getTileLocation(Tile *tile);
 	//void offsetPosition(Tile* tile, glm::vec3 &position);
 };
 

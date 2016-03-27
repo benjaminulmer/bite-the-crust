@@ -279,6 +279,7 @@ void Game::connectSystems()
 	deliveryManager->deliveryTextures[players[3]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
+	deliveryManager->deliveryLocationUpdate.connect(renderingEngine, &RenderingEngine::updateDeliveryLocation);
 
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
@@ -376,7 +377,7 @@ void Game::mainLoop()
 			pizzas.append(to_string(players[0]->pizzaCount));
 			renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
 
-			renderingEngine->drawDelivery(vec3(10,0,30));
+			renderingEngine->drawDelivery();
 //			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
 
 

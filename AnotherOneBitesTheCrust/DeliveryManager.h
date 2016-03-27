@@ -34,6 +34,7 @@ public:
 	std::map<Vehicle*, GLuint> deliveryTextures;
 	sigslot::signal1<std::map<Vehicle*, int>> gameOverSignal;
 	sigslot::signal1<Vehicle*> pizzasRefilled;
+	sigslot::signal1<glm::vec3> deliveryLocationUpdate;
 	
 	void addDeliveryLocation(Tile* location);
 	void addPlayer(Vehicle* player);

@@ -164,5 +164,8 @@ public:
 	glm::mat4 introM;
 	glm::mat4 introV;
 
+	int currentMenuSelection;
+	int currentPauseSelection;
+
 };
 

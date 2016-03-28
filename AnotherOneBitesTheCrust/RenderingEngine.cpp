@@ -16,6 +16,9 @@ RenderingEngine::RenderingEngine()
 
 	generateIDs();
 	loadProjectionMatrix();
+
+	currentMenuSelection = 1;
+	currentPauseSelection = 1;
 }
 
 RenderingEngine::~RenderingEngine(void) {}
@@ -1202,8 +1205,8 @@ void RenderingEngine::displayIntro(int index)
 	introM = mat4(1.0f);
 
 		//Translations done here. Order of translations is scale, rotate, translate
-	introM = introEntities[index]->getModelMatrix();
-	introM = calculateDefaultModel(introM, introEntities[index]);
+	//introM = introEntities[index]->getModelMatrix();
+	//introM = calculateDefaultModel(introM, introEntities[index]);
 
 	mat4 MVP = P * introV * introM;
 	
@@ -1246,8 +1249,8 @@ void RenderingEngine::displayMenu()
 		introM = mat4(1.0f);
 
 			//Translations done here. Order of translations is scale, rotate, translate
-		introM = menuEntities[i]->getModelMatrix();
-		introM = calculateDefaultModel(introM, menuEntities[i]);
+		//introM = menuEntities[i]->getModelMatrix();
+		//introM = calculateDefaultModel(introM, menuEntities[i]);
 		mat4 MVP = P * introV * introM;
 	
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
@@ -1289,8 +1292,8 @@ void RenderingEngine::displayPause()
 		introM = mat4(1.0f);
 
 			//Translations done here. Order of translations is scale, rotate, translate
-		introM = pausedEntities[i]->getModelMatrix();
-		introM = calculateDefaultModel(introM, pausedEntities[i]);
+		//introM = pausedEntities[i]->getModelMatrix();
+		//introM = calculateDefaultModel(introM, pausedEntities[i]);
 		mat4 MVP = P * introV * introM;
 	
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));

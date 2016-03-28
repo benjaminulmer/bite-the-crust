@@ -156,7 +156,11 @@ public:
 	//intro stuff
 	void setupIntro();
 	void displayIntro(int index);
+	void displayMenu();
+	void displayPause();
 	std::vector<Entity*> introEntities;
+	std::vector<Entity*> menuEntities;
+	std::vector<Entity*> pausedEntities;
 	glm::mat4 introM;
 	glm::mat4 introV;
 

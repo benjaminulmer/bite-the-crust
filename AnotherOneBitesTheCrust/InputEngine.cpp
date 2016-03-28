@@ -89,23 +89,42 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 			inputs[e.cdevice.which]->jump = true;
 		}
 	}
-	else if (state == GameState::MENU || state == GameState::PAUSE)
+	else if (state == GameState::MENU)
 	{
 		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_UP)
 		{
-			menuUp();
+			menuInput(InputType::UP);
 		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_DOWN)
 		{
-			menuDown();
+			menuInput(InputType::DOWN);
 		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 		{
-			menuEnter();
+			menuInput(InputType::ENTER);
 		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
 		{
-			menuBack();
+			menuInput(InputType::BACK);
+		}
+	}
+	else if (state == GameState::PAUSE)
+	{
+		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_UP)
+		{
+			pauseInput(InputType::UP);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_DOWN)
+		{
+			pauseInput(InputType::DOWN);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+		{
+			pauseInput(InputType::ENTER);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+		{
+			pauseInput(InputType::BACK);
 		}
 	}
 

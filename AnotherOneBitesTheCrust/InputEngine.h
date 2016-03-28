@@ -32,10 +32,8 @@ public:
 	void openControllers();
 
 	sigslot::signal0<> unFucker;
-	sigslot::signal0<> menuUp;
-	sigslot::signal0<> menuDown;
-	sigslot::signal0<> menuEnter;
-	sigslot::signal0<> menuBack;
+	sigslot::signal1<InputType> menuInput;
+	sigslot::signal1<InputType> pauseInput;
 
 private:
 	SDL_GameController* controllers[MAX_NUM_CONTROLLERS];

@@ -1316,6 +1316,46 @@ void RenderingEngine::displayPause()
 	}
 }
 
+void menuInput(InputType type)
+{
+	if (type == InputType::UP)
+	{
+
+	}
+	else if (type == InputType::DOWN)
+	{
+
+	}
+	else if (type == InputType::ENTER)
+	{
+
+	}
+	else if (type == InputType::BACK)
+	{
+
+	}
+}
+
+void pauseInput(InputType type)
+{
+	if (type == InputType::UP)
+	{
+
+	}
+	else if (type == InputType::DOWN)
+	{
+
+	}
+	else if (type == InputType::ENTER)
+	{
+
+	}
+	else if (type == InputType::BACK)
+	{
+
+	}
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TESTING STUFF BELOW

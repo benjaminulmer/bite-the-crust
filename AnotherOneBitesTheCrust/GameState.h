@@ -7,3 +7,11 @@ enum class GameState
 	PAUSE,
 	EXIT
 };
+
+enum class InputType
+{
+	UP,
+	DOWN,
+	ENTER,
+	BACK
+};

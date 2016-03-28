@@ -7,7 +7,7 @@
 		{"name": "lawn", "model": "lawn.obj", "physics": "tile.json", "texture": "lawn.DDS"},
         {"name": "parkingLot", "model": "parkingLot.obj", "physics": "tile.json", "texture": "parkingLot.DDS"},
 
-        {"name": "pizzaBox", "model": "pizzaBox.obj", "physics": "pizzaBox.json", "texture": "pizzaBox.DDS"},
+        {"name": "pizzaBox", "model": "pizzaBox.obj", "physics": "pizzaBox.json", "texture": "pizzaBox-yellow.DDS"},
 		{"name": "wheel", "model": "wheel.obj", "physics": "default.json", "texture": "redVan.DDS"},
         {"name": "redVan", "model": "van.obj", "physics": "default.json", "texture": "redVan.DDS"},
         {"name": "blueVan", "model": "van.obj", "physics": "default.json", "texture": "blueVan.DDS"},

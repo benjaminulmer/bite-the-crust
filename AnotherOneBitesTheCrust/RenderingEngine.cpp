@@ -16,6 +16,9 @@ RenderingEngine::RenderingEngine()
 
 	generateIDs();
 	loadProjectionMatrix();
+
+	currentMenuSelection = 1;
+	currentPauseSelection = 1;
 }
 
 RenderingEngine::~RenderingEngine(void) {}
@@ -76,7 +79,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 mat4 RenderingEngine::calculateDefaultModel(mat4 model, Entity * entity)
 {
 	//Translations done here. Order of translations is scale, translate, rotate
-	model = glm::scale(model,entity->getDefaultScale());
+	model = glm::scale(model, entity->getDefaultScale());
 	model = glm::translate(model, entity->getDefaultTranslation());
 	model = glm::rotate(model, entity->getDefaultRotationAngle(), entity->getDefaultRotationAxis());
 
@@ -1096,6 +1099,92 @@ void RenderingEngine::setupIntro()
 			glm::vec3(0,1,0)
 		);
 
+	//loading menus stuff
+	Renderable *aobtc = ContentLoading::createRenderable("res\\Models\\AOBTC.obj");
+	Renderable *play = ContentLoading::createRenderable("res\\Models\\play.obj");
+	Renderable *howtoplay = ContentLoading::createRenderable("res\\Models\\howtoplay.obj");
+	Renderable *controls = ContentLoading::createRenderable("res\\Models\\controls.obj");
+	Renderable *story = ContentLoading::createRenderable("res\\Models\\story.obj");
+	Renderable *exit = ContentLoading::createRenderable("res\\Models\\exit.obj");
+	
+	GLuint aobtcTexture = ContentLoading::loadDDS("res\\Textures\\AOBTC-colored.DDS");
+	GLuint selected = ContentLoading::loadDDS("res\\Textures\\selected.DDS");
+	GLuint unselected = ContentLoading::loadDDS("res\\Textures\\unselected.DDS");
+	
+	assignBuffersTex(aobtc);
+	assignBuffersTex(play);
+	assignBuffersTex(howtoplay);
+	assignBuffersTex(controls);
+	assignBuffersTex(story);
+	assignBuffersTex(exit);
+
+	Entity *eAOBTC = new Entity();
+	eAOBTC->setRenderable(aobtc);
+	eAOBTC->setTexture(aobtcTexture);
+	menuEntities.push_back(eAOBTC);
+
+	Entity *ePlay = new Entity();
+	ePlay->setRenderable(play);
+	ePlay->setTexture(selected);
+	menuEntities.push_back(ePlay);
+
+	Entity *eHowToPlay = new Entity();
+	eHowToPlay->setRenderable(howtoplay);
+	eHowToPlay->setTexture(unselected);
+	menuEntities.push_back(eHowToPlay);
+
+	Entity *eControls = new Entity();
+	eControls->setRenderable(controls);
+	eControls->setTexture(unselected);
+	menuEntities.push_back(eControls);
+
+	Entity *eStory = new Entity();
+	eStory->setRenderable(story);
+	eStory->setTexture(unselected);
+	menuEntities.push_back(eStory);
+
+	Entity *eExit = new Entity();
+	eExit->setRenderable(exit);
+	eExit->setTexture(unselected);
+	menuEntities.push_back(eExit);
+
+	//loading paused stuff
+	Renderable *paused = ContentLoading::createRenderable("res\\Models\\paused.obj");
+	Renderable *resume = ContentLoading::createRenderable("res\\Models\\resume.obj");
+	Renderable *restart = ContentLoading::createRenderable("res\\Models\\restart.obj");
+	Renderable *exitMain = ContentLoading::createRenderable("res\\Models\\exittomain.obj");
+	Renderable *exitDesk = ContentLoading::createRenderable("res\\Models\\exittodesk.obj");
+	assignBuffersTex(paused);
+	assignBuffersTex(resume);
+	assignBuffersTex(restart);
+	assignBuffersTex(exitMain);
+	assignBuffersTex(exitDesk);
+
+	Entity *ePaused = new Entity();
+	ePaused->setRenderable(paused);
+	ePaused->setTexture(aobtcTexture);
+	pausedEntities.push_back(ePaused);
+
+	Entity *eResume = new Entity();
+	eResume->setRenderable(resume);
+	eResume->setTexture(selected);
+	pausedEntities.push_back(eResume);
+
+	Entity *eRestart = new Entity();
+	eRestart->setRenderable(restart);
+	eRestart->setTexture(unselected);
+	pausedEntities.push_back(eRestart);
+
+	Entity *eExitMain = new Entity();
+	eExitMain->setRenderable(exitMain);
+	eExitMain->setTexture(unselected);
+	pausedEntities.push_back(eExitMain);
+
+	Entity *eExitDesk = new Entity();
+	eExitDesk->setRenderable(exitDesk);
+	eExitDesk->setTexture(unselected);
+	pausedEntities.push_back(eExitDesk);
+
 }
 
 void RenderingEngine::displayIntro(int index)
@@ -1108,7 +1197,7 @@ void RenderingEngine::displayIntro(int index)
 	glUseProgram(textureProgramID);
 
 
-	glUniform3f(lightPos, 0.0f, 4.0f, 1.0f);
+	glUniform3f(lightPos, 0.0f, 5.0f, 1.0f);
 	glUniform1f(lightPow, 50.0f);
 	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
 
@@ -1116,8 +1205,8 @@ void RenderingEngine::displayIntro(int index)
 	introM = mat4(1.0f);
 
 		//Translations done here. Order of translations is scale, rotate, translate
-	introM = introEntities[index]->getModelMatrix();
-	introM = calculateDefaultModel(introM, introEntities[index]);
+	//introM = introEntities[index]->getModelMatrix();
+	//introM = calculateDefaultModel(introM, introEntities[index]);
 
 	mat4 MVP = P * introV * introM;
 	
@@ -1140,6 +1229,94 @@ void RenderingEngine::displayIntro(int index)
 	glBindVertexArray(0);
 	
 }
+
+void RenderingEngine::displayMenu()
+{
+
+	glEnable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glDisable(GL_BLEND);
+	glUseProgram(textureProgramID);
+
+
+	glUniform3f(lightPos, 0.0f, 7.0f, 1.0f);
+	glUniform1f(lightPow, 70.0f);
+	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
+
+	for(int i = 0; i < menuEntities.size(); i++)
+	{
+		introM = mat4(1.0f);
+
+			//Translations done here. Order of translations is scale, rotate, translate
+		//introM = menuEntities[i]->getModelMatrix();
+		//introM = calculateDefaultModel(introM, menuEntities[i]);
+		mat4 MVP = P * introV * introM;
+	
+		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
+		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
+		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
+
+		glBindVertexArray(menuEntities[i]->getRenderable()->vao);
+		GLuint tex = menuEntities[i]->getTexture();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
+
+		// Set our "myTextureSampler" sampler to user Texture Unit 0
+		glUniform1i(tID, 0);
+		//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+		
+		glDrawElements(GL_TRIANGLES, menuEntities[i]->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
+
+		glBindVertexArray(0);
+	}
+}
+
+void RenderingEngine::displayPause()
+{
+
+	glEnable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glDisable(GL_BLEND);
+	glUseProgram(textureProgramID);
+
+
+	glUniform3f(lightPos, 0.0f, 7.0f, 1.0f);
+	glUniform1f(lightPow, 70.0f);
+	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
+
+	for(int i = 0; i < pausedEntities.size(); i++)
+	{
+		introM = mat4(1.0f);
+
+			//Translations done here. Order of translations is scale, rotate, translate
+		//introM = pausedEntities[i]->getModelMatrix();
+		//introM = calculateDefaultModel(introM, pausedEntities[i]);
+		mat4 MVP = P * introV * introM;
+	
+		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
+		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
+		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
+
+		glBindVertexArray(pausedEntities[i]->getRenderable()->vao);
+		GLuint tex = pausedEntities[i]->getTexture();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
+
+		// Set our "myTextureSampler" sampler to user Texture Unit 0
+		glUniform1i(tID, 0);
+		//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+		
+		glDrawElements(GL_TRIANGLES, pausedEntities[i]->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
+
+		glBindVertexArray(0);
+	}
+}
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TESTING STUFF BELOW
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::PLAY;
+	gameState = GameState::MENU;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -324,7 +324,7 @@ void Game::mainLoop()
 			SDL_GL_SwapWindow(window);
 			SDL_Delay(5000);
 
-			gameState = GameState::PLAY;
+			gameState = GameState::MENU;
 			
 		}
 		else if(gameState == GameState::PLAY)
@@ -403,11 +403,18 @@ void Game::mainLoop()
 		}
 		else if(gameState == GameState::MENU)
 		{
-			//menyoo logic
+			processSDLEvents();
+
+			renderingEngine->displayMenu();
+			SDL_GL_SwapWindow(window);
+
 		}
 		else if(gameState == GameState::PAUSE)
 		{
-			//pause menu logic
+			processSDLEvents();
+
+			renderingEngine->displayPause();
+			SDL_GL_SwapWindow(window);
 		}
 
 	}

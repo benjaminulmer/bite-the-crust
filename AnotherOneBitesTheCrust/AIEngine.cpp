@@ -238,8 +238,6 @@ graphNode * findClosestNode(glm::vec3 position, Map & map)
 	return closest;
 }
 
-
-
 void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 {
 	// Should be 'goal node' of this tile
@@ -357,6 +355,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 		toUpdate->currentPath.clear();
 		toUpdate->pizzaDelivered = false;
 		toUpdate->newDestination = false;
+		toUpdate->pickingUp = false;
 		return;
 	}
 

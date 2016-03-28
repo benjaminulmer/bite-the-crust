@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::MENU;
+	gameState = GameState::PAUSE;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -258,6 +258,9 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 // Connects systems together
 void Game::connectSystems()
 {
+	inputEngine->menuInput.connect(renderingEngine, &RenderingEngine::menuInput);
+	inputEngine->pauseInput.connect(renderingEngine, &RenderingEngine::pauseInput);
+
 	inputEngine->setInputStruct(&players[0]->input, 0);
 	inputEngine->setCamera(camera, 0);
 

@@ -1316,43 +1316,43 @@ void RenderingEngine::displayPause()
 	}
 }
 
-void menuInput(InputType type)
+void RenderingEngine::menuInput(InputType type)
 {
 	if (type == InputType::UP)
 	{
-
+		std::cout << "menu up" << std::endl;
 	}
 	else if (type == InputType::DOWN)
 	{
-
+		std::cout << "menu down" << std::endl;
 	}
 	else if (type == InputType::ENTER)
 	{
-
+		std::cout << "menu enter" << std::endl;
 	}
 	else if (type == InputType::BACK)
 	{
-
+		std::cout << "menu back" << std::endl;
 	}
 }
 
-void pauseInput(InputType type)
+void RenderingEngine::pauseInput(InputType type)
 {
 	if (type == InputType::UP)
 	{
-
+		std::cout << "pause up" << std::endl;
 	}
 	else if (type == InputType::DOWN)
 	{
-
+		std::cout << "pause down" << std::endl;
 	}
 	else if (type == InputType::ENTER)
 	{
-
+		std::cout << "pause enter" << std::endl;
 	}
 	else if (type == InputType::BACK)
 	{
-
+		std::cout << "pause back" << std::endl;
 	}
 }
 

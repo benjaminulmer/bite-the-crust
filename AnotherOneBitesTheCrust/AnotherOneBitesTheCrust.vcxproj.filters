@@ -59,6 +59,7 @@
     <ClInclude Include="WheelEntity.h" />
     <ClInclude Include="AICollisionEntity.h" />
     <ClInclude Include="StaticEntity.h" />
+    <ClInclude Include="GameState.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\textured-StandardShading.fragmentshader" />

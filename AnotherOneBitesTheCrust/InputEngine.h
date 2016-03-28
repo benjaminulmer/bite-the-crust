@@ -3,6 +3,7 @@
 #include <sigslot.h>
 #include "Vehicle.h"
 #include "Camera.h"
+#include "GameState.h"
 
 enum class InputMode
 {
@@ -25,12 +26,16 @@ public:
 	void setInputStruct(VehicleInput* input, int controllerNum);
 	void setCamera(Camera* camera, int controllerNum);
 
-	void controllerAxisMotion(SDL_Event e);
-	void controllerButtonDown(SDL_Event e);
-	void controllerButtonUp(SDL_Event e);
+	void controllerAxisMotion(SDL_Event e, GameState state);
+	void controllerButtonDown(SDL_Event e, GameState state);
+	void controllerButtonUp(SDL_Event e, GameState state);
 	void openControllers();
 
 	sigslot::signal0<> unFucker;
+	sigslot::signal0<> menuUp;
+	sigslot::signal0<> menuDown;
+	sigslot::signal0<> menuEnter;
+	sigslot::signal0<> menuBack;
 
 private:
 	SDL_GameController* controllers[MAX_NUM_CONTROLLERS];

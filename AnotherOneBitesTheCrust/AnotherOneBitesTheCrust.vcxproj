@@ -196,6 +196,7 @@
     <ClInclude Include="Filtering.h" />
     <ClInclude Include="FrictionPairs.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="graphNode.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="Map.h" />

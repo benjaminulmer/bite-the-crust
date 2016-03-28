@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::MENU;
+	gameState = GameState::PLAY;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -437,15 +437,15 @@ void Game::processSDLEvents()
 		}
 		else if (event.type == SDL_CONTROLLERAXISMOTION) 
 		{
-			inputEngine->controllerAxisMotion(event);
+			inputEngine->controllerAxisMotion(event, gameState);
 		}
 		else if (event.type == SDL_CONTROLLERBUTTONDOWN)
 		{
-			inputEngine->controllerButtonDown(event);
+			inputEngine->controllerButtonDown(event, gameState);
 		}
 		else if (event.type == SDL_CONTROLLERBUTTONUP)
 		{
-			inputEngine->controllerButtonUp(event);
+			inputEngine->controllerButtonUp(event, gameState);
 		}
 		else if (event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
 		{

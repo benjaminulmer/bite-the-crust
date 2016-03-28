@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 const int MIN_DIST = 5;
-const int MAX_ATTEMPTS = 60;
+const int MAX_ATTEMPTS = 120;
 
 AIEngine::AIEngine(void)
 {
@@ -120,7 +120,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
 	// TODO: Should divide by half the map or something
-	float gas = glm::clamp(distanceToGoal / 100, (float)0, (float)0.60);
+	float gas = glm::clamp(distanceToGoal / 100, (float)0.1, (float)0.60);
 
 	// TODO: Maybe put these in an init file for tuning purposes?
 	if (gas > 0.1)

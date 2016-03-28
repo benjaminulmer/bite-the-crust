@@ -40,6 +40,10 @@
         {"name": "flower2", "model" :"flower2.obj", "texture": "flower1.DDS"},
 		{"name": "flower3", "model" :"flower3.obj", "texture": "flower2.DDS"},
         
+		{"name": "grass1", "model" : "grass.obj", "texture": "grassTexture.DDS"},
+        {"name": "grass2", "model" :"grass1.obj", "texture": "grassTexture.DDS"},
+		{"name": "grass3", "model" :"grass2.obj", "texture": "grassTexture.DDS"},
+
         {"name": "rock1", "model" :"rock1.obj", "texture": "rock.DDS"},
         {"name": "rock2", "model" :"rock2.obj", "physics": "default.json", "texture": "rock.DDS"},
         {"name": "rock3", "model" :"rock3.obj", "physics": "staticDrivableTriangle.json", "texture": "rock.DDS"}

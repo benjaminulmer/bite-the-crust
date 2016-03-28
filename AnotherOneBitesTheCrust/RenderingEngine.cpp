@@ -846,7 +846,7 @@ void RenderingEngine::setupMinimap(Map map)
 
 
 	vec3 diameter(maxX - minX, maxY - minY, maxZ - minZ);
-	float mmRadius = glm::length(diameter)*1.6;
+	float mmRadius = glm::length(diameter)*1.7;
 	//cout << "radius " << mmRadius << endl;
 
 

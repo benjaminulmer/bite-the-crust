@@ -3,19 +3,25 @@
 
 using namespace physx;
 
+#include <iostream>
+
 void SimulationCallback::onContact(const physx::PxContactPairHeader &pairHeader, const physx::PxContactPair *pairs, physx::PxU32 nbPairs)
 {
-
+	for (PxU32 i = 0; i < 2; i++)
+	{
+		Entity* entity = (Entity*)pairHeader.actors[i]->userData;
+		if (entity->type == EntityType::VEHICLE) 
+		{
+			collision((Vehicle*)entity);
+		}
+	}
 }
 
 void SimulationCallback::onTrigger(physx::PxTriggerPair *pairs, physx::PxU32 count)
 {
 	for (PxU32 i = 0; i < count; i++) 
 	{
-		if (pairs[i].status == PxPairFlag::eNOTIFY_TOUCH_FOUND)
-		{
-			inPickUpLocation((Vehicle*)pairs[i].otherActor->userData);
-		}
+		inPickUpLocation((Vehicle*)pairs[i].otherActor->userData);
 	}
 }
 

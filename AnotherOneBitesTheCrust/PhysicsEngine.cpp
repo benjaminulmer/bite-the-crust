@@ -307,6 +307,7 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 		bool inAir = true;
 		for (PxU32 j = 0; j < results[i].nbWheelQueryResults; j++)
 		{
+			//std::cout << "Lateral: " << results[i].wheelQueryResults[j].lateralSlip << "    Longitudinal: " << results[i].wheelQueryResults[j].longitudinalSlip << std::endl; 
 			if (!results[i].wheelQueryResults[j].isInAir)
 			{
 				inAir = false;

@@ -314,8 +314,11 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 			toUpdate->avoiding = false;
 			toUpdate->avoidAttempts = 0;
 		}
+		if(toUpdate->currentPath.size() > 0)
+			facePoint(toUpdate, toUpdate->currentPath.front());
+		else
+			facePoint(toUpdate, goal);
 
-		facePoint(toUpdate, goal);
 		return;
 	}
 

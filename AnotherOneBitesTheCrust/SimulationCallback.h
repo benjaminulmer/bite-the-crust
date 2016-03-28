@@ -19,6 +19,6 @@ public:
 	void onConstraintBreak(physx::PxConstraintInfo *constraints, physx::PxU32 count);
 
 	sigslot::signal1<PizzaBox*> pizzaBoxSleep;
-
 	sigslot::signal1<Vehicle*> inPickUpLocation;
+	sigslot::signal1<Vehicle*> collision;
 };

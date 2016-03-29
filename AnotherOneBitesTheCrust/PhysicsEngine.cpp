@@ -305,15 +305,21 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 	for (PxU32 i = 0; i < vehicles.size(); i++)
 	{
 		bool inAir = true;
+		bool slipping = false;
 		for (PxU32 j = 0; j < results[i].nbWheelQueryResults; j++)
 		{
 			if (!results[i].wheelQueryResults[j].isInAir)
 			{
 				inAir = false;
 			}
+			if (results[i].wheelQueryResults[j].longitudinalSlip > 0.9f || results[i].wheelQueryResults[j].longitudinalSlip < -0.9f)
+			{
+				slipping = true;
+			}
 		}
 		Vehicle* veh = (Vehicle*)vehicles[i]->getRigidDynamicActor()->userData;
 		veh->isInAir = inAir;
+		veh->isSlipping = slipping;
 	}
 	scene->simulate(deltaTimeS);
 }
@@ -321,6 +327,7 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 void PhysicsEngine::fetchSimulationResults()
 {
 	scene->fetchResults(true);
+	simulationCallback->finishedFetch();
 }
 
 PhysicsEngine::~PhysicsEngine(void)

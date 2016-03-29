@@ -78,14 +78,20 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 	if (tile == nullptr) // The pizza right now can land outside the tiles
 		return;
 	if (tile == deliveries[pizza->owner].location) {
-		if (!pizza->owner->isAI)
+		if (tile->ground->getTexture() != tile->groundTexture) {
 			tile->ground->setTexture(tile->groundTexture);
+		}
 		tile->house->setTexture(pizza->owner->houseTexture);
 		houseColorSignal(map, tile, pizza->owner->color);
 		int score = 5 + (int)(ceil(deliveries[pizza->owner].time / 1000.0f / 3)); // Bonus of remaining time in seconds, divided by 3
 		scores[pizza->owner] += score;
 		freeLocations.erase(std::remove(freeLocations.begin(), freeLocations.end(), deliveries[pizza->owner].location), freeLocations.end());
 		deliveries[pizza->owner] = newDelivery(pizza->owner);
+		for (int i = 0; i < players.size(); i++) {
+			if (deliveries[players[i]].location == tile) {
+				deliveries[players[i]] = newDelivery(players[i]);
+			}
+		}
 	}
 	else
 		pizza->owner->pizzaDelivered = false;

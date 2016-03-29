@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::PLAY;
+	gameState = GameState::INTRO;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -45,6 +45,11 @@ void Game::run()
 	connectSystems();
 
 	mainLoop();
+}
+
+void Game::setGameState(GameState state)
+{
+	gameState = state;
 }
 
 // Initialize all subsystems for the game
@@ -187,7 +192,7 @@ void Game::setupEntities()
 	renderingEngine->setupMinimap(map);
 
 	// Create vehicles
-	for(int i = 0; i < MAX_PLAYERS; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
+	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
 		float rotationRad = physx::PxPi * 0.5f;
@@ -258,6 +263,9 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 // Connects systems together
 void Game::connectSystems()
 {
+	inputEngine->menuInput.connect(renderingEngine, &RenderingEngine::menuInput);
+	inputEngine->pauseInput.connect(renderingEngine, &RenderingEngine::pauseInput);
+
 	inputEngine->setInputStruct(&players[0]->input, 0);
 	inputEngine->setCamera(camera, 0);
 
@@ -288,9 +296,13 @@ void Game::connectSystems()
 	deliveryManager->houseColorSignal.connect(renderingEngine, &RenderingEngine::updateHouseColor);
 
 	deliveryManager->assignDeliveries();
+	physicsEngine->simulationCallback->collision.connect(audioEngine, &AudioEngine::playCannonSound);
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
 	deliveryManager->pizzasRefilled.connect(audioEngine, &AudioEngine::playReloadSound);
+
+	inputEngine->pausePressed.connect(this, &Game::setGameState);
+	renderingEngine->gameStateSelected.connect(this, &Game::setGameState);
 }
 
 // Main loop of the game
@@ -314,17 +326,17 @@ void Game::mainLoop()
 
 			renderingEngine->displayIntro(0);
 			SDL_GL_SwapWindow(window);
-			SDL_Delay(5000);
+			SDL_Delay(3000);
 
 			renderingEngine->displayIntro(1);
 			SDL_GL_SwapWindow(window);
-			SDL_Delay(5000);
+			SDL_Delay(3000);
 
 			renderingEngine->displayIntro(2);
 			SDL_GL_SwapWindow(window);
-			SDL_Delay(5000);
+			SDL_Delay(3000);
 
-			gameState = GameState::PLAY;
+			gameState = GameState::MENU;
 			
 		}
 		else if(gameState == GameState::PLAY)
@@ -403,11 +415,18 @@ void Game::mainLoop()
 		}
 		else if(gameState == GameState::MENU)
 		{
-			//menyoo logic
+			processSDLEvents();
+			renderingEngine->updateMenu();
+			renderingEngine->displayMenu();
+			SDL_GL_SwapWindow(window);
+
 		}
 		else if(gameState == GameState::PAUSE)
 		{
-			//pause menu logic
+			processSDLEvents();
+			renderingEngine->updatePaused();
+			renderingEngine->displayPause();
+			SDL_GL_SwapWindow(window);
 		}
 
 	}
@@ -430,15 +449,15 @@ void Game::processSDLEvents()
 		}
 		else if (event.type == SDL_CONTROLLERAXISMOTION) 
 		{
-			inputEngine->controllerAxisMotion(event);
+			inputEngine->controllerAxisMotion(event, gameState);
 		}
 		else if (event.type == SDL_CONTROLLERBUTTONDOWN)
 		{
-			inputEngine->controllerButtonDown(event);
+			inputEngine->controllerButtonDown(event, gameState);
 		}
 		else if (event.type == SDL_CONTROLLERBUTTONUP)
 		{
-			inputEngine->controllerButtonUp(event);
+			inputEngine->controllerButtonUp(event, gameState);
 		}
 		else if (event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
 		{

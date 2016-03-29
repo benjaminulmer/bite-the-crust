@@ -8,21 +8,12 @@
 #include "PhysicsEntityInfo.h"
 #include "DeliveryManager.h"
 #include "Map.h"
+#include "GameState.h"
 
 #include <SDL.h>
 #include <glew.h>
 #include <map>
 #include <random>
-
-
-enum class GameState
-{
-	INTRO,
-	MENU,
-	PLAY,
-	PAUSE,
-	EXIT
-};
 
 class Game :
 	public sigslot::has_slots<>
@@ -45,7 +36,6 @@ public:
 
 private:
 	static const unsigned int PHYSICS_STEP_MS = 16;
-	
 
 	void initSystems();
 	void setupEntities();
@@ -56,6 +46,7 @@ private:
 	void quitGame();
 	void endGame(std::map<Vehicle*, int> scores);
 	void shootPizza(Vehicle* vehicle);
+	void setGameState(GameState state);
 
 	// Temporary
 	void Game::unFuckerTheGame();

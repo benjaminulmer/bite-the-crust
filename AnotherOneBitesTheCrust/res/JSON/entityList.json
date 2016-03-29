@@ -7,7 +7,7 @@
 		{"name": "lawn", "model": "lawn.obj", "physics": "tile.json", "texture": "lawn.DDS"},
         {"name": "parkingLot", "model": "parkingLot.obj", "physics": "tile.json", "texture": "parkingLot.DDS"},
 
-        {"name": "pizzaBox", "model": "pizzaBox.obj", "physics": "pizzaBox.json", "texture": "pizzaBox.DDS"},
+        {"name": "pizzaBox", "model": "pizzaBox.obj", "physics": "pizzaBox.json", "texture": "pizzaBox-red.DDS"},
 		{"name": "wheel", "model": "wheel.obj", "physics": "default.json", "texture": "redVan.DDS"},
         {"name": "redVan", "model": "van.obj", "physics": "default.json", "texture": "redVan.DDS"},
         {"name": "blueVan", "model": "van.obj", "physics": "default.json", "texture": "blueVan.DDS"},
@@ -19,7 +19,7 @@
 		{"name": "house3", "model": "house3.obj", "physics": "staticDrivableTriangle.json", "texture": "house.DDS"},
 		{"name": "house4", "model": "house4.obj", "physics": "staticDrivableTriangle.json", "texture": "house.DDS"},
         {"name": "stripMall", "model": "stripMall.obj", "physics": "staticDrivableTriangle.json", "texture": "stripMall.DDS"},
-		{"name": "fence", "model": "fence.obj", "physics": "staticBox.json", "texture": "fence.DDS"},
+		{"name": "fence", "model": "fence.obj", "physics": "fence.json", "texture": "fence.DDS"},
 
 		{"name": "ramp", "model": "ramp.obj", "physics": "staticDrivableConvex.json", "texture": "ramp.DDS"},
         {"name": "barrier", "model": "barrier.obj", "physics": "default.json", "texture": "barrier.DDS"},
@@ -40,6 +40,10 @@
         {"name": "flower2", "model" :"flower2.obj", "texture": "flower1.DDS"},
 		{"name": "flower3", "model" :"flower3.obj", "texture": "flower2.DDS"},
         
+		{"name": "grass1", "model" : "grass.obj", "texture": "grassTexture.DDS"},
+        {"name": "grass2", "model" :"grass1.obj", "texture": "grassTexture.DDS"},
+		{"name": "grass3", "model" :"grass2.obj", "texture": "grassTexture.DDS"},
+
         {"name": "rock1", "model" :"rock1.obj", "texture": "rock.DDS"},
         {"name": "rock2", "model" :"rock2.obj", "physics": "default.json", "texture": "rock.DDS"},
         {"name": "rock3", "model" :"rock3.obj", "physics": "staticDrivableTriangle.json", "texture": "rock.DDS"}

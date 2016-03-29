@@ -3,6 +3,7 @@
 #include <sigslot.h>
 #include "Vehicle.h"
 #include "PizzaBox.h"
+#include <vector>
 
 class SimulationCallback
 	: public physx::PxSimulationEventCallback
@@ -18,7 +19,11 @@ public:
 
 	void onConstraintBreak(physx::PxConstraintInfo *constraints, physx::PxU32 count);
 
-	sigslot::signal1<PizzaBox*> pizzaBoxSleep;
+	void finishedFetch();
 
+	sigslot::signal1<PizzaBox*> pizzaBoxSleep;
 	sigslot::signal1<Vehicle*> inPickUpLocation;
+	sigslot::signal1<Vehicle*> collision;
+
+	std::vector<physx::PxActor*> toEndSleepNotifies;
 };

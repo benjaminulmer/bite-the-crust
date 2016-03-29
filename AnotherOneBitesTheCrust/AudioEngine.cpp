@@ -94,7 +94,7 @@ Sound3D * AudioEngine::getOpenChannel()
 	return playingOn;
 }
 
-FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, PhysicsEntity * source)
+FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, PhysicsEntity * source, float volume = 1)
 {
 	Sound3D * playingOn = getOpenChannel();
 	
@@ -107,6 +107,7 @@ FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, Physi
 	playingOn->channel->setVolumeRamp(false); // For fixing popping noise at low volume.
 	playingOn->channel->set3DAttributes(&glmVec3ToFmodVec(pos), 0);
 	playingOn->channel->setPaused(false);
+	playingOn->channel->setVolume(volume);
 
 	playing.push_back(playingOn);
 	errorCheck();

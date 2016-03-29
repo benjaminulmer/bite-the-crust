@@ -38,7 +38,7 @@ public:
 	void playBrakeSound(Vehicle * source);
 	void playEngineIdleSound(Vehicle * source);
 	void playEngineRevSound(Vehicle * source);
-	FMOD::Channel * playSound(FMOD::Sound *, glm::vec3, PhysicsEntity *);
+	FMOD::Channel * playSound(FMOD::Sound *, glm::vec3, PhysicsEntity *,float volume);
 	void update(glm::mat4);
 
 private:

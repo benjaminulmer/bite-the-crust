@@ -12,7 +12,7 @@ RenderingEngine::RenderingEngine()
 	//glEnable(GL_MULTISAMPLE);
 	//glDepthFunc(GL_LESS);
 
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 	generateIDs();
 	loadProjectionMatrix();
@@ -362,6 +362,7 @@ void RenderingEngine::printText2Doutline(const char * text, int x, int y, int si
 	glDeleteBuffers(1, &Text2DVertexBufferID);
 	glDeleteBuffers(1, &Text2DUVBufferID);
 
+	glEnable(GL_CULL_FACE);
 }
 
 
@@ -888,7 +889,8 @@ void RenderingEngine::setupMinimap(Map map)
 
 void RenderingEngine::drawMinimap(Vehicle* vans[4])
 {
-	 glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 	glUseProgram(basicProgramID);
 
 	// Use VAO that holds buffer bindings
@@ -946,6 +948,8 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 		glDrawArrays(GL_TRIANGLES, 0, mmVanVerts.size());
 		glBindVertexArray(0);
 	}
+
+	glEnable(GL_CULL_FACE);
 }
 
 void RenderingEngine::drawDelivery()
@@ -1115,9 +1119,9 @@ void RenderingEngine::setupIntro()
 	//loading menus stuff
 	Renderable *aobtc = ContentLoading::createRenderable("res\\Models\\AOBTC.obj");
 	Renderable *play = ContentLoading::createRenderable("res\\Models\\play.obj");
-	//Renderable *howtoplay = ContentLoading::createRenderable("res\\Models\\howtoplay.obj");
-	//Renderable *controls = ContentLoading::createRenderable("res\\Models\\controls.obj");
-	//Renderable *story = ContentLoading::createRenderable("res\\Models\\story.obj");
+	Renderable *howtoplay = ContentLoading::createRenderable("res\\Models\\howtoplay.obj");
+	Renderable *controls = ContentLoading::createRenderable("res\\Models\\controls.obj");
+	Renderable *story = ContentLoading::createRenderable("res\\Models\\story.obj");
 	Renderable *exit = ContentLoading::createRenderable("res\\Models\\exit.obj");
 	
 	GLuint aobtcTexture = ContentLoading::loadDDS("res\\Textures\\AOBTC-colored.DDS");
@@ -1126,9 +1130,9 @@ void RenderingEngine::setupIntro()
 	
 	assignBuffersTex(aobtc);
 	assignBuffersTex(play);
-	//assignBuffersTex(howtoplay);
-	//assignBuffersTex(controls);
-	//assignBuffersTex(story);
+	assignBuffersTex(howtoplay);
+	assignBuffersTex(controls);
+	assignBuffersTex(story);
 	assignBuffersTex(exit);
 
 	Entity *eAOBTC = new Entity();
@@ -1141,20 +1145,20 @@ void RenderingEngine::setupIntro()
 	ePlay->setTexture(selected);
 	menuEntities.push_back(ePlay);
 
-	//Entity *eHowToPlay = new Entity();
-	//eHowToPlay->setRenderable(howtoplay);
-	//eHowToPlay->setTexture(unselected);
-	//menuEntities.push_back(eHowToPlay);
+	Entity *eHowToPlay = new Entity();
+	eHowToPlay->setRenderable(howtoplay);
+	eHowToPlay->setTexture(unselected);
+	menuEntities.push_back(eHowToPlay);
 
-	//Entity *eControls = new Entity();
-	//eControls->setRenderable(controls);
-	//eControls->setTexture(unselected);
-	//menuEntities.push_back(eControls);
+	Entity *eControls = new Entity();
+	eControls->setRenderable(controls);
+	eControls->setTexture(unselected);
+	menuEntities.push_back(eControls);
 
-	//Entity *eStory = new Entity();
-	//eStory->setRenderable(story);
-	//eStory->setTexture(unselected);
-	//menuEntities.push_back(eStory);
+	Entity *eStory = new Entity();
+	eStory->setRenderable(story);
+	eStory->setTexture(unselected);
+	menuEntities.push_back(eStory);
 
 	Entity *eExit = new Entity();
 	eExit->setRenderable(exit);
@@ -1164,13 +1168,13 @@ void RenderingEngine::setupIntro()
 	//loading paused stuff
 	Renderable *paused = ContentLoading::createRenderable("res\\Models\\paused.obj");
 	Renderable *resume = ContentLoading::createRenderable("res\\Models\\resume.obj");
-	//Renderable *restart = ContentLoading::createRenderable("res\\Models\\restart.obj");
-	//Renderable *exitMain = ContentLoading::createRenderable("res\\Models\\exittomain.obj");
+	Renderable *restart = ContentLoading::createRenderable("res\\Models\\restart.obj");
+	Renderable *exitMain = ContentLoading::createRenderable("res\\Models\\exittomain.obj");
 	Renderable *exitDesk = ContentLoading::createRenderable("res\\Models\\exittodesk.obj");
 	assignBuffersTex(paused);
 	assignBuffersTex(resume);
-	//assignBuffersTex(restart);
-	//assignBuffersTex(exitMain);
+	assignBuffersTex(restart);
+	assignBuffersTex(exitMain);
 	assignBuffersTex(exitDesk);
 
 	Entity *ePaused = new Entity();
@@ -1183,15 +1187,15 @@ void RenderingEngine::setupIntro()
 	eResume->setTexture(selected);
 	pausedEntities.push_back(eResume);
 
-	//Entity *eRestart = new Entity();
-	//eRestart->setRenderable(restart);
-	//eRestart->setTexture(unselected);
-	//pausedEntities.push_back(eRestart);
+	Entity *eRestart = new Entity();
+	eRestart->setRenderable(restart);
+	eRestart->setTexture(unselected);
+	pausedEntities.push_back(eRestart);
 
-	//Entity *eExitMain = new Entity();
-	//eExitMain->setRenderable(exitMain);
-	//eExitMain->setTexture(unselected);
-	//pausedEntities.push_back(eExitMain);
+	Entity *eExitMain = new Entity();
+	eExitMain->setRenderable(exitMain);
+	eExitMain->setTexture(unselected);
+	pausedEntities.push_back(eExitMain);
 
 	Entity *eExitDesk = new Entity();
 	eExitDesk->setRenderable(exitDesk);

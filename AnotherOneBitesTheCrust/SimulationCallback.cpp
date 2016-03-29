@@ -3,8 +3,6 @@
 
 using namespace physx;
 
-#include <iostream>
-
 void SimulationCallback::onContact(const physx::PxContactPairHeader &pairHeader, const physx::PxContactPair *pairs, physx::PxU32 nbPairs)
 {
 	for (PxU32 i = 0; i < 2; i++)
@@ -34,7 +32,7 @@ void SimulationCallback::onSleep(physx::PxActor **actors, physx::PxU32 count)
 	for (PxU32 i = 0; i < count; i ++)
 	{
 		pizzaBoxSleep((PizzaBox*)actors[i]->userData);
-		//actors[i]->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, false);
+		toEndSleepNotifies.push_back(actors[i]);
 	}
 }
 
@@ -46,4 +44,12 @@ void SimulationCallback::onWake(physx::PxActor **actors, physx::PxU32 count)
 void SimulationCallback::onConstraintBreak(physx::PxConstraintInfo *constraints, physx::PxU32 count)
 {
 
+}
+
+void SimulationCallback::finishedFetch()
+{
+	for (PxActor* actor : toEndSleepNotifies) 
+	{
+		actor->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, false);
+	}
 }

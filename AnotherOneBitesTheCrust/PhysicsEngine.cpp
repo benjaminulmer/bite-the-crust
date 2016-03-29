@@ -327,6 +327,7 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 void PhysicsEngine::fetchSimulationResults()
 {
 	scene->fetchResults(true);
+	simulationCallback->finishedFetch();
 }
 
 PhysicsEngine::~PhysicsEngine(void)

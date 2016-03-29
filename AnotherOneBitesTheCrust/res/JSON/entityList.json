@@ -8,11 +8,11 @@
         {"name": "parkingLot", "model": "parkingLot.obj", "physics": "tile.json", "texture": "parkingLot.DDS"},
 
         {"name": "pizzaBox", "model": "pizzaBox.obj", "physics": "pizzaBox.json", "texture": "pizzaBox-red.DDS"},
-		{"name": "wheel", "model": "wheel.obj", "physics": "default.json", "texture": "redVan.DDS"},
-        {"name": "redVan", "model": "van.obj", "physics": "default.json", "texture": "redVan.DDS"},
-        {"name": "blueVan", "model": "van.obj", "physics": "default.json", "texture": "blueVan.DDS"},
-        {"name": "greenVan", "model": "van.obj", "physics": "default.json", "texture": "greenVan.DDS"},
-        {"name": "yellowVan", "model": "van.obj", "physics": "default.json", "texture": "yellowVan.DDS"},
+		{"name": "wheel", "model": "wheel.obj", "texture": "redVan.DDS"},
+        {"name": "redVan", "model": "van.obj", "texture": "redVan.DDS"},
+        {"name": "blueVan", "model": "van.obj", "texture": "blueVan.DDS"},
+        {"name": "greenVan", "model": "van.obj", "texture": "greenVan.DDS"},
+        {"name": "yellowVan", "model": "van.obj", "texture": "yellowVan.DDS"},
 
 		{"name": "house1", "model": "house1.obj", "physics": "staticDrivableTriangle.json", "texture": "house.DDS"},
 		{"name": "house2", "model": "house2.obj", "physics": "staticDrivableTriangle.json", "texture": "house.DDS"},
@@ -34,7 +34,7 @@
         {"name": "pine", "model": "pine.obj", "physics": "staticDrivableTriangle.json", "texture": "tree.DDS"},
      
         {"name": "bigBush", "model": "bigBush.obj", "physics": "default.json", "texture": "bush.DDS"},
-		{"name": "smallBush", "model": "smallBush.obj", "physics": "default.json", "texture": "bush.DDS"},
+		{"name": "smallBush", "model": "smallBush.obj", "physics": "smallBush.json", "texture": "bush.DDS"},
         
         {"name": "flower1", "model" :"flower1.obj", "texture": "flower1.DDS"},
         {"name": "flower2", "model" :"flower2.obj", "texture": "flower1.DDS"},
@@ -45,7 +45,7 @@
 		{"name": "grass3", "model" :"grass2.obj", "texture": "grassTexture.DDS"},
 
         {"name": "rock1", "model" :"rock1.obj", "texture": "rock.DDS"},
-        {"name": "rock2", "model" :"rock2.obj", "physics": "default.json", "texture": "rock.DDS"},
+        {"name": "rock2", "model" :"rock2.obj", "physics": "smallRock.json", "texture": "rock.DDS"},
         {"name": "rock3", "model" :"rock3.obj", "physics": "staticDrivableTriangle.json", "texture": "rock.DDS"}
     ]
 }

@@ -85,6 +85,7 @@ public:
 	GLuint houseTexture;
 	glm::vec3 color;
 	std::string pizzaBoxRenderName;
+	std::string colorName;
 
 	bool isSlipping;
 	bool isInAir;

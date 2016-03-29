@@ -225,24 +225,28 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->setTexture(textureMap["redVan"]);
 			vehicle->color = glm::vec3(1,0,0);
 			vehicle->pizzaBoxRenderName = "pizzaBoxRed";
+			vehicle->colorName = "Red";
 			break;
 		case 1:
 			vehicle->setRenderable(renderablesMap["blueVan"]);
 			vehicle->setTexture(textureMap["blueVan"]);
 			vehicle->color = glm::vec3(0,0,1);
 			vehicle->pizzaBoxRenderName = "pizzaBoxBlue";
+			vehicle->colorName = "Blue";
 			break;
 		case 2:
 			vehicle->setRenderable(renderablesMap["greenVan"]);
 			vehicle->setTexture(textureMap["greenVan"]);
 			vehicle->color = glm::vec3(0,1,0);
 			vehicle->pizzaBoxRenderName = "pizzaBoxGreen";
+			vehicle->colorName = "Green";
 			break;
 		case 3:
 			vehicle->setRenderable(renderablesMap["yellowVan"]);
 			vehicle->setTexture(textureMap["yellowVan"]);
 			vehicle->color = glm::vec3(1,1,0);
 			vehicle->pizzaBoxRenderName = "pizzaBoxYellow";
+			vehicle->colorName = "Yellow";
 			break;
 	}
 	// TODO get dimensions working properly for vehicle
@@ -495,8 +499,17 @@ void Game::endGame(std::map<Vehicle*, int> scores) {
 		renderingEngine->drawSkybox(players[0]->getPosition());
 		renderingEngine->drawMinimap(players); 
 
-		string winner = "	GREEN WINS			";
-		renderingEngine->printBanner(winner.data(), 0, 720/2, 100, vec3(1,0,0));
+		Vehicle* winner = players[0];
+		for (int i = 1; i < MAX_PLAYERS; i++) {
+			if (scores[players[i]] > scores[winner])
+				winner = players[i];
+		}
+		string winnerText = "	" + winner->colorName + " WINS			";
+		renderingEngine->printBanner(winnerText.data(), 0, 720/2, 100, winner->color);
+		for (int i = 0; i < MAX_PLAYERS; i++) {
+			string scoreText = "TIPS: $" + std::to_string(scores[players[i]]);
+			renderingEngine->printBanner(scoreText.data(), 100, 300 - i*50, 50, players[i]->color);
+		}
 		//press start to exit
 
 		SDL_GL_SwapWindow(window);

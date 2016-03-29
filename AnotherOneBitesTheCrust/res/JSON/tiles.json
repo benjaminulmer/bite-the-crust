@@ -8,7 +8,7 @@
             ],
 			"nodes" : [
 				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4,5]},
+				{"x" : 0.0, "z" : 0.0, "neighbours" : [0,2,3,4,5]},
 				{"x" : 1.0, "z" : 1.0, "neighbours" : [1]},
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
 				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
@@ -135,9 +135,14 @@
             "entities": [
                 {"name": "roadBlock", "x": 10, "z": 4, "rotation": 90},        
                 {"name": "roadBlock", "x": 10, "z": 10, "rotation": 90},
-                {"name": "roadBlock", "x": 10, "z": 16, "rotation": 90}
+                {"name": "roadBlock", "x": 10, "z": 16, "rotation": 90},
+				{"name" : "ramp", "x" : 20, "z" : 12},
+				{"name" : "ramp", "x" : 20, "z" : 7}
             ],
-			"nodes" : [
+			"nodes" : [		
+				{"x" : 0.0, "z" : 0.5, "neighbours" : []},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
 			]
         },
         {
@@ -161,7 +166,8 @@
                 {"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
 				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3]},
 				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]},
-				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 0, "z": 0.5, "neighbours" : [1]}
             ]
         },
         {
@@ -246,6 +252,19 @@
 				{"name": ["birch", "oak", "aspen", "rock3", "pine", "bigBush"], "x": 10, "z": 8},
 				{"name": ["birch", "oak", "aspen", "rock3", "pine", "bigBush"], "x": 4, "z": 4}
             ]
-        }
+        },
+		{
+			"id": 21,
+			"description": "Blocked off Lawn with fence",
+			"ground": "lawn",
+			"entities": [
+			{"name": "fence", "x": 10, "rotation": 270},
+                {"name": "roadBlock", "x": 10, "z": 6, "rotation": 90},        
+                {"name": "roadBlock", "x": 10, "z": 12, "rotation": 90},
+                {"name": "roadBlock", "x": 10, "z": 18, "rotation": 90}
+			],
+			"nodes": [
+			]
+		}
     ]
 }

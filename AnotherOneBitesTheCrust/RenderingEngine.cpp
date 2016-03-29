@@ -883,7 +883,7 @@ void RenderingEngine::setupMinimap(Map map)
 		glm::vec3(0, 0, 1)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
 
-	shift = vec3(2.38, 0.0, -1.7);
+	shift = vec3(2.65, 0.0, -1.7);
 }
 
 void RenderingEngine::drawMinimap(Vehicle* vans[4])

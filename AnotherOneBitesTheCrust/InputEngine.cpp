@@ -24,7 +24,7 @@ void InputEngine::openControllers()
 	std::cout << "NUM CONTROLLERS: " << SDL_NumJoysticks() << std::endl;
 }
 
-void InputEngine::controllerAxisMotion(SDL_Event e)
+void InputEngine::controllerAxisMotion(SDL_Event e, GameState state)
 {
 	if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;
 
@@ -62,37 +62,79 @@ void InputEngine::controllerAxisMotion(SDL_Event e)
 	}
 }
 
-void InputEngine::controllerButtonDown(SDL_Event e)
+void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 {
-	if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;
+	if (state == GameState::PLAY)
+	{
+		if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;
 
-	if (e.cbutton.button == SDL_CONTROLLER_BUTTON_X)
-	{
-		inputs[e.cdevice.which]->shootPizza = true;
+		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_X)
+		{
+			inputs[e.cdevice.which]->shootPizza = true;
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+		{
+			inputs[e.cdevice.which]->handBrake = true;
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+		{
+			cameras[e.cdevice.which]->setReverseCam(true);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSTICK)
+		{
+			unFucker();
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
+		{
+			inputs[e.cdevice.which]->jump = true;
+		}
 	}
-	else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+	else if (state == GameState::MENU)
 	{
-		inputs[e.cdevice.which]->handBrake = true;
+		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_UP)
+		{
+			menuInput(InputType::UP);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_DOWN)
+		{
+			menuInput(InputType::DOWN);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+		{
+			menuInput(InputType::ENTER);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+		{
+			menuInput(InputType::BACK);
+		}
 	}
-	else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+	else if (state == GameState::PAUSE)
 	{
-		cameras[e.cdevice.which]->setReverseCam(true);
+		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_UP)
+		{
+			pauseInput(InputType::UP);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_DOWN)
+		{
+			pauseInput(InputType::DOWN);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+		{
+			pauseInput(InputType::ENTER);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+		{
+			pauseInput(InputType::BACK);
+		}
 	}
-	else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSTICK)
-	{
-		unFucker();
-	}
-	else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
-	{
-		inputs[e.cdevice.which]->jump = true;
-	}
+
 	/*else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSTICK)
 	{
 		mode = (mode == InputMode::NORMAL) ? InputMode::DEBUG : InputMode::NORMAL; 
 	}*/
 }
 
-void InputEngine::controllerButtonUp(SDL_Event e)
+void InputEngine::controllerButtonUp(SDL_Event e, GameState state)
 {
 	if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;
 

@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::PLAY;
+	gameState = GameState::PAUSE;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -258,6 +258,9 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 // Connects systems together
 void Game::connectSystems()
 {
+	inputEngine->menuInput.connect(renderingEngine, &RenderingEngine::menuInput);
+	inputEngine->pauseInput.connect(renderingEngine, &RenderingEngine::pauseInput);
+
 	inputEngine->setInputStruct(&players[0]->input, 0);
 	inputEngine->setCamera(camera, 0);
 
@@ -325,7 +328,7 @@ void Game::mainLoop()
 			SDL_GL_SwapWindow(window);
 			SDL_Delay(5000);
 
-			gameState = GameState::PLAY;
+			gameState = GameState::MENU;
 			
 		}
 		else if(gameState == GameState::PLAY)
@@ -404,11 +407,18 @@ void Game::mainLoop()
 		}
 		else if(gameState == GameState::MENU)
 		{
-			//menyoo logic
+			processSDLEvents();
+
+			renderingEngine->displayMenu();
+			SDL_GL_SwapWindow(window);
+
 		}
 		else if(gameState == GameState::PAUSE)
 		{
-			//pause menu logic
+			processSDLEvents();
+
+			renderingEngine->displayPause();
+			SDL_GL_SwapWindow(window);
 		}
 
 	}
@@ -431,15 +441,15 @@ void Game::processSDLEvents()
 		}
 		else if (event.type == SDL_CONTROLLERAXISMOTION) 
 		{
-			inputEngine->controllerAxisMotion(event);
+			inputEngine->controllerAxisMotion(event, gameState);
 		}
 		else if (event.type == SDL_CONTROLLERBUTTONDOWN)
 		{
-			inputEngine->controllerButtonDown(event);
+			inputEngine->controllerButtonDown(event, gameState);
 		}
 		else if (event.type == SDL_CONTROLLERBUTTONUP)
 		{
-			inputEngine->controllerButtonUp(event);
+			inputEngine->controllerButtonUp(event, gameState);
 		}
 		else if (event.type == SDL_CONTROLLERDEVICEREMOVED || event.type == SDL_CONTROLLERDEVICEADDED)
 		{

@@ -19,6 +19,7 @@
 #include "Camera.h"
 #include "ContentLoading.h"
 #include "Entity.h"
+#include "GameState.h"
 
 class RenderingEngine :
 	public sigslot::has_slots<>
@@ -156,9 +157,18 @@ public:
 	//intro stuff
 	void setupIntro();
 	void displayIntro(int index);
+	void displayMenu();
+	void displayPause();
 	std::vector<Entity*> introEntities;
+	std::vector<Entity*> menuEntities;
+	std::vector<Entity*> pausedEntities;
 	glm::mat4 introM;
 	glm::mat4 introV;
 
+	void menuInput(InputType type);
+	void pauseInput(InputType type);
+
+	int currentMenuSelection;
+	int currentPauseSelection;
 };
 

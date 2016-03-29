@@ -83,7 +83,7 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSTICK)
 		{
-			unFucker();
+			//unFucker();
 		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
 		{

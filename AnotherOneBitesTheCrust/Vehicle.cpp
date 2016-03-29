@@ -169,7 +169,7 @@ void Vehicle::update()
 	if (input.jump && !isInAir)
 	{
 		PxRigidBody* rigid = (PxRigidBody*)actor;
-		rigid->addForce(PxVec3(0, 500, 0), PxForceMode::eACCELERATION);
+		rigid->addForce(PxVec3(0, 375, 0), PxForceMode::eACCELERATION);
 		input.jump = false;
 	}
 }

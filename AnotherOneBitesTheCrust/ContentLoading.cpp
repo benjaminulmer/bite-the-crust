@@ -458,10 +458,20 @@ bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
 			e.names = names;
 			e.position = glm::vec3(x, y, z);
 
-			if (entityArray[j].HasMember("rotation"))
-				e.rotationDeg = (float)entityArray[j]["rotation"].GetDouble();
+			if (entityArray[j].HasMember("lowerRotation"))
+				e.lowerRotation = (float)entityArray[j]["lowerRotation"].GetDouble();
 			else
-				e.rotationDeg = 0;
+				e.lowerRotation = 0;
+			if (entityArray[j].HasMember("upperRotation"))
+				e.upperRotation = (float)entityArray[j]["upperRotation"].GetDouble();
+			else
+				e.upperRotation = 0;
+			// A hard coded rotation overwrites upper and lower bounds
+			if (entityArray[j].HasMember("rotation")) {
+				float rotationDeg = (float)entityArray[j]["rotation"].GetDouble();
+				e.lowerRotation = rotationDeg;
+				e.upperRotation = rotationDeg;
+			}
 
 			t.entityTemplates.push_back(e);
 		}
@@ -535,7 +545,8 @@ bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
 					int z = (int)tile.entityTemplates[i].position.z;
 					tile.entityTemplates[i].position.x = (float)(tileSize - z);
 					tile.entityTemplates[i].position.z = (float)x;
-					tile.entityTemplates[i].rotationDeg += -90;
+					tile.entityTemplates[i].lowerRotation += -90;
+					tile.entityTemplates[i].upperRotation += -90;
 				}
 				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
@@ -552,7 +563,8 @@ bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
 					int z = (int)tile.entityTemplates[i].position.z;
 					tile.entityTemplates[i].position.x = (float)z;
 					tile.entityTemplates[i].position.z = (float)(tileSize - x);
-					tile.entityTemplates[i].rotationDeg += 90;
+					tile.entityTemplates[i].lowerRotation += 90;
+					tile.entityTemplates[i].upperRotation += 90;
 				}
 				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;
@@ -569,7 +581,8 @@ bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
 					int z = (int)tile.entityTemplates[i].position.z;
 					tile.entityTemplates[i].position.x = (float)(tileSize - x);
 					tile.entityTemplates[i].position.z = (float)(tileSize - z);
-					tile.entityTemplates[i].rotationDeg += 180;
+					tile.entityTemplates[i].lowerRotation += 180;
+					tile.entityTemplates[i].upperRotation += 180;
 				}
 				for (unsigned int i = 0; i < tileNodes.size(); i++) {
 					glm::vec3 pos = tileNodes[i].position;

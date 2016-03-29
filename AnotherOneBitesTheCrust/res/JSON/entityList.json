@@ -23,7 +23,7 @@
 
 		{"name": "ramp", "model": "ramp.obj", "physics": "staticDrivableConvex.json", "texture": "ramp.DDS"},
         {"name": "barrier", "model": "barrier.obj", "physics": "default.json", "texture": "barrier.DDS"},
-        {"name": "roadBlock", "model": "roadBlock.obj", "physics": "staticDrivableTriangle.json", "texture": "roadBlock.DDS"},
+        {"name": "roadBlock", "model": "roadBlock.obj", "physics": "roadBlock.json", "texture": "roadBlock.DDS"},
         {"name": "pole", "model": "pole.obj", "physics": "staticDrivableTriangle.json", "texture": "pole.DDS"},
 		{"name": "bench", "model": "bench.obj", "physics": "default.json", "texture": "bench.DDS"},	
         

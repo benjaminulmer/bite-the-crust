@@ -88,7 +88,7 @@
 			"entities": [
 				{"name": "fence", "x": 10, "rotation": 270},
 				{"name": "fence", "z": 10},
-				{"name": ["birch", "oak", "deadTree", "aspen", "pine", "rock3"], "x": 10, "z": 10}
+				{"name": ["birch", "oak", "deadTree", "aspen", "pine", "rock3"], "x": 10, "z": 10, "upperRotation": 360}
 			],
 			"nodes": [
 			]
@@ -214,17 +214,17 @@
             "description": "Park tile",
             "ground": "lawn",
             "entities": [
-                {"name": ["flower1", "flower2", "flower3"], "x": 3, "z": 7, "rotation": 90},
-                {"name": ["flower1", "flower2", "flower3"], "x": 2, "z": 19},
-                {"name": ["flower1", "flower2", "flower3"], "x": 8, "z": 5},
-                {"name": ["flower1", "flower2", "flower3"], "x": 13, "z": 2, "rotation": 45},
-                {"name": ["flower1", "flower2", "flower3"], "x": 15, "z": 10, "rotation": 25},
-                {"name": ["flower1", "flower2", "flower3"], "x": 10, "z": 14, "rotation": 30},
-                {"name": ["rock1", "rock2", "rock3"], "x": 3, "z": 5},
-                {"name": ["rock1", "rock2", "rock3"], "x": 5, "z": 16, "rotation": 20},
-                {"name": ["rock1", "rock2", "rock3"], "x": 17, "z": 3},
-                {"name": ["birch", "oak", "deadTree", "aspen", "pine"], "x": 4, "z": 2},
-                {"name": ["birch", "oak", "deadTree", "aspen", "pine"], "x": 14, "z": 18}
+                {"name": ["flower1", "flower2", "flower3"], "x": 3, "z": 7, "upperRotation": 360},
+                {"name": ["flower1", "flower2", "flower3"], "x": 2, "z": 19, "upperRotation": 360},
+                {"name": ["flower1", "flower2", "flower3"], "x": 8, "z": 5, "upperRotation": 360},
+                {"name": ["flower1", "flower2", "flower3"], "x": 13, "z": 2, "upperRotation": 360},
+                {"name": ["flower1", "flower2", "flower3"], "x": 15, "z": 10, "upperRotation": 360},
+                {"name": ["flower1", "flower2", "flower3"], "x": 10, "z": 14, "upperRotation": 360},
+                {"name": ["rock1", "rock2", "rock3"], "x": 3, "z": 5, "upperRotation": 360},
+                {"name": ["rock1", "rock2", "rock3"], "x": 5, "z": 16, "upperRotation": 360},
+                {"name": ["rock1", "rock2", "rock3"], "x": 17, "z": 3, "upperRotation": 360},
+                {"name": ["birch", "oak", "deadTree", "aspen", "pine"], "x": 4, "z": 2, "upperRotation": 360},
+                {"name": ["birch", "oak", "deadTree", "aspen", "pine"], "x": 14, "z": 18, "upperRotation": 360}
             ]
         },
         {
@@ -249,8 +249,8 @@
             "ground": "lawn",
             "entities": [
                 {"name": "fence", "x": 10, "rotation": 270},
-				{"name": ["birch", "oak", "aspen", "rock3", "pine", "bigBush"], "x": 10, "z": 8},
-				{"name": ["birch", "oak", "aspen", "rock3", "pine", "bigBush"], "x": 4, "z": 4}
+				{"name": ["birch", "oak", "aspen", "rock3", "pine", "bigBush"], "x": 10, "z": 8, "upperRotation": 360},
+				{"name": ["birch", "oak", "aspen", "rock3", "pine", "bigBush"], "x": 4, "z": 4, "upperRotation": 360}
             ]
         },
 		{

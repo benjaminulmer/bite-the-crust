@@ -934,7 +934,7 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 		mmM = mat4(1.0f);
 		mmM = translate(mmM, mmCenter * shift);
 		mmM = mmM * vans[i]->getModelMatrix();
-		mmM = scale(mmM, vec3(2.0));
+		mmM = scale(mmM, vec3(3.0));
 		mmM = rotate(mmM, -1.5708f, glm::vec3(0,1,0));
 
 		mmMVP = P * mmV * mmM;

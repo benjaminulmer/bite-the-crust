@@ -135,6 +135,13 @@ void AudioEngine::playCannonSound(Vehicle * source)
 	playSound(cannonSound, pos, source);
 }
 
+void AudioEngine::playCollisionSound(Vehicle * source)
+{
+	glm::vec3 pos = source->getPosition();
+
+	playSound(crashSound, pos, source);
+}
+
 void AudioEngine::playBrakeSound(Vehicle * source)
 {
 	glm::vec3 pos = source->getPosition();
@@ -232,6 +239,9 @@ void AudioEngine::initStreams()
     errorCheck();
 
 	result = fmodSystem->createSound("res\\Audio\\brake.wav", FMOD_LOOP_OFF | FMOD_3D, 0, &brakeSound);
+    errorCheck();
+
+	result = fmodSystem->createSound("res\\Audio\\crash.wav", FMOD_LOOP_OFF | FMOD_3D, 0, &crashSound);
     errorCheck();
 }
 

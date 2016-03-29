@@ -296,7 +296,7 @@ void Game::connectSystems()
 	deliveryManager->houseColorSignal.connect(renderingEngine, &RenderingEngine::updateHouseColor);
 
 	deliveryManager->assignDeliveries();
-	physicsEngine->simulationCallback->collision.connect(audioEngine, &AudioEngine::playCannonSound);
+	physicsEngine->simulationCallback->collision.connect(audioEngine, &AudioEngine::playCollisionSound);
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
 	deliveryManager->pizzasRefilled.connect(audioEngine, &AudioEngine::playReloadSound);

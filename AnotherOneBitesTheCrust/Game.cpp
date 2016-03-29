@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::INTRO;
+	gameState = GameState::MENU;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -192,7 +192,7 @@ void Game::setupEntities()
 	renderingEngine->setupMinimap(map);
 
 	// Create vehicles
-	for(int i = 0; i < MAX_PLAYERS; i++) // TODO: replace with MAX_VEHICLES when rest of game logic can handle
+	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
 		float rotationRad = physx::PxPi * 0.5f;
@@ -206,9 +206,9 @@ void Game::setupEntities()
 	}
 	// hard code textures for now
 	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseRed.DDS");
-	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseBlue.DDS");
-	players[2]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseGreen.DDS");
-	players[3]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseYellow.DDS");
+	//players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseBlue.DDS");
+	//players[2]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseGreen.DDS");
+	//players[3]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseYellow.DDS");
 
 	camera = new Camera(players[0]);
 	renderingEngine->updateView(*camera);
@@ -384,7 +384,7 @@ void Game::mainLoop()
 			//renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
 			//renderingEngine->drawNodes(map.allNodes.size(), "points");
 			renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
-			renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
+			//renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
 
 			// TODO: Broken record, but should draw to corresponding player's viewport
 			string speed = "Speed: ";

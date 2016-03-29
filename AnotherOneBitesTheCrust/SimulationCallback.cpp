@@ -12,7 +12,11 @@ void SimulationCallback::onContact(const physx::PxContactPairHeader &pairHeader,
 		Entity* entity = (Entity*)pairHeader.actors[i]->userData;
 		if (entity->type == EntityType::VEHICLE) 
 		{
-			collision((Vehicle*)entity);
+			Vehicle* veh = (Vehicle*)entity;
+			if (veh->getPhysicsVehicle()->computeForwardSpeed() > 10 || veh->getPhysicsVehicle()->computeForwardSpeed() < -10)
+			{
+				collision(veh);
+			}
 		}
 	}
 }

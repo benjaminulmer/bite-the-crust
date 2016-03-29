@@ -28,7 +28,7 @@ public:
 	PhysicsEngine *physicsEngine;
 	RenderingEngine *renderingEngine;
 	DeliveryManager* deliveryManager;
-	static const int MAX_PLAYERS = 4;
+	static const int MAX_PLAYERS = 1;
 	
 	void run();
 

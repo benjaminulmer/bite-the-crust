@@ -60,7 +60,7 @@ void AudioEngine::startBackgroundMusic()
 {
 	std::uniform_int_distribution<int> dist(0, backgroundSongs.size()-1);
 	backgroundSongChoice = dist(generator);
-    result = fmodSystem->playSound(backgroundSongs[backgroundSongChoice], 0, false, &backgroundChannel);
+    //result = fmodSystem->playSound(backgroundSongs[backgroundSongChoice], 0, false, &backgroundChannel);
     errorCheck();
 	result = backgroundChannel->setVolume(0.5);
 	errorCheck();

@@ -85,6 +85,7 @@ public:
 	GLuint houseTexture;
 	glm::vec3 color;
 
+	bool isSlipping;
 	bool isInAir;
 
 	void update();

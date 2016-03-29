@@ -64,6 +64,7 @@ void InputEngine::controllerAxisMotion(SDL_Event e, GameState state)
 
 void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 {
+
 	if (state == GameState::PLAY)
 	{
 		if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;
@@ -134,6 +135,11 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 		{
 			pauseInput(InputType::BACK);
 		}
+	}
+	else if(state == GameState::END)
+	if (e.cbutton.button == SDL_CONTROLLER_BUTTON_START)
+	{
+		endInput(InputType::BACK);
 	}
 
 	/*else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSTICK)

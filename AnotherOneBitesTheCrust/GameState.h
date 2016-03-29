@@ -5,6 +5,7 @@ enum class GameState
 	MENU,
 	PLAY,
 	PAUSE,
+	END,
 	EXIT
 };
 

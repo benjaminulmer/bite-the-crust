@@ -10,7 +10,7 @@ struct TileEntity
 {
 	std::vector<std::string> names; // Multiple because it can be a random choice between multiple entities
 	glm::vec3 position;
-	float rotationDeg;
+	float lowerRotation, upperRotation;
 };
 
 struct Tile

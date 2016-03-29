@@ -150,8 +150,8 @@ void Game::setupEntities()
 			{
 				TileEntity tileEntity = tile->entityTemplates[k];
 
-				std::uniform_int_distribution<int> dist(0, tileEntity.names.size()-1);
-				std::string name = tileEntity.names[dist(generator)];
+				std::uniform_int_distribution<int> nameDist(0, tileEntity.names.size()-1);
+				std::string name = tileEntity.names[nameDist(generator)];
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
@@ -176,7 +176,8 @@ void Game::setupEntities()
 					e->setRenderable(renderablesMap[name]);
 					e->setTexture(textureMap[name]);
 
-					float rotationRad = physx::PxPi * (tileEntity.rotationDeg / 180.0f);
+					std::uniform_int_distribution<int> rotationDist(tileEntity.lowerRotation, tileEntity.upperRotation);
+					float rotationRad = physx::PxPi * (rotationDist(generator) / 180.0f);
 					physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
 
 					physicsEngine->createEntity(e, physicsEntityInfoMap[name], transform);

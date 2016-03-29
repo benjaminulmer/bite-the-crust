@@ -86,7 +86,7 @@ void Vehicle::resetIfNeeded()
 
 	PxF32 cos = vehUp.dot(up);
 	PxVec3 vel = ((PxRigidDynamic*)actor)->getLinearVelocity();
-	if (cos <= 0.5f && vel.x == 0 && vel.y == 0 && vel.z == 0)
+	if (cos <= 0.707f && vel.x == 0 && vel.y == 0 && vel.z == 0)
 	{
 		PxVec3 forw(0, 0, 1);
 		PxVec3 vehForw = actor->getGlobalPose().rotate(forw);

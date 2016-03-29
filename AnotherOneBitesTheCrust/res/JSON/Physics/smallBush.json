@@ -1,0 +1,11 @@
+{
+	"geometry": [
+        {"shape":"convexMesh"}
+    ],
+    "type": "dynamic",
+    "dynamicInfo": {
+        "density": 1.0,
+        "linearDamping": 0.0,
+        "angularDamping": 0.0
+    }
+}

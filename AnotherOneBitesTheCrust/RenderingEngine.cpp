@@ -256,10 +256,15 @@ void RenderingEngine::initText2D(const char * texturePath){
 void RenderingEngine::printText2D(const char * text, int x, int y, int size)
 {
 	//printText2Doutline(text, x+1, y+1, (int)(size+0.5f), glm::vec4(0,0,0,1));
-	printText2Doutline(text, x, y, size, glm::vec4(1,1,1,1));
+	printText2Doutline(text, x, y, size, glm::vec4(1,1,1,1), false);
 }
 
-void RenderingEngine::printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color){
+void RenderingEngine::printBanner(const char * text, int x, int y, int size, glm::vec3 color)
+{
+	printText2Doutline(text, x, y, size, glm::vec4(color.x, color.y, color.z, 1), true);
+}
+
+void RenderingEngine::printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color, bool invert){
 
 
 	unsigned int length = strlen(text);
@@ -328,11 +333,19 @@ void RenderingEngine::printText2Doutline(const char * text, int x, int y, int si
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, Text2DUVBufferID);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+	
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_ONE_MINUS_SRC_ALPHA,GL_SRC_ALPHA);
-	//glDisable(GL_CULL_FACE);
+	if(invert)
+	{
+		glDisable(GL_BLEND);
+	}
+	else
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	
+	glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 
 	glUniform4f(colorID, color.x, color.y, color.z, color.a);
@@ -921,7 +934,7 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 		mmM = mat4(1.0f);
 		mmM = translate(mmM, mmCenter * shift);
 		mmM = mmM * vans[i]->getModelMatrix();
-		mmM = scale(mmM, vec3(2.0));
+		mmM = scale(mmM, vec3(3.0));
 		mmM = rotate(mmM, -1.5708f, glm::vec3(0,1,0));
 
 		mmMVP = P * mmV * mmM;
@@ -1402,7 +1415,12 @@ void RenderingEngine::pauseInput(InputType type)
 	}
 }
 
+void RenderingEngine::endInput(InputType type)
+{
+	if (type == InputType::BACK)
+		gameStateSelected(GameState::EXIT);
 
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TESTING STUFF BELOW
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

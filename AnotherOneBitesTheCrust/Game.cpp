@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::INTRO;
+	gameState = GameState::MENU;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -265,6 +265,7 @@ void Game::connectSystems()
 {
 	inputEngine->menuInput.connect(renderingEngine, &RenderingEngine::menuInput);
 	inputEngine->pauseInput.connect(renderingEngine, &RenderingEngine::pauseInput);
+	inputEngine->endInput.connect(renderingEngine, &RenderingEngine::endInput);
 
 	inputEngine->setInputStruct(&players[0]->input, 0);
 	inputEngine->setCamera(camera, 0);
@@ -328,13 +329,13 @@ void Game::mainLoop()
 			SDL_GL_SwapWindow(window);
 			SDL_Delay(3000);
 
-			renderingEngine->displayIntro(1);
-			SDL_GL_SwapWindow(window);
-			SDL_Delay(3000);
+			//renderingEngine->displayIntro(1);
+			//SDL_GL_SwapWindow(window);
+			//SDL_Delay(3000);
 
-			renderingEngine->displayIntro(2);
-			SDL_GL_SwapWindow(window);
-			SDL_Delay(3000);
+			//renderingEngine->displayIntro(2);
+			//SDL_GL_SwapWindow(window);
+			//SDL_Delay(3000);
 
 			gameState = GameState::MENU;
 			
@@ -389,7 +390,7 @@ void Game::mainLoop()
 			// TODO: Broken record, but should draw to corresponding player's viewport
 			string speed = "Speed: ";
 			speed.append(to_string(players[0]->getPhysicsVehicle()->computeForwardSpeed()));
-			renderingEngine->printText2D(speed.data(), 0, 700, 24);
+			renderingEngine->printText2D(speed.data(), 0, 690, 24);
 
 			string frameRate = "DeltaTime: ";
 			frameRate.append(to_string(deltaTimeMs));
@@ -397,7 +398,7 @@ void Game::mainLoop()
 
 			string score = "Tips: $";
 			score.append(to_string(deliveryManager->getScore(players[0])));
-			renderingEngine->printText2D(score.data(), 1050, 700, 24);
+			renderingEngine->printText2D(score.data(), 1050, 690, 24);
 			renderingEngine->printText2D(deliveryManager->getDeliveryText(players[0]).data(), 725, 670, 20);
 
 			string pizzas = "Pizzas: ";
@@ -406,7 +407,6 @@ void Game::mainLoop()
 
 			renderingEngine->drawDelivery();
 //			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
-
 
 			//swap buffers
 			SDL_GL_SwapWindow(window);
@@ -418,6 +418,11 @@ void Game::mainLoop()
 			processSDLEvents();
 			renderingEngine->updateMenu();
 			renderingEngine->displayMenu();
+			
+
+			string instructions = "D-pad - Move, A - Select, B - Back";
+			renderingEngine->printText2D(instructions.data(), 0, 0, 24);
+
 			SDL_GL_SwapWindow(window);
 
 		}
@@ -426,6 +431,9 @@ void Game::mainLoop()
 			processSDLEvents();
 			renderingEngine->updatePaused();
 			renderingEngine->displayPause();
+
+			string instructions = "D-pad - Move, A - Select, B - Back";
+			renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 			SDL_GL_SwapWindow(window);
 		}
 
@@ -471,8 +479,23 @@ void Game::processSDLEvents()
 }
 
 void Game::endGame(std::map<Vehicle*, int> scores) {
-	gameState = GameState::EXIT;
-	fatalError("Game over!");
+	gameState = GameState::END;
+	while(gameState != GameState::EXIT)
+	{
+		processSDLEvents();
+		renderingEngine->displayFuncTex(entities);
+		for(int i = 0 ; i < MAX_PLAYERS; i++)
+			renderingEngine->drawShadow(players[i]->getPosition());
+
+		renderingEngine->drawSkybox(players[0]->getPosition());
+		renderingEngine->drawMinimap(players); 
+
+		string winner = "	GREEN WINS			";
+		renderingEngine->printBanner(winner.data(), 0, 720/2, 100, vec3(1,0,0));
+		//press start to exit
+
+		SDL_GL_SwapWindow(window);
+	}
 }
 
 // Creates and fires a pizza from the provided vehicle

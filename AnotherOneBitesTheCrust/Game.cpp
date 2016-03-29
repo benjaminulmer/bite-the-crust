@@ -412,7 +412,10 @@ void Game::mainLoop()
 
 			string pizzas = "Pizzas: ";
 			pizzas.append(to_string(players[0]->pizzaCount));
-			renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
+			if(players[0]->pizzaCount > 0)
+				renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
+			else
+				renderingEngine->printText2Doutline(pizzas.data(), 990, 640, 30, glm::vec4(1,0,0,1), false);
 
 			renderingEngine->drawDelivery();
 //			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");

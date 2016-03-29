@@ -224,21 +224,25 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->setRenderable(renderablesMap["redVan"]);
 			vehicle->setTexture(textureMap["redVan"]);
 			vehicle->color = glm::vec3(1,0,0);
+			vehicle->pizzaBoxRenderName = "pizzaBoxRed";
 			break;
 		case 1:
 			vehicle->setRenderable(renderablesMap["blueVan"]);
 			vehicle->setTexture(textureMap["blueVan"]);
 			vehicle->color = glm::vec3(0,0,1);
+			vehicle->pizzaBoxRenderName = "pizzaBoxBlue";
 			break;
 		case 2:
 			vehicle->setRenderable(renderablesMap["greenVan"]);
 			vehicle->setTexture(textureMap["greenVan"]);
 			vehicle->color = glm::vec3(0,1,0);
+			vehicle->pizzaBoxRenderName = "pizzaBoxGreen";
 			break;
 		case 3:
 			vehicle->setRenderable(renderablesMap["yellowVan"]);
 			vehicle->setTexture(textureMap["yellowVan"]);
 			vehicle->color = glm::vec3(1,1,0);
+			vehicle->pizzaBoxRenderName = "pizzaBoxYellow";
 			break;
 	}
 	// TODO get dimensions working properly for vehicle
@@ -503,8 +507,8 @@ void Game::endGame(std::map<Vehicle*, int> scores) {
 void Game::shootPizza(Vehicle* vehicle)
 {
 	PizzaBox* pizzaBox = new PizzaBox(vehicle);
-	pizzaBox->setRenderable(renderablesMap["pizzaBox"]);
-	pizzaBox->setTexture(textureMap["pizzaBox"]);
+	pizzaBox->setRenderable(renderablesMap[vehicle->pizzaBoxRenderName]);
+	pizzaBox->setTexture(textureMap[vehicle->pizzaBoxRenderName]);
 
 	physx::PxTransform transform = vehicle->getActor()->getGlobalPose();
 	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.25f, 1.0f));
@@ -514,7 +518,7 @@ void Game::shootPizza(Vehicle* vehicle)
 	physx::PxVec3 vehicleVelocity = vehicle->getRigidDynamic()->getLinearVelocity();
 	velocity += vehicleVelocity;
 
-	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap["pizzaBox"], transform);
+	physicsEngine->createEntity(pizzaBox, physicsEntityInfoMap[vehicle->pizzaBoxRenderName], transform);
 	pizzaBox->getRigidDynamic()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);

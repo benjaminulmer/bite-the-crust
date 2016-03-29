@@ -192,8 +192,8 @@ void AudioEngine::playEngineRevSound(Vehicle * source)
 		playing.engineRevChannel = playSound(engineRevSound, pos, source);
 		playing.engineRevChannel->setVolume(0.3f);
 	}
-	if(playing.engineIdleChannel != nullptr)
-		playing.engineIdleChannel->setPaused(true);
+	//if(playing.engineIdleChannel != nullptr)
+		//playing.engineIdleChannel->setPaused(true);
 	
 
 	vehicleLoops[source] = playing;

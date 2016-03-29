@@ -20,6 +20,7 @@
 #include "ContentLoading.h"
 #include "Entity.h"
 #include "GameState.h"
+#include <sigslot.h>
 
 class RenderingEngine :
 	public sigslot::has_slots<>
@@ -167,8 +168,14 @@ public:
 
 	void menuInput(InputType type);
 	void pauseInput(InputType type);
+	void updateMenu();
+	void updatePaused();
+	GLuint selected;
+	GLuint unselected;
 
 	int currentMenuSelection;
 	int currentPauseSelection;
+
+	sigslot::signal1<GameState> gameStateSelected;
 };
 

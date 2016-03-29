@@ -24,7 +24,7 @@ Game::Game(void)
 	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
-	gameState = GameState::PAUSE;
+	gameState = GameState::INTRO;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
 	inputEngine = nullptr;
@@ -45,6 +45,11 @@ void Game::run()
 	connectSystems();
 
 	mainLoop();
+}
+
+void Game::setGameState(GameState state)
+{
+	gameState = state;
 }
 
 // Initialize all subsystems for the game
@@ -295,6 +300,9 @@ void Game::connectSystems()
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
 	deliveryManager->pizzasRefilled.connect(audioEngine, &AudioEngine::playReloadSound);
+
+	inputEngine->pausePressed.connect(this, &Game::setGameState);
+	renderingEngine->gameStateSelected.connect(this, &Game::setGameState);
 }
 
 // Main loop of the game
@@ -318,15 +326,15 @@ void Game::mainLoop()
 
 			renderingEngine->displayIntro(0);
 			SDL_GL_SwapWindow(window);
-			SDL_Delay(5000);
+			SDL_Delay(3000);
 
 			renderingEngine->displayIntro(1);
 			SDL_GL_SwapWindow(window);
-			SDL_Delay(5000);
+			SDL_Delay(3000);
 
 			renderingEngine->displayIntro(2);
 			SDL_GL_SwapWindow(window);
-			SDL_Delay(5000);
+			SDL_Delay(3000);
 
 			gameState = GameState::MENU;
 			
@@ -408,7 +416,7 @@ void Game::mainLoop()
 		else if(gameState == GameState::MENU)
 		{
 			processSDLEvents();
-
+			renderingEngine->updateMenu();
 			renderingEngine->displayMenu();
 			SDL_GL_SwapWindow(window);
 
@@ -416,7 +424,7 @@ void Game::mainLoop()
 		else if(gameState == GameState::PAUSE)
 		{
 			processSDLEvents();
-
+			renderingEngine->updatePaused();
 			renderingEngine->displayPause();
 			SDL_GL_SwapWindow(window);
 		}

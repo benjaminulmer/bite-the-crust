@@ -88,6 +88,10 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 		{
 			inputs[e.cdevice.which]->jump = true;
 		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_START)
+		{
+			pausePressed(GameState::PAUSE);
+		}
 	}
 	else if (state == GameState::MENU)
 	{
@@ -123,6 +127,10 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 			pauseInput(InputType::ENTER);
 		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+		{
+			pauseInput(InputType::BACK);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_START)
 		{
 			pauseInput(InputType::BACK);
 		}

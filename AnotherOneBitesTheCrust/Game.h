@@ -46,6 +46,7 @@ private:
 	void quitGame();
 	void endGame(std::map<Vehicle*, int> scores);
 	void shootPizza(Vehicle* vehicle);
+	void setGameState(GameState state);
 
 	// Temporary
 	void Game::unFuckerTheGame();

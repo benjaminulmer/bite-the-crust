@@ -1102,20 +1102,20 @@ void RenderingEngine::setupIntro()
 	//loading menus stuff
 	Renderable *aobtc = ContentLoading::createRenderable("res\\Models\\AOBTC.obj");
 	Renderable *play = ContentLoading::createRenderable("res\\Models\\play.obj");
-	Renderable *howtoplay = ContentLoading::createRenderable("res\\Models\\howtoplay.obj");
-	Renderable *controls = ContentLoading::createRenderable("res\\Models\\controls.obj");
-	Renderable *story = ContentLoading::createRenderable("res\\Models\\story.obj");
+	//Renderable *howtoplay = ContentLoading::createRenderable("res\\Models\\howtoplay.obj");
+	//Renderable *controls = ContentLoading::createRenderable("res\\Models\\controls.obj");
+	//Renderable *story = ContentLoading::createRenderable("res\\Models\\story.obj");
 	Renderable *exit = ContentLoading::createRenderable("res\\Models\\exit.obj");
 	
 	GLuint aobtcTexture = ContentLoading::loadDDS("res\\Textures\\AOBTC-colored.DDS");
-	GLuint selected = ContentLoading::loadDDS("res\\Textures\\selected.DDS");
-	GLuint unselected = ContentLoading::loadDDS("res\\Textures\\unselected.DDS");
+	selected = ContentLoading::loadDDS("res\\Textures\\selected.DDS");
+	unselected = ContentLoading::loadDDS("res\\Textures\\unselected.DDS");
 	
 	assignBuffersTex(aobtc);
 	assignBuffersTex(play);
-	assignBuffersTex(howtoplay);
-	assignBuffersTex(controls);
-	assignBuffersTex(story);
+	//assignBuffersTex(howtoplay);
+	//assignBuffersTex(controls);
+	//assignBuffersTex(story);
 	assignBuffersTex(exit);
 
 	Entity *eAOBTC = new Entity();
@@ -1128,20 +1128,20 @@ void RenderingEngine::setupIntro()
 	ePlay->setTexture(selected);
 	menuEntities.push_back(ePlay);
 
-	Entity *eHowToPlay = new Entity();
-	eHowToPlay->setRenderable(howtoplay);
-	eHowToPlay->setTexture(unselected);
-	menuEntities.push_back(eHowToPlay);
+	//Entity *eHowToPlay = new Entity();
+	//eHowToPlay->setRenderable(howtoplay);
+	//eHowToPlay->setTexture(unselected);
+	//menuEntities.push_back(eHowToPlay);
 
-	Entity *eControls = new Entity();
-	eControls->setRenderable(controls);
-	eControls->setTexture(unselected);
-	menuEntities.push_back(eControls);
+	//Entity *eControls = new Entity();
+	//eControls->setRenderable(controls);
+	//eControls->setTexture(unselected);
+	//menuEntities.push_back(eControls);
 
-	Entity *eStory = new Entity();
-	eStory->setRenderable(story);
-	eStory->setTexture(unselected);
-	menuEntities.push_back(eStory);
+	//Entity *eStory = new Entity();
+	//eStory->setRenderable(story);
+	//eStory->setTexture(unselected);
+	//menuEntities.push_back(eStory);
 
 	Entity *eExit = new Entity();
 	eExit->setRenderable(exit);
@@ -1151,13 +1151,13 @@ void RenderingEngine::setupIntro()
 	//loading paused stuff
 	Renderable *paused = ContentLoading::createRenderable("res\\Models\\paused.obj");
 	Renderable *resume = ContentLoading::createRenderable("res\\Models\\resume.obj");
-	Renderable *restart = ContentLoading::createRenderable("res\\Models\\restart.obj");
-	Renderable *exitMain = ContentLoading::createRenderable("res\\Models\\exittomain.obj");
+	//Renderable *restart = ContentLoading::createRenderable("res\\Models\\restart.obj");
+	//Renderable *exitMain = ContentLoading::createRenderable("res\\Models\\exittomain.obj");
 	Renderable *exitDesk = ContentLoading::createRenderable("res\\Models\\exittodesk.obj");
 	assignBuffersTex(paused);
 	assignBuffersTex(resume);
-	assignBuffersTex(restart);
-	assignBuffersTex(exitMain);
+	//assignBuffersTex(restart);
+	//assignBuffersTex(exitMain);
 	assignBuffersTex(exitDesk);
 
 	Entity *ePaused = new Entity();
@@ -1170,15 +1170,15 @@ void RenderingEngine::setupIntro()
 	eResume->setTexture(selected);
 	pausedEntities.push_back(eResume);
 
-	Entity *eRestart = new Entity();
-	eRestart->setRenderable(restart);
-	eRestart->setTexture(unselected);
-	pausedEntities.push_back(eRestart);
+	//Entity *eRestart = new Entity();
+	//eRestart->setRenderable(restart);
+	//eRestart->setTexture(unselected);
+	//pausedEntities.push_back(eRestart);
 
-	Entity *eExitMain = new Entity();
-	eExitMain->setRenderable(exitMain);
-	eExitMain->setTexture(unselected);
-	pausedEntities.push_back(eExitMain);
+	//Entity *eExitMain = new Entity();
+	//eExitMain->setRenderable(exitMain);
+	//eExitMain->setTexture(unselected);
+	//pausedEntities.push_back(eExitMain);
 
 	Entity *eExitDesk = new Entity();
 	eExitDesk->setRenderable(exitDesk);
@@ -1316,23 +1316,62 @@ void RenderingEngine::displayPause()
 	}
 }
 
+void RenderingEngine::updateMenu()
+{
+	for(unsigned int i = 1; i < menuEntities.size(); i++)
+	{
+		if(i == currentMenuSelection)
+		{
+			menuEntities[i]->setTexture(selected);
+		}
+		else
+		{
+			menuEntities[i]->setTexture(unselected);
+		}
+	}
+}
+
+void RenderingEngine::updatePaused()
+{
+	
+	for(unsigned int i = 1; i < pausedEntities.size(); i++)
+	{
+		if(i == currentPauseSelection)
+		{
+			pausedEntities[i]->setTexture(selected);
+		}
+		else
+		{
+			pausedEntities[i]->setTexture(unselected);
+		}
+	}
+}
+
 void RenderingEngine::menuInput(InputType type)
 {
 	if (type == InputType::UP)
 	{
-		std::cout << "menu up" << std::endl;
+		currentMenuSelection -= 1;
+		if(currentMenuSelection < 1)
+			currentMenuSelection = 1;
 	}
 	else if (type == InputType::DOWN)
 	{
-		std::cout << "menu down" << std::endl;
+		currentMenuSelection += 1;
+		if(currentMenuSelection > menuEntities.size() - 1)
+			currentMenuSelection = menuEntities.size() -1;
 	}
 	else if (type == InputType::ENTER)
 	{
-		std::cout << "menu enter" << std::endl;
+		if(currentMenuSelection == 1)
+			gameStateSelected(GameState::PLAY);
+		//else if(currentMenuSelection == 2)
+		//	introV = translate(introV, vec3(0, -3, 0));
+		else if(currentMenuSelection == menuEntities.size()-1)
+			gameStateSelected(GameState::EXIT);
 	}
 	else if (type == InputType::BACK)
 	{
-		std::cout << "menu back" << std::endl;
 	}
 }
 
@@ -1340,19 +1379,26 @@ void RenderingEngine::pauseInput(InputType type)
 {
 	if (type == InputType::UP)
 	{
-		std::cout << "pause up" << std::endl;
+		currentPauseSelection -= 1;
+		if(currentPauseSelection < 1)
+			currentPauseSelection = 1;
 	}
 	else if (type == InputType::DOWN)
 	{
-		std::cout << "pause down" << std::endl;
+		currentPauseSelection += 1;
+		if(currentPauseSelection > pausedEntities.size() - 1)
+			currentPauseSelection = pausedEntities.size() - 1;
 	}
 	else if (type == InputType::ENTER)
 	{
-		std::cout << "pause enter" << std::endl;
+		if(currentPauseSelection == 1)
+			gameStateSelected(GameState::PLAY);
+		else if(currentPauseSelection == pausedEntities.size()-1)
+			gameStateSelected(GameState::EXIT);
 	}
 	else if (type == InputType::BACK)
 	{
-		std::cout << "pause back" << std::endl;
+		gameStateSelected(GameState::PLAY);
 	}
 }
 

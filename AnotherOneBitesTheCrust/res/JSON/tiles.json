@@ -132,16 +132,14 @@
             "id": 11,
 			"description": "Blocked straight section of the road",
             "ground": "straightRoad",
-            "entities": [
-                {"name": "roadBlock", "x": 10, "z": 4, "rotation": 90},        
+            "entities": [     
                 {"name": "roadBlock", "x": 10, "z": 10, "rotation": 90},
-                {"name": "roadBlock", "x": 10, "z": 16, "rotation": 90},
 				{"name" : "ramp", "x" : 20, "z" : 12},
 				{"name" : "ramp", "x" : 20, "z" : 7}
             ],
 			"nodes" : [		
 				{"x" : 0.0, "z" : 0.5, "neighbours" : []},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0]},
 				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
 			]
         },

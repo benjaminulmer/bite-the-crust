@@ -51,6 +51,9 @@ reload.wav
 	
 dryFire.wav
 	https://www.freesound.org/people/PhreaKsAccount/sounds/46265/
+
+crash.wav
+	http://www.freesound.org/people/squareal/sounds/237375/
 	
 	
 Obj and DDS loading

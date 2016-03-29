@@ -62,7 +62,7 @@ void AudioEngine::startBackgroundMusic()
 	backgroundSongChoice = dist(generator);
     result = fmodSystem->playSound(backgroundSongs[backgroundSongChoice], 0, false, &backgroundChannel);
     errorCheck();
-	result = backgroundChannel->setVolume(0.5);
+	result = backgroundChannel->setVolume(0.3);
 	errorCheck();
 }
 
@@ -133,6 +133,13 @@ void AudioEngine::playCannonSound(Vehicle * source)
 	glm::vec3 pos = source->getPosition();
 
 	playSound(cannonSound, pos, source);
+}
+
+void AudioEngine::playCollisionSound(Vehicle * source)
+{
+	glm::vec3 pos = source->getPosition();
+
+	playSound(crashSound, pos, source);
 }
 
 void AudioEngine::playBrakeSound(Vehicle * source)
@@ -232,6 +239,9 @@ void AudioEngine::initStreams()
     errorCheck();
 
 	result = fmodSystem->createSound("res\\Audio\\brake.wav", FMOD_LOOP_OFF | FMOD_3D, 0, &brakeSound);
+    errorCheck();
+
+	result = fmodSystem->createSound("res\\Audio\\crash.wav", FMOD_LOOP_OFF | FMOD_3D, 0, &crashSound);
     errorCheck();
 }
 

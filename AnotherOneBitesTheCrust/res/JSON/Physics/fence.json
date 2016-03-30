@@ -1,6 +1,6 @@
 {
 	"geometry": [
-        {"shape":"box", "halfY": 500.0, "flag0": "OBSTACLE", "flag1": "OBSTACLE_AGAINST"}
+        {"shape":"box", "halfY": 500.0}
     ],
     "type": "static"
 }

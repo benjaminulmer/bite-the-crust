@@ -220,6 +220,8 @@ void Game::setupEntities()
 		float rotationRad = physx::PxPi * 0.5f;
 		setupVehicle(players[i], physx::PxTransform(physx::PxVec3(20, 2, 135 - 15.0*i), physx::PxQuat(rotationRad, physx::PxVec3(0,1,0))), i);
 
+		camera[i] = new Camera(players[i]);
+
 		// TODO: get info from menu selection (ie. number of player characters)
 		if(i > 0)
 			players[i]->isAI = true;
@@ -231,9 +233,6 @@ void Game::setupEntities()
 	players[1]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseBlue.DDS");
 	players[2]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseGreen.DDS");
 	players[3]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseYellow.DDS");
-
-	camera = new Camera(players[0]);
-	renderingEngine->updateView(*camera);
 }
 
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
@@ -296,7 +295,7 @@ void Game::connectSystems()
 	inputEngine->endInput.connect(renderingEngine, &RenderingEngine::endInput);
 
 	inputEngine->setInputStruct(&players[0]->input, 0);
-	inputEngine->setCamera(camera, 0);
+	inputEngine->setCamera(camera[0], 0);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -330,11 +329,103 @@ void Game::connectSystems()
 	renderingEngine->gameStateSelected.connect(this, &Game::setGameState);
 }
 
+void Game::playDisplay()
+{
+	renderingEngine->displayFuncTex(entities);
+	for(int i = 0 ; i < MAX_PLAYERS; i++)
+	{
+		renderingEngine->drawShadow(players[i]->getPosition());
+	}
+	renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
+	renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
+
+	// TODO: Broken record, but should draw to corresponding player's viewport
+	string speed = "Speed: ";
+	speed.append(to_string(players[0]->getPhysicsVehicle()->computeForwardSpeed()));
+	renderingEngine->printText2D(speed.data(), 0, 690, 24);
+
+	string frameRate = "DeltaTime: ";
+	frameRate.append(to_string(deltaTimeMs));
+	renderingEngine->printText2D(frameRate.data(), 0, 640, 20);
+
+	string deltaAcc = "DeltaTimeACC: ";
+	deltaAcc.append(to_string(deltaTimeAccMs));
+	renderingEngine->printText2D(deltaAcc.data(), 0, 670, 20);
+
+	string score = "Tips: $";
+	score.append(to_string(deliveryManager->getScore(players[0])));
+	renderingEngine->printText2D(score.data(), 1050, 690, 24);
+	renderingEngine->printText2D(deliveryManager->getDeliveryText(players[0]).data(), 725, 670, 20);
+
+	string pizzas = "Pizzas: ";
+	pizzas.append(to_string(players[0]->pizzaCount));
+	(players[0]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 1050, 640, 24) : renderingEngine->printText2Doutline(pizzas.data(), 990, 640, 30, glm::vec4(1,0,0,1), false);
+
+	renderingEngine->drawDelivery();
+}
+
+void Game::playLogic()
+{
+	// Figure out timestep and run physics
+	newTimeMs = SDL_GetTicks();
+	deltaTimeMs = newTimeMs - oldTimeMs;
+	oldTimeMs = newTimeMs;
+	deltaTimeAccMs += deltaTimeMs;
+
+	while (deltaTimeAccMs >= PHYSICS_STEP_MS)
+	{
+		if (gameState == GameState::END) break;
+		deltaTimeAccMs -= PHYSICS_STEP_MS;
+		deliveryManager->timePassed(PHYSICS_STEP_MS);
+
+		// Update the player and AI cars and cameras
+		for(int i = 0; i < MAX_PLAYERS; i++)
+		{
+			if(players[i]->isAI)
+			{
+				AICollisionEntity closest = physicsEngine->AISweep(players[i]);
+				aiEngine->updateAI(players[i], deliveryManager->deliveries[players[i]], map, closest);
+			}
+			players[i]->update();
+			camera[i]->update();
+		}
+		physicsEngine->simulate(PHYSICS_STEP_MS);	
+		physicsEngine->fetchSimulationResults();
+	}
+	// TODO splitscreen
+	renderingEngine->updateView(*camera[0]);
+
+	// TODO: update audioengine to support multiple listeners
+	audioEngine->update(players[0]->getModelMatrix());
+
+	playDisplay();
+}
+
+void Game::menuLogic()
+{
+	oldTimeMs = SDL_GetTicks();
+	renderingEngine->updateMenu();
+	renderingEngine->displayMenu();
+
+	string instructions = "D-pad - Move, A - Select, B - Back";
+	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
+}
+
+void Game::pauseLogic()
+{
+	oldTimeMs = SDL_GetTicks();
+	renderingEngine->updatePaused();
+	renderingEngine->displayPause();
+
+	string instructions = "D-pad - Move, A - Select, B - Back";
+	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
+}
+
 // Main loop of the game
 void Game::mainLoop()
 {
-	unsigned int oldTimeMs = SDL_GetTicks();
-	unsigned int deltaTimeAccMs = 0;
+	oldTimeMs = SDL_GetTicks();
+	deltaTimeAccMs = 0;
 
 	// Game loop
 	while (gameState != GameState::EXIT)
@@ -357,106 +448,21 @@ void Game::mainLoop()
 			//SDL_Delay(3000);
 
 			gameState = GameState::MENU;
-			
 		}
 		else if(gameState == GameState::PLAY)
 		{
-			// Figure out timestep and run physics
-			unsigned int newTimeMs = SDL_GetTicks();
-			unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
-			oldTimeMs = newTimeMs;
-
-			deltaTimeAccMs += deltaTimeMs;
-			while (deltaTimeAccMs >= PHYSICS_STEP_MS)
-			{
-				deltaTimeAccMs -= PHYSICS_STEP_MS;
-				deliveryManager->timePassed(PHYSICS_STEP_MS);
-
-				// Update the player and AI cars
-				for(int i = 0; i < MAX_PLAYERS; i++)
-				{
-					if(players[i]->isAI)
-					{
-						AICollisionEntity closest = physicsEngine->AISweep(players[i]);
-						aiEngine->updateAI(players[i], deliveryManager->deliveries[players[i]], map, closest);
-					}
-					players[i]->update();
-				}
-				physicsEngine->simulate(PHYSICS_STEP_MS);	
-				physicsEngine->fetchSimulationResults();
-				camera->update();
-			}
-			
-			renderingEngine->updateView(*camera);
-
-			// Update Sound
-			// TODO: update audioengine to support multiple listeners
-			audioEngine->update(players[0]->getModelMatrix());
-
-			// Display
-			renderingEngine->displayFuncTex(entities);
-			for(int i = 0 ; i < MAX_PLAYERS; i++)
-			{
-				renderingEngine->drawShadow(players[i]->getPosition());
-			}
-			renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
-			renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
-
-			// TODO: Broken record, but should draw to corresponding player's viewport
-			string speed = "Speed: ";
-			speed.append(to_string(players[0]->getPhysicsVehicle()->computeForwardSpeed()));
-			renderingEngine->printText2D(speed.data(), 0, 690, 24);
-
-			string frameRate = "DeltaTime: ";
-			frameRate.append(to_string(deltaTimeMs));
-			renderingEngine->printText2D(frameRate.data(), 0, 640, 20);
-
-			string deltaAcc = "DeltaTimeACC: ";
-			deltaAcc.append(to_string(deltaTimeAccMs));
-			renderingEngine->printText2D(deltaAcc.data(), 0, 670, 20);
-
-			string score = "Tips: $";
-			score.append(to_string(deliveryManager->getScore(players[0])));
-			renderingEngine->printText2D(score.data(), 1050, 690, 24);
-			renderingEngine->printText2D(deliveryManager->getDeliveryText(players[0]).data(), 725, 670, 20);
-
-			string pizzas = "Pizzas: ";
-			pizzas.append(to_string(players[0]->pizzaCount));
-			if(players[0]->pizzaCount > 0)
-			{
-				renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
-			}
-			else
-			{
-				renderingEngine->printText2Doutline(pizzas.data(), 990, 640, 30, glm::vec4(1,0,0,1), false);
-			}
-			renderingEngine->drawDelivery();
-
-			//swap buffers
-			SDL_GL_SwapWindow(window);
-			
+			playLogic();
 		}
 		else if(gameState == GameState::MENU)
 		{
-			oldTimeMs = SDL_GetTicks();
-			renderingEngine->updateMenu();
-			renderingEngine->displayMenu();
-
-			string instructions = "D-pad - Move, A - Select, B - Back";
-			renderingEngine->printText2D(instructions.data(), 0, 0, 24);
-
-			SDL_GL_SwapWindow(window);
+			menuLogic();
 		}
 		else if(gameState == GameState::PAUSE)
 		{
-			oldTimeMs = SDL_GetTicks();
-			renderingEngine->updatePaused();
-			renderingEngine->displayPause();
-
-			string instructions = "D-pad - Move, A - Select, B - Back";
-			renderingEngine->printText2D(instructions.data(), 0, 0, 24);
-			SDL_GL_SwapWindow(window);
+			pauseLogic();
 		}
+		if (gameState != GameState::END)
+			SDL_GL_SwapWindow(window);
 	}
 }
 
@@ -499,31 +505,29 @@ void Game::processSDLEvents()
 
 void Game::endGame(std::map<Vehicle*, int> scores) {
 	gameState = GameState::END;
-	while(gameState != GameState::EXIT)
+
+	renderingEngine->displayFuncTex(entities);
+	for(int i = 0 ; i < MAX_PLAYERS; i++)
 	{
-		processSDLEvents();
-		renderingEngine->displayFuncTex(entities);
-		for(int i = 0 ; i < MAX_PLAYERS; i++)
-			renderingEngine->drawShadow(players[i]->getPosition());
-
-		renderingEngine->drawSkybox(players[0]->getPosition());
-		renderingEngine->drawMinimap(players); 
-
-		Vehicle* winner = players[0];
-		for (int i = 1; i < MAX_PLAYERS; i++) {
-			if (scores[players[i]] > scores[winner])
-				winner = players[i];
-		}
-		string winnerText = "	" + winner->colorName + " WINS			";
-		renderingEngine->printBanner(winnerText.data(), 0, 720/2, 100, winner->color);
-		for (int i = 0; i < MAX_PLAYERS; i++) {
-			string scoreText = "TIPS: $" + std::to_string(scores[players[i]]);
-			renderingEngine->printBanner(scoreText.data(), 100, 300 - i*50, 50, players[i]->color);
-		}
-		//press start to exit
-
-		SDL_GL_SwapWindow(window);
+		renderingEngine->drawShadow(players[i]->getPosition());
 	}
+	renderingEngine->drawSkybox(players[0]->getPosition());
+
+	Vehicle* winner = players[0];
+	for (int i = 1; i < MAX_PLAYERS; i++)
+	{
+		if (scores[players[i]] > scores[winner])
+			winner = players[i];
+	}
+	string winnerText = "	" + winner->colorName + " WINS			";
+	renderingEngine->printBanner(winnerText.data(), 0, 720/2, 100, winner->color);
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		string scoreText = "TIPS: $" + std::to_string(scores[players[i]]);
+		renderingEngine->printBanner(scoreText.data(), 100, 300 - i*50, 50, players[i]->color);
+	}
+	//press start to exit
+
+	SDL_GL_SwapWindow(window);
 }
 
 // Creates and fires a pizza from the provided vehicle

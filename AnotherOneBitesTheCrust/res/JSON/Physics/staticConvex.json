@@ -1,6 +1,6 @@
 {
 	"geometry": [
-        {"shape":"convexMesh", "flag0": "OBSTACLE", "flag1": "OBSTACLE_AGAINST"}
+        {"shape":"convexMesh"}
     ],
     "type": "static"
 }

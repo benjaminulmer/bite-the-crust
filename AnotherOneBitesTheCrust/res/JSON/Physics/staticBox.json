@@ -1,6 +1,6 @@
 {
 	"geometry": [
-        {"shape":"box", "flag0": "OBSTACLE", "flag1": "OBSTACLE_AGAINST"}
+        {"shape":"box"}
     ],
     "type": "static"
 }

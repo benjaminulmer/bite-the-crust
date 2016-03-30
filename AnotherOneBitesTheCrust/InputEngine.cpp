@@ -137,11 +137,12 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 		}
 	}
 	else if(state == GameState::END)
-	if (e.cbutton.button == SDL_CONTROLLER_BUTTON_START)
 	{
-		endInput(InputType::BACK);
+		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_START)
+		{
+			endInput(InputType::BACK);
+		}
 	}
-
 	/*else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSTICK)
 	{
 		mode = (mode == InputMode::NORMAL) ? InputMode::DEBUG : InputMode::NORMAL; 

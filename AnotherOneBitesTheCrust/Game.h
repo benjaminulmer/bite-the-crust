@@ -41,20 +41,32 @@ private:
 	void setGameState(GameState state);
 	void initSystems();
 	void loadJSONfiles();
+
 	Tile* setupTile(int i, int j);
 	void setupRegularEntity(std::string name, Tile* tile, glm::vec3 pos);
 	void setupPhysicsEntity(std::string name, Tile* tile, TileEntity tileEntity, glm::vec3 pos);
 	void setupEntities();
 	void setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num);
+
 	void connectSystems();
-	void mainLoop();
 	void processSDLEvents();
 	void quitGame();
 	void endGame(std::map<Vehicle*, int> scores);
 	void shootPizza(Vehicle* vehicle);
 
+	void playDisplay();
+	void playLogic();
+	void menuLogic();
+	void pauseLogic();
+	void mainLoop();
+
 	GameState gameState;
-	int outOfGameTimeAccMS;
+
+	unsigned int oldTimeMs;
+	unsigned int newTimeMs;
+	unsigned int deltaTimeMs;
+	unsigned int deltaTimeAccMs;
+	unsigned int outOfGameTimeAccMs;
 
 	SDL_Window* window;
 	SDL_Surface* screen;
@@ -62,8 +74,8 @@ private:
 	int screenHeight;
 	SDL_Surface *text;
 
-	Camera* camera;
-	Vehicle * players [MAX_PLAYERS];
+	Camera* camera[MAX_PLAYERS];
+	Vehicle * players[MAX_PLAYERS];
 
 	PhysicsEntityInfo* pizzaInfo;
 	std::vector<Entity*> entities;

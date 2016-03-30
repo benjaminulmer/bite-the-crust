@@ -88,7 +88,13 @@
 			"entities": [
 				{"name": "fence", "x": 10, "rotation": 270},
 				{"name": "fence", "z": 10},
-				{"name": ["birch", "oak", "deadTree", "aspen", "pine", "rock3"], "x": 10, "z": 10, "upperRotation": 360}
+				{"name": ["birch", "oak", "deadTree", "aspen", "pine", "rock3"], "x": 10, "z": 10, "upperRotation": 360},
+				{"name": ["flower1", "flower2", "flower3"], "x": 10, "z": 5, "rotation": 90},
+				{"name": ["flower1", "flower2", "flower3"], "x": 10, "z": 5, "rotation": 90},
+				{"name": ["flower1", "flower2", "flower3"], "x": 10, "z": 5, "rotation": 90},
+				{"name": ["flower1", "flower2", "flower3"], "x": 10, "z": 5, "rotation": 90},
+				{"name": ["flower1", "flower2", "flower3"], "x": 10, "z": 5, "rotation": 90},
+				{"name": ["flower1", "flower2", "flower3"], "x": 10, "z": 5, "rotation": 90}
 			],
 			"nodes": [
 			]

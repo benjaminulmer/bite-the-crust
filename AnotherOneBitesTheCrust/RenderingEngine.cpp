@@ -10,6 +10,7 @@ RenderingEngine::RenderingEngine()
 {
 	//glEnable(GL_MULTISAMPLE);
 	//glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
 
 	generateIDs();
 	loadProjectionMatrix();
@@ -30,11 +31,9 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	//glClearDepth(1.0);
 
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
-
 
 	glUniform3f(lightPos, mmCenter.x, 200.0f, mmCenter.z);
 	glUniform1f(lightPow, 20000.0f);

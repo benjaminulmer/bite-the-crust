@@ -884,10 +884,10 @@ void RenderingEngine::setupMinimap(Map map)
 		glm::vec3(centerX, centerY, centerZ), // and looks at the origin
 		glm::vec3(0, 0, 1)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
+	
+	mmV = translate(mmV, vec3(650,0,-170));
 	mmV = rotate(mmV, radians(90.0f), vec3(0,-1,0));
-	//shift = vec3(2.65, 0.0, -1.7);
-	//shift = rotate(shift, radians(90.0f), vec3(0,-1,0));
-	shift = vec3(-1.3, 0.0, -6.0);		//x is up and down, z is left and right
+	
 }
 
 void RenderingEngine::drawMinimap(Vehicle* vans[4])
@@ -902,8 +902,6 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
 	
 	mmM = mat4(1.0f);
-	//mmM = scale(mmM, vec3(0.5, 0.5, 0.5));
-	mmM = translate(mmM,mmCenter * shift);	//positive X moves it left. Positive Z moves it up
 
 	mat4 mmMVP = P * mmV * mmM;
 
@@ -937,7 +935,6 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 	for (int i = 0; i < 4; i++) {
 		glBindVertexArray(mmVanVAOs[i]);
 		mmM = mat4(1.0f);
-		mmM = translate(mmM, mmCenter * shift);
 		mmM = mmM * vans[i]->getModelMatrix();
 		mmM = scale(mmM, vec3(3.0));
 		mmM = rotate(mmM, -1.5708f, glm::vec3(0,1,0));
@@ -961,7 +958,6 @@ void RenderingEngine::drawDelivery()
 	glBindVertexArray(mmDeliveryVAO);
 
 	mmM = mat4(1.0f);
-	mmM = translate(mmM,mmCenter * shift);
 	mmM = translate(mmM, deliveryPosition);
 
 	mat4 mmMVP = P * mmV * mmM;

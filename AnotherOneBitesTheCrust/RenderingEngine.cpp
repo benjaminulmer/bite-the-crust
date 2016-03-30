@@ -8,11 +8,8 @@ using namespace glm;
 
 RenderingEngine::RenderingEngine()
 {
-	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_MULTISAMPLE);
 	//glDepthFunc(GL_LESS);
-
-	glEnable(GL_CULL_FACE);
 
 	generateIDs();
 	loadProjectionMatrix();
@@ -20,14 +17,13 @@ RenderingEngine::RenderingEngine()
 	menuState = 0;
 	currentMenuSelection = 1;
 	currentPauseSelection = 1;
+
+	initText2D("res\\Fonts\\Carbon.DDS");
+	setupMiscBuffers();
+	setupIntro();
 }
 
 RenderingEngine::~RenderingEngine(void) {}
-
-
-//vehicle dimensions
-//x: 2.5, y:2, z:5
-
 
 void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 {

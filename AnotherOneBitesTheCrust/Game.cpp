@@ -5,7 +5,6 @@
 #include "StaticEntity.h"
 
 #include <iostream>
-#include <string>
 #include <sigslot.h>
 
 using namespace std;
@@ -22,8 +21,8 @@ void fatalError(string errorString)
 Game::Game(void)
 {
 	window = nullptr;
-	screenWidth = 1280;		//pro csgo resolution
-	screenHeight = 720;
+	screenWidth = 1920;		//pro csgo resolution
+	screenHeight = 1080;
 	gameState = GameState::MENU;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
@@ -36,27 +35,28 @@ Game::Game(void)
 	generator.seed(rd());
 }
 
+void Game::setGameState(GameState state)
+{
+	gameState = state;
+}
+
 // The entry point of the game
 void Game::run()
 {
 	// Preload data, initialize subsystems, anything to do before entering the main loop
 	initSystems();
+	loadJSONfiles();
 	setupEntities();
 	connectSystems();
 
 	mainLoop();
 }
 
-void Game::setGameState(GameState state)
-{
-	gameState = state;
-}
-
 // Initialize all subsystems for the game
 void Game::initSystems()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);		//Initialize SDL
-	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN);
 
 	if(window == nullptr)
 	{
@@ -82,7 +82,7 @@ void Game::initSystems()
 		printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 	}
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);				//blue background
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	aiEngine = new AIEngine();
 	audioEngine = new AudioEngine();
@@ -90,18 +90,48 @@ void Game::initSystems()
 	physicsEngine = new PhysicsEngine();
 	renderingEngine = new RenderingEngine();
 	deliveryManager = new DeliveryManager();
-	renderingEngine->initText2D("res\\Fonts\\Carbon.DDS");
-	renderingEngine->setupMiscBuffers();
-	renderingEngine->setupIntro();
-
 }
 
-// Create and initialize all loaded entities in the game world
-void Game::setupEntities()
+Tile* Game::setupTile(int i, int j)
+{
+	Tile* tile = &map.tiles[i][j];
+
+	if (tile->deliverable)
+	{
+		deliveryManager->addDeliveryLocation(tile);
+		map.deliveryTiles.push_back(tile);
+	}
+	if (tile->pickup)
+	{
+		// TODO make this better/less hardcoded
+		physicsEngine->createPizzaPickup(physx::PxVec3((float)j*map.tileSize + map.tileSize/2, 0, (float)i*map.tileSize + map.tileSize/2), 8.0f);
+	}
+
+	StaticEntity* ground = new StaticEntity();
+	ground->setRenderable(renderablesMap[tile->groundModel]);
+	ground->setTexture(textureMap[tile->groundModel]);
+
+	// Offset by tileSize/2 so that the corner of the map starts at 0,0
+	glm::vec3 pos = glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2);
+
+	float rotationRad = physx::PxPi * (tile->groundRotationDeg / 180.0f);
+	physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
+
+	physicsEngine->createEntity(ground, physicsEntityInfoMap[tile->groundModel], transform);
+	tile->ground = ground;
+	tile->groundTexture = textureMap[tile->groundModel];
+	entities.push_back(ground);
+
+	return tile;
+}
+
+void Game::loadJSONfiles()
 {
 	// Load data for entities
 	if (!ContentLoading::loadEntityList("res\\JSON\\entityList.json", renderablesMap, physicsEntityInfoMap, textureMap))
+	{
 		fatalError("Could not load entities list.");
+	}
 
 	// Assign the buffers for all the renderables
 	std::map<std::string, Renderable*>::iterator it;
@@ -112,7 +142,55 @@ void Game::setupEntities()
 
 	// Load the map
 	if (!ContentLoading::loadMap("res\\JSON\\tiles.json", "res\\JSON\\map.json", map))
+	{
 		fatalError("Could not load map file.");
+	}
+}
+
+void Game::setupRegularEntity(std::string name, Tile* tile, glm::vec3 pos)
+{
+	Entity* e = new Entity();
+	e->setRenderable(renderablesMap[name]);
+	e->setTexture(textureMap[name]);
+
+	e->setDefaultRotation(physx::PxPi *(tile->groundRotationDeg) / 180.0f, glm::vec3(0,1,0));
+	e->setDefaultTranslation(pos);
+	entities.push_back(e);
+}
+
+void Game::setupPhysicsEntity(std::string name, Tile* tile, TileEntity tileEntity, glm::vec3 pos)
+{
+	PhysicsEntity* e;
+	if (physicsEntityInfoMap[name]->type == PhysicsType::DYNAMIC)
+	{
+		e = new DynamicEntity();
+	} 
+	else
+	{
+		e = new StaticEntity();
+		tile->staticEntities.push_back(e);
+	}
+
+	// TODO, error check that these models do exist, instead of just break
+	e->setRenderable(renderablesMap[name]);
+	e->setTexture(textureMap[name]);
+
+	std::uniform_int_distribution<int> rotationDist(tileEntity.lowerRotation, tileEntity.upperRotation);
+	float rotationRad = physx::PxPi * (rotationDist(generator) / 180.0f);
+	physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
+
+	physicsEngine->createEntity(e, physicsEntityInfoMap[name], transform);
+	entities.push_back(e);
+
+	if (name.find("house") != std::string::npos)
+	{
+		tile->house = e;
+	}
+}
+
+// Create and initialize all loaded entities in the game world
+void Game::setupEntities()
+{
 	deliveryManager->map = &map;
 
 	// Create all the entities loaded in the map
@@ -120,73 +198,16 @@ void Game::setupEntities()
 	{
 		for (unsigned int j = 0; j < map.tiles[i].size(); j++)
 		{
-			Tile* tile = &map.tiles[i][j];
-
-			if (tile->deliverable) {
-				deliveryManager->addDeliveryLocation(tile);
-				map.deliveryTiles.push_back(tile);
-			}
-			if (tile->pickup) {
-				// TODO make this better/less hardcoded
-				physicsEngine->createPizzaPickup(physx::PxVec3((float)j*map.tileSize + map.tileSize/2, 0, (float)i*map.tileSize + map.tileSize/2), 8.0f);
-			}
-
-			StaticEntity* ground = new StaticEntity();
-			ground->setRenderable(renderablesMap[tile->groundModel]);
-			ground->setTexture(textureMap[tile->groundModel]);
-
-			// Offset by tileSize/2 so that the corner of the map starts at 0,0
-			glm::vec3 pos = glm::vec3(j*map.tileSize + map.tileSize/2, 0, i*map.tileSize + map.tileSize/2);
-
-			float rotationRad = physx::PxPi * (tile->groundRotationDeg / 180.0f);
-			physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
-
-			physicsEngine->createEntity(ground, physicsEntityInfoMap[tile->groundModel], transform);
-			tile->ground = ground;
-			tile->groundTexture = textureMap[tile->groundModel];
-			entities.push_back(ground);
-
+			Tile* tile = setupTile(i, j);
 			for (unsigned int k = 0; k < tile->entityTemplates.size(); k++)
-			{
+			{		
 				TileEntity tileEntity = tile->entityTemplates[k];
-
 				std::uniform_int_distribution<int> nameDist(0, tileEntity.names.size()-1);
 				std::string name = tileEntity.names[nameDist(generator)];
 
 				// Offset position based on what tile we're in
 				glm::vec3 pos = tileEntity.position + glm::vec3(j * map.tileSize, 0, i * map.tileSize);
-				if (physicsEntityInfoMap.count(name) == 0) {
-					Entity* e = new Entity();
-					e->setRenderable(renderablesMap[name]);
-					e->setTexture(textureMap[name]);
-
-					e->setDefaultRotation(physx::PxPi *(tile->groundRotationDeg) / 180.0f, glm::vec3(0,1,0));
-					e->setDefaultTranslation(pos);
-					entities.push_back(e);
-				} else {
-					PhysicsEntity* e;
-					if (physicsEntityInfoMap[name]->type == PhysicsType::DYNAMIC) {
-						e = new DynamicEntity();
-					} else {
-						e = new StaticEntity();
-						tile->staticEntities.push_back(e);
-					}
-
-					// TODO, error check that these models do exist, instead of just break
-					e->setRenderable(renderablesMap[name]);
-					e->setTexture(textureMap[name]);
-
-					std::uniform_int_distribution<int> rotationDist(tileEntity.lowerRotation, tileEntity.upperRotation);
-					float rotationRad = physx::PxPi * (rotationDist(generator) / 180.0f);
-					physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
-
-					physicsEngine->createEntity(e, physicsEntityInfoMap[name], transform);
-					entities.push_back(e);
-
-					if (name.find("house") != std::string::npos) {
-						tile->house = e;
-					}
-				}
+				(physicsEntityInfoMap.count(name) == 0) ? setupRegularEntity(name, tile, pos) : setupPhysicsEntity(name, tile, tileEntity, pos);
 			}
 		}
 	}
@@ -249,8 +270,6 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->colorName = "Yellow";
 			break;
 	}
-	// TODO get dimensions working properly for vehicle
-	vehicle->tuning.chassisDims = physx::PxVec3(2, 2, 5);
 	physicsEngine->createVehicle(vehicle, transform);
 	entities.push_back(vehicle);
 
@@ -279,8 +298,6 @@ void Game::connectSystems()
 	inputEngine->setInputStruct(&players[0]->input, 0);
 	inputEngine->setCamera(camera, 0);
 
-	inputEngine->setInputStruct(&players[0]->input, 0);
-
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		players[i]->shootPizzaSignal.connect(this, &Game::shootPizza);
@@ -292,8 +309,6 @@ void Game::connectSystems()
 
 		deliveryManager->addPlayer(players[i]);
 	}
-
-	inputEngine->unFucker.connect(this, &Game::unFuckerTheGame);
 
 	// TODO: Should have a textures array or something that corresponds to each player so we can add this to above loop
 	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRed.DDS");
@@ -320,11 +335,6 @@ void Game::mainLoop()
 {
 	unsigned int oldTimeMs = SDL_GetTicks();
 	unsigned int deltaTimeAccMs = 0;
-
-	std::vector<glm::vec3> allNodes;
-	for(graphNode * node : map.allNodes)
-		allNodes.push_back(node->getPosition());
-	//renderingEngine->setupNodes(allNodes, vec3(1,1,0));
 
 	// Game loop
 	while (gameState != GameState::EXIT)
@@ -371,8 +381,6 @@ void Game::mainLoop()
 					{
 						AICollisionEntity closest = physicsEngine->AISweep(players[i]);
 						aiEngine->updateAI(players[i], deliveryManager->deliveries[players[i]], map, closest);
-						//renderingEngine->setupNodes(players[i]->currentPath, vec3(1,1,0)); // TODO: Remove when adding multiple AIs, otherwise will be very confusing (or change colours to match AI)
-						
 					}
 					players[i]->update();
 				}
@@ -389,10 +397,9 @@ void Game::mainLoop()
 			// Display
 			renderingEngine->displayFuncTex(entities);
 			for(int i = 0 ; i < MAX_PLAYERS; i++)
+			{
 				renderingEngine->drawShadow(players[i]->getPosition());
-			
-			//renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
-			//renderingEngine->drawNodes(map.allNodes.size(), "points");
+			}
 			renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
 			renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
 
@@ -413,30 +420,30 @@ void Game::mainLoop()
 			string pizzas = "Pizzas: ";
 			pizzas.append(to_string(players[0]->pizzaCount));
 			if(players[0]->pizzaCount > 0)
+			{
 				renderingEngine->printText2D(pizzas.data(), 1050, 640, 24);
+			}
 			else
+			{
 				renderingEngine->printText2Doutline(pizzas.data(), 990, 640, 30, glm::vec4(1,0,0,1), false);
-
+			}
 			renderingEngine->drawDelivery();
-//			renderingEngine->drawNodes(p2Vehicle->currentPath.size(), "lines");
 
 			//swap buffers
 			SDL_GL_SwapWindow(window);
 			physicsEngine->fetchSimulationResults();
-			//gameState = GameState::INTRO;
 		}
 		else if(gameState == GameState::MENU)
 		{
 			processSDLEvents();
+
 			renderingEngine->updateMenu();
 			renderingEngine->displayMenu();
-			
 
 			string instructions = "D-pad - Move, A - Select, B - Back";
 			renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 
 			SDL_GL_SwapWindow(window);
-
 		}
 		else if(gameState == GameState::PAUSE)
 		{
@@ -448,9 +455,7 @@ void Game::mainLoop()
 			renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 			SDL_GL_SwapWindow(window);
 		}
-
 	}
-
 }
 
 // Loop over all SDL events since last frame and call appropriate for each type of event
@@ -538,20 +543,6 @@ void Game::shootPizza(Vehicle* vehicle)
 	pizzaBox->getRigidDynamic()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
-}
-
-void Game::unFuckerTheGame()
-{
-	for(int i =0 ; i < MAX_PLAYERS; i++)
-	{
-		players[i]->getActor()->setGlobalPose(physx::PxTransform(10 + i*10.0f, 2, 20));
-		players[i]->getPhysicsVehicle()->setToRestState();
-	}
-
-	for (unsigned int i = 0; i < 10; i++) 
-	{
-		camera->update();
-	}
 }
 
 Game::~Game(void)

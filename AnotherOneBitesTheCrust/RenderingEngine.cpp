@@ -17,6 +17,7 @@ RenderingEngine::RenderingEngine()
 	generateIDs();
 	loadProjectionMatrix();
 
+	menuState = 0;
 	currentMenuSelection = 1;
 	currentPauseSelection = 1;
 }
@@ -883,8 +884,10 @@ void RenderingEngine::setupMinimap(Map map)
 		glm::vec3(centerX, centerY, centerZ), // and looks at the origin
 		glm::vec3(0, 0, 1)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
-
-	shift = vec3(2.65, 0.0, -1.7);
+	mmV = rotate(mmV, radians(90.0f), vec3(0,-1,0));
+	//shift = vec3(2.65, 0.0, -1.7);
+	//shift = rotate(shift, radians(90.0f), vec3(0,-1,0));
+	shift = vec3(-1.3, 0.0, -6.0);		//x is up and down, z is left and right
 }
 
 void RenderingEngine::drawMinimap(Vehicle* vans[4])
@@ -1116,6 +1119,7 @@ void RenderingEngine::setupIntro()
 			glm::vec3(0,1,0)
 		);
 
+
 	//loading menus stuff
 	Renderable *aobtc = ContentLoading::createRenderable("res\\Models\\AOBTC.obj");
 	Renderable *play = ContentLoading::createRenderable("res\\Models\\play.obj");
@@ -1123,8 +1127,11 @@ void RenderingEngine::setupIntro()
 	Renderable *controls = ContentLoading::createRenderable("res\\Models\\controls.obj");
 	Renderable *story = ContentLoading::createRenderable("res\\Models\\story.obj");
 	Renderable *exit = ContentLoading::createRenderable("res\\Models\\exit.obj");
+	Renderable *billboard = ContentLoading::createRenderable("res\\Models\\Billboard.obj");
 	
 	GLuint aobtcTexture = ContentLoading::loadDDS("res\\Textures\\AOBTC-colored.DDS");
+	GLuint billboardHowto = ContentLoading::loadDDS("res\\Textures\\Billboard-howto.DDS");
+	GLuint billboardControls = ContentLoading::loadDDS("res\\Textures\\Billboard-controls.DDS");
 	selected = ContentLoading::loadDDS("res\\Textures\\selected.DDS");
 	unselected = ContentLoading::loadDDS("res\\Textures\\unselected.DDS");
 	
@@ -1134,6 +1141,7 @@ void RenderingEngine::setupIntro()
 	assignBuffersTex(controls);
 	assignBuffersTex(story);
 	assignBuffersTex(exit);
+	assignBuffersTex(billboard);
 
 	Entity *eAOBTC = new Entity();
 	eAOBTC->setRenderable(aobtc);
@@ -1164,6 +1172,18 @@ void RenderingEngine::setupIntro()
 	eExit->setRenderable(exit);
 	eExit->setTexture(unselected);
 	menuEntities.push_back(eExit);
+
+	Entity *eBillboardHowto = new Entity();
+	eBillboardHowto->setRenderable(billboard);
+	eBillboardHowto->setTexture(billboardHowto);
+	eBillboardHowto->setDefaultTranslation(vec3(13,0,0));
+	menuEntities.push_back(eBillboardHowto);
+
+	Entity *eBillboardControls = new Entity();
+	eBillboardControls->setRenderable(billboard);
+	eBillboardControls->setTexture(billboardControls);
+	eBillboardControls->setDefaultTranslation(vec3(-13,0,0));
+	menuEntities.push_back(eBillboardControls);
 
 	//loading paused stuff
 	Renderable *paused = ContentLoading::createRenderable("res\\Models\\paused.obj");
@@ -1267,7 +1287,7 @@ void RenderingEngine::displayMenu()
 
 			//Translations done here. Order of translations is scale, rotate, translate
 		//introM = menuEntities[i]->getModelMatrix();
-		//introM = calculateDefaultModel(introM, menuEntities[i]);
+		introM = calculateDefaultModel(introM, menuEntities[i]);
 		mat4 MVP = P * introV * introM;
 	
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
@@ -1335,7 +1355,7 @@ void RenderingEngine::displayPause()
 
 void RenderingEngine::updateMenu()
 {
-	for(unsigned int i = 1; i < menuEntities.size(); i++)
+	for(unsigned int i = 1; i < menuEntities.size()-2; i++)
 	{
 		if(i == currentMenuSelection)
 		{
@@ -1368,27 +1388,57 @@ void RenderingEngine::menuInput(InputType type)
 {
 	if (type == InputType::UP)
 	{
-		currentMenuSelection -= 1;
+		if(menuState == 0)
+			currentMenuSelection -= 1;
 		if(currentMenuSelection < 1)
 			currentMenuSelection = 1;
 	}
 	else if (type == InputType::DOWN)
 	{
-		currentMenuSelection += 1;
-		if(currentMenuSelection > menuEntities.size() - 1)
-			currentMenuSelection = menuEntities.size() -1;
+		if(menuState == 0)
+			currentMenuSelection += 1;
+		if(currentMenuSelection > menuEntities.size() - 3)
+			currentMenuSelection = menuEntities.size() - 3;
 	}
 	else if (type == InputType::ENTER)
 	{
-		if(currentMenuSelection == 1)
+		if(currentMenuSelection == 1)			//PLAY
+		{
 			gameStateSelected(GameState::PLAY);
-		//else if(currentMenuSelection == 2)
-		//	introV = translate(introV, vec3(0, -3, 0));
-		else if(currentMenuSelection == menuEntities.size()-1)
+			introV = glm::lookAt(
+			glm::vec3(0,0,7), 
+			glm::vec3(0,0,0), 
+			glm::vec3(0,1,0));
+		}
+		else if(currentMenuSelection == 2)	//HOW TO PLAY
+		{
+			if(menuState == 0)
+				introV = translate(introV, vec3(-13,0,0));
+			menuState = 1;
+		}
+		else if(currentMenuSelection == 3)	//CONTROLS
+		{
+			if(menuState == 0)
+				introV = translate(introV, vec3(13,0,0));
+			menuState = 1;
+		}
+		else if(currentMenuSelection == menuEntities.size()- 3)	//EXIT
+		{
 			gameStateSelected(GameState::EXIT);
+		}
 	}
 	else if (type == InputType::BACK)
 	{
+		if(menuState != 0)
+		{
+			introV = glm::lookAt(
+				glm::vec3(0,0,7), 
+				glm::vec3(0,0,0), 
+				glm::vec3(0,1,0)
+			);
+			menuState = 0;
+		}
+
 	}
 }
 
@@ -1409,13 +1459,17 @@ void RenderingEngine::pauseInput(InputType type)
 	else if (type == InputType::ENTER)
 	{
 		if(currentPauseSelection == 1)
+		{
 			gameStateSelected(GameState::PLAY);
+			currentPauseSelection = 1;
+		}
 		else if(currentPauseSelection == pausedEntities.size()-1)
 			gameStateSelected(GameState::EXIT);
 	}
 	else if (type == InputType::BACK)
 	{
 		gameStateSelected(GameState::PLAY);
+		currentPauseSelection = 1;
 	}
 }
 

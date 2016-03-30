@@ -21,8 +21,8 @@ void fatalError(string errorString)
 Game::Game(void)
 {
 	window = nullptr;
-	screenWidth = 1920;		//pro csgo resolution
-	screenHeight = 1080;
+	screenWidth = 1280;		//pro csgo resolution
+	screenHeight = 720;
 	gameState = GameState::MENU;
 	renderingEngine = nullptr;
 	physicsEngine = nullptr;
@@ -56,7 +56,7 @@ void Game::run()
 void Game::initSystems()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);		//Initialize SDL
-	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN);
+	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 
 	if(window == nullptr)
 	{
@@ -92,6 +92,28 @@ void Game::initSystems()
 	deliveryManager = new DeliveryManager();
 }
 
+void Game::loadJSONfiles()
+{
+	// Load data for entities
+	if (!ContentLoading::loadEntityList("res\\JSON\\entityList.json", renderablesMap, physicsEntityInfoMap, textureMap))
+	{
+		fatalError("Could not load entities list.");
+	}
+
+	// Assign the buffers for all the renderables
+	std::map<std::string, Renderable*>::iterator it;
+	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it)
+	{
+		renderingEngine->assignBuffersTex(it->second);
+	}
+
+	// Load the map
+	if (!ContentLoading::loadMap("res\\JSON\\tiles.json", "res\\JSON\\map.json", map))
+	{
+		fatalError("Could not load map file.");
+	}
+}
+
 Tile* Game::setupTile(int i, int j)
 {
 	Tile* tile = &map.tiles[i][j];
@@ -123,28 +145,6 @@ Tile* Game::setupTile(int i, int j)
 	entities.push_back(ground);
 
 	return tile;
-}
-
-void Game::loadJSONfiles()
-{
-	// Load data for entities
-	if (!ContentLoading::loadEntityList("res\\JSON\\entityList.json", renderablesMap, physicsEntityInfoMap, textureMap))
-	{
-		fatalError("Could not load entities list.");
-	}
-
-	// Assign the buffers for all the renderables
-	std::map<std::string, Renderable*>::iterator it;
-	for (it = renderablesMap.begin(); it != renderablesMap.end(); ++it)
-	{
-		renderingEngine->assignBuffersTex(it->second);
-	}
-
-	// Load the map
-	if (!ContentLoading::loadMap("res\\JSON\\tiles.json", "res\\JSON\\map.json", map))
-	{
-		fatalError("Could not load map file.");
-	}
 }
 
 void Game::setupRegularEntity(std::string name, Tile* tile, glm::vec3 pos)
@@ -339,11 +339,11 @@ void Game::mainLoop()
 	// Game loop
 	while (gameState != GameState::EXIT)
 	{
+		processSDLEvents();
+
 		//TODO: Skipable intros
 		if (gameState == GameState::INTRO)
 		{
-			processSDLEvents();
-
 			renderingEngine->displayIntro(0);
 			SDL_GL_SwapWindow(window);
 			SDL_Delay(3000);
@@ -361,15 +361,13 @@ void Game::mainLoop()
 		}
 		else if(gameState == GameState::PLAY)
 		{
-			processSDLEvents();
-
 			// Figure out timestep and run physics
 			unsigned int newTimeMs = SDL_GetTicks();
 			unsigned int deltaTimeMs = newTimeMs - oldTimeMs;
 			oldTimeMs = newTimeMs;
 
 			deltaTimeAccMs += deltaTimeMs;
-			if (deltaTimeAccMs >= PHYSICS_STEP_MS) 
+			while (deltaTimeAccMs >= PHYSICS_STEP_MS)
 			{
 				deltaTimeAccMs -= PHYSICS_STEP_MS;
 				deliveryManager->timePassed(PHYSICS_STEP_MS);
@@ -384,12 +382,13 @@ void Game::mainLoop()
 					}
 					players[i]->update();
 				}
-				physicsEngine->simulate(PHYSICS_STEP_MS);
-
-				// Update the camera
+				physicsEngine->simulate(PHYSICS_STEP_MS);	
+				physicsEngine->fetchSimulationResults();
 				camera->update();
-				renderingEngine->updateView(*camera);		
 			}
+			
+			renderingEngine->updateView(*camera);
+
 			// Update Sound
 			// TODO: update audioengine to support multiple listeners
 			audioEngine->update(players[0]->getModelMatrix());
@@ -410,7 +409,11 @@ void Game::mainLoop()
 
 			string frameRate = "DeltaTime: ";
 			frameRate.append(to_string(deltaTimeMs));
-			renderingEngine->printText2D(frameRate.data(), 0, 670, 20);
+			renderingEngine->printText2D(frameRate.data(), 0, 640, 20);
+
+			string deltaAcc = "DeltaTimeACC: ";
+			deltaAcc.append(to_string(deltaTimeAccMs));
+			renderingEngine->printText2D(deltaAcc.data(), 0, 670, 20);
 
 			string score = "Tips: $";
 			score.append(to_string(deliveryManager->getScore(players[0])));
@@ -431,12 +434,11 @@ void Game::mainLoop()
 
 			//swap buffers
 			SDL_GL_SwapWindow(window);
-			physicsEngine->fetchSimulationResults();
+			
 		}
 		else if(gameState == GameState::MENU)
 		{
-			processSDLEvents();
-
+			oldTimeMs = SDL_GetTicks();
 			renderingEngine->updateMenu();
 			renderingEngine->displayMenu();
 
@@ -447,7 +449,7 @@ void Game::mainLoop()
 		}
 		else if(gameState == GameState::PAUSE)
 		{
-			processSDLEvents();
+			oldTimeMs = SDL_GetTicks();
 			renderingEngine->updatePaused();
 			renderingEngine->displayPause();
 

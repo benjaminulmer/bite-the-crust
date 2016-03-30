@@ -54,6 +54,7 @@ private:
 	void shootPizza(Vehicle* vehicle);
 
 	GameState gameState;
+	int outOfGameTimeAccMS;
 
 	SDL_Window* window;
 	SDL_Surface* screen;

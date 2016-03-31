@@ -2,17 +2,20 @@
 
 DecorationEntity::DecorationEntity(void)
 {
+	modelMatrix = glm::mat4(1);
 	type = EntityType::DECORATION;
 }
 
 void DecorationEntity::rotate(float angle, glm::vec3 axis)
 {
-	modelMatrix = glm::rotate(modelMatrix, angle, axis);
+	rotMatrix = glm::rotate(rotMatrix, angle, axis);
+	modelMatrix = transMatrix * rotMatrix;
 }
 
 void DecorationEntity::translate(glm::vec3 pos)
 {
-	modelMatrix = glm::translate(modelMatrix, pos);
+	transMatrix = glm::translate(transMatrix, pos);
+	modelMatrix = transMatrix * rotMatrix;
 }
 
 glm::vec3 DecorationEntity::getPosition()

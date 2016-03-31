@@ -34,8 +34,7 @@ public:
 	sigslot::signal0<> unFucker;
 	sigslot::signal1<InputType> menuInput;
 	sigslot::signal1<InputType> pauseInput;
-	sigslot::signal1<InputType> endInput;
-	sigslot::signal1<GameState> pausePressed;
+	sigslot::signal1<GameState> setGameState;
 
 private:
 	SDL_GameController* controllers[MAX_NUM_CONTROLLERS];

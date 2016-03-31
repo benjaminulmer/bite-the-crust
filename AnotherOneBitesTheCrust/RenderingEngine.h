@@ -170,7 +170,6 @@ public:
 
 	void menuInput(InputType type);
 	void pauseInput(InputType type);
-	void endInput(InputType type);
 	void updateMenu();
 	void updatePaused();
 	GLuint selected;

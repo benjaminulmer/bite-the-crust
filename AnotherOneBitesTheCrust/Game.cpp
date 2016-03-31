@@ -37,6 +37,11 @@ Game::Game(void)
 
 void Game::setGameState(GameState state)
 {
+	if (state == GameState::PLAY)
+	{
+		setupEntities();
+		connectSystems();
+	}
 	gameState = state;
 }
 
@@ -46,8 +51,11 @@ void Game::run()
 	// Preload data, initialize subsystems, anything to do before entering the main loop
 	initSystems();
 	loadJSONfiles();
-	setupEntities();
-	connectSystems();
+
+	inputEngine->menuInput.connect(renderingEngine, &RenderingEngine::menuInput);
+	inputEngine->pauseInput.connect(renderingEngine, &RenderingEngine::pauseInput);
+	inputEngine->setGameState.connect(this, &Game::setGameState);
+	renderingEngine->gameStateSelected.connect(this, &Game::setGameState);
 
 	mainLoop();
 }
@@ -290,9 +298,6 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 // Connects systems together
 void Game::connectSystems()
 {
-	inputEngine->menuInput.connect(renderingEngine, &RenderingEngine::menuInput);
-	inputEngine->pauseInput.connect(renderingEngine, &RenderingEngine::pauseInput);
-	inputEngine->endInput.connect(renderingEngine, &RenderingEngine::endInput);
 
 	inputEngine->setInputStruct(&players[0]->input, 0);
 	inputEngine->setCamera(camera[0], 0);
@@ -324,9 +329,6 @@ void Game::connectSystems()
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
 	deliveryManager->pizzasRefilled.connect(audioEngine, &AudioEngine::playReloadSound);
-
-	inputEngine->pausePressed.connect(this, &Game::setGameState);
-	renderingEngine->gameStateSelected.connect(this, &Game::setGameState);
 }
 
 void Game::playDisplay()
@@ -372,10 +374,14 @@ void Game::playLogic()
 	oldTimeMs = newTimeMs;
 	deltaTimeAccMs += deltaTimeMs;
 
+	playDisplay();
+
 	while (deltaTimeAccMs >= PHYSICS_STEP_MS)
 	{
 		if (gameState == GameState::END) break;
 		deltaTimeAccMs -= PHYSICS_STEP_MS;
+		physicsEngine->simulate(PHYSICS_STEP_MS);	
+
 		deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 		// Update the player and AI cars and cameras
@@ -389,7 +395,6 @@ void Game::playLogic()
 			players[i]->update();
 			camera[i]->update();
 		}
-		physicsEngine->simulate(PHYSICS_STEP_MS);	
 		physicsEngine->fetchSimulationResults();
 	}
 	// TODO splitscreen
@@ -397,8 +402,6 @@ void Game::playLogic()
 
 	// TODO: update audioengine to support multiple listeners
 	audioEngine->update(players[0]->getModelMatrix());
-
-	playDisplay();
 }
 
 void Game::menuLogic()
@@ -419,6 +422,29 @@ void Game::pauseLogic()
 
 	string instructions = "D-pad - Move, A - Select, B - Back";
 	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
+}
+
+void Game::endLogic()
+{
+	renderingEngine->displayFuncTex(entities);
+	for(int i = 0 ; i < MAX_PLAYERS; i++)
+	{
+		renderingEngine->drawShadow(players[i]->getPosition());
+	}
+	renderingEngine->drawSkybox(players[0]->getPosition());
+
+	Vehicle* winner = players[0];
+	for (int i = 1; i < MAX_PLAYERS; i++)
+	{
+		if (scores[players[i]] > scores[winner])
+			winner = players[i];
+	}
+	string winnerText = "	" + winner->colorName + " WINS			";
+	renderingEngine->printBanner(winnerText.data(), 0, 720/2, 100, winner->color);
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		string scoreText = "TIPS: $" + std::to_string(scores[players[i]]);
+		renderingEngine->printBanner(scoreText.data(), 100, 300 - i*50, 50, players[i]->color);
+	}
 }
 
 // Main loop of the game
@@ -461,9 +487,17 @@ void Game::mainLoop()
 		{
 			pauseLogic();
 		}
-		if (gameState != GameState::END)
-			SDL_GL_SwapWindow(window);
+		else if (gameState == GameState::END)
+		{
+			endLogic();
+		}
+		SDL_GL_SwapWindow(window);
 	}
+}
+
+void Game::endGame(std::map<Vehicle*, int> scores) {
+	gameState = GameState::END;
+	this->scores = scores;
 }
 
 // Loop over all SDL events since last frame and call appropriate for each type of event
@@ -503,33 +537,6 @@ void Game::processSDLEvents()
 	}
 }
 
-void Game::endGame(std::map<Vehicle*, int> scores) {
-	gameState = GameState::END;
-
-	renderingEngine->displayFuncTex(entities);
-	for(int i = 0 ; i < MAX_PLAYERS; i++)
-	{
-		renderingEngine->drawShadow(players[i]->getPosition());
-	}
-	renderingEngine->drawSkybox(players[0]->getPosition());
-
-	Vehicle* winner = players[0];
-	for (int i = 1; i < MAX_PLAYERS; i++)
-	{
-		if (scores[players[i]] > scores[winner])
-			winner = players[i];
-	}
-	string winnerText = "	" + winner->colorName + " WINS			";
-	renderingEngine->printBanner(winnerText.data(), 0, 720/2, 100, winner->color);
-	for (int i = 0; i < MAX_PLAYERS; i++) {
-		string scoreText = "TIPS: $" + std::to_string(scores[players[i]]);
-		renderingEngine->printBanner(scoreText.data(), 100, 300 - i*50, 50, players[i]->color);
-	}
-	//press start to exit
-
-	SDL_GL_SwapWindow(window);
-}
-
 // Creates and fires a pizza from the provided vehicle
 void Game::shootPizza(Vehicle* vehicle)
 {
@@ -553,11 +560,8 @@ void Game::shootPizza(Vehicle* vehicle)
 
 Game::~Game(void)
 {
-	for(int i = 0 ; i < MAX_PLAYERS; i++)
-		players[i]->shootPizzaSignal.disconnect_all();
-
-	for (unsigned int i = 0; i < entities.size(); i++)
-		delete entities[i];
+	/*for (unsigned int i = 0; i < entities.size(); i++)
+		delete entities[i];*/
 
 	std::map<std::string, Renderable*>::iterator it;
 	for (it = ContentLoading::loadedModels.begin(); it != ContentLoading::loadedModels.end(); ++it)

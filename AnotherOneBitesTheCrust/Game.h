@@ -58,6 +58,7 @@ private:
 	void playLogic();
 	void menuLogic();
 	void pauseLogic();
+	void endLogic();
 	void mainLoop();
 
 	GameState gameState;
@@ -76,6 +77,7 @@ private:
 
 	Camera* camera[MAX_PLAYERS];
 	Vehicle * players[MAX_PLAYERS];
+	std::map<Vehicle*, int> scores;
 
 	PhysicsEntityInfo* pizzaInfo;
 	std::vector<Entity*> entities;

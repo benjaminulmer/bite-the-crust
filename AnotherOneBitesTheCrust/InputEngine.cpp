@@ -91,7 +91,7 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_START)
 		{
-			pausePressed(GameState::PAUSE);
+			setGameState(GameState::PAUSE);
 		}
 	}
 	else if (state == GameState::MENU)
@@ -140,7 +140,7 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 	{
 		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_START)
 		{
-			endInput(InputType::BACK);
+			setGameState(GameState::MENU);
 		}
 	}
 	/*else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSTICK)

@@ -160,6 +160,7 @@
     <ClCompile Include="AudioEngine.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ContentLoading.cpp" />
+    <ClCompile Include="DecorationEntity.cpp" />
     <ClCompile Include="DeliveryManager.cpp" />
     <ClCompile Include="DynamicEntity.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="AudioEngine.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ContentLoading.h" />
+    <ClInclude Include="DecorationEntity.h" />
     <ClInclude Include="DeliveryManager.h" />
     <ClInclude Include="DynamicEntity.h" />
     <ClInclude Include="Entity.h" />

@@ -75,10 +75,6 @@ glm::mat4 Entity::getModelMatrix() {
 	return glm::mat4(1.0f);
 }
 
-void Entity::setPosition(glm::vec3 pos) {
-	return;
-}
-
 bool Entity::hasRenderable() {
 	return (renderable != NULL);
 }

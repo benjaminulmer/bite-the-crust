@@ -6,6 +6,7 @@ enum class EntityType
 {
 	BASE,
 	CAMERA,
+	DECORATION,
 	PHYSICS,
 	DYNAMIC,
 	STATIC,
@@ -33,19 +34,15 @@ public:
 	glm::vec3 getDefaultScale();
 	// END THINGS THAT NEED TO DIE IN A FIRE
 
-	virtual void setPosition(glm::vec3 pos);
 	virtual glm::vec3 getPosition();
 	virtual glm::mat4 getModelMatrix();
 
 	// Component for rendering
 	bool hasRenderable(); 
-
 	void setRenderable(Renderable* r);
 	Renderable* getRenderable();
-
 	void setTexture(GLuint tex);
 	GLuint getTexture();
-	
 
 private:
 	Renderable* renderable;

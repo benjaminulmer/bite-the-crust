@@ -3,6 +3,7 @@
 #include "WheelEntity.h"
 #include "ContentLoading.h"
 #include "StaticEntity.h"
+#include "DecorationEntity.h"
 
 #include <iostream>
 #include <sigslot.h>
@@ -39,8 +40,6 @@ void Game::setGameState(GameState state)
 {
 	if (state == GameState::PLAY)
 	{
-		setupEntities();
-		connectSystems();
 	}
 	gameState = state;
 }
@@ -51,6 +50,8 @@ void Game::run()
 	// Preload data, initialize subsystems, anything to do before entering the main loop
 	initSystems();
 	loadJSONfiles();
+	setupEntities();
+	connectSystems();
 
 	inputEngine->menuInput.connect(renderingEngine, &RenderingEngine::menuInput);
 	inputEngine->pauseInput.connect(renderingEngine, &RenderingEngine::pauseInput);
@@ -157,12 +158,12 @@ Tile* Game::setupTile(int i, int j)
 
 void Game::setupRegularEntity(std::string name, Tile* tile, glm::vec3 pos)
 {
-	Entity* e = new Entity();
+	DecorationEntity* e = new DecorationEntity();
 	e->setRenderable(renderablesMap[name]);
 	e->setTexture(textureMap[name]);
 
-	e->setDefaultRotation(physx::PxPi *(tile->groundRotationDeg) / 180.0f, glm::vec3(0,1,0));
-	e->setDefaultTranslation(pos);
+	e->rotate(glm::radians((float)tile->groundRotationDeg), glm::vec3(0,1,0));
+	e->translate(pos);
 	entities.push_back(e);
 }
 

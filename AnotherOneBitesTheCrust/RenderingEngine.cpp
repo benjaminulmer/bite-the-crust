@@ -1,5 +1,6 @@
 #include "RenderingEngine.h"
 #include "Game.h"
+#include "DecorationEntity.h"
 #include <math.h>
 #include <iostream>
 
@@ -72,16 +73,6 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 
 		glBindVertexArray(0);
 	}
-}
-
-mat4 RenderingEngine::calculateDefaultModel(mat4 model, Entity * entity)
-{
-	//Translations done here. Order of translations is scale, translate, rotate
-	model = glm::scale(model, entity->getDefaultScale());
-	model = glm::translate(model, entity->getDefaultTranslation());
-	model = glm::rotate(model, entity->getDefaultRotationAngle(), entity->getDefaultRotationAxis());
-
-	return model;
 }
 
 void RenderingEngine::generateIDs()
@@ -1166,16 +1157,16 @@ void RenderingEngine::setupIntro()
 	eExit->setTexture(unselected);
 	menuEntities.push_back(eExit);
 
-	Entity *eBillboardHowto = new Entity();
+	DecorationEntity *eBillboardHowto = new DecorationEntity();
 	eBillboardHowto->setRenderable(billboard);
 	eBillboardHowto->setTexture(billboardHowto);
-	eBillboardHowto->setDefaultTranslation(vec3(13,0,0));
+	eBillboardHowto->translate(vec3(13,0,0));
 	menuEntities.push_back(eBillboardHowto);
 
-	Entity *eBillboardControls = new Entity();
+	DecorationEntity *eBillboardControls = new DecorationEntity();
 	eBillboardControls->setRenderable(billboard);
 	eBillboardControls->setTexture(billboardControls);
-	eBillboardControls->setDefaultTranslation(vec3(-13,0,0));
+	eBillboardControls->translate(vec3(-13,0,0));
 	menuEntities.push_back(eBillboardControls);
 
 	//loading paused stuff
@@ -1279,8 +1270,7 @@ void RenderingEngine::displayMenu()
 		introM = mat4(1.0f);
 
 			//Translations done here. Order of translations is scale, rotate, translate
-		//introM = menuEntities[i]->getModelMatrix();
-		introM = calculateDefaultModel(introM, menuEntities[i]);
+		introM = menuEntities[i]->getModelMatrix();
 		mat4 MVP = P * introV * introM;
 	
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));

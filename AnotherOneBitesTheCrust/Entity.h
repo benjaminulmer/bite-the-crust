@@ -25,13 +25,6 @@ public:
 	void testPrint();
 
 	// THESE NEED TO DIE IN A FIRE
-	void setDefaultRotation(float radians, glm::vec3 axis);
-	void setDefaultTranslation(glm::vec3 trans);
-	void setDefaultScale(glm::vec3 scale);
-	float getDefaultRotationAngle();
-	glm::vec3 getDefaultRotationAxis();
-	glm::vec3 getDefaultTranslation();
-	glm::vec3 getDefaultScale();
 	// END THINGS THAT NEED TO DIE IN A FIRE
 
 	virtual glm::vec3 getPosition();

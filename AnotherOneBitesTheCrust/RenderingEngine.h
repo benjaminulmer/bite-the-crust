@@ -31,7 +31,6 @@ public:
 
 	void displayFunc(std::vector<Entity*> entities);
 	void displayFuncTex(std::vector<Entity*> entities);
-	glm::mat4 calculateDefaultModel(glm::mat4 model, Entity * entity);
 
 	void generateIDs();
 	void deleteIDs();

@@ -247,7 +247,6 @@ void Game::setupEntities()
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 {
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", vehicle);
-	vehicle->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 	switch(num) {
 		case 0:
 			vehicle->setRenderable(renderablesMap["redVan"]);
@@ -290,7 +289,6 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 		WheelEntity* wheel = new WheelEntity(vehicle, wheels[i]);
 		wheel->setRenderable(renderablesMap["wheel"]);
 		wheel->setTexture(textureMap["wheel"]);
-		wheel->setDefaultRotation(-1.5708f, glm::vec3(0,1,0));
 		entities.push_back(wheel);
 	}
 	

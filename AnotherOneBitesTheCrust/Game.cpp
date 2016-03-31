@@ -298,7 +298,6 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 // Connects systems together
 void Game::connectSystems()
 {
-
 	inputEngine->setInputStruct(&players[0]->input, 0);
 	inputEngine->setCamera(camera[0], 0);
 
@@ -426,6 +425,31 @@ void Game::pauseLogic()
 
 void Game::endLogic()
 {
+	// Figure out timestep and run physics
+	newTimeMs = SDL_GetTicks();
+	deltaTimeMs = newTimeMs - oldTimeMs;
+	oldTimeMs = newTimeMs;
+	deltaTimeAccMs += deltaTimeMs;
+
+	while (deltaTimeAccMs >= PHYSICS_STEP_MS)
+	{
+		deltaTimeAccMs -= PHYSICS_STEP_MS;
+		physicsEngine->simulate(PHYSICS_STEP_MS);	
+
+		// Update the player and AI cars and cameras
+		for(int i = 0; i < MAX_PLAYERS; i++)
+		{
+			players[i]->update();
+			camera[i]->update();
+		}
+		physicsEngine->fetchSimulationResults();
+	}
+	// TODO splitscreen
+	renderingEngine->updateView(*camera[0]);
+
+	// TODO: update audioengine to support multiple listeners
+	audioEngine->update(players[0]->getModelMatrix());
+
 	renderingEngine->displayFuncTex(entities);
 	for(int i = 0 ; i < MAX_PLAYERS; i++)
 	{

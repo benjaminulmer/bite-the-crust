@@ -1,6 +1,5 @@
 #include "DecorationEntity.h"
 
-
 DecorationEntity::DecorationEntity(void)
 {
 

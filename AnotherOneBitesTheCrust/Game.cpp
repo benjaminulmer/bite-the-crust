@@ -21,27 +21,40 @@ void fatalError(string errorString)
 
 Game::Game(void)
 {
-	window = nullptr;
 	screenWidth = 1280;		//pro csgo resolution
 	screenHeight = 720;
 	gameState = GameState::MENU;
-	renderingEngine = nullptr;
-	physicsEngine = nullptr;
-	inputEngine = nullptr;
-	aiEngine = nullptr;
-	audioEngine = nullptr;
-	screen = nullptr;
-	deliveryManager = nullptr;
+
 	std::random_device rd;
 	generator.seed(rd());
 }
 
 void Game::setGameState(GameState state)
 {
-	if (state == GameState::PLAY)
+	if (state == GameState::STARTING_GAME)
 	{
+		setupEntities();
+		connectSystems();
+		gameState = GameState::PLAY;
+		int breakPooint;
 	}
-	gameState = state;
+	else if (state == GameState::BACK_TO_MENU)
+	{
+		reset();
+		physicsEngine->reset();
+		// delete entities
+		// reset physics scene
+		gameState = GameState::MENU;
+	}
+	else 
+	{
+		gameState = state;
+	}
+}
+
+void Game::reset() 
+{
+	entities.erase(entities.begin(), entities.end());
 }
 
 // The entry point of the game
@@ -50,13 +63,11 @@ void Game::run()
 	// Preload data, initialize subsystems, anything to do before entering the main loop
 	initSystems();
 	loadJSONfiles();
-	setupEntities();
-	connectSystems();
 
-	inputEngine->menuInput.connect(renderingEngine, &RenderingEngine::menuInput);
-	inputEngine->pauseInput.connect(renderingEngine, &RenderingEngine::pauseInput);
+	inputEngine->menuInput.connect(menuLogic, &MenuLogic::menuInput);
+	inputEngine->pauseInput.connect(menuLogic, &MenuLogic::pauseInput);
 	inputEngine->setGameState.connect(this, &Game::setGameState);
-	renderingEngine->gameStateSelected.connect(this, &Game::setGameState);
+	menuLogic->gameStateSelected.connect(this, &Game::setGameState);
 
 	mainLoop();
 }
@@ -98,6 +109,7 @@ void Game::initSystems()
 	inputEngine = new InputEngine();
 	physicsEngine = new PhysicsEngine();
 	renderingEngine = new RenderingEngine();
+	menuLogic = new MenuLogic(renderingEngine);
 	deliveryManager = new DeliveryManager();
 }
 
@@ -324,6 +336,7 @@ void Game::connectSystems()
 
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->collision.connect(audioEngine, &AudioEngine::playCollisionSound);
+
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
 	deliveryManager->pizzasRefilled.connect(audioEngine, &AudioEngine::playReloadSound);
@@ -364,7 +377,7 @@ void Game::playDisplay()
 	renderingEngine->drawDelivery();
 }
 
-void Game::playLogic()
+void Game::playLoop()
 {
 	// Figure out timestep and run physics
 	newTimeMs = SDL_GetTicks();
@@ -402,27 +415,25 @@ void Game::playLogic()
 	audioEngine->update(players[0]->getModelMatrix());
 }
 
-void Game::menuLogic()
+void Game::menuLoop()
 {
 	oldTimeMs = SDL_GetTicks();
-	renderingEngine->updateMenu();
-	renderingEngine->displayMenu();
+	menuLogic->updateMenu();
 
 	string instructions = "D-pad - Move, A - Select, B - Back";
 	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 }
 
-void Game::pauseLogic()
+void Game::pauseLoop()
 {
 	oldTimeMs = SDL_GetTicks();
-	renderingEngine->updatePaused();
-	renderingEngine->displayPause();
+	menuLogic->updatePaused();
 
 	string instructions = "D-pad - Move, A - Select, B - Back";
 	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 }
 
-void Game::endLogic()
+void Game::endLoop()
 {
 	// Figure out timestep and run physics
 	newTimeMs = SDL_GetTicks();
@@ -484,7 +495,7 @@ void Game::mainLoop()
 		//TODO: Skipable intros
 		if (gameState == GameState::INTRO)
 		{
-			renderingEngine->displayIntro(0);
+			//renderingEngine->displayIntro(0);
 			SDL_GL_SwapWindow(window);
 			SDL_Delay(3000);
 
@@ -500,19 +511,19 @@ void Game::mainLoop()
 		}
 		else if(gameState == GameState::PLAY)
 		{
-			playLogic();
+			playLoop();
 		}
 		else if(gameState == GameState::MENU)
 		{
-			menuLogic();
+			menuLoop();
 		}
 		else if(gameState == GameState::PAUSE)
 		{
-			pauseLogic();
+			pauseLoop();
 		}
 		else if (gameState == GameState::END)
 		{
-			endLogic();
+			endLoop();
 		}
 		SDL_GL_SwapWindow(window);
 	}

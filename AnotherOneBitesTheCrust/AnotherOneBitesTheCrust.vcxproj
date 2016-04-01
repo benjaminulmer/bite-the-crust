@@ -171,6 +171,7 @@
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MenuLogic.cpp" />
     <ClCompile Include="PhysicsHelper.cpp" />
     <ClCompile Include="PizzaBox.cpp" />
     <ClCompile Include="SimulationCallback.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="graphNode.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MenuLogic.h" />
     <ClInclude Include="PhysicsHelper.h" />
     <ClInclude Include="PhysicsEntityInfo.h" />
     <ClInclude Include="PizzaBox.h" />

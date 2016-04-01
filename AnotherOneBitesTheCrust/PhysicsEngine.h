@@ -16,7 +16,6 @@ public:
 	~PhysicsEngine(void);
 
 	void reset();
-	void init();
 
 	void simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();

@@ -7,6 +7,7 @@
 #include "Renderable.h"
 #include "PhysicsEntityInfo.h"
 #include "DeliveryManager.h"
+#include "MenuLogic.h"
 #include "Map.h"
 #include "GameState.h"
 
@@ -29,11 +30,10 @@ public:
 	PhysicsEngine *physicsEngine;
 	RenderingEngine *renderingEngine;
 	DeliveryManager* deliveryManager;
+	MenuLogic* menuLogic;
 	static const int MAX_PLAYERS = 4;
 	
 	void run();
-
-	Renderable * pizza;
 
 private:
 	static const unsigned int PHYSICS_STEP_MS = 16;
@@ -41,6 +41,7 @@ private:
 	void setGameState(GameState state);
 	void initSystems();
 	void loadJSONfiles();
+	void reset();
 
 	Tile* setupTile(int i, int j);
 	void setupRegularEntity(std::string name, Tile* tile, glm::vec3 pos);
@@ -55,10 +56,10 @@ private:
 	void shootPizza(Vehicle* vehicle);
 
 	void playDisplay();
-	void playLogic();
-	void menuLogic();
-	void pauseLogic();
-	void endLogic();
+	void playLoop();
+	void menuLoop();
+	void pauseLoop();
+	void endLoop();
 	void mainLoop();
 
 	GameState gameState;

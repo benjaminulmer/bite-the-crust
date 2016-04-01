@@ -156,27 +156,8 @@ public:
 	GLuint nodeColorBuffer;
 
 	//intro stuff
-	void setupIntro();
-	void displayIntro(int index);
-	void displayMenu();
-	void displayPause();
-	std::vector<Entity*> introEntities;
-	std::vector<Entity*> menuEntities;
-	std::vector<Entity*> pausedEntities;
-	glm::mat4 introM;
-	glm::mat4 introV;
-
-	void menuInput(InputType type);
-	void pauseInput(InputType type);
-	void updateMenu();
-	void updatePaused();
-	GLuint selected;
-	GLuint unselected;
-
-	int currentMenuSelection;
-	int currentPauseSelection;
-	int menuState;
-
-	sigslot::signal1<GameState> gameStateSelected;
+	void displayIntro(int index, std::vector<Entity*> menusEntities, glm::mat4 menusM, glm::mat4 menusV);
+	void displayMenu(std::vector<Entity*> menuEntities, glm::mat4 menusM, glm::mat4 menusV);
+	void displayPause(std::vector<Entity*> pausedEntities, glm::mat4 menusM, glm::mat4 menusV);
 };
 

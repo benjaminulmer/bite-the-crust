@@ -29,6 +29,7 @@
     <ClCompile Include="WheelEntity.cpp" />
     <ClCompile Include="StaticEntity.cpp" />
     <ClCompile Include="DecorationEntity.cpp" />
+    <ClCompile Include="MenuLogic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIEngine.h" />
@@ -62,6 +63,7 @@
     <ClInclude Include="StaticEntity.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="DecorationEntity.h" />
+    <ClInclude Include="MenuLogic.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\textured-StandardShading.fragmentshader" />

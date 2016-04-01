@@ -1116,7 +1116,6 @@ void RenderingEngine::displayMenu(std::vector<Entity*> menuEntities, mat4 menusM
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
 
-
 	glUniform3f(lightPos, 0.0f, 7.0f, 1.0f);
 	glUniform1f(lightPow, 70.0f);
 	glUniform3f(ambientScale, 0.5, 0.5, 0.5);

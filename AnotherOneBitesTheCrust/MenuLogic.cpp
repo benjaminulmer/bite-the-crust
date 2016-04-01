@@ -3,9 +3,9 @@
 MenuLogic::MenuLogic(RenderingEngine* re)
 {
 	renderingEngine = re;
-	menuState = 0;
-	currentMenuSelection = 1;
-	currentPauseSelection = 1;
+	menuDepth = 0;
+	menuSelection = MenuOptions::PLAY;
+	pauseSelection = PauseOptions::RESUME;
 
 	setupMenus();
 }
@@ -43,7 +43,6 @@ void MenuLogic::setupMenus()
 			glm::vec3(0,1,0)
 		);
 
-
 	//loading menus stuff
 	Renderable *aobtc = ContentLoading::createRenderable("res\\Models\\AOBTC.obj");
 	Renderable *play = ContentLoading::createRenderable("res\\Models\\play.obj");
@@ -66,11 +65,6 @@ void MenuLogic::setupMenus()
 	renderingEngine->assignBuffersTex(story);
 	renderingEngine->assignBuffersTex(exit);
 	renderingEngine->assignBuffersTex(billboard);
-
-	Entity *eAOBTC = new Entity();
-	eAOBTC->setRenderable(aobtc);
-	eAOBTC->setTexture(aobtcTexture);
-	menuEntities.push_back(eAOBTC);
 
 	Entity *ePlay = new Entity();
 	ePlay->setRenderable(play);
@@ -97,6 +91,11 @@ void MenuLogic::setupMenus()
 	eExit->setTexture(unselected);
 	menuEntities.push_back(eExit);
 
+	Entity *eAOBTC = new Entity();
+	eAOBTC->setRenderable(aobtc);
+	eAOBTC->setTexture(aobtcTexture);
+	menuEntities.push_back(eAOBTC);
+
 	DecorationEntity *eBillboardHowto = new DecorationEntity();
 	eBillboardHowto->setRenderable(billboard);
 	eBillboardHowto->setTexture(billboardHowto);
@@ -121,11 +120,6 @@ void MenuLogic::setupMenus()
 	renderingEngine->assignBuffersTex(exitMain);
 	renderingEngine->assignBuffersTex(exitDesk);
 
-	Entity *ePaused = new Entity();
-	ePaused->setRenderable(paused);
-	ePaused->setTexture(aobtcTexture);
-	pausedEntities.push_back(ePaused);
-
 	Entity *eResume = new Entity();
 	eResume->setRenderable(resume);
 	eResume->setTexture(selected);
@@ -145,13 +139,18 @@ void MenuLogic::setupMenus()
 	eExitDesk->setRenderable(exitDesk);
 	eExitDesk->setTexture(unselected);
 	pausedEntities.push_back(eExitDesk);
+
+	Entity *ePaused = new Entity();
+	ePaused->setRenderable(paused);
+	ePaused->setTexture(aobtcTexture);
+	pausedEntities.push_back(ePaused);
 }
 
 void MenuLogic::updateMenu()
 {
-	for(unsigned int i = 1; i < menuEntities.size()-2; i++)
+	for(unsigned int i = 0; i < menuEntities.size()-3; i++)
 	{
-		if(i == currentMenuSelection)
+		if(i == (int)menuSelection)
 		{
 			menuEntities[i]->setTexture(selected);
 		}
@@ -165,9 +164,9 @@ void MenuLogic::updateMenu()
 
 void MenuLogic::updatePaused()
 {
-	for(unsigned int i = 1; i < pausedEntities.size(); i++)
+	for(unsigned int i = 0; i < pausedEntities.size()-1; i++)
 	{
-		if(i == currentPauseSelection)
+		if(i == (int)pauseSelection)
 		{
 			pausedEntities[i]->setTexture(selected);
 		}
@@ -183,21 +182,19 @@ void MenuLogic::menuInput(InputType type)
 {
 	if (type == InputType::UP)
 	{
-		if(menuState == 0)
-			currentMenuSelection -= 1;
-		if(currentMenuSelection < 1)
-			currentMenuSelection = 1;
+		menuSelection = (MenuOptions)(((int)menuSelection - 1) % (int)MenuOptions::MAX);
+		if ((int)menuSelection < 0) 
+		{
+			menuSelection = (MenuOptions)((int)MenuOptions::MAX - 1);
+		}
 	}
 	else if (type == InputType::DOWN)
 	{
-		if(menuState == 0)
-			currentMenuSelection += 1;
-		if(currentMenuSelection > menuEntities.size() - 3)
-			currentMenuSelection = menuEntities.size() - 3;
+		menuSelection = (MenuOptions)(((int)menuSelection + 1) % (int)MenuOptions::MAX);
 	}
 	else if (type == InputType::ENTER)
 	{
-		if(currentMenuSelection == 1)			//PLAY
+		if(menuSelection == MenuOptions::PLAY)
 		{
 			gameStateSelected(GameState::STARTING_GAME);
 			menusV = glm::lookAt(
@@ -205,33 +202,31 @@ void MenuLogic::menuInput(InputType type)
 			glm::vec3(0,0,0), 
 			glm::vec3(0,1,0));
 		}
-		else if(currentMenuSelection == 2)	//HOW TO PLAY
+		else if(menuSelection == MenuOptions::HOW_TO && menuDepth == 0)
 		{
-			if(menuState == 0)
-				menusV = translate(menusV, glm::vec3(-13,0,0));
-			menuState = 1;
+			menusV = translate(menusV, glm::vec3(-13,0,0));
+			menuDepth = 1;
 		}
-		else if(currentMenuSelection == 3)	//CONTROLS
+		else if(menuSelection == MenuOptions::CONTROLS && menuDepth == 0)
 		{
-			if(menuState == 0)
-				menusV = translate(menusV, glm::vec3(13,0,0));
-			menuState = 1;
+			menusV = translate(menusV, glm::vec3(13,0,0));
+			menuDepth = 1;
 		}
-		else if(currentMenuSelection == menuEntities.size()- 3)	//EXIT
+		else if(menuSelection == MenuOptions::EXIT)
 		{
 			gameStateSelected(GameState::EXIT);
 		}
 	}
 	else if (type == InputType::BACK)
 	{
-		if(menuState != 0)
+		if(menuDepth != 0)
 		{
 			menusV = glm::lookAt(
 				glm::vec3(0,0,7), 
 				glm::vec3(0,0,0), 
 				glm::vec3(0,1,0)
 			);
-			menuState = 0;
+			menuDepth = 0;
 		}
 	}
 }
@@ -240,32 +235,36 @@ void MenuLogic::pauseInput(InputType type)
 {
 	if (type == InputType::UP)
 	{
-		currentPauseSelection -= 1;
-		if(currentPauseSelection < 1)
-			currentPauseSelection = 1;
+		pauseSelection = (PauseOptions)(((int)pauseSelection - 1) % (int)PauseOptions::MAX);
+		if ((int)pauseSelection < 0) 
+		{
+			pauseSelection = (PauseOptions)((int)PauseOptions::MAX - 1);
+		}
 	}
 	else if (type == InputType::DOWN)
 	{
-		currentPauseSelection += 1;
-		if(currentPauseSelection > pausedEntities.size() - 1)
-			currentPauseSelection = pausedEntities.size() - 1;
+		pauseSelection = (PauseOptions)(((int)pauseSelection + 1) % (int)PauseOptions::MAX);
 	}
 	else if (type == InputType::ENTER)
 	{
-		if(currentPauseSelection == 1)
+		if(pauseSelection == PauseOptions::RESUME)
 		{
 			gameStateSelected(GameState::PLAY);
-			currentPauseSelection = 1;
+			pauseSelection = PauseOptions::RESUME;
 		}
-		else if(currentPauseSelection == pausedEntities.size()-2)
+		else if(pauseSelection == PauseOptions::MAIN_MENU)
+		{
 			gameStateSelected(GameState::BACK_TO_MENU);
-		else if(currentPauseSelection == pausedEntities.size()-1)
+		}
+		else if(pauseSelection == PauseOptions::DESKTOP)
+		{
 			gameStateSelected(GameState::EXIT);
+		}
 	}
 	else if (type == InputType::BACK)
 	{
 		gameStateSelected(GameState::PLAY);
-		currentPauseSelection = 1;
+		pauseSelection = PauseOptions::RESUME;
 	}
 }
 

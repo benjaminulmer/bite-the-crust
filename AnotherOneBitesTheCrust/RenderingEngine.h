@@ -10,7 +10,6 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <gtx/transform.hpp>
-
 #include <glew.h>
 
 #include "res_path.h"

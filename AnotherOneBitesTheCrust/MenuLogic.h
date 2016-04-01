@@ -5,6 +5,25 @@
 #include "ContentLoading.h"
 #include "RenderingEngine.h"
 
+enum class MenuOptions
+{
+	PLAY = 0,
+	HOW_TO,
+	CONTROLS,
+	STORY,
+	EXIT,
+	MAX,
+};
+
+enum class PauseOptions
+{
+	RESUME = 0,
+	RESTART,
+	MAIN_MENU,
+	DESKTOP,
+	MAX
+};
+
 class MenuLogic :
 	public sigslot::has_slots<>
 {
@@ -29,9 +48,9 @@ public:
 	GLuint selected;
 	GLuint unselected;
 
-	int currentMenuSelection;
-	int currentPauseSelection;
-	int menuState;
+	MenuOptions menuSelection;
+	int menuDepth;
+	PauseOptions pauseSelection;	
 
 	sigslot::signal1<GameState> gameStateSelected;
 };

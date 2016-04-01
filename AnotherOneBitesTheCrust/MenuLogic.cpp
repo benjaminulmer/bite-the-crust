@@ -148,6 +148,7 @@ void MenuLogic::setupMenus()
 
 void MenuLogic::updateMenu()
 {
+	// -3 to not count billboards and AOBtC logo
 	for(unsigned int i = 0; i < menuEntities.size()-3; i++)
 	{
 		if(i == (int)menuSelection)
@@ -164,6 +165,7 @@ void MenuLogic::updateMenu()
 
 void MenuLogic::updatePaused()
 {
+	// -1 to not count Pause title
 	for(unsigned int i = 0; i < pausedEntities.size()-1; i++)
 	{
 		if(i == (int)pauseSelection)
@@ -183,6 +185,7 @@ void MenuLogic::menuInput(InputType type)
 	if (type == InputType::UP)
 	{
 		menuSelection = (MenuOptions)(((int)menuSelection - 1) % (int)MenuOptions::MAX);
+		// Here because negative modulo is compiler defined
 		if ((int)menuSelection < 0) 
 		{
 			menuSelection = (MenuOptions)((int)MenuOptions::MAX - 1);
@@ -236,6 +239,7 @@ void MenuLogic::pauseInput(InputType type)
 	if (type == InputType::UP)
 	{
 		pauseSelection = (PauseOptions)(((int)pauseSelection - 1) % (int)PauseOptions::MAX);
+		// Here because negative modulo is compiler defined
 		if ((int)pauseSelection < 0) 
 		{
 			pauseSelection = (PauseOptions)((int)PauseOptions::MAX - 1);

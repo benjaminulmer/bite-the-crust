@@ -12,7 +12,7 @@
 		{"name": "pizzaBoxGreen", "model": "pizzaBox.obj", "physics": "pizzaBox.json", "texture": "pizzaBox-green.DDS"},
         {"name": "pizzaBoxYellow", "model": "pizzaBox.obj", "physics": "pizzaBox.json", "texture": "pizzaBox-yellow.DDS"},
         {"name": "wheel", "model": "wheel.obj", "texture": "redVan.DDS"},
-        {"name": "redVan", "model": "SpaceShip.obj", "texture": "redVan.DDS"},
+        {"name": "redVan", "model": "van.obj", "texture": "redVan.DDS"},
         {"name": "blueVan", "model": "van.obj", "texture": "blueVan.DDS"},
         {"name": "greenVan", "model": "van.obj", "texture": "greenVan.DDS"},
         {"name": "yellowVan", "model": "van.obj", "texture": "yellowVan.DDS"},

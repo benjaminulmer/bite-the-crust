@@ -23,6 +23,7 @@ Game::Game(void)
 {
 	windowWidth = 1280;		//pro csgo resolution
 	windowHeight = 720;
+	isFullscreen = false;
 	isVSync = false;
 	gameState = GameState::MENU;
 
@@ -387,7 +388,24 @@ void Game::playLoop()
 	oldTimeMs = newTimeMs;
 	deltaTimeAccMs += deltaTimeMs;
 
+	// TODO HORRIBLE HARDCODED TESTING SHUT UP OK?!
+	glViewport(0, 360, 640, 360);
+	renderingEngine->updateView(*camera[0]);
 	playDisplay();
+
+	glViewport(640, 360, 640, 360);
+	renderingEngine->updateView(*camera[1]);
+	playDisplay();
+
+	glViewport(0, 0, 640, 360);
+	renderingEngine->updateView(*camera[2]);
+	playDisplay();
+
+	glViewport(640, 0, 640, 360);
+	renderingEngine->updateView(*camera[3]);
+	playDisplay();
+
+	//glClear(GL_COLOR_BUFFER_BIT );
 
 	while (deltaTimeAccMs >= PHYSICS_STEP_MS)
 	{
@@ -411,7 +429,6 @@ void Game::playLoop()
 		physicsEngine->fetchSimulationResults();
 	}
 	// TODO splitscreen
-	renderingEngine->updateView(*camera[0]);
 
 	// TODO: update audioengine to support multiple listeners
 	audioEngine->update(players[0]->getModelMatrix());
@@ -550,6 +567,25 @@ void Game::toggleVSync()
 	}
 }
 
+void Game::toggleFullscreen()
+{
+	if (isFullscreen)
+	{
+		SDL_SetWindowFullscreen(window, 0);
+		SDL_SetWindowSize(window, windowWidth, windowHeight);
+		glViewport(0, 0, windowWidth, windowHeight);
+		isFullscreen = false;
+	}
+	else 
+	{
+		// TODO Hardcoded for testing. It's late Ok..
+		SDL_SetWindowSize(window, 1920, 1200);
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+		glViewport(0, 0, 1920, 1200);
+		isFullscreen = true;
+	}
+}
+
 // Loop over all SDL events since last frame and call appropriate for each type of event
 void Game::processSDLEvents()
 {
@@ -585,6 +621,10 @@ void Game::processSDLEvents()
 			else if (event.key.keysym.scancode == SDL_SCANCODE_V)
 			{
 				toggleVSync();
+			}
+			else if (event.key.keysym.scancode == SDL_SCANCODE_F)
+			{
+				toggleFullscreen();
 			}
 		}
 	}

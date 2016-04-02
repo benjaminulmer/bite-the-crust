@@ -26,7 +26,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	//glClearDepth(1.0);
 
 	glEnable(GL_DEPTH_TEST);
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glClear(GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
 

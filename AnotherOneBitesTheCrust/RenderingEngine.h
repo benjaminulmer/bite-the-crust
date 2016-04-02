@@ -10,7 +10,6 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <gtx/transform.hpp>
-
 #include <glew.h>
 
 #include "res_path.h"
@@ -19,6 +18,8 @@
 #include "Camera.h"
 #include "ContentLoading.h"
 #include "Entity.h"
+#include "GameState.h"
+#include <sigslot.h>
 
 class RenderingEngine :
 	public sigslot::has_slots<>
@@ -29,11 +30,10 @@ public:
 
 	void displayFunc(std::vector<Entity*> entities);
 	void displayFuncTex(std::vector<Entity*> entities);
-	glm::mat4 calculateDefaultModel(glm::mat4 model, Entity * entity);
 
 	void generateIDs();
 	void deleteIDs();
-	void loadProjectionMatrix();
+	void loadProjectionMatrix(int width, int height);
 	void updateView(Camera& c);
 	void assignBuffersTex(Renderable* r);
 	void deleteBuffers(Renderable* r);
@@ -72,7 +72,8 @@ public:
 
 	void initText2D(const char * texturePath);
 	void printText2D(const char * text, int x, int y, int size);
-	void printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color);
+	void printBanner(const char * text, int x, int y, int size, glm::vec3 color);
+	void printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color, bool invert);
 	void cleanupText2D();
 
 	GLuint textProgramID;			//shader
@@ -154,18 +155,8 @@ public:
 	GLuint nodeColorBuffer;
 
 	//intro stuff
-	void setupIntro();
-	void displayIntro(int index);
-	void displayMenu();
-	void displayPause();
-	std::vector<Entity*> introEntities;
-	std::vector<Entity*> menuEntities;
-	std::vector<Entity*> pausedEntities;
-	glm::mat4 introM;
-	glm::mat4 introV;
-
-	int currentMenuSelection;
-	int currentPauseSelection;
-
+	void displayIntro(int index, std::vector<Entity*> menusEntities, glm::mat4 menusM, glm::mat4 menusV);
+	void displayMenu(std::vector<Entity*> menuEntities, glm::mat4 menusM, glm::mat4 menusV);
+	void displayPause(std::vector<Entity*> pausedEntities, glm::mat4 menusM, glm::mat4 menusV);
 };
 

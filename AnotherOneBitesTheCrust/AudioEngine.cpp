@@ -62,7 +62,7 @@ void AudioEngine::startBackgroundMusic()
 	backgroundSongChoice = dist(generator);
     result = fmodSystem->playSound(backgroundSongs[backgroundSongChoice], 0, false, &backgroundChannel);
     errorCheck();
-	result = backgroundChannel->setVolume(0.5);
+	result = backgroundChannel->setVolume(0.3);
 	errorCheck();
 }
 
@@ -94,7 +94,7 @@ Sound3D * AudioEngine::getOpenChannel()
 	return playingOn;
 }
 
-FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, PhysicsEntity * source)
+FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, PhysicsEntity * source, float volume = 1)
 {
 	Sound3D * playingOn = getOpenChannel();
 	
@@ -107,6 +107,7 @@ FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, Physi
 	playingOn->channel->setVolumeRamp(false); // For fixing popping noise at low volume.
 	playingOn->channel->set3DAttributes(&glmVec3ToFmodVec(pos), 0);
 	playingOn->channel->setPaused(false);
+	playingOn->channel->setVolume(volume);
 
 	playing.push_back(playingOn);
 	errorCheck();
@@ -133,6 +134,13 @@ void AudioEngine::playCannonSound(Vehicle * source)
 	glm::vec3 pos = source->getPosition();
 
 	playSound(cannonSound, pos, source);
+}
+
+void AudioEngine::playCollisionSound(Vehicle * source)
+{
+	glm::vec3 pos = source->getPosition();
+
+	playSound(crashSound, pos, source);
 }
 
 void AudioEngine::playBrakeSound(Vehicle * source)
@@ -192,8 +200,8 @@ void AudioEngine::playEngineRevSound(Vehicle * source)
 		playing.engineRevChannel = playSound(engineRevSound, pos, source);
 		playing.engineRevChannel->setVolume(0.3f);
 	}
-	if(playing.engineIdleChannel != nullptr)
-		playing.engineIdleChannel->setPaused(true);
+	//if(playing.engineIdleChannel != nullptr)
+		//playing.engineIdleChannel->setPaused(true);
 	
 
 	vehicleLoops[source] = playing;
@@ -232,6 +240,9 @@ void AudioEngine::initStreams()
     errorCheck();
 
 	result = fmodSystem->createSound("res\\Audio\\brake.wav", FMOD_LOOP_OFF | FMOD_3D, 0, &brakeSound);
+    errorCheck();
+
+	result = fmodSystem->createSound("res\\Audio\\crash.wav", FMOD_LOOP_OFF | FMOD_3D, 0, &crashSound);
     errorCheck();
 }
 

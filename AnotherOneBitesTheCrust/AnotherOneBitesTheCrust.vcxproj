@@ -160,6 +160,7 @@
     <ClCompile Include="AudioEngine.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ContentLoading.cpp" />
+    <ClCompile Include="DecorationEntity.cpp" />
     <ClCompile Include="DeliveryManager.cpp" />
     <ClCompile Include="DynamicEntity.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="InputEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MenuLogic.cpp" />
     <ClCompile Include="PhysicsHelper.cpp" />
     <ClCompile Include="PizzaBox.cpp" />
     <ClCompile Include="SimulationCallback.cpp" />
@@ -190,15 +192,18 @@
     <ClInclude Include="AudioEngine.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ContentLoading.h" />
+    <ClInclude Include="DecorationEntity.h" />
     <ClInclude Include="DeliveryManager.h" />
     <ClInclude Include="DynamicEntity.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Filtering.h" />
     <ClInclude Include="FrictionPairs.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="graphNode.h" />
     <ClInclude Include="InputEngine.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MenuLogic.h" />
     <ClInclude Include="PhysicsHelper.h" />
     <ClInclude Include="PhysicsEntityInfo.h" />
     <ClInclude Include="PizzaBox.h" />

@@ -5,12 +5,10 @@
 			"description": "Corner of the road",
             "ground": "turnRoad",
             "entities": [
-                {"name": "barrier", "rotation": 35},
-                {"name": "pole", "x": 20, "rotation": 90}
             ],
 			"nodes" : [
 				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4,5]},
+				{"x" : 0.0, "z" : 0.0, "neighbours" : [0,2,3,4,5]},
 				{"x" : 1.0, "z" : 1.0, "neighbours" : [1]},
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
 				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
@@ -89,7 +87,8 @@
 			"ground": "lawn",
 			"entities": [
 				{"name": "fence", "x": 10, "rotation": 270},
-				{"name": "fence", "z": 10}
+				{"name": "fence", "z": 10},
+				{"name": ["birch", "oak", "deadTree", "aspen", "pine", "rock3"], "x": 10, "z": 10, "upperRotation": 360}
 			],
 			"nodes": [
 			]
@@ -110,6 +109,8 @@
 			"description": "Center lawn tile with no fences",
 			"ground": "lawn",
 			"entities": [
+				{"name": ["grass1", "grass2", "grass3"], "x": 14, "z": 13},
+				{"name": ["grass1", "grass2", "grass3"], "x": 4, "z": 7}
 			],
 			"nodes": [
 
@@ -131,12 +132,15 @@
             "id": 11,
 			"description": "Blocked straight section of the road",
             "ground": "straightRoad",
-            "entities": [
-                {"name": "roadBlock", "x": 10, "z": 4, "rotation": 90},        
+            "entities": [     
                 {"name": "roadBlock", "x": 10, "z": 10, "rotation": 90},
-                {"name": "roadBlock", "x": 10, "z": 16, "rotation": 90}
+				{"name" : "ramp", "x" : 20, "z" : 12},
+				{"name" : "ramp", "x" : 20, "z" : 7}
             ],
-			"nodes" : [
+			"nodes" : [		
+				{"x" : 0.0, "z" : 0.5, "neighbours" : []},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
 			]
         },
         {
@@ -158,9 +162,10 @@
             "entities": [],
             "nodes": [
                 {"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
 				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]},
-				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 0, "z": 0.5, "neighbours" : [1]}
             ]
         },
         {
@@ -207,17 +212,17 @@
             "description": "Park tile",
             "ground": "lawn",
             "entities": [
-                {"name": ["flower1", "flower2", "flower3"], "x": 3, "z": 7, "rotation": 90},
-                {"name": ["flower1", "flower2", "flower3"], "x": 2, "z": 19},
-                {"name": ["flower1", "flower2", "flower3"], "x": 8, "z": 5},
-                {"name": ["flower1", "flower2", "flower3"], "x": 13, "z": 2, "rotation": 45},
-                {"name": ["flower1", "flower2", "flower3"], "x": 15, "z": 10, "rotation": 25},
-                {"name": ["flower1", "flower2", "flower3"], "x": 10, "z": 14, "rotation": 30},
-                {"name": ["rock1", "rock2", "rock3"], "x": 3, "z": 5},
-                {"name": ["rock1", "rock2", "rock3"], "x": 5, "z": 16, "rotation": 20},
-                {"name": ["rock1", "rock2", "rock3"], "x": 17, "z": 3},
-                {"name": ["birch", "oak", "deadTree", "aspen", "pine"], "x": 4, "z": 2},
-                {"name": ["birch", "oak", "deadTree", "aspen", "pine"], "x": 14, "z": 18}
+                {"name": ["flower1", "flower2", "flower3"], "x": 3, "z": 7, "upperRotation": 360},
+                {"name": ["flower1", "flower2", "flower3"], "x": 2, "z": 19, "upperRotation": 360},
+                {"name": ["flower1", "flower2", "flower3"], "x": 8, "z": 5, "upperRotation": 360},
+                {"name": ["flower1", "flower2", "flower3"], "x": 13, "z": 2, "upperRotation": 360},
+                {"name": ["flower1", "flower2", "flower3"], "x": 15, "z": 10, "upperRotation": 360},
+                {"name": ["flower1", "flower2", "flower3"], "x": 10, "z": 14, "upperRotation": 360},
+                {"name": ["rock1", "rock2", "rock3"], "x": 3, "z": 5, "upperRotation": 360},
+                {"name": ["rock1", "rock2", "rock3"], "x": 5, "z": 16, "upperRotation": 360},
+                {"name": ["rock1", "rock2", "rock3"], "x": 17, "z": 3, "upperRotation": 360},
+                {"name": ["birch", "oak", "deadTree", "aspen", "pine"], "x": 6, "z": 4, "upperRotation": 360},
+                {"name": ["birch", "oak", "deadTree", "aspen", "pine"], "x": 14, "z": 18, "upperRotation": 360}
             ]
         },
         {
@@ -235,6 +240,41 @@
             "ground": "parkingLot",
             "pickup": true,
             "entities": []
-        }
+        },        
+		{
+            "id": 20,
+            "description": "Lawn tile with fence and no house",
+            "ground": "lawn",
+            "entities": [
+                {"name": "fence", "x": 10, "rotation": 270},
+				{"name": ["birch", "oak", "aspen", "rock3", "pine", "bigBush"], "x": 10, "z": 8, "upperRotation": 360},
+				{"name": ["birch", "oak", "aspen", "rock3", "pine", "bigBush"], "x": 4, "z": 4, "upperRotation": 360}
+            ]
+        },
+		{
+			"id": 21,
+			"description": "Blocked off Lawn with fence",
+			"ground": "lawn",
+			"entities": [
+			{"name": "fence", "x": 10, "rotation": 270},
+                {"name": "roadBlock", "x": 10, "z": 6, "rotation": 90},        
+                {"name": "roadBlock", "x": 10, "z": 12, "rotation": 90},
+                {"name": "roadBlock", "x": 10, "z": 18, "rotation": 90}
+			],
+			"nodes": [
+			]
+		},
+		{
+			"id": 22,
+			"description": "Blocked off Lawn no fence",
+			"ground": "lawn",
+			"entities": [
+                {"name": "roadBlock", "x": 10, "z": 2, "rotation": 90},        
+                {"name": "roadBlock", "x": 10, "z": 8, "rotation": 90},
+                {"name": "roadBlock", "x": 10, "z": 14, "rotation": 90}
+			],
+			"nodes": [
+			]
+		}
     ]
 }

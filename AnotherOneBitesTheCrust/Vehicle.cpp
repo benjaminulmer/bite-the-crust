@@ -27,6 +27,8 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	setSteerSpeedData();
 
 	pizzaCount = MAX_PIZZAS;
+	isInAir = false;
+	isSlipping = false;
 
 	type = EntityType::VEHICLE;
 }
@@ -84,7 +86,7 @@ void Vehicle::resetIfNeeded()
 
 	PxF32 cos = vehUp.dot(up);
 	PxVec3 vel = ((PxRigidDynamic*)actor)->getLinearVelocity();
-	if (cos <= 0.5f && vel.x == 0 && vel.y == 0 && vel.z == 0)
+	if (cos <= 0.707f && vel.x == 0 && vel.y == 0 && vel.z == 0)
 	{
 		PxVec3 forw(0, 0, 1);
 		PxVec3 vehForw = actor->getGlobalPose().rotate(forw);
@@ -131,8 +133,6 @@ void Vehicle::update()
 	{
 		vehicleInput.setAnalogAccel(input.backward);
 		vehicleInput.setAnalogBrake(input.forward);
-		if(input.forward > 0 && forwardSpeed < 0)
-			brakeSignal(this);
 	} 
 	else 
 	{
@@ -140,11 +140,11 @@ void Vehicle::update()
 		vehicleInput.setAnalogBrake(input.backward);
 		if(input.forward > 0)
 			gasSignal(this);
-		if(input.backward > 0 && forwardSpeed > 0)
-			brakeSignal(this);
 	}
-	if(input.forward == 0 && input.backward == 0)
+	if (input.forward == 0 && input.backward == 0)
 		idleSignal(this);
+	if (isSlipping && (forwardSpeed > 5 || forwardSpeed < -5))
+		brakeSignal(this);
 
 	// Steer and handbrake
 	vehicleInput.setAnalogSteer(input.steer);
@@ -166,10 +166,10 @@ void Vehicle::update()
 		input.shootPizza = false;
 	}
 
-	if (input.jump)
+	if (input.jump && !isInAir)
 	{
 		PxRigidBody* rigid = (PxRigidBody*)actor;
-		rigid->addForce(PxVec3(0, 500, 0), PxForceMode::eACCELERATION);
+		rigid->addForce(PxVec3(0, 375, 0), PxForceMode::eACCELERATION);
 		input.jump = false;
 	}
 }

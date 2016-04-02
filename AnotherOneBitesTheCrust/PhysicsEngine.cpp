@@ -15,6 +15,12 @@ PhysicsEngine::PhysicsEngine(void)
 	initVehicleSDK();
 }
 
+void PhysicsEngine::reset()
+{
+	vehicles.erase(vehicles.begin(), vehicles.end());
+	scene = physics->createScene(*sceneDesc);
+}
+
 void PhysicsEngine::initSimulationData()
 {
 	scale = PxTolerancesScale();
@@ -45,19 +51,19 @@ void PhysicsEngine::initPhysXSDK()
 	cooking = PxCreateCooking(PX_PHYSICS_VERSION, *foundation, params); 
 
 	// Create scene
+	sceneDesc = new PxSceneDesc(scale);
 	cpuDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
-	PxSceneDesc sceneDesc(scale);
-	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	sceneDesc.cpuDispatcher = cpuDispatcher;
+	sceneDesc->gravity = PxVec3(0.0f, -9.81f, 0.0f);
+	sceneDesc->cpuDispatcher = cpuDispatcher;
 
-	sceneDesc.filterShader = FilterShader;
+	sceneDesc->filterShader = FilterShader;
 	FilterCallback* filterCallback = new FilterCallback();
-	sceneDesc.filterCallback = filterCallback;
+	sceneDesc->filterCallback = filterCallback;
 
 	simulationCallback = new SimulationCallback();
-	sceneDesc.simulationEventCallback = simulationCallback;
+	sceneDesc->simulationEventCallback = simulationCallback;
 
-	scene = physics->createScene(sceneDesc);
+	scene = physics->createScene(*sceneDesc);
 }
 
 void PhysicsEngine::initVehicleSDK()
@@ -305,15 +311,21 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 	for (PxU32 i = 0; i < vehicles.size(); i++)
 	{
 		bool inAir = true;
+		bool slipping = false;
 		for (PxU32 j = 0; j < results[i].nbWheelQueryResults; j++)
 		{
 			if (!results[i].wheelQueryResults[j].isInAir)
 			{
 				inAir = false;
 			}
+			if (results[i].wheelQueryResults[j].longitudinalSlip > 0.9f || results[i].wheelQueryResults[j].longitudinalSlip < -0.9f)
+			{
+				slipping = true;
+			}
 		}
 		Vehicle* veh = (Vehicle*)vehicles[i]->getRigidDynamicActor()->userData;
 		veh->isInAir = inAir;
+		veh->isSlipping = slipping;
 	}
 	scene->simulate(deltaTimeS);
 }
@@ -321,6 +333,7 @@ void PhysicsEngine::simulate(unsigned int deltaTimeMs)
 void PhysicsEngine::fetchSimulationResults()
 {
 	scene->fetchResults(true);
+	simulationCallback->finishedFetch();
 }
 
 PhysicsEngine::~PhysicsEngine(void)

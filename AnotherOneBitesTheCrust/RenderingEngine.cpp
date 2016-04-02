@@ -1,5 +1,6 @@
 #include "RenderingEngine.h"
 #include "Game.h"
+#include "DecorationEntity.h"
 #include <math.h>
 #include <iostream>
 
@@ -8,36 +9,26 @@ using namespace glm;
 
 RenderingEngine::RenderingEngine()
 {
-	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_MULTISAMPLE);
 	//glDepthFunc(GL_LESS);
-
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 	generateIDs();
-	loadProjectionMatrix();
 
-	currentMenuSelection = 1;
-	currentPauseSelection = 1;
+	initText2D("res\\Fonts\\Carbon.DDS");
+	setupMiscBuffers();
 }
 
 RenderingEngine::~RenderingEngine(void) {}
-
-
-//vehicle dimensions
-//x: 2.5, y:2, z:5
-
 
 void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 {
 	//glClearDepth(1.0);
 
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
-
 
 	glUniform3f(lightPos, mmCenter.x, 200.0f, mmCenter.z);
 	glUniform1f(lightPow, 20000.0f);
@@ -50,15 +41,17 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 
 		//Translations done here. Order of translations is scale, rotate, translate
 		M = entities[i]->getModelMatrix();
-		M = calculateDefaultModel(M, entities[i]);
+		//M = calculateDefaultModel(M, entities[i]);
 
 		mat4 MVP = P * V * M;
-		mat4 normal = glm::transpose(glm::inverse(V * M));
+
+		// Not used. Need to remove from shader
+		//mat4 normal = glm::transpose(glm::inverse(V * M));
 
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
 		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(V));
 		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(M));
-		glUniformMatrix4fv(normalID, 1, GL_FALSE, value_ptr(normal));
+		//glUniformMatrix4fv(normalID, 1, GL_FALSE, value_ptr(normal));
 
 		glBindVertexArray(entities[i]->getRenderable()->vao);
 		GLuint tex = entities[i]->getTexture();
@@ -66,7 +59,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 		glBindTexture(GL_TEXTURE_2D, tex);
 		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
 
-	// Set our "myTextureSampler" sampler to user Texture Unit 0
+		// Set our "myTextureSampler" sampler to user Texture Unit 0
 		glUniform1i(tID, 0);
 		//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
 		
@@ -74,16 +67,6 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 
 		glBindVertexArray(0);
 	}
-}
-
-mat4 RenderingEngine::calculateDefaultModel(mat4 model, Entity * entity)
-{
-	//Translations done here. Order of translations is scale, translate, rotate
-	model = glm::scale(model, entity->getDefaultScale());
-	model = glm::translate(model, entity->getDefaultTranslation());
-	model = glm::rotate(model, entity->getDefaultRotationAngle(), entity->getDefaultRotationAxis());
-
-	return model;
 }
 
 void RenderingEngine::generateIDs()
@@ -146,13 +129,11 @@ void RenderingEngine::generateIDs()
 
 }
 
-void RenderingEngine::loadProjectionMatrix()
+void RenderingEngine::loadProjectionMatrix(int width, int height)
 {
-	P = perspective(1.0472f, (float)1280/(float)720, 1.0f, 1000.0f);	//radians kek
-	O = glm::ortho(0.0f, 5.0f, 5.0f, 0.0f, 1.0f, 100.0f);
+	P = perspective(1.0472f, (float)width/(float)height, 1.0f, 1000.0f);	//radians kek
+	O = ortho(0.0f, 5.0f, 5.0f, 0.0f, 1.0f, 1000.0f);
 }
-
-
 
 void RenderingEngine::updateView(Camera& c)
 {
@@ -256,10 +237,15 @@ void RenderingEngine::initText2D(const char * texturePath){
 void RenderingEngine::printText2D(const char * text, int x, int y, int size)
 {
 	//printText2Doutline(text, x+1, y+1, (int)(size+0.5f), glm::vec4(0,0,0,1));
-	printText2Doutline(text, x, y, size, glm::vec4(1,1,1,1));
+	printText2Doutline(text, x, y, size, glm::vec4(1,1,1,1), false);
 }
 
-void RenderingEngine::printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color){
+void RenderingEngine::printBanner(const char * text, int x, int y, int size, glm::vec3 color)
+{
+	printText2Doutline(text, x, y, size, glm::vec4(color.x, color.y, color.z, 1), true);
+}
+
+void RenderingEngine::printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color, bool invert){
 
 
 	unsigned int length = strlen(text);
@@ -328,11 +314,19 @@ void RenderingEngine::printText2Doutline(const char * text, int x, int y, int si
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, Text2DUVBufferID);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+	
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_ONE_MINUS_SRC_ALPHA,GL_SRC_ALPHA);
-	//glDisable(GL_CULL_FACE);
+	if(invert)
+	{
+		glDisable(GL_BLEND);
+	}
+	else
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	
+	glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 
 	glUniform4f(colorID, color.x, color.y, color.z, color.a);
@@ -349,6 +343,7 @@ void RenderingEngine::printText2Doutline(const char * text, int x, int y, int si
 	glDeleteBuffers(1, &Text2DVertexBufferID);
 	glDeleteBuffers(1, &Text2DUVBufferID);
 
+	glEnable(GL_CULL_FACE);
 }
 
 
@@ -849,7 +844,7 @@ void RenderingEngine::setupMinimap(Map map)
 
 
 	vec3 diameter(maxX - minX, maxY - minY, maxZ - minZ);
-	float mmRadius = glm::length(diameter)*1.6;
+	float mmRadius = glm::length(diameter)*1.7;
 	//cout << "radius " << mmRadius << endl;
 
 
@@ -869,13 +864,16 @@ void RenderingEngine::setupMinimap(Map map)
 		glm::vec3(centerX, centerY, centerZ), // and looks at the origin
 		glm::vec3(0, 0, 1)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
-
-	shift = vec3(2.38, 0.0, -1.7);
+	
+	mmV = translate(mmV, vec3(650,0,-170));
+	mmV = rotate(mmV, radians(90.0f), vec3(0,-1,0));
+	
 }
 
 void RenderingEngine::drawMinimap(Vehicle* vans[4])
 {
-	 glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 	glUseProgram(basicProgramID);
 
 	// Use VAO that holds buffer bindings
@@ -884,8 +882,6 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 	// Draw Quads, start at vertex 0, draw 4 of them (for a quad)
 	
 	mmM = mat4(1.0f);
-	//mmM = scale(mmM, vec3(0.5, 0.5, 0.5));
-	mmM = translate(mmM,mmCenter * shift);	//positive X moves it left. Positive Z moves it up
 
 	mat4 mmMVP = P * mmV * mmM;
 
@@ -919,9 +915,8 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 	for (int i = 0; i < 4; i++) {
 		glBindVertexArray(mmVanVAOs[i]);
 		mmM = mat4(1.0f);
-		mmM = translate(mmM, mmCenter * shift);
 		mmM = mmM * vans[i]->getModelMatrix();
-		mmM = scale(mmM, vec3(2.0));
+		mmM = scale(mmM, vec3(3.0));
 		mmM = rotate(mmM, -1.5708f, glm::vec3(0,1,0));
 
 		mmMVP = P * mmV * mmM;
@@ -933,6 +928,8 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 		glDrawArrays(GL_TRIANGLES, 0, mmVanVerts.size());
 		glBindVertexArray(0);
 	}
+
+	glEnable(GL_CULL_FACE);
 }
 
 void RenderingEngine::drawDelivery()
@@ -941,7 +938,6 @@ void RenderingEngine::drawDelivery()
 	glBindVertexArray(mmDeliveryVAO);
 
 	mmM = mat4(1.0f);
-	mmM = translate(mmM,mmCenter * shift);
 	mmM = translate(mmM, deliveryPosition);
 
 	mat4 mmMVP = P * mmV * mmM;
@@ -1066,130 +1062,8 @@ void RenderingEngine::drawNodes(int size, string style)
 
 }
 
-void RenderingEngine::setupIntro()
+void RenderingEngine::displayIntro(int index, std::vector<Entity*> introEntities, glm::mat4 menusM, glm::mat4 menusV)
 {
-	Renderable *logo = ContentLoading::createRenderable("res\\Models\\deliverers.obj");
-	Renderable *gameBy = ContentLoading::createRenderable("res\\Models\\gameby.obj");
-	Renderable *names = ContentLoading::createRenderable("res\\Models\\names.obj");
-	GLuint introTexture = ContentLoading::loadDDS("res\\Textures\\intro-colored.DDS");
-
-	assignBuffersTex(logo);
-	assignBuffersTex(gameBy);
-	assignBuffersTex(names);
-
-	Entity *eLogo = new Entity();
-	eLogo->setRenderable(logo);
-	eLogo->setTexture(introTexture);
-	introEntities.push_back(eLogo);
-	
-	Entity *eGameBy = new Entity();
-	eGameBy->setRenderable(gameBy);
-	eGameBy->setTexture(introTexture);
-	introEntities.push_back(eGameBy);
-
-	Entity *eNames = new Entity();
-	eNames->setRenderable(names);
-	eNames->setTexture(introTexture);
-	introEntities.push_back(eNames);
-
-	introM = mat4(1.0f);
-	introV = glm::lookAt(
-			glm::vec3(0,0,7), 
-			glm::vec3(0,0,0), 
-			glm::vec3(0,1,0)
-		);
-
-	//loading menus stuff
-	Renderable *aobtc = ContentLoading::createRenderable("res\\Models\\AOBTC.obj");
-	Renderable *play = ContentLoading::createRenderable("res\\Models\\play.obj");
-	Renderable *howtoplay = ContentLoading::createRenderable("res\\Models\\howtoplay.obj");
-	Renderable *controls = ContentLoading::createRenderable("res\\Models\\controls.obj");
-	Renderable *story = ContentLoading::createRenderable("res\\Models\\story.obj");
-	Renderable *exit = ContentLoading::createRenderable("res\\Models\\exit.obj");
-	
-	GLuint aobtcTexture = ContentLoading::loadDDS("res\\Textures\\AOBTC-colored.DDS");
-	GLuint selected = ContentLoading::loadDDS("res\\Textures\\selected.DDS");
-	GLuint unselected = ContentLoading::loadDDS("res\\Textures\\unselected.DDS");
-	
-	assignBuffersTex(aobtc);
-	assignBuffersTex(play);
-	assignBuffersTex(howtoplay);
-	assignBuffersTex(controls);
-	assignBuffersTex(story);
-	assignBuffersTex(exit);
-
-	Entity *eAOBTC = new Entity();
-	eAOBTC->setRenderable(aobtc);
-	eAOBTC->setTexture(aobtcTexture);
-	menuEntities.push_back(eAOBTC);
-
-	Entity *ePlay = new Entity();
-	ePlay->setRenderable(play);
-	ePlay->setTexture(selected);
-	menuEntities.push_back(ePlay);
-
-	Entity *eHowToPlay = new Entity();
-	eHowToPlay->setRenderable(howtoplay);
-	eHowToPlay->setTexture(unselected);
-	menuEntities.push_back(eHowToPlay);
-
-	Entity *eControls = new Entity();
-	eControls->setRenderable(controls);
-	eControls->setTexture(unselected);
-	menuEntities.push_back(eControls);
-
-	Entity *eStory = new Entity();
-	eStory->setRenderable(story);
-	eStory->setTexture(unselected);
-	menuEntities.push_back(eStory);
-
-	Entity *eExit = new Entity();
-	eExit->setRenderable(exit);
-	eExit->setTexture(unselected);
-	menuEntities.push_back(eExit);
-
-	//loading paused stuff
-	Renderable *paused = ContentLoading::createRenderable("res\\Models\\paused.obj");
-	Renderable *resume = ContentLoading::createRenderable("res\\Models\\resume.obj");
-	Renderable *restart = ContentLoading::createRenderable("res\\Models\\restart.obj");
-	Renderable *exitMain = ContentLoading::createRenderable("res\\Models\\exittomain.obj");
-	Renderable *exitDesk = ContentLoading::createRenderable("res\\Models\\exittodesk.obj");
-	assignBuffersTex(paused);
-	assignBuffersTex(resume);
-	assignBuffersTex(restart);
-	assignBuffersTex(exitMain);
-	assignBuffersTex(exitDesk);
-
-	Entity *ePaused = new Entity();
-	ePaused->setRenderable(paused);
-	ePaused->setTexture(aobtcTexture);
-	pausedEntities.push_back(ePaused);
-
-	Entity *eResume = new Entity();
-	eResume->setRenderable(resume);
-	eResume->setTexture(selected);
-	pausedEntities.push_back(eResume);
-
-	Entity *eRestart = new Entity();
-	eRestart->setRenderable(restart);
-	eRestart->setTexture(unselected);
-	pausedEntities.push_back(eRestart);
-
-	Entity *eExitMain = new Entity();
-	eExitMain->setRenderable(exitMain);
-	eExitMain->setTexture(unselected);
-	pausedEntities.push_back(eExitMain);
-
-	Entity *eExitDesk = new Entity();
-	eExitDesk->setRenderable(exitDesk);
-	eExitDesk->setTexture(unselected);
-	pausedEntities.push_back(eExitDesk);
-
-}
-
-void RenderingEngine::displayIntro(int index)
-{
-
 	glEnable(GL_DEPTH_TEST);
 	//glDisable(GL_DEPTH_TEST);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -1202,17 +1076,17 @@ void RenderingEngine::displayIntro(int index)
 	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
 
 
-	introM = mat4(1.0f);
+	menusM = mat4(1.0f);
 
 		//Translations done here. Order of translations is scale, rotate, translate
-	//introM = introEntities[index]->getModelMatrix();
-	//introM = calculateDefaultModel(introM, introEntities[index]);
+	//menusM = introEntities[index]->getModelMatrix();
+	//menusM = calculateDefaultModel(menusM, introEntities[index]);
 
-	mat4 MVP = P * introV * introM;
+	mat4 MVP = P * menusV * menusM;
 	
 	glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
-	glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
-	glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
+	glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(menusV));
+	glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(menusM));
 
 	glBindVertexArray(introEntities[index]->getRenderable()->vao);
 	GLuint tex = introEntities[index]->getTexture();
@@ -1230,7 +1104,7 @@ void RenderingEngine::displayIntro(int index)
 	
 }
 
-void RenderingEngine::displayMenu()
+void RenderingEngine::displayMenu(std::vector<Entity*> menuEntities, mat4 menusM, mat4 menusV)
 {
 
 	glEnable(GL_DEPTH_TEST);
@@ -1239,23 +1113,21 @@ void RenderingEngine::displayMenu()
 	glDisable(GL_BLEND);
 	glUseProgram(textureProgramID);
 
-
 	glUniform3f(lightPos, 0.0f, 7.0f, 1.0f);
 	glUniform1f(lightPow, 70.0f);
 	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
 
 	for(int i = 0; i < menuEntities.size(); i++)
 	{
-		introM = mat4(1.0f);
+		menusM = mat4(1.0f);
 
 			//Translations done here. Order of translations is scale, rotate, translate
-		//introM = menuEntities[i]->getModelMatrix();
-		//introM = calculateDefaultModel(introM, menuEntities[i]);
-		mat4 MVP = P * introV * introM;
+		menusM = menuEntities[i]->getModelMatrix();
+		mat4 MVP = P * menusV * menusM;
 	
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
-		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
-		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
+		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(menusV));
+		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(menusM));
 
 		glBindVertexArray(menuEntities[i]->getRenderable()->vao);
 		GLuint tex = menuEntities[i]->getTexture();
@@ -1273,7 +1145,7 @@ void RenderingEngine::displayMenu()
 	}
 }
 
-void RenderingEngine::displayPause()
+void RenderingEngine::displayPause(std::vector<Entity*> pausedEntities, mat4 menusM, mat4 menusV)
 {
 
 	glEnable(GL_DEPTH_TEST);
@@ -1289,16 +1161,16 @@ void RenderingEngine::displayPause()
 
 	for(int i = 0; i < pausedEntities.size(); i++)
 	{
-		introM = mat4(1.0f);
+		menusM = mat4(1.0f);
 
 			//Translations done here. Order of translations is scale, rotate, translate
-		//introM = pausedEntities[i]->getModelMatrix();
-		//introM = calculateDefaultModel(introM, pausedEntities[i]);
-		mat4 MVP = P * introV * introM;
+		//menusM = pausedEntities[i]->getModelMatrix();
+		//menusM = calculateDefaultModel(menusM, pausedEntities[i]);
+		mat4 MVP = P * menusV * menusM;
 	
 		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
-		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(introV));
-		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(introM));
+		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(menusV));
+		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(menusM));
 
 		glBindVertexArray(pausedEntities[i]->getRenderable()->vao);
 		GLuint tex = pausedEntities[i]->getTexture();
@@ -1315,7 +1187,6 @@ void RenderingEngine::displayPause()
 		glBindVertexArray(0);
 	}
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TESTING STUFF BELOW

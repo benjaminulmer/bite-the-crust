@@ -35,22 +35,26 @@ PxFilterFlags FilterShader(PxFilterObjectAttributes attributes0, PxFilterData fi
 	PX_UNUSED(constantBlock);
 	PX_UNUSED(constantBlockSize);
 
-	if ((PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1)))
-    {
-		if (filterData0.word0 == (PxU32)FilterFlag::CHASSIS || filterData1.word0 == (PxU32)FilterFlag::CHASSIS)
+	if (filterData0.word0 == (PxU32)FilterFlag::CHASSIS || filterData1.word0 == (PxU32)FilterFlag::CHASSIS)
+	{
+		if ((PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1)))
 		{
 			pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
 			return PxFilterFlags();
 		}
-    }
+		else 
+		{
+			pairFlags = PxPairFlag::eCONTACT_DEFAULT | PxPairFlag::eNOTIFY_TOUCH_FOUND;
+			return PxFilterFlags();
+		}
+	}
 
 	if(((filterData0.word0 & filterData1.word1) == 0) && ((filterData1.word0 & filterData0.word1) == 0))
 	{
 		return PxFilterFlag::eSUPPRESS;
 	}
-
+	
 	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
-
 	return PxFilterFlags();
 }
 

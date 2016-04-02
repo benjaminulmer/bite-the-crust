@@ -33,16 +33,17 @@ public:
 	void startBackgroundMusic();
 	void playReloadSound(Vehicle * source);
 	void playDryFireSound(Vehicle * source);
+	void playCollisionSound(Vehicle * source);
 	void playCannonSound(Vehicle * source);
 	void playBrakeSound(Vehicle * source);
 	void playEngineIdleSound(Vehicle * source);
 	void playEngineRevSound(Vehicle * source);
-	FMOD::Channel * playSound(FMOD::Sound *, glm::vec3, PhysicsEntity *);
+	FMOD::Channel * playSound(FMOD::Sound *, glm::vec3, PhysicsEntity *,float volume);
 	void update(glm::mat4);
 
 private:
 	FMOD::System *fmodSystem;
-	FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound, *reloadSound, *dryFireSound;
+	FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound, *reloadSound, *dryFireSound, *crashSound;
 	std::vector<FMOD::Sound*> backgroundSongs;
 	FMOD::Channel *backgroundChannel, *engineChannel;
 	FMOD_RESULT result;

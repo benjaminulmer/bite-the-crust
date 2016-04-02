@@ -1,0 +1,6 @@
+{
+	"geometry": [
+        {"shape":"box", "halfY": 500.0}
+    ],
+    "type": "static"
+}

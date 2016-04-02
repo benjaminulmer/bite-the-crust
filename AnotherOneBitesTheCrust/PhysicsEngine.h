@@ -15,6 +15,8 @@ public:
 	PhysicsEngine(void);
 	~PhysicsEngine(void);
 
+	void reset();
+
 	void simulate(unsigned int deltaTimeMs);
 	void fetchSimulationResults();
 	
@@ -42,6 +44,7 @@ private:
 	physx::PxPhysics* physics;
 	physx::PxCooking* cooking;
 	physx::PxDefaultCpuDispatcher* cpuDispatcher;
+	physx::PxSceneDesc* sceneDesc;
 	physx::PxScene* scene;
 	
 	VehicleSceneQueryData* vehicleSceneQueryData;

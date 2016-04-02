@@ -63,7 +63,7 @@ Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	std::uniform_int_distribution<int> dist(0, freeLocations.size()-1);
 	int randomTile = dist(generator);
 	d.location = freeLocations[randomTile];
-	d.time = 1000.0 * 20.0; // 20 seconds
+	d.time = 1000.0 * 30.0; // 20 seconds
 	// Only draw delivery tile for player
 	if (!player->isAI)
 		d.location->ground->setTexture(deliveryTextures[player]);

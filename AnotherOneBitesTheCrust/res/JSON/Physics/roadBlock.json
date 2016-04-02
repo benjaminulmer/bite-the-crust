@@ -1,0 +1,6 @@
+{
+	"geometry": [
+        {"shape":"triangleMesh"}
+    ],
+    "type": "static"
+}

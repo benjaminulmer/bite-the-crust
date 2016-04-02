@@ -33,7 +33,7 @@ public:
 
 	void generateIDs();
 	void deleteIDs();
-	void loadProjectionMatrix();
+	void loadProjectionMatrix(int width, int height);
 	void updateView(Camera& c);
 	void assignBuffersTex(Renderable* r);
 	void deleteBuffers(Renderable* r);

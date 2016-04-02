@@ -14,7 +14,6 @@ RenderingEngine::RenderingEngine()
 	glEnable(GL_CULL_FACE);
 
 	generateIDs();
-	loadProjectionMatrix();
 
 	initText2D("res\\Fonts\\Carbon.DDS");
 	setupMiscBuffers();
@@ -130,13 +129,11 @@ void RenderingEngine::generateIDs()
 
 }
 
-void RenderingEngine::loadProjectionMatrix()
+void RenderingEngine::loadProjectionMatrix(int width, int height)
 {
-	P = perspective(1.0472f, (float)1280/(float)720, 1.0f, 1000.0f);	//radians kek
-	O = glm::ortho(0.0f, 5.0f, 5.0f, 0.0f, 1.0f, 100.0f);
+	P = perspective(1.0472f, (float)width/(float)height, 1.0f, 1000.0f);	//radians kek
+	O = ortho(0.0f, 5.0f, 5.0f, 0.0f, 1.0f, 1000.0f);
 }
-
-
 
 void RenderingEngine::updateView(Camera& c)
 {

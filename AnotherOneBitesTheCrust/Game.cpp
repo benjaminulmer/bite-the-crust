@@ -21,8 +21,9 @@ void fatalError(string errorString)
 
 Game::Game(void)
 {
-	screenWidth = 1280;		//pro csgo resolution
-	screenHeight = 720;
+	windowWidth = 1280;		//pro csgo resolution
+	windowHeight = 720;
+	isVSync = false;
 	gameState = GameState::MENU;
 
 	std::random_device rd;
@@ -76,14 +77,14 @@ void Game::run()
 void Game::initSystems()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);		//Initialize SDL
-	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
-
+	SDL_ShowCursor(0);
+	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_OPENGL);
 	if(window == nullptr)
 	{
 		fatalError("SDL Window could not be created");
 	}
 
-	SDL_GLContext glContext = SDL_GL_CreateContext(window);
+	glContext = SDL_GL_CreateContext(window);
 	if(glContext == nullptr)
 	{
 		fatalError("SDL_GL context could not be created");
@@ -97,7 +98,7 @@ void Game::initSystems()
 	}
 	
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);		//enable double buffering
-	if( SDL_GL_SetSwapInterval( 0 ) < 0 )
+	if( SDL_GL_SetSwapInterval(0) < 0 )
 	{
 		printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 	}
@@ -110,6 +111,7 @@ void Game::initSystems()
 	physicsEngine = new PhysicsEngine();
 	renderingEngine = new RenderingEngine();
 	menuLogic = new MenuLogic(renderingEngine);
+	renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
 	deliveryManager = new DeliveryManager();
 }
 
@@ -509,15 +511,15 @@ void Game::mainLoop()
 
 			gameState = GameState::MENU;
 		}
-		else if(gameState == GameState::PLAY)
+		else if (gameState == GameState::PLAY)
 		{
 			playLoop();
 		}
-		else if(gameState == GameState::MENU)
+		else if (gameState == GameState::MENU)
 		{
 			menuLoop();
 		}
-		else if(gameState == GameState::PAUSE)
+		else if (gameState == GameState::PAUSE)
 		{
 			pauseLoop();
 		}
@@ -534,6 +536,20 @@ void Game::endGame(std::map<Vehicle*, int> scores) {
 	this->scores = scores;
 }
 
+void Game::toggleVSync()
+{
+	if (isVSync) 
+	{
+		SDL_GL_SetSwapInterval(0);
+		isVSync = false;
+	}
+	else
+	{
+		SDL_GL_SetSwapInterval(1);
+		isVSync = true;
+	}
+}
+
 // Loop over all SDL events since last frame and call appropriate for each type of event
 void Game::processSDLEvents()
 {
@@ -541,10 +557,6 @@ void Game::processSDLEvents()
     while (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT)
-		{
-			gameState = GameState::EXIT;
-		}
-		else if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 		{
 			gameState = GameState::EXIT;
 		}
@@ -564,9 +576,16 @@ void Game::processSDLEvents()
 		{
 			inputEngine->openControllers();
 		}
-		else
+		else if (event.type == SDL_KEYDOWN)
 		{
-			// other events, do nothing yet
+			if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+			{
+				gameState = GameState::EXIT;
+			}
+			else if (event.key.keysym.scancode == SDL_SCANCODE_V)
+			{
+				toggleVSync();
+			}
 		}
 	}
 }

@@ -70,11 +70,17 @@ private:
 	unsigned int deltaTimeAccMs;
 	unsigned int outOfGameTimeAccMs;
 
+	bool isFullscreen;
+	bool isVSync;
+	SDL_GLContext glContext;
 	SDL_Window* window;
-	SDL_Surface* screen;
+	int windowWidth;
+	int windowHeight;
 	int screenWidth;
 	int screenHeight;
-	SDL_Surface *text;
+
+	void toggleVSync();
+	void toggleFullscreen();
 
 	Camera* camera[MAX_PLAYERS];
 	Vehicle * players[MAX_PLAYERS];

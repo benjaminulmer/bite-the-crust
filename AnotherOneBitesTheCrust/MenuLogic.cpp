@@ -12,6 +12,13 @@ MenuLogic::MenuLogic(RenderingEngine* re)
 
 void MenuLogic::setupMenus()
 {
+	menusM = glm::mat4(1.0f);
+	menusV = glm::lookAt(
+			glm::vec3(0,0,7), 
+			glm::vec3(0,0,0), 
+			glm::vec3(0,1,0)
+		);
+
 	Renderable *logo = ContentLoading::createRenderable("res\\Models\\deliverers.obj");
 	Renderable *gameBy = ContentLoading::createRenderable("res\\Models\\gameby.obj");
 	Renderable *names = ContentLoading::createRenderable("res\\Models\\names.obj");
@@ -36,13 +43,6 @@ void MenuLogic::setupMenus()
 	eNames->setTexture(introTexture);
 	introEntities.push_back(eNames);
 
-	menusM = glm::mat4(1.0f);
-	menusV = glm::lookAt(
-			glm::vec3(0,0,7), 
-			glm::vec3(0,0,0), 
-			glm::vec3(0,1,0)
-		);
-
 	//loading menus stuff
 	Renderable *aobtc = ContentLoading::createRenderable("res\\Models\\AOBTC.obj");
 	Renderable *play = ContentLoading::createRenderable("res\\Models\\play.obj");
@@ -51,6 +51,7 @@ void MenuLogic::setupMenus()
 	Renderable *story = ContentLoading::createRenderable("res\\Models\\story.obj");
 	Renderable *exit = ContentLoading::createRenderable("res\\Models\\exit.obj");
 	Renderable *billboard = ContentLoading::createRenderable("res\\Models\\Billboard.obj");
+	Renderable *numPlayers = ContentLoading::createRenderable("res\\Models\\numPlayers.obj");
 	
 	GLuint aobtcTexture = ContentLoading::loadDDS("res\\Textures\\AOBTC-colored.DDS");
 	GLuint billboardHowto = ContentLoading::loadDDS("res\\Textures\\Billboard-howto.DDS");
@@ -65,6 +66,7 @@ void MenuLogic::setupMenus()
 	renderingEngine->assignBuffersTex(story);
 	renderingEngine->assignBuffersTex(exit);
 	renderingEngine->assignBuffersTex(billboard);
+	renderingEngine->assignBuffersTex(numPlayers);
 
 	Entity *ePlay = new Entity();
 	ePlay->setRenderable(play);
@@ -108,6 +110,12 @@ void MenuLogic::setupMenus()
 	eBillboardControls->translate(glm::vec3(-13,0,0));
 	menuEntities.push_back(eBillboardControls);
 
+	DecorationEntity *eNumPlayers = new DecorationEntity();
+	eNumPlayers->setRenderable(numPlayers);
+	eNumPlayers->setTexture(unselected);
+	eNumPlayers->translate(glm::vec3(0,-10,0));
+	menuEntities.push_back(eNumPlayers);
+
 	//loading paused stuff
 	Renderable *paused = ContentLoading::createRenderable("res\\Models\\paused.obj");
 	Renderable *resume = ContentLoading::createRenderable("res\\Models\\resume.obj");
@@ -149,7 +157,7 @@ void MenuLogic::setupMenus()
 void MenuLogic::updateMenu()
 {
 	// -3 to not count billboards and AOBtC logo
-	for(unsigned int i = 0; i < menuEntities.size()-3; i++)
+	for(unsigned int i = 0; i < menuEntities.size()-4; i++)
 	{
 		if(i == (int)menuSelection)
 		{
@@ -184,16 +192,22 @@ void MenuLogic::menuInput(InputType type)
 {
 	if (type == InputType::UP)
 	{
-		menuSelection = (MenuOptions)(((int)menuSelection - 1) % (int)MenuOptions::MAX);
-		// Here because negative modulo is compiler defined
-		if ((int)menuSelection < 0) 
+		if(menuDepth == 0)
 		{
-			menuSelection = (MenuOptions)((int)MenuOptions::MAX - 1);
+			menuSelection = (MenuOptions)(((int)menuSelection - 1) % (int)MenuOptions::MAX);
+			// Here because negative modulo is compiler defined
+			if ((int)menuSelection < 0) 
+			{
+				menuSelection = (MenuOptions)((int)MenuOptions::MAX - 1);
+			}
 		}
 	}
 	else if (type == InputType::DOWN)
 	{
-		menuSelection = (MenuOptions)(((int)menuSelection + 1) % (int)MenuOptions::MAX);
+		if(menuDepth == 0)
+		{
+			menuSelection = (MenuOptions)(((int)menuSelection + 1) % (int)MenuOptions::MAX);
+		}
 	}
 	else if (type == InputType::ENTER)
 	{

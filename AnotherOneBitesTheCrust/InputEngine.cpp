@@ -104,6 +104,14 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 		{
 			menuInput(InputType::DOWN);
 		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_LEFT)
+		{
+			menuInput(InputType::LEFT);
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_RIGHT)
+		{
+			menuInput(InputType::RIGHT);
+		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 		{
 			menuInput(InputType::ENTER);

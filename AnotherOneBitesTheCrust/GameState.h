@@ -16,6 +16,8 @@ enum class InputType
 {
 	UP,
 	DOWN,
+	LEFT,
+	RIGHT,
 	ENTER,
 	BACK
 };

@@ -32,7 +32,9 @@ public:
 	DeliveryManager* deliveryManager;
 	MenuLogic* menuLogic;
 	static const int MAX_PLAYERS = 4;
-	
+	static const int DEF_WINDOW_WIDTH = 1280;
+	static const int DEF_WINDOW_HEIGHT = 720;
+
 	void run();
 
 private:
@@ -55,14 +57,17 @@ private:
 	void endGame(std::map<Vehicle*, int> scores);
 	void shootPizza(Vehicle* vehicle);
 
-	void playDisplay();
+	void gameDisplay(int player);
+	void playHUD(int player);
+	void endHUD();
 	void playLoop();
 	void menuLoop();
 	void pauseLoop();
-	void endLoop();
+	void endLoop(int player);
 	void mainLoop();
 
 	GameState gameState;
+	int numHumans;
 
 	unsigned int oldTimeMs;
 	unsigned int newTimeMs;
@@ -76,8 +81,8 @@ private:
 	SDL_Window* window;
 	int windowWidth;
 	int windowHeight;
-	int screenWidth;
-	int screenHeight;
+	int displayWidth;
+	int displayHeight;
 
 	void toggleVSync();
 	void toggleFullscreen();

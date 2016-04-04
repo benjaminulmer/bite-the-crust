@@ -21,10 +21,11 @@ void fatalError(string errorString)
 
 Game::Game(void)
 {
-	windowWidth = 1280;		//pro csgo resolution
-	windowHeight = 720;
+	windowWidth = DEF_WINDOW_WIDTH;		//pro csgo resolution
+	windowHeight = DEF_WINDOW_HEIGHT;
 	isFullscreen = false;
 	isVSync = false;
+	numHumans = 1;
 	gameState = GameState::MENU;
 
 	std::random_device rd;
@@ -44,8 +45,6 @@ void Game::setGameState(GameState state)
 	{
 		reset();
 		physicsEngine->reset();
-		// delete entities
-		// reset physics scene
 		gameState = GameState::MENU;
 	}
 	else 
@@ -79,6 +78,10 @@ void Game::initSystems()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);		//Initialize SDL
 	SDL_ShowCursor(0);
+	SDL_Rect rect;
+	SDL_GetDisplayBounds(0, &rect);
+	displayWidth = rect.w;
+	displayHeight = rect.h;
 	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_OPENGL);
 	if(window == nullptr)
 	{
@@ -345,19 +348,20 @@ void Game::connectSystems()
 	deliveryManager->pizzasRefilled.connect(audioEngine, &AudioEngine::playReloadSound);
 }
 
-void Game::playDisplay()
+void Game::gameDisplay(int player)
 {
 	renderingEngine->displayFuncTex(entities);
 	for(int i = 0 ; i < MAX_PLAYERS; i++)
 	{
 		renderingEngine->drawShadow(players[i]->getPosition());
 	}
-	renderingEngine->drawSkybox(players[0]->getPosition()); // TODO: See above; should render skybox for each player
-	renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
+	renderingEngine->drawSkybox(players[player]->getPosition()); // TODO: See above; should render skybox for each player
+}
 
-	// TODO: Broken record, but should draw to corresponding player's viewport
+void Game::playHUD(int player)
+{
 	string speed = "Speed: ";
-	speed.append(to_string(players[0]->getPhysicsVehicle()->computeForwardSpeed()));
+	speed.append(to_string(players[player]->getPhysicsVehicle()->computeForwardSpeed()));
 	renderingEngine->printText2D(speed.data(), 0, 690, 24);
 
 	string frameRate = "DeltaTime: ";
@@ -369,15 +373,34 @@ void Game::playDisplay()
 	renderingEngine->printText2D(deltaAcc.data(), 0, 670, 20);
 
 	string score = "Tips: $";
-	score.append(to_string(deliveryManager->getScore(players[0])));
+	score.append(to_string(deliveryManager->getScore(players[player])));
 	renderingEngine->printText2D(score.data(), 1050, 690, 24);
-	renderingEngine->printText2D(deliveryManager->getDeliveryText(players[0]).data(), 725, 670, 20);
+	renderingEngine->printText2D(deliveryManager->getDeliveryText(players[player]).data(), 725, 670, 20);
 
 	string pizzas = "Pizzas: ";
-	pizzas.append(to_string(players[0]->pizzaCount));
-	(players[0]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 1050, 640, 24) : renderingEngine->printText2Doutline(pizzas.data(), 990, 640, 30, glm::vec4(1,0,0,1), false);
+	pizzas.append(to_string(players[player]->pizzaCount));
+	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 1050, 640, 24) : renderingEngine->printText2Doutline(pizzas.data(), 990, 640, 30, glm::vec4(1,0,0,1), false);
 
+	renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
 	renderingEngine->drawDelivery();
+}
+
+void Game::endHUD()
+{
+	glViewport(0, 0, windowWidth, windowHeight);
+
+	Vehicle* winner = players[0];
+	for (int i = 1; i < MAX_PLAYERS; i++)
+	{
+		if (scores[players[i]] > scores[winner])
+			winner = players[i];
+	}
+	string winnerText = "	" + winner->colorName + " WINS			";
+	renderingEngine->printBanner(winnerText.data(), 0, 720/2, 100, winner->color);
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		string scoreText = "TIPS: $" + std::to_string(scores[players[i]]);
+		renderingEngine->printBanner(scoreText.data(), 100, 300 - i*50, 50, players[i]->color);
+	}
 }
 
 void Game::playLoop()
@@ -388,31 +411,36 @@ void Game::playLoop()
 	oldTimeMs = newTimeMs;
 	deltaTimeAccMs += deltaTimeMs;
 
-	// TODO HORRIBLE HARDCODED TESTING SHUT UP OK?!
-	glViewport(0, 360, 640, 360);
+	// slipscreen testing
+	int w = windowWidth/2;
+	int h = windowHeight/2;
+
+	glViewport(0, h, w, h);
 	renderingEngine->updateView(*camera[0]);
-	playDisplay();
+	gameDisplay(0);
+	playHUD(0);
 
-	glViewport(640, 360, 640, 360);
+	glViewport(w, h, w, h);
 	renderingEngine->updateView(*camera[1]);
-	playDisplay();
+	gameDisplay(1);
+	playHUD(1);
 
-	glViewport(0, 0, 640, 360);
+	glViewport(0, 0, w, h);
 	renderingEngine->updateView(*camera[2]);
-	playDisplay();
+	gameDisplay(2);
+	playHUD(2);
 
-	glViewport(640, 0, 640, 360);
+	glViewport(w, 0, w, h);
 	renderingEngine->updateView(*camera[3]);
-	playDisplay();
-
-	//glClear(GL_COLOR_BUFFER_BIT );
+	gameDisplay(3);
+	playHUD(3);
+	// END slipscreen testing
 
 	while (deltaTimeAccMs >= PHYSICS_STEP_MS)
 	{
 		if (gameState == GameState::END) break;
 		deltaTimeAccMs -= PHYSICS_STEP_MS;
 		physicsEngine->simulate(PHYSICS_STEP_MS);	
-
 		deliveryManager->timePassed(PHYSICS_STEP_MS);
 
 		// Update the player and AI cars and cameras
@@ -428,9 +456,6 @@ void Game::playLoop()
 		}
 		physicsEngine->fetchSimulationResults();
 	}
-	// TODO splitscreen
-
-	// TODO: update audioengine to support multiple listeners
 	audioEngine->update(players[0]->getModelMatrix());
 }
 
@@ -452,13 +477,36 @@ void Game::pauseLoop()
 	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 }
 
-void Game::endLoop()
+void Game::endLoop(int player)
 {
 	// Figure out timestep and run physics
 	newTimeMs = SDL_GetTicks();
 	deltaTimeMs = newTimeMs - oldTimeMs;
 	oldTimeMs = newTimeMs;
 	deltaTimeAccMs += deltaTimeMs;
+
+	// slipscreen testing
+	int w = windowWidth/2;
+	int h = windowHeight/2;
+
+	glViewport(0, h, w, h);
+	renderingEngine->updateView(*camera[0]);
+	gameDisplay(0);
+
+	glViewport(w, h, w, h);
+	renderingEngine->updateView(*camera[1]);
+	gameDisplay(1);
+
+	glViewport(0, 0, w, h);
+	renderingEngine->updateView(*camera[2]);
+	gameDisplay(2);
+
+	glViewport(w, 0, w, h);
+	renderingEngine->updateView(*camera[3]);
+	gameDisplay(3);
+
+	endHUD();
+	// END slipscreen testing
 
 	while (deltaTimeAccMs >= PHYSICS_STEP_MS)
 	{
@@ -473,31 +521,7 @@ void Game::endLoop()
 		}
 		physicsEngine->fetchSimulationResults();
 	}
-	// TODO splitscreen
-	renderingEngine->updateView(*camera[0]);
-
-	// TODO: update audioengine to support multiple listeners
 	audioEngine->update(players[0]->getModelMatrix());
-
-	renderingEngine->displayFuncTex(entities);
-	for(int i = 0 ; i < MAX_PLAYERS; i++)
-	{
-		renderingEngine->drawShadow(players[i]->getPosition());
-	}
-	renderingEngine->drawSkybox(players[0]->getPosition());
-
-	Vehicle* winner = players[0];
-	for (int i = 1; i < MAX_PLAYERS; i++)
-	{
-		if (scores[players[i]] > scores[winner])
-			winner = players[i];
-	}
-	string winnerText = "	" + winner->colorName + " WINS			";
-	renderingEngine->printBanner(winnerText.data(), 0, 720/2, 100, winner->color);
-	for (int i = 0; i < MAX_PLAYERS; i++) {
-		string scoreText = "TIPS: $" + std::to_string(scores[players[i]]);
-		renderingEngine->printBanner(scoreText.data(), 100, 300 - i*50, 50, players[i]->color);
-	}
 }
 
 // Main loop of the game
@@ -542,7 +566,7 @@ void Game::mainLoop()
 		}
 		else if (gameState == GameState::END)
 		{
-			endLoop();
+			endLoop(1);
 		}
 		SDL_GL_SwapWindow(window);
 	}
@@ -571,17 +595,26 @@ void Game::toggleFullscreen()
 {
 	if (isFullscreen)
 	{
+		windowWidth = DEF_WINDOW_WIDTH;
+		windowHeight = DEF_WINDOW_HEIGHT;
 		SDL_SetWindowFullscreen(window, 0);
 		SDL_SetWindowSize(window, windowWidth, windowHeight);
+
+		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
 		glViewport(0, 0, windowWidth, windowHeight);
+
 		isFullscreen = false;
 	}
 	else 
 	{
-		// TODO Hardcoded for testing. It's late Ok..
-		SDL_SetWindowSize(window, 1920, 1200);
+		windowWidth = displayWidth;
+		windowHeight = displayHeight;
+		SDL_SetWindowSize(window, windowWidth, windowHeight);
 		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
-		glViewport(0, 0, 1920, 1200);
+
+		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+		glViewport(0, 0, windowWidth, windowHeight);
+
 		isFullscreen = true;
 	}
 }

@@ -24,6 +24,7 @@ enum class PauseOptions
 	MAX
 };
 
+
 class MenuLogic :
 	public sigslot::has_slots<>
 {
@@ -38,6 +39,8 @@ public:
 	std::vector<Entity*> introEntities;
 	std::vector<Entity*> menuEntities;
 	std::vector<Entity*> pausedEntities;
+	std::vector<Entity*> backgroundEntities;
+	std::vector<Entity*> playerEntities;
 	glm::mat4 menusM;
 	glm::mat4 menusV;
 

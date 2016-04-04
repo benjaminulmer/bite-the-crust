@@ -14,6 +14,8 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	input.handBrake = false;
 	input.shootPizza = false;
 	input.jump = false;
+
+	isAI = true;
 	pizzaDelivered = false;
 	avoiding = false;
 	pickingUp = false;
@@ -89,11 +91,13 @@ void Vehicle::resetIfNeeded()
 	if (cos <= 0.707f && vel.x == 0 && vel.y == 0 && vel.z == 0)
 	{
 		PxVec3 forw(0, 0, 1);
+		PxVec3 left(1, 0, 0);
 		PxVec3 vehForw = actor->getGlobalPose().rotate(forw);
-		PxF32 angleRad = acos(vehForw.dot(forw));
-
+		PxVec3 vehLeft = actor->getGlobalPose().rotate(left);
+		
+		PxF32 angleRad = (vehLeft.dot(forw)) ? -acos(vehForw.dot(forw)) : acos(vehForw.dot(forw));
 		PxTransform cur = actor->getGlobalPose();
-		actor->setGlobalPose(PxTransform(PxVec3(cur.p.x, cur.p.y + 0.5f, cur.p.z), PxQuat(-angleRad, up)));
+		actor->setGlobalPose(PxTransform(PxVec3(cur.p.x, cur.p.y + 0.5f, cur.p.z), PxQuat(angleRad, up)));
 	}
 }
 

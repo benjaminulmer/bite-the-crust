@@ -37,6 +37,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
 			continue;
+
 		M = mat4(1.0f);
 
 		//Translations done here. Order of translations is scale, rotate, translate

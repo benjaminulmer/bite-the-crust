@@ -25,7 +25,7 @@ Game::Game(void)
 	windowHeight = DEF_WINDOW_HEIGHT;
 	isFullscreen = false;
 	isVSync = false;
-	numHumans = 1;
+	numHumans = 3;
 	gameState = GameState::MENU;
 
 	std::random_device rd;
@@ -387,8 +387,6 @@ void Game::playHUD(int player)
 
 void Game::endHUD()
 {
-	glViewport(0, 0, windowWidth, windowHeight);
-
 	Vehicle* winner = players[0];
 	for (int i = 1; i < MAX_PLAYERS; i++)
 	{
@@ -396,7 +394,7 @@ void Game::endHUD()
 			winner = players[i];
 	}
 	string winnerText = "	" + winner->colorName + " WINS			";
-	renderingEngine->printBanner(winnerText.data(), 0, 720/2, 100, winner->color);
+	renderingEngine->printBanner(winnerText.data(), 0, 720/2, 100, winner->color);	
 	for (int i = 0; i < MAX_PLAYERS; i++) {
 		string scoreText = "TIPS: $" + std::to_string(scores[players[i]]);
 		renderingEngine->printBanner(scoreText.data(), 100, 300 - i*50, 50, players[i]->color);
@@ -412,29 +410,70 @@ void Game::playLoop()
 	deltaTimeAccMs += deltaTimeMs;
 
 	// slipscreen testing
-	int w = windowWidth/2;
-	int h = windowHeight/2;
+	if (numHumans == 1)
+	{
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
+		playHUD(0);
+	}
+	else if (numHumans == 2)
+	{
+		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
+		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
+		playHUD(0);
 
-	glViewport(0, h, w, h);
-	renderingEngine->updateView(*camera[0]);
-	gameDisplay(0);
-	playHUD(0);
+		glViewport(0, 0, windowWidth, windowHeight/2);
+		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
+		renderingEngine->updateView(*camera[1]);
+		gameDisplay(1);
+		playHUD(1);
+	}
+	else if (numHumans == 3)
+	{
+		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
+		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
+		playHUD(0);
 
-	glViewport(w, h, w, h);
-	renderingEngine->updateView(*camera[1]);
-	gameDisplay(1);
-	playHUD(1);
+		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+		glViewport(0, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[2]);
+		gameDisplay(2);
+		playHUD(2);
 
-	glViewport(0, 0, w, h);
-	renderingEngine->updateView(*camera[2]);
-	gameDisplay(2);
-	playHUD(2);
+		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[3]);
+		gameDisplay(3);
+		playHUD(3);
+	}
+	else
+	{
+		glViewport(0, windowHeight/2, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
+		playHUD(0);
 
-	glViewport(w, 0, w, h);
-	renderingEngine->updateView(*camera[3]);
-	gameDisplay(3);
-	playHUD(3);
-	// END slipscreen testing
+		glViewport(windowWidth/2, windowHeight/2, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[1]);
+		gameDisplay(1);
+		playHUD(1);
+
+		glViewport(0, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[2]);
+		gameDisplay(2);
+		playHUD(2);
+
+		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[3]);
+		gameDisplay(3);
+		playHUD(3);
+	}
+	renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+	glViewport(0, 0, windowWidth, windowHeight);
+
 
 	while (deltaTimeAccMs >= PHYSICS_STEP_MS)
 	{

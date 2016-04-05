@@ -4,7 +4,7 @@
 	"chassisMOIscalarY": 0.7,
 	"chassisMOIscalarZ": 1,
 	"chassisCMOffsetX": 0,
-	"chassisCMOffsetY": 1,
+	"chassisCMOffsetY": -1,
 	"chassisCMOffsetZ": 0.25,
 	
 	"chassisStaticFriction": 0.5,

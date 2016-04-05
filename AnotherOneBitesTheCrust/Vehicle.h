@@ -78,6 +78,8 @@ public:
 	int avoidAttempts, stuckDuration;
 	glm::vec3 getDestination();
 	// END AI stuff
+	glm::vec3 deliveryLocation;
+
 
 	VehicleInput input;
 	VehicleTuning tuning;

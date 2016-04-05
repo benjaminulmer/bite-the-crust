@@ -24,8 +24,8 @@ Game::Game(void)
 	windowWidth = DEF_WINDOW_WIDTH;		//pro csgo resolution
 	windowHeight = DEF_WINDOW_HEIGHT;
 	isFullscreen = false;
-	isVSync = false;
 	numHumans = 1;
+	isVSync = true;
 	gameState = GameState::MENU;
 
 	std::random_device rd;
@@ -81,32 +81,15 @@ void Game::initSystems()
 	SDL_Rect rect;
 	SDL_GetDisplayBounds(0, &rect);
 	displayWidth = rect.w;
-	displayHeight = rect.h;
+	displayHeight = (displayWidth * 9)/16;
 	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_OPENGL);
-	if(window == nullptr)
-	{
-		fatalError("SDL Window could not be created");
-	}
-
+	SDL_GL_SetSwapInterval(1);
 	glContext = SDL_GL_CreateContext(window);
-	if(glContext == nullptr)
-	{
-		fatalError("SDL_GL context could not be created");
-	}
 
 	glewExperimental = GL_TRUE;
 	GLenum error = glewInit();
-	if(error != GLEW_OK)
-	{
-		fatalError("Could not init GLEW");
-	}
 	
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);		//enable double buffering
-	if( SDL_GL_SetSwapInterval(0) < 0 )
-	{
-		printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
-	}
-
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	aiEngine = new AIEngine();
@@ -250,10 +233,7 @@ void Game::setupEntities()
 		camera[i] = new Camera(players[i]);
 
 		// TODO: get info from menu selection (ie. number of player characters)
-		if(i > 0)
-			players[i]->isAI = true;
-		else
-			players[i]->isAI = false;
+
 	}
 	// hard code textures for now
 	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseRed.DDS");
@@ -309,7 +289,6 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 		wheel->setTexture(textureMap["wheel"]);
 		entities.push_back(wheel);
 	}
-	
 }
 
 // Connects systems together
@@ -317,6 +296,11 @@ void Game::connectSystems()
 {
 	inputEngine->setInputStruct(&players[0]->input, 0);
 	inputEngine->setCamera(camera[0], 0);
+	players[0]->isAI = false;
+
+	inputEngine->setInputStruct(&players[1]->input, 1);
+	inputEngine->setCamera(camera[1], 1);
+	players[1]->isAI = false;
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -337,7 +321,6 @@ void Game::connectSystems()
 	deliveryManager->deliveryTextures[players[3]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
-	deliveryManager->deliveryLocationUpdate.connect(renderingEngine, &RenderingEngine::updateDeliveryLocation);
 	deliveryManager->houseColorSignal.connect(renderingEngine, &RenderingEngine::updateHouseColor);
 
 	deliveryManager->assignDeliveries();
@@ -381,8 +364,7 @@ void Game::playHUD(int player)
 	pizzas.append(to_string(players[player]->pizzaCount));
 	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 1050, 640, 24) : renderingEngine->printText2Doutline(pizzas.data(), 990, 640, 30, glm::vec4(1,0,0,1), false);
 
-	renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
-	renderingEngine->drawDelivery();
+	(numHumans == 1) ? renderingEngine->drawMinimap(players, player, windowHeight) : renderingEngine->drawMinimap(players, player, windowHeight/2); // TODO: Should support arbitrary number of vans
 }
 
 void Game::endHUD()
@@ -524,28 +506,61 @@ void Game::endLoop(int player)
 	oldTimeMs = newTimeMs;
 	deltaTimeAccMs += deltaTimeMs;
 
-	// slipscreen testing
-	int w = windowWidth/2;
-	int h = windowHeight/2;
+	if (numHumans == 1)
+	{
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
+		playHUD(0);
+	}
+	else if (numHumans == 2)
+	{
+		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
+		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
 
-	glViewport(0, h, w, h);
-	renderingEngine->updateView(*camera[0]);
-	gameDisplay(0);
+		glViewport(0, 0, windowWidth, windowHeight/2);
+		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
+		renderingEngine->updateView(*camera[1]);
+		gameDisplay(1);
+	}
+	else if (numHumans == 3)
+	{
+		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
+		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
 
-	glViewport(w, h, w, h);
-	renderingEngine->updateView(*camera[1]);
-	gameDisplay(1);
+		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+		glViewport(0, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[2]);
+		gameDisplay(2);
 
-	glViewport(0, 0, w, h);
-	renderingEngine->updateView(*camera[2]);
-	gameDisplay(2);
+		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[3]);
+		gameDisplay(3);
+	}
+	else
+	{
+		glViewport(0, windowHeight/2, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
 
-	glViewport(w, 0, w, h);
-	renderingEngine->updateView(*camera[3]);
-	gameDisplay(3);
+		glViewport(windowWidth/2, windowHeight/2, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[1]);
+		gameDisplay(1);
 
+		glViewport(0, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[2]);
+		gameDisplay(2);
+
+		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[3]);
+		gameDisplay(3);
+	}
+	renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+	glViewport(0, 0, windowWidth, windowHeight);
 	endHUD();
-	// END slipscreen testing
 
 	while (deltaTimeAccMs >= PHYSICS_STEP_MS)
 	{

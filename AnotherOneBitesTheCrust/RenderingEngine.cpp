@@ -14,7 +14,7 @@ RenderingEngine::RenderingEngine()
 	glEnable(GL_CULL_FACE);
 
 	generateIDs();
-
+	//resolution = vec2(640,360);
 	initText2D("res\\Fonts\\Carbon.DDS");
 	setupMiscBuffers();
 }
@@ -37,6 +37,7 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	for (int i = 0; i < (int)entities.size(); i++) {
 		if (!entities[i]->hasRenderable())
 			continue;
+
 
 		M = mat4(1.0f);
 
@@ -79,6 +80,7 @@ void RenderingEngine::generateIDs()
 	textProgramID = CreateShaderProgram(textVsSource, textFsSource);
 	glUseProgram(textProgramID);
 	colorID = glGetUniformLocation(textProgramID, "color");
+	resID = glGetUniformLocation(textProgramID, "resolution");
 
 	string texvsShader = "res\\Shaders\\textured-StandardShading.vertexshader";
 	string texfsShader = "res\\Shaders\\textured-StandardShading.fragmentshader";
@@ -126,8 +128,6 @@ void RenderingEngine::generateIDs()
 	glGenBuffers(1, &mmDeliveryColorBuffer);
 
 	basicmvpID = glGetUniformLocation(basicProgramID, "MVP");
-
-
 }
 
 void RenderingEngine::loadProjectionMatrix(int width, int height)
@@ -235,6 +235,11 @@ void RenderingEngine::initText2D(const char * texturePath){
 	textTextureID = ContentLoading::loadDDS(texturePath);
 }
 
+void RenderingEngine::setTextResolution(int width, int height)
+{
+	resolution = vec2(width/2, height/2);
+}
+
 void RenderingEngine::printText2D(const char * text, int x, int y, int size)
 {
 	//printText2Doutline(text, x+1, y+1, (int)(size+0.5f), glm::vec4(0,0,0,1));
@@ -331,6 +336,7 @@ void RenderingEngine::printText2Doutline(const char * text, int x, int y, int si
     glDisable(GL_DEPTH_TEST);
 
 	glUniform4f(colorID, color.x, color.y, color.z, color.a);
+	glUniform2f(resID, resolution.x, resolution.y);
 
 	// Draw call
 	glBindVertexArray(textVAO);
@@ -1183,3 +1189,14 @@ void RenderingEngine::displayPause(std::vector<Entity*> pausedEntities, mat4 men
 		glBindVertexArray(0);
 	}
 }
+
+//spinny arrow
+//      up  dest 
+//       ^  ^  
+//left <-| /
+//if (left . dest < 0)
+//	neg theta
+// else 
+//	pos theta
+//arccos(up . dest) = theta
+//multiply theta by pos or negative

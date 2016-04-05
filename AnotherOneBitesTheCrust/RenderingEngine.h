@@ -70,6 +70,8 @@ public:
 	void drawShadow(glm::vec3 position);
 	void drawSkybox(glm::vec3 position);
 
+	glm::vec2 resolution;
+	void setTextResolution(int width, int height);
 	void initText2D(const char * texturePath);
 	void printText2D(const char * text, int x, int y, int size);
 	void printBanner(const char * text, int x, int y, int size, glm::vec3 color);
@@ -81,6 +83,7 @@ public:
 	GLuint textTextureID;			//texture
 	GLuint Text2DVertexBufferID;	//vertex buffer
 	GLuint Text2DUVBufferID;		//UV buffer
+	GLuint resID;
 
 	//IDs for shaders
 	GLuint mvpID;

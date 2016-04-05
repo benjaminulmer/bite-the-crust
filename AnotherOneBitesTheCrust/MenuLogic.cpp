@@ -4,6 +4,7 @@ MenuLogic::MenuLogic(RenderingEngine* re)
 {
 	renderingEngine = re;
 	menuDepth = 0;
+	numPlayers = 1;
 	menuSelection = MenuOptions::PLAY;
 	pauseSelection = PauseOptions::RESUME;
 
@@ -51,11 +52,6 @@ void MenuLogic::setupMenus()
 	Renderable *story = ContentLoading::createRenderable("res\\Models\\story.obj");
 	Renderable *exit = ContentLoading::createRenderable("res\\Models\\exit.obj");
 	Renderable *billboard = ContentLoading::createRenderable("res\\Models\\Billboard.obj");
-	Renderable *numPlayers = ContentLoading::createRenderable("res\\Models\\numPlayers.obj");
-	Renderable *one = ContentLoading::createRenderable("res\\Models\\one.obj");
-	Renderable *two = ContentLoading::createRenderable("res\\Models\\two.obj");
-	Renderable *three = ContentLoading::createRenderable("res\\Models\\three.obj");
-	Renderable *four = ContentLoading::createRenderable("res\\Models\\four.obj");
 	
 	GLuint aobtcTexture = ContentLoading::loadDDS("res\\Textures\\AOBTC-colored.DDS");
 	GLuint billboardHowto = ContentLoading::loadDDS("res\\Textures\\Billboard-howto.DDS");
@@ -70,11 +66,6 @@ void MenuLogic::setupMenus()
 	renderingEngine->assignBuffersTex(story);
 	renderingEngine->assignBuffersTex(exit);
 	renderingEngine->assignBuffersTex(billboard);
-	renderingEngine->assignBuffersTex(numPlayers);
-	renderingEngine->assignBuffersTex(one);
-	renderingEngine->assignBuffersTex(two);
-	renderingEngine->assignBuffersTex(three);
-	renderingEngine->assignBuffersTex(four);
 
 	Entity *ePlay = new Entity();
 	ePlay->setRenderable(play);
@@ -118,35 +109,46 @@ void MenuLogic::setupMenus()
 	eBillboardControls->translate(glm::vec3(-13,0,0));
 	menuEntities.push_back(eBillboardControls);
 
+
+
+	//selecting player stuff 
+	Renderable *numPlayers = ContentLoading::createRenderable("res\\Models\\numPlayers.obj");
+	Renderable *one = ContentLoading::createRenderable("res\\Models\\one.obj");
+	Renderable *two = ContentLoading::createRenderable("res\\Models\\two.obj");
+	Renderable *three = ContentLoading::createRenderable("res\\Models\\three.obj");
+	Renderable *four = ContentLoading::createRenderable("res\\Models\\four.obj");
+
+	renderingEngine->assignBuffersTex(numPlayers);
+	renderingEngine->assignBuffersTex(one);
+	renderingEngine->assignBuffersTex(two);
+	renderingEngine->assignBuffersTex(three);
+	renderingEngine->assignBuffersTex(four);
+
 	DecorationEntity *eNumPlayers = new DecorationEntity();
 	eNumPlayers->setRenderable(numPlayers);
 	eNumPlayers->setTexture(unselected);
-	eNumPlayers->translate(glm::vec3(0,-10,0));
-	menuEntities.push_back(eNumPlayers);
+	playerSelectEntities.push_back(eNumPlayers);
 
 	DecorationEntity *eOne = new DecorationEntity();
 	eOne->setRenderable(one);
 	eOne->setTexture(selected);
-	eOne->translate(glm::vec3(0,-10,0));
-	menuEntities.push_back(eOne);
+	playerSelectEntities.push_back(eOne);
 
 	DecorationEntity *eTwo = new DecorationEntity();
 	eTwo->setRenderable(two);
 	eTwo->setTexture(unselected);
-	eTwo->translate(glm::vec3(0,-10,0));
-	menuEntities.push_back(eTwo);
+	playerSelectEntities.push_back(eTwo);
 
 	DecorationEntity *eThree = new DecorationEntity();
 	eThree->setRenderable(three);
 	eThree->setTexture(unselected);
-	eThree->translate(glm::vec3(0,-10,0));
-	menuEntities.push_back(eThree);
+	playerSelectEntities.push_back(eThree);
 
 	DecorationEntity *eFour = new DecorationEntity();
 	eFour->setRenderable(four);
 	eFour->setTexture(unselected);
-	eFour->translate(glm::vec3(0,-10,0));
-	menuEntities.push_back(eFour);
+	playerSelectEntities.push_back(eFour);
+
 
 
 	//loading paused stuff
@@ -160,6 +162,8 @@ void MenuLogic::setupMenus()
 	renderingEngine->assignBuffersTex(restart);
 	renderingEngine->assignBuffersTex(exitMain);
 	renderingEngine->assignBuffersTex(exitDesk);
+
+
 
 	Entity *eResume = new Entity();
 	eResume->setRenderable(resume);
@@ -190,18 +194,36 @@ void MenuLogic::setupMenus()
 void MenuLogic::updateMenu()
 {
 	// -3 to not count billboards and AOBtC logo
-	for(unsigned int i = 0; i < menuEntities.size()-8; i++)
+	if(menuDepth == 2)
 	{
-		if(i == (int)menuSelection)
+		for(unsigned int i = 1; i < playerSelectEntities.size(); i++)
 		{
-			menuEntities[i]->setTexture(selected);
+			if(i == numPlayers)
+			{
+				playerSelectEntities[i]->setTexture(selected);
+			}
+			else
+			{
+				playerSelectEntities[i]->setTexture(unselected);
+			}
 		}
-		else
-		{
-			menuEntities[i]->setTexture(unselected);
-		}
+		renderingEngine->displayMenu(playerSelectEntities, menusM, menusV);
 	}
-	renderingEngine->displayMenu(menuEntities, menusM, menusV);
+	else
+	{
+		for(unsigned int i = 0; i < menuEntities.size()-3; i++)
+		{
+			if(i == (int)menuSelection)
+			{
+				menuEntities[i]->setTexture(selected);
+			}
+			else
+			{
+				menuEntities[i]->setTexture(unselected);
+			}
+		}
+		renderingEngine->displayMenu(menuEntities, menusM, menusV);
+	}
 }
 
 void MenuLogic::updatePaused()
@@ -227,6 +249,7 @@ void MenuLogic::menuInput(InputType type)
 	{
 		if(menuDepth == 0)
 		{
+			std::cout << "UP" << std::endl;
 			menuSelection = (MenuOptions)(((int)menuSelection - 1) % (int)MenuOptions::MAX);
 			// Here because negative modulo is compiler defined
 			if ((int)menuSelection < 0) 
@@ -237,9 +260,34 @@ void MenuLogic::menuInput(InputType type)
 	}
 	else if (type == InputType::DOWN)
 	{
+		
 		if(menuDepth == 0)
 		{
+			std::cout << "down" << std::endl;
 			menuSelection = (MenuOptions)(((int)menuSelection + 1) % (int)MenuOptions::MAX);
+		}
+	}
+	else if (type == InputType::LEFT)
+	{
+		if(menuDepth == 2)
+		{
+			numPlayers -= 1;
+			if(numPlayers < 1)
+			{
+				numPlayers = 1;
+			}
+
+		}
+	}
+	else if (type == InputType::RIGHT)
+	{
+		if(menuDepth == 2)
+		{
+			numPlayers += 1;
+			if(numPlayers > 4)
+			{
+				numPlayers = 4;
+			}
 		}
 	}
 	else if (type == InputType::ENTER)
@@ -251,15 +299,10 @@ void MenuLogic::menuInput(InputType type)
 			glm::vec3(0,0,7), 
 			glm::vec3(0,0,0), 
 			glm::vec3(0,1,0));
+			menuDepth = 0;
 		}
 		else if(menuSelection == MenuOptions::PLAY)
 		{
-			//gameStateSelected(GameState::STARTING_GAME);
-			/*menusV = glm::lookAt(
-			glm::vec3(0,0,7), 
-			glm::vec3(0,0,0), 
-			glm::vec3(0,1,0));*/
-			menusV = translate(menusV, glm::vec3(0,10,0));
 			menuDepth = 2;
 		}
 		else if(menuSelection == MenuOptions::HOW_TO && menuDepth == 0)

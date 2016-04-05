@@ -40,7 +40,7 @@ public:
 	std::vector<Entity*> menuEntities;
 	std::vector<Entity*> pausedEntities;
 	std::vector<Entity*> backgroundEntities;
-	std::vector<Entity*> playerEntities;
+	std::vector<Entity*> playerSelectEntities;
 	glm::mat4 menusM;
 	glm::mat4 menusV;
 
@@ -53,7 +53,8 @@ public:
 
 	MenuOptions menuSelection;
 	int menuDepth;
-	PauseOptions pauseSelection;	
+	PauseOptions pauseSelection;
+	int numPlayers;
 
 	sigslot::signal1<GameState> gameStateSelected;
 };

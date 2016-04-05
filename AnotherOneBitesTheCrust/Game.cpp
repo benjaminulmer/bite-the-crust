@@ -24,8 +24,8 @@ Game::Game(void)
 	windowWidth = DEF_WINDOW_WIDTH;		//pro csgo resolution
 	windowHeight = DEF_WINDOW_HEIGHT;
 	isFullscreen = false;
+	numHumans = 1;
 	isVSync = true;
-	numHumans = 4;
 	gameState = GameState::MENU;
 
 	std::random_device rd;
@@ -394,6 +394,7 @@ void Game::playLoop()
 	if (numHumans == 1)
 	{
 		renderingEngine->updateView(*camera[0]);
+		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 	}
@@ -402,6 +403,7 @@ void Game::playLoop()
 		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
 		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
+		renderingEngine->setTextResolution(windowWidth*2, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 
@@ -416,6 +418,7 @@ void Game::playLoop()
 		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
 		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
+		renderingEngine->setTextResolution(windowWidth*2, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 
@@ -429,6 +432,7 @@ void Game::playLoop()
 
 		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[2]);
+		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(2);
 		playHUD(2);
 	}
@@ -436,6 +440,7 @@ void Game::playLoop()
 	{
 		glViewport(0, windowHeight/2, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
+		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 
@@ -484,6 +489,7 @@ void Game::playLoop()
 void Game::menuLoop()
 {
 	oldTimeMs = SDL_GetTicks();
+	renderingEngine->setTextResolution(windowWidth, windowHeight);
 	menuLogic->updateMenu();
 
 	string instructions = "D-pad - Move, A - Select, B - Back";
@@ -493,6 +499,7 @@ void Game::menuLoop()
 void Game::pauseLoop()
 {
 	oldTimeMs = SDL_GetTicks();
+	renderingEngine->setTextResolution(windowWidth, windowHeight);
 	menuLogic->updatePaused();
 
 	string instructions = "D-pad - Move, A - Select, B - Back";

@@ -133,12 +133,12 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	
 	input->handBrake = false;
 
-	if(ratio > 0.025)
+	if(ratio > 0.05)
 	{
 		if(leftCosAngle > 0)
-			input->steer = ratio*2.5;
+			input->steer = ratio;
 		else
-			input->steer = -ratio*2.5;
+			input->steer = -ratio;
 	}
 	else if(distanceToGoal < MIN_DIST)
 	{

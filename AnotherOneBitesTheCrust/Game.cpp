@@ -40,10 +40,6 @@ void Game::setGameState(GameState state)
 		setupEntities();
 		connectSystems();
 		gameState = GameState::PLAY;
-<<<<<<< Updated upstream
-		int breakPooint;
-=======
->>>>>>> Stashed changes
 	}
 	else if (state == GameState::BACK_TO_MENU)
 	{
@@ -424,17 +420,12 @@ void Game::playLoop()
 		playHUD(0);
 
 		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+
 		glViewport(0, 0, windowWidth/2, windowHeight/2);
-<<<<<<< Updated upstream
-		renderingEngine->updateView(*camera[2]);
-		gameDisplay(2);
-		playHUD(2);
-=======
 		renderingEngine->updateView(*camera[1]);
 		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(1);
 		playHUD(1);
->>>>>>> Stashed changes
 
 		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[2]);

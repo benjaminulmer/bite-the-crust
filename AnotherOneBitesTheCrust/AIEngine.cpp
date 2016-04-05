@@ -120,7 +120,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
 	// TODO: Should divide by half the map or something
-	float gas = glm::clamp(distanceToGoal / 100, (float)0.1, (float)0.60);
+	float gas = glm::clamp(distanceToGoal / 100, 0.3f, 0.7f);
 
 	// TODO: Maybe put these in an init file for tuning purposes?
 	if (gas > 0.1)
@@ -133,12 +133,12 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	
 	input->handBrake = false;
 
-	if(ratio > 0.05)
+	if(ratio > 0.025)
 	{
 		if(leftCosAngle > 0)
-			input->steer = ratio;
+			input->steer = ratio*2.5;
 		else
-			input->steer = -ratio;
+			input->steer = -ratio*2.5;
 	}
 	else if(distanceToGoal < MIN_DIST)
 	{

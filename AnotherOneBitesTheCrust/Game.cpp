@@ -294,13 +294,13 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 // Connects systems together
 void Game::connectSystems()
 {
-	inputEngine->setInputStruct(&players[0]->input, 0);
+	/*inputEngine->setInputStruct(&players[0]->input, 0);
 	inputEngine->setCamera(camera[0], 0);
-	players[0]->isAI = false;
+	players[0]->isAI = false;*/
 
-	inputEngine->setInputStruct(&players[1]->input, 1);
+	/*inputEngine->setInputStruct(&players[1]->input, 1);
 	inputEngine->setCamera(camera[1], 1);
-	players[1]->isAI = false;
+	players[1]->isAI = false;*/
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -728,7 +728,7 @@ void Game::shootPizza(Vehicle* vehicle)
 	physx::PxVec3 posOffset = transform.rotate(physx::PxVec3(0.0f, 1.25f, 1.0f));
 	transform.p += posOffset;
 
-	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 2, 17));
+	physx::PxVec3 velocity = transform.rotate(physx::PxVec3(0.0f, 2, 21));
 	physx::PxVec3 vehicleVelocity = vehicle->getRigidDynamic()->getLinearVelocity();
 	velocity += vehicleVelocity;
 

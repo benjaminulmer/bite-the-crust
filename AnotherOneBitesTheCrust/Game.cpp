@@ -25,7 +25,7 @@ Game::Game(void)
 	windowHeight = DEF_WINDOW_HEIGHT;
 	isFullscreen = false;
 	isVSync = false;
-	numHumans = 3;
+	numHumans = 1;
 	gameState = GameState::MENU;
 
 	std::random_device rd;
@@ -39,7 +39,7 @@ void Game::setGameState(GameState state)
 		setupEntities();
 		connectSystems();
 		gameState = GameState::PLAY;
-		int breakPooint;
+		numHumans = menuLogic->numPlayers;
 	}
 	else if (state == GameState::BACK_TO_MENU)
 	{

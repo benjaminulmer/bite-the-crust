@@ -95,7 +95,7 @@ void Vehicle::resetIfNeeded()
 		PxVec3 vehForw = actor->getGlobalPose().rotate(forw);
 		PxVec3 vehLeft = actor->getGlobalPose().rotate(left);
 		
-		PxF32 angleRad = (vehLeft.dot(forw)) ? -acos(vehForw.dot(forw)) : acos(vehForw.dot(forw));
+		PxF32 angleRad = (vehLeft.dot(forw) < 0) ? -acos(vehForw.dot(forw)) : acos(vehForw.dot(forw));
 		PxTransform cur = actor->getGlobalPose();
 		actor->setGlobalPose(PxTransform(PxVec3(cur.p.x, cur.p.y + 0.5f, cur.p.z), PxQuat(angleRad, up)));
 	}

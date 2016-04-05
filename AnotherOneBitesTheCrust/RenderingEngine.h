@@ -118,7 +118,7 @@ public:
 	void drawMinimap(Vehicle* vans[4], int height);
 	void updateHouseColor(Map *map, Tile* tile, glm::vec3 color);
 	void updateDeliveryLocation(glm::vec3 pos);
-	void drawDelivery();
+	void drawDelivery(int height);
 	std::vector<glm::vec3> mmRoadVerts;
 	std::vector<float> mmRoadColors;
 	GLuint mmRoadVAO;

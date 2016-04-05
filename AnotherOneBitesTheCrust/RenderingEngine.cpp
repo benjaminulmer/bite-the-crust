@@ -929,9 +929,10 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4], int height)
 	}
 
 	glEnable(GL_CULL_FACE);
+	drawDelivery(height);
 }
 
-void RenderingEngine::drawDelivery()
+void RenderingEngine::drawDelivery(int height)
 {
 	glUseProgram(basicProgramID);
 	glBindVertexArray(mmDeliveryVAO);
@@ -945,7 +946,7 @@ void RenderingEngine::drawDelivery()
 			GL_FALSE,
 			value_ptr(mmMVP)
 			);
-	GLfloat width = 5;
+	GLfloat width = height/144;
 	glLineWidth(width);
 	glDrawArrays(GL_LINE_LOOP, 0, mmDeliveryVerts.size());
 	glBindVertexArray(0);

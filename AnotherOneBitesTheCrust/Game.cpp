@@ -366,7 +366,6 @@ void Game::playHUD(int player)
 	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 1050, 640, 24) : renderingEngine->printText2Doutline(pizzas.data(), 990, 640, 30, glm::vec4(1,0,0,1), false);
 
 	(numHumans == 1) ? renderingEngine->drawMinimap(players, windowHeight) : renderingEngine->drawMinimap(players, windowHeight/2); // TODO: Should support arbitrary number of vans
-	renderingEngine->drawDelivery();
 }
 
 void Game::endHUD()

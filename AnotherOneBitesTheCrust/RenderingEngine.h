@@ -115,7 +115,7 @@ public:
 
 	//minimap stuff
 	void setupMinimap(Map map);
-	void drawMinimap(Vehicle* vans[4]);
+	void drawMinimap(Vehicle* vans[4], int height);
 	void updateHouseColor(Map *map, Tile* tile, glm::vec3 color);
 	void updateDeliveryLocation(glm::vec3 pos);
 	void drawDelivery();

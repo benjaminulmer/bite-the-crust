@@ -81,7 +81,7 @@ void Game::initSystems()
 	SDL_Rect rect;
 	SDL_GetDisplayBounds(0, &rect);
 	displayWidth = rect.w;
-	displayHeight = rect.h;
+	displayHeight = (displayWidth * 9)/16;
 	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_OPENGL);
 	SDL_GL_SetSwapInterval(1);
 	glContext = SDL_GL_CreateContext(window);
@@ -321,7 +321,7 @@ void Game::connectSystems()
 	deliveryManager->deliveryTextures[players[3]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
-	deliveryManager->deliveryLocationUpdate.connect(renderingEngine, &RenderingEngine::updateDeliveryLocation);
+	deliveryManager->deliveryLocationUpdate.connect(renderingEngine, &RenderingEngine::updateDeliveryLocation); // TODO connect this to member in vehicle
 	deliveryManager->houseColorSignal.connect(renderingEngine, &RenderingEngine::updateHouseColor);
 
 	deliveryManager->assignDeliveries();
@@ -365,7 +365,7 @@ void Game::playHUD(int player)
 	pizzas.append(to_string(players[player]->pizzaCount));
 	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 1050, 640, 24) : renderingEngine->printText2Doutline(pizzas.data(), 990, 640, 30, glm::vec4(1,0,0,1), false);
 
-	renderingEngine->drawMinimap(players); // TODO: Should support arbitrary number of vans
+	(numHumans == 1) ? renderingEngine->drawMinimap(players, windowHeight) : renderingEngine->drawMinimap(players, windowHeight/2); // TODO: Should support arbitrary number of vans
 	renderingEngine->drawDelivery();
 }
 

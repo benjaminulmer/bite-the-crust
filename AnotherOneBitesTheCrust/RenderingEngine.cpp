@@ -871,7 +871,7 @@ void RenderingEngine::setupMinimap(Map map)
 	
 }
 
-void RenderingEngine::drawMinimap(Vehicle* vans[4])
+void RenderingEngine::drawMinimap(Vehicle* vans[4], int height)
 {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -892,7 +892,7 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 		value_ptr(mmMVP)	// pointer to data in Mat4f
 		);
 
-	GLfloat width = 20;
+	GLfloat width = height/36;
 	glPointSize(width);
 
 	glDrawArrays(GL_POINTS, 0, mmRoadVerts.size());
@@ -907,8 +907,6 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4])
 		GL_FALSE,	// transpose matrix, Mat4f is row major
 		value_ptr(mmMVP)	// pointer to data in Mat4f
 		);
-
-	glPointSize(width);
 
 	glDrawArrays(GL_POINTS, 0, mmHouseVerts.size());
 	glBindVertexArray(0);

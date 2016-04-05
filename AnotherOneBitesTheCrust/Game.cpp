@@ -395,6 +395,7 @@ void Game::playLoop()
 	if (numHumans == 1)
 	{
 		renderingEngine->updateView(*camera[0]);
+		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 	}
@@ -403,6 +404,7 @@ void Game::playLoop()
 		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
 		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
+		renderingEngine->setTextResolution(windowWidth*2, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 
@@ -417,12 +419,14 @@ void Game::playLoop()
 		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
 		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
+		renderingEngine->setTextResolution(windowWidth*2, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 
 		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
 		glViewport(0, 0, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[2]);
+		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(2);
 		playHUD(2);
 
@@ -435,6 +439,7 @@ void Game::playLoop()
 	{
 		glViewport(0, windowHeight/2, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
+		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 
@@ -483,6 +488,7 @@ void Game::playLoop()
 void Game::menuLoop()
 {
 	oldTimeMs = SDL_GetTicks();
+	renderingEngine->setTextResolution(windowWidth, windowHeight);
 	menuLogic->updateMenu();
 
 	string instructions = "D-pad - Move, A - Select, B - Back";
@@ -492,6 +498,7 @@ void Game::menuLoop()
 void Game::pauseLoop()
 {
 	oldTimeMs = SDL_GetTicks();
+	renderingEngine->setTextResolution(windowWidth, windowHeight);
 	menuLogic->updatePaused();
 
 	string instructions = "D-pad - Move, A - Select, B - Back";

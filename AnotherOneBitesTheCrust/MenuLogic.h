@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "DecorationEntity.h"
+#include "NonPhysicsEntity.h"
 #include "GameState.h"
 #include "ContentLoading.h"
 #include "RenderingEngine.h"

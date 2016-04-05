@@ -4,12 +4,12 @@
 #include <gtc/type_ptr.hpp>
 #include <gtx/transform.hpp>
 
-class DecorationEntity :
+class NonPhysicsEntity :
 	public Entity
 {
 public:
-	DecorationEntity(void);
-	~DecorationEntity(void);
+	NonPhysicsEntity(void);
+	~NonPhysicsEntity(void);
 
 	void rotate(float angle, glm::vec3 axis);
 	void translate(glm::vec3 pos);

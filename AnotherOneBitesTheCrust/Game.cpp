@@ -3,7 +3,7 @@
 #include "WheelEntity.h"
 #include "ContentLoading.h"
 #include "StaticEntity.h"
-#include "DecorationEntity.h"
+#include "NonPhysicsEntity.h"
 
 #include <iostream>
 #include <sigslot.h>
@@ -159,7 +159,7 @@ Tile* Game::setupTile(int i, int j)
 
 void Game::setupRegularEntity(std::string name, Tile* tile, glm::vec3 pos)
 {
-	DecorationEntity* e = new DecorationEntity();
+	NonPhysicsEntity* e = new NonPhysicsEntity();
 	e->setRenderable(renderablesMap[name]);
 	e->setTexture(textureMap[name]);
 

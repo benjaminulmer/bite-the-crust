@@ -1,6 +1,6 @@
 #include "RenderingEngine.h"
 #include "Game.h"
-#include "DecorationEntity.h"
+#include "NonPhysicsEntity.h"
 #include <math.h>
 #include <iostream>
 

@@ -97,13 +97,13 @@ void MenuLogic::setupMenus()
 	eAOBTC->setTexture(aobtcTexture);
 	menuEntities.push_back(eAOBTC);
 
-	DecorationEntity *eBillboardHowto = new DecorationEntity();
+	NonPhysicsEntity *eBillboardHowto = new NonPhysicsEntity();
 	eBillboardHowto->setRenderable(billboard);
 	eBillboardHowto->setTexture(billboardHowto);
 	eBillboardHowto->translate(glm::vec3(13,0,0));
 	menuEntities.push_back(eBillboardHowto);
 
-	DecorationEntity *eBillboardControls = new DecorationEntity();
+	NonPhysicsEntity *eBillboardControls = new NonPhysicsEntity();
 	eBillboardControls->setRenderable(billboard);
 	eBillboardControls->setTexture(billboardControls);
 	eBillboardControls->translate(glm::vec3(-13,0,0));
@@ -124,27 +124,27 @@ void MenuLogic::setupMenus()
 	renderingEngine->assignBuffersTex(three);
 	renderingEngine->assignBuffersTex(four);
 
-	DecorationEntity *eNumPlayers = new DecorationEntity();
+	NonPhysicsEntity *eNumPlayers = new NonPhysicsEntity();
 	eNumPlayers->setRenderable(numPlayers);
 	eNumPlayers->setTexture(unselected);
 	playerSelectEntities.push_back(eNumPlayers);
 
-	DecorationEntity *eOne = new DecorationEntity();
+	NonPhysicsEntity *eOne = new NonPhysicsEntity();
 	eOne->setRenderable(one);
 	eOne->setTexture(selected);
 	playerSelectEntities.push_back(eOne);
 
-	DecorationEntity *eTwo = new DecorationEntity();
+	NonPhysicsEntity *eTwo = new NonPhysicsEntity();
 	eTwo->setRenderable(two);
 	eTwo->setTexture(unselected);
 	playerSelectEntities.push_back(eTwo);
 
-	DecorationEntity *eThree = new DecorationEntity();
+	NonPhysicsEntity *eThree = new NonPhysicsEntity();
 	eThree->setRenderable(three);
 	eThree->setTexture(unselected);
 	playerSelectEntities.push_back(eThree);
 
-	DecorationEntity *eFour = new DecorationEntity();
+	NonPhysicsEntity *eFour = new NonPhysicsEntity();
 	eFour->setRenderable(four);
 	eFour->setTexture(unselected);
 	playerSelectEntities.push_back(eFour);
@@ -249,7 +249,6 @@ void MenuLogic::menuInput(InputType type)
 	{
 		if(menuDepth == 0)
 		{
-			std::cout << "UP" << std::endl;
 			menuSelection = (MenuOptions)(((int)menuSelection - 1) % (int)MenuOptions::MAX);
 			// Here because negative modulo is compiler defined
 			if ((int)menuSelection < 0) 
@@ -263,7 +262,6 @@ void MenuLogic::menuInput(InputType type)
 		
 		if(menuDepth == 0)
 		{
-			std::cout << "down" << std::endl;
 			menuSelection = (MenuOptions)(((int)menuSelection + 1) % (int)MenuOptions::MAX);
 		}
 	}

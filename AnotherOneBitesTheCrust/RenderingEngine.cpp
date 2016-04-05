@@ -565,7 +565,7 @@ void RenderingEngine::setupMinimap(Map map)
 				glm::vec3 pos = vec3((float)ground->getPosition().x, (float)ground->getPosition().y, (float)ground->getPosition().z);
 				mmHouseVerts.push_back(pos);
 				//pink
-				mmHouseColors.push_back(vec3(1.0f, 0.68f, 0.73f));
+				mmHouseColors.push_back(vec3(0.9f, 0.9f, 0.9f));
 			}
 			else if(tile->pickup)
 			{
@@ -763,7 +763,7 @@ void RenderingEngine::setupMinimap(Map map)
 	for(int i = 0; i < mmDeliveryVerts.size(); i++)
 	{
 		//cout << mmDeliveryVerts[i].x << " " << mmDeliveryVerts[i].y << " " << mmDeliveryVerts[i].z << " " << endl;
-		mmDeliveryColors.push_back(vec3(1.0f,0.0f,0.0f));
+		mmDeliveryColors.push_back(vec3(0.1f,0.1f,0.1f));
 	}
 
 	glUseProgram(basicProgramID);
@@ -871,7 +871,7 @@ void RenderingEngine::setupMinimap(Map map)
 	
 }
 
-void RenderingEngine::drawMinimap(Vehicle* vans[4], int height)
+void RenderingEngine::drawMinimap(Vehicle* vans[4], int player, int height)
 {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -915,7 +915,7 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4], int height)
 		glBindVertexArray(mmVanVAOs[i]);
 		mmM = mat4(1.0f);
 		mmM = mmM * vans[i]->getModelMatrix();
-		mmM = scale(mmM, vec3(3.0));
+		mmM = (i == player) ? scale(mmM, vec3(4.0)) : scale(mmM, vec3(3.0));
 		mmM = rotate(mmM, -1.5708f, glm::vec3(0,1,0));
 
 		mmMVP = P * mmV * mmM;
@@ -929,16 +929,16 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4], int height)
 	}
 
 	glEnable(GL_CULL_FACE);
-	drawDelivery(height);
+	drawDelivery(vans[player]->deliveryLocation, height);
 }
 
-void RenderingEngine::drawDelivery(int height)
+void RenderingEngine::drawDelivery(vec3 pos, int height)
 {
 	glUseProgram(basicProgramID);
 	glBindVertexArray(mmDeliveryVAO);
 
 	mmM = mat4(1.0f);
-	mmM = translate(mmM, deliveryPosition);
+	mmM = translate(mmM, pos);
 
 	mat4 mmMVP = P * mmV * mmM;
 	glUniformMatrix4fv(basicmvpID,
@@ -950,10 +950,6 @@ void RenderingEngine::drawDelivery(int height)
 	glLineWidth(width);
 	glDrawArrays(GL_LINE_LOOP, 0, mmDeliveryVerts.size());
 	glBindVertexArray(0);
-}
-
-void RenderingEngine::updateDeliveryLocation(glm::vec3 pos) {
-	deliveryPosition = pos;
 }
 
 void RenderingEngine::updateHouseColor(Map *map, Tile* tile, glm::vec3 color) {

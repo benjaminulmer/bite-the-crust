@@ -68,8 +68,7 @@ Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	if (!player->isAI)
 		d.location->ground->setTexture(deliveryTextures[player]);
 	player->newDestination = true;
-	if (!player->isAI)
-		deliveryLocationUpdate(map->getTileLocation(d.location));
+	player->deliveryLocation = map->getTileLocation(d.location);
 	return d;
 }
 

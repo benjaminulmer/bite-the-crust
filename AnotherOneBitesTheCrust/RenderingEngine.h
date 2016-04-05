@@ -115,10 +115,9 @@ public:
 
 	//minimap stuff
 	void setupMinimap(Map map);
-	void drawMinimap(Vehicle* vans[4], int height);
+	void drawMinimap(Vehicle* vans[4], int player, int height);
 	void updateHouseColor(Map *map, Tile* tile, glm::vec3 color);
-	void updateDeliveryLocation(glm::vec3 pos);
-	void drawDelivery(int height);
+	void drawDelivery(glm::vec3 pos, int height);
 	std::vector<glm::vec3> mmRoadVerts;
 	std::vector<float> mmRoadColors;
 	GLuint mmRoadVAO;
@@ -145,7 +144,6 @@ public:
 	glm::vec3 mmScale;
 	glm::vec3 mmCenter;
 	glm::vec3 shift;
-	glm::vec3 deliveryPosition;
 
 	//testing stuf for danny
 	void setupNodes(std::vector <glm::vec3> verts, glm::vec3 color);

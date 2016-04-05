@@ -1183,3 +1183,14 @@ void RenderingEngine::displayPause(std::vector<Entity*> pausedEntities, mat4 men
 		glBindVertexArray(0);
 	}
 }
+
+//spinny arrow
+//      up  dest 
+//       ^  ^  
+//left <-| /
+//if (left . dest < 0)
+//	neg theta
+// else 
+//	pos theta
+//arccos(up . dest) = theta
+//multiply theta by pos or negative

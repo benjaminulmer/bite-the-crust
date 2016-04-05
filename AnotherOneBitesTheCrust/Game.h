@@ -63,7 +63,7 @@ private:
 	void playLoop();
 	void menuLoop();
 	void pauseLoop();
-	void endLoop(int player);
+	void endLoop();
 	void mainLoop();
 
 	GameState gameState;

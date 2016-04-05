@@ -36,10 +36,14 @@ void Game::setGameState(GameState state)
 {
 	if (state == GameState::STARTING_GAME)
 	{
+		numHumans = menuLogic->numPlayers;
 		setupEntities();
 		connectSystems();
 		gameState = GameState::PLAY;
+<<<<<<< Updated upstream
 		int breakPooint;
+=======
+>>>>>>> Stashed changes
 	}
 	else if (state == GameState::BACK_TO_MENU)
 	{
@@ -294,13 +298,12 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 // Connects systems together
 void Game::connectSystems()
 {
-	/*inputEngine->setInputStruct(&players[0]->input, 0);
-	inputEngine->setCamera(camera[0], 0);
-	players[0]->isAI = false;*/
-
-	/*inputEngine->setInputStruct(&players[1]->input, 1);
-	inputEngine->setCamera(camera[1], 1);
-	players[1]->isAI = false;*/
+	for (int i = 0; i < numHumans; i++) 
+	{
+		inputEngine->setInputStruct(&players[i]->input, i);
+		inputEngine->setCamera(camera[i], i);
+		players[i]->isAI = false;
+	}
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -422,14 +425,21 @@ void Game::playLoop()
 
 		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
 		glViewport(0, 0, windowWidth/2, windowHeight/2);
+<<<<<<< Updated upstream
 		renderingEngine->updateView(*camera[2]);
 		gameDisplay(2);
 		playHUD(2);
+=======
+		renderingEngine->updateView(*camera[1]);
+		renderingEngine->setTextResolution(windowWidth, windowHeight);
+		gameDisplay(1);
+		playHUD(1);
+>>>>>>> Stashed changes
 
 		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[3]);
-		gameDisplay(3);
-		playHUD(3);
+		renderingEngine->updateView(*camera[2]);
+		gameDisplay(2);
+		playHUD(2);
 	}
 	else
 	{
@@ -498,7 +508,7 @@ void Game::pauseLoop()
 	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 }
 
-void Game::endLoop(int player)
+void Game::endLoop()
 {
 	// Figure out timestep and run physics
 	newTimeMs = SDL_GetTicks();
@@ -620,7 +630,7 @@ void Game::mainLoop()
 		}
 		else if (gameState == GameState::END)
 		{
-			endLoop(1);
+			endLoop();
 		}
 		SDL_GL_SwapWindow(window);
 	}
@@ -653,6 +663,7 @@ void Game::toggleFullscreen()
 		windowHeight = DEF_WINDOW_HEIGHT;
 		SDL_SetWindowFullscreen(window, 0);
 		SDL_SetWindowSize(window, windowWidth, windowHeight);
+		SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
 		glViewport(0, 0, windowWidth, windowHeight);

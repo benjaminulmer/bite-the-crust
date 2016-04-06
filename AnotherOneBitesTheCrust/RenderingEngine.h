@@ -160,8 +160,9 @@ public:
 	void displayMenu(std::vector<Entity*> menuEntities, glm::mat4 menusM, glm::mat4 menusV);
 	void displayPause(std::vector<Entity*> pausedEntities, glm::mat4 menusM, glm::mat4 menusV);
 
-	//arrow stuff
-	void setupHudArrow();
-	void displayHudArrow(glm::vec3 currentPos, glm::vec3 deliveryPos);
+
+	void displayHudArrow(Entity* arrow, glm::mat4 menusM, glm::mat4 menusV);
+
+
 };
 

@@ -1205,3 +1205,44 @@ void RenderingEngine::displayPause(std::vector<Entity*> pausedEntities, mat4 men
 //	pos theta
 //arccos(up . dest) = theta
 //multiply theta by pos or negative
+
+
+void RenderingEngine::displayHudArrow(Entity* hudArrow, glm::mat4 menusM, glm::mat4 menusV)
+{
+		
+	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
+	//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glDisable(GL_BLEND);
+	glUseProgram(textureProgramID);
+
+	glUniform3f(lightPos, 0.0f, 7.0f, 1.0f);
+	glUniform1f(lightPow, 70.0f);
+	glUniform3f(ambientScale, 0.6, 0.6, 0.6);
+
+	menusM = mat4(1.0f);
+
+	//Translations done here. Order of translations is scale, rotate, translate
+	menusM = hudArrow->getModelMatrix();
+	mat4 MVP = P * menusV * menusM;
+	
+	glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
+	glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(menusV));
+	glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(menusM));
+
+	glBindVertexArray(hudArrow->getRenderable()->vao);
+	GLuint tex = hudArrow->getTexture();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
+
+	// Set our "myTextureSampler" sampler to user Texture Unit 0
+	glUniform1i(tID, 0);
+	//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+		
+	glDrawElements(GL_TRIANGLES, hudArrow->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
+
+	glBindVertexArray(0);
+}
+
+//Test if something is in viewport. result = vector(houseArrow - camera) dot with vector(lookAt - camera). If result < cos(30) then it is not seen

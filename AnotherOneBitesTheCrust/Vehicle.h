@@ -90,6 +90,8 @@ public:
 	std::string pizzaBoxRenderName;
 	std::string colorName;
 	NonPhysicsEntity* arrow;
+	NonPhysicsEntity* rightArrow;
+	NonPhysicsEntity* leftArrow;
 
 	bool isSlipping;
 	bool isInAir;

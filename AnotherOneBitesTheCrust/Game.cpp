@@ -305,7 +305,7 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 // Connects systems together
 void Game::connectSystems()
 {
-	for (int i = 0; i < numHumans; i++) 
+	for (int i = 0; i < 1; i++) 
 	{
 		inputEngine->setInputStruct(&players[i]->input, i);
 		inputEngine->setCamera(camera[i], i);
@@ -450,6 +450,8 @@ void Game::playLoop()
 		renderingEngine->updateView(*camera[1]);
 		gameDisplay(1);
 		playHUD(1);
+		
+		renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
 
 		glViewport(0, 0, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[2]);
@@ -479,6 +481,8 @@ void Game::playLoop()
 			{
 				AICollisionEntity closest = physicsEngine->AISweep(players[i]);
 				aiEngine->updateAI(players[i], deliveryManager->deliveries[players[i]], map, closest);
+				if(i == 1)
+					renderingEngine->setupNodes(players[i]->currentPath, glm::vec3(1,1,0));
 			}
 			players[i]->update();
 			camera[i]->update();

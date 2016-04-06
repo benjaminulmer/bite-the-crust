@@ -123,7 +123,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	float gas = glm::clamp(distanceToGoal / 100, 0.3f, 0.7f);
 
 	// TODO: Maybe put these in an init file for tuning purposes?
-	if (gas > 0.1)
+	if (gas > 0.15)
 	{
 		input->forward = gas;
 		input->backward = 0;
@@ -136,9 +136,9 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	if(ratio > 0.05)
 	{
 		if(leftCosAngle > 0)
-			input->steer = ratio;
+			input->steer = glm::clamp(ratio*2.5f, 0.f, 1.f);
 		else
-			input->steer = -ratio;
+			input->steer = -1 * glm::clamp(ratio*2.5f, 0.f, 1.f);;
 	}
 	else if(distanceToGoal < MIN_DIST)
 	{
@@ -241,16 +241,16 @@ graphNode * findClosestNode(glm::vec3 position, Map & map)
 void AIEngine::updatePath(Vehicle* toUpdate, Delivery destination, Map & map)
 {
 	// Should be 'goal node' of this tile
-	graphNode * destinationNode = destination.location->nodes.at(0);
+	glm::vec3 destinationNode = destination.location->goal;
 
 	
-	if(glm::length(destinationNode->getPosition() - toUpdate->getPosition()) <= MIN_DIST)
-		toUpdate->currentPath.push_back(destinationNode->getPosition());
+	if(glm::length(destinationNode - toUpdate->getPosition()) <= MIN_DIST)
+		toUpdate->currentPath.push_back(destinationNode);
 	else
 	{
 		graphNode * closest = findClosestNode(toUpdate->getPosition(), map);
 
-		toUpdate->currentPath = aStar(closest, destinationNode, map.allNodes);
+		toUpdate->currentPath = aStar(closest, nullptr, map.allNodes, destinationNode);
 	}
 }
 
@@ -363,7 +363,9 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	}
 
 	glm::vec3 nextPoint;
-	if(toUpdate->currentPath.size() >= 3)
+	if(toUpdate->currentPath.size() >= 5)
+		nextPoint = toUpdate->currentPath.at(4);
+	else if(toUpdate->currentPath.size() >= 3)
 		nextPoint = toUpdate->currentPath.at(2);
 	else
 		nextPoint = toUpdate->currentPath.at(0);

@@ -3,6 +3,13 @@
 #include "glm.hpp"
 #include <sigslot.h>
 
+enum class ArrowState
+{
+	LEFT,
+	RIGHT,
+	ON_SCREEN
+};
+
 class Camera
 	: public Entity, public sigslot::has_slots<>
 {
@@ -23,6 +30,7 @@ public:
 
 	void update();
 
+	ArrowState arrowState;
 	void setReverseCam(bool val);
 	bool isReverseCam();
 

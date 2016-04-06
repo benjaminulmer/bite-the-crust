@@ -345,6 +345,79 @@ void Game::gameDisplay(int player)
 	renderingEngine->drawSkybox(players[player]->getPosition()); // TODO: See above; should render skybox for each player
 }
 
+void Game::splitscreenViewports()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	if (numHumans == 1)
+	{
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
+		if(gameState == GameState::PLAY) playHUD(0);
+	}
+	else if (numHumans == 2)
+	{
+		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
+
+		glViewport(windowWidth/4, windowHeight/2, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
+		if(gameState == GameState::PLAY) playHUD(0);
+
+		glViewport(windowWidth/4, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[1]);
+		gameDisplay(1);
+		if(gameState == GameState::PLAY) playHUD(1);
+	}
+	else if (numHumans == 3)
+	{
+		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
+
+		glViewport(windowWidth/4, windowHeight/2, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
+		if(gameState == GameState::PLAY) playHUD(0);
+
+		glViewport(0, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[1]);
+		gameDisplay(1);
+		if(gameState == GameState::PLAY) playHUD(1);
+
+		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[2]);
+		gameDisplay(2);
+		if(gameState == GameState::PLAY) playHUD(2);
+	}
+	else
+	{
+		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
+
+		glViewport(0, windowHeight/2, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[0]);
+		gameDisplay(0);
+		if(gameState == GameState::PLAY) playHUD(0);
+
+		glViewport(windowWidth/2, windowHeight/2, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[1]);
+		gameDisplay(1);
+		if(gameState == GameState::PLAY) playHUD(1);
+		
+		renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
+
+		glViewport(0, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[2]);
+		gameDisplay(2);
+		if(gameState == GameState::PLAY) playHUD(2);
+
+		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
+		renderingEngine->updateView(*camera[3]);
+		gameDisplay(3);
+		if(gameState == GameState::PLAY) playHUD(3);
+	}
+	renderingEngine->setResolution(windowWidth, windowHeight);
+	glViewport(0, 0, windowWidth, windowHeight);
+}
+
+// +-6 , 2 trans for arrow
 void Game::playHUD(int player)
 {
 	string speed = "Speed: ";
@@ -395,77 +468,7 @@ void Game::playLoop()
 	oldTimeMs = newTimeMs;
 	deltaTimeAccMs += deltaTimeMs;
 
-	// slipscreen testing
-	if (numHumans == 1)
-	{
-		renderingEngine->updateView(*camera[0]);
-		gameDisplay(0);
-		playHUD(0);
-	}
-	else if (numHumans == 2)
-	{
-		renderingEngine->setResolution(windowWidth, windowHeight/2);
-
-		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
-		renderingEngine->updateView(*camera[0]);
-		gameDisplay(0);
-		playHUD(0);
-
-		glViewport(0, 0, windowWidth, windowHeight/2);
-		renderingEngine->updateView(*camera[1]);
-		gameDisplay(1);
-		playHUD(1);
-	}
-	else if (numHumans == 3)
-	{
-		renderingEngine->setResolution(windowWidth, windowHeight/2);
-
-		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
-		renderingEngine->updateView(*camera[0]);
-		gameDisplay(0);
-		playHUD(0);
-
-		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
-
-		glViewport(0, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[1]);
-		gameDisplay(1);
-		playHUD(1);
-
-		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[2]);
-		gameDisplay(2);
-		playHUD(2);
-	}
-	else
-	{
-		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
-
-		glViewport(0, windowHeight/2, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[0]);
-		gameDisplay(0);
-		playHUD(0);
-
-		glViewport(windowWidth/2, windowHeight/2, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[1]);
-		gameDisplay(1);
-		playHUD(1);
-		
-		renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
-
-		glViewport(0, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[2]);
-		gameDisplay(2);
-		playHUD(2);
-
-		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[3]);
-		gameDisplay(3);
-		playHUD(3);
-	}
-	renderingEngine->setResolution(windowWidth, windowHeight);
-	glViewport(0, 0, windowWidth, windowHeight);
-
+	splitscreenViewports();
 
 	while (deltaTimeAccMs >= PHYSICS_STEP_MS)
 	{
@@ -518,63 +521,7 @@ void Game::endLoop()
 	oldTimeMs = newTimeMs;
 	deltaTimeAccMs += deltaTimeMs;
 
-	if (numHumans == 1)
-	{
-		renderingEngine->updateView(*camera[0]);
-		gameDisplay(0);
-	}
-	else if (numHumans == 2)
-	{
-		renderingEngine->setResolution(windowWidth, windowHeight/2);
-
-		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
-		renderingEngine->updateView(*camera[0]);
-		gameDisplay(0);
-
-		glViewport(0, 0, windowWidth, windowHeight/2);
-		renderingEngine->updateView(*camera[1]);
-		gameDisplay(1);
-	}
-	else if (numHumans == 3)
-	{
-		renderingEngine->setResolution(windowWidth, windowHeight/2);
-
-		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
-		renderingEngine->updateView(*camera[0]);
-		gameDisplay(0);
-
-		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
-
-		glViewport(0, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[1]);
-		gameDisplay(1);
-
-		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[2]);
-		gameDisplay(2);
-	}
-	else
-	{
-		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
-
-		glViewport(0, windowHeight/2, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[0]);
-		gameDisplay(0);
-
-		glViewport(windowWidth/2, windowHeight/2, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[1]);
-		gameDisplay(1);
-
-		glViewport(0, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[2]);
-		gameDisplay(2);
-
-		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[3]);
-		gameDisplay(3);
-	}
-	renderingEngine->setResolution(windowWidth, windowHeight);
-	glViewport(0, 0, windowWidth, windowHeight);
+	splitscreenViewports();
 	endHUD();
 
 	while (deltaTimeAccMs >= PHYSICS_STEP_MS)

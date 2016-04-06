@@ -38,6 +38,22 @@ void Camera::update()
 	// Set location based on which mode (forward vs reverse)
 	position = (reverseCam) ? posBufferReverse[posBufferIndex] : posBufferForward[posBufferIndex];
 	lookAtPosition = vehicle->getPosition();
+
+	glm::vec3 toDest = glm::normalize(vehicle->deliveryLocation - position);
+	glm::vec3 viewDir = glm::normalize(lookAtPosition - position);
+	glm::vec3 left = glm::normalize(glm::cross(upVector, viewDir));
+
+	float angle = glm::acos(glm::dot(toDest, viewDir));
+	float leftCos = glm::dot(toDest, left);
+
+	if (angle > 0.87f)
+	{
+		arrowState = (leftCos < 0) ? ArrowState::RIGHT : ArrowState::LEFT;
+	}
+	else
+	{
+		arrowState = ArrowState::ON_SCREEN;
+	}
 }
 
 Camera::~Camera(void)

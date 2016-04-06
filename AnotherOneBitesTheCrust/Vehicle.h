@@ -81,7 +81,6 @@ public:
 	// END AI stuff
 	glm::vec3 deliveryLocation;
 
-
 	VehicleInput input;
 	VehicleTuning tuning;
 

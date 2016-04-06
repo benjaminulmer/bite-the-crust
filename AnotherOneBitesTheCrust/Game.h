@@ -58,6 +58,7 @@ private:
 	void shootPizza(Vehicle* vehicle);
 
 	void gameDisplay(int player);
+	void splitscreenViewports();
 	void playHUD(int player);
 	void endHUD();
 	void playLoop();

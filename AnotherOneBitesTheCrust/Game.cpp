@@ -83,8 +83,8 @@ void Game::initSystems()
 	displayWidth = rect.w;
 	displayHeight = (displayWidth * 9)/16;
 	window = SDL_CreateWindow("Another One Bites the Crust", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_OPENGL);
-	SDL_GL_SetSwapInterval(1);
 	glContext = SDL_GL_CreateContext(window);
+	SDL_GL_SetSwapInterval(1);
 
 	glewExperimental = GL_TRUE;
 	GLenum error = glewInit();

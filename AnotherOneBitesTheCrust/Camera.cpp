@@ -7,8 +7,8 @@ Camera::Camera(Vehicle* vehicle)
 
 	for (unsigned int i = 0; i < BUFFER_SIZE; i++)
 	{
-		posBufferForward[i] = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
-		posBufferReverse[i] = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
+		posBufferForward[i] = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0,6,-15,0));
+		posBufferReverse[i] = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0,6,-15,0));
 	}
 	posBufferIndex = 0;
 	position = (posBufferForward[BUFFER_SIZE]);
@@ -21,8 +21,8 @@ Camera::Camera(Vehicle* vehicle)
 void Camera::update()
 {
 	// Update buffer from vehicle position
-	posBufferForward[posBufferIndex] = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0,8,-15,0));
-	posBufferReverse[posBufferIndex] = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0,8,15,0));
+	posBufferForward[posBufferIndex] = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0,6,-15,0));
+	posBufferReverse[posBufferIndex] = vehicle->getPosition() + glm::vec3(vehicle->getModelMatrix() * glm::vec4(0,6,15,0));
 
 	// Don't let camera fall below ground
 	if (posBufferForward[posBufferIndex].y < 1) 

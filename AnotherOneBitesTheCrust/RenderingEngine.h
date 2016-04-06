@@ -34,7 +34,6 @@ public:
 
 	void generateIDs();
 	void deleteIDs();
-	void loadProjectionMatrix(int width, int height);
 	void updateView(Camera& c);
 	void assignBuffersTex(Renderable* r);
 	void deleteBuffers(Renderable* r);
@@ -72,11 +71,11 @@ public:
 	void drawSkybox(glm::vec3 position);
 
 	glm::vec2 resolution;
-	void setTextResolution(int width, int height);
+	void setResolution(int width, int height);
 	void initText2D(const char * texturePath);
 	void printText2D(const char * text, float x, float y, int size);
 	void printBanner(const char * text, float x, float y, int size, glm::vec3 color);
-	void printText2Doutline(const char * text, float x, float y, int size, glm::vec4 color, bool invert);
+	void printText2Doutline(const char * text, float xIn, float yIn, int sizeIn, glm::vec4 color, bool invert);
 	void cleanupText2D();
 
 	GLuint textProgramID;			//shader

@@ -98,7 +98,7 @@ void Game::initSystems()
 	physicsEngine = new PhysicsEngine();
 	renderingEngine = new RenderingEngine();
 	menuLogic = new MenuLogic(renderingEngine);
-	renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+	renderingEngine->setResolution(windowWidth, windowHeight);
 	deliveryManager = new DeliveryManager();
 }
 
@@ -349,24 +349,24 @@ void Game::playHUD(int player)
 {
 	string speed = "Speed: ";
 	speed.append(to_string(players[player]->getPhysicsVehicle()->computeForwardSpeed()));
-	renderingEngine->printText2D(speed.data(), 0, 0.96f * windowHeight, 24);
+	renderingEngine->printText2D(speed.data(), 0, 0.96f, 24);
 
 	string frameRate = "DeltaTime: ";
 	frameRate.append(to_string(deltaTimeMs));
-	renderingEngine->printText2D(frameRate.data(), 0, 0.89f * windowHeight, 20);
+	renderingEngine->printText2D(frameRate.data(), 0, 0.89f, 20);
 
 	string deltaAcc = "DeltaTimeACC: ";
 	deltaAcc.append(to_string(deltaTimeAccMs));
-	renderingEngine->printText2D(deltaAcc.data(), 0, 0.93f * windowHeight, 20);
+	renderingEngine->printText2D(deltaAcc.data(), 0, 0.93f, 20);
 
 	string score = "Tips: $";
 	score.append(to_string(deliveryManager->getScore(players[player])));
-	renderingEngine->printText2D(score.data(), 0.82f * windowWidth, 0.96f * windowHeight, 24);
-	renderingEngine->printText2D(deliveryManager->getDeliveryText(players[player]).data(), 0.57f * windowWidth, 0.93f * windowHeight, 20);
+	renderingEngine->printText2D(score.data(), 0.82f, 0.96f, 24);
+	renderingEngine->printText2D(deliveryManager->getDeliveryText(players[player]).data(), 0.57f, 0.93f, 20);
 
 	string pizzas = "Pizzas: ";
 	pizzas.append(to_string(players[player]->pizzaCount));
-	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 0.82f * windowWidth, 0.89f * windowHeight, 24) : renderingEngine->printText2Doutline(pizzas.data(), 0.77f * windowWidth, 0.89f * windowHeight, 30, glm::vec4(1,0,0,1), false);
+	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 0.82f, 0.89f, 24) : renderingEngine->printText2Doutline(pizzas.data(), 0.77f, 0.89f, 30, glm::vec4(1,0,0,1), false);
 
 	(numHumans == 1) ? renderingEngine->drawMinimap(players, player, windowHeight) : renderingEngine->drawMinimap(players, player, windowHeight/2); // TODO: Should support arbitrary number of vans
 }
@@ -380,10 +380,10 @@ void Game::endHUD()
 			winner = players[i];
 	}
 	string winnerText = "	" + winner->colorName + " WINS			";
-	renderingEngine->printBanner(winnerText.data(), 0, 720/2, 100, winner->color);	
+	renderingEngine->printBanner(winnerText.data(), 0, 0.5f, 100, winner->color);	
 	for (int i = 0; i < MAX_PLAYERS; i++) {
 		string scoreText = "TIPS: $" + std::to_string(scores[players[i]]);
-		renderingEngine->printBanner(scoreText.data(), 100, 300 - i*50, 50, players[i]->color);
+		renderingEngine->printBanner(scoreText.data(), 0.078f, 0.417f - i*0.069, 50, players[i]->color);
 	}
 }
 
@@ -399,53 +399,50 @@ void Game::playLoop()
 	if (numHumans == 1)
 	{
 		renderingEngine->updateView(*camera[0]);
-		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 	}
 	else if (numHumans == 2)
 	{
+		renderingEngine->setResolution(windowWidth, windowHeight/2);
+
 		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
-		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
-		renderingEngine->setTextResolution(windowWidth*2, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 
 		glViewport(0, 0, windowWidth, windowHeight/2);
-		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[1]);
 		gameDisplay(1);
 		playHUD(1);
 	}
 	else if (numHumans == 3)
 	{
+		renderingEngine->setResolution(windowWidth, windowHeight/2);
+
 		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
-		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
-		renderingEngine->setTextResolution(windowWidth*2, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 
-		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
 
 		glViewport(0, 0, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[1]);
-		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(1);
 		playHUD(1);
 
 		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[2]);
-		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(2);
 		playHUD(2);
 	}
 	else
 	{
+		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
+
 		glViewport(0, windowHeight/2, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
-		renderingEngine->setTextResolution(windowWidth, windowHeight);
 		gameDisplay(0);
 		playHUD(0);
 
@@ -464,7 +461,7 @@ void Game::playLoop()
 		gameDisplay(3);
 		playHUD(3);
 	}
-	renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+	renderingEngine->setResolution(windowWidth, windowHeight);
 	glViewport(0, 0, windowWidth, windowHeight);
 
 
@@ -494,7 +491,6 @@ void Game::playLoop()
 void Game::menuLoop()
 {
 	oldTimeMs = SDL_GetTicks();
-	renderingEngine->setTextResolution(windowWidth, windowHeight);
 	menuLogic->updateMenu();
 
 	string instructions = "D-pad - Move, A - Select, B - Back";
@@ -504,7 +500,6 @@ void Game::menuLoop()
 void Game::pauseLoop()
 {
 	oldTimeMs = SDL_GetTicks();
-	renderingEngine->setTextResolution(windowWidth, windowHeight);
 	menuLogic->updatePaused();
 
 	string instructions = "D-pad - Move, A - Select, B - Back";
@@ -523,38 +518,41 @@ void Game::endLoop()
 	{
 		renderingEngine->updateView(*camera[0]);
 		gameDisplay(0);
-		playHUD(0);
 	}
 	else if (numHumans == 2)
 	{
+		renderingEngine->setResolution(windowWidth, windowHeight/2);
+
 		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
-		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
 		gameDisplay(0);
 
 		glViewport(0, 0, windowWidth, windowHeight/2);
-		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[1]);
 		gameDisplay(1);
 	}
 	else if (numHumans == 3)
 	{
+		renderingEngine->setResolution(windowWidth, windowHeight/2);
+
 		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
-		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
 		gameDisplay(0);
 
-		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
+
 		glViewport(0, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[2]);
-		gameDisplay(2);
+		renderingEngine->updateView(*camera[1]);
+		gameDisplay(1);
 
 		glViewport(windowWidth/2, 0, windowWidth/2, windowHeight/2);
-		renderingEngine->updateView(*camera[3]);
-		gameDisplay(3);
+		renderingEngine->updateView(*camera[2]);
+		gameDisplay(2);
 	}
 	else
 	{
+		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
+
 		glViewport(0, windowHeight/2, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
 		gameDisplay(0);
@@ -571,7 +569,7 @@ void Game::endLoop()
 		renderingEngine->updateView(*camera[3]);
 		gameDisplay(3);
 	}
-	renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+	renderingEngine->setResolution(windowWidth, windowHeight);
 	glViewport(0, 0, windowWidth, windowHeight);
 	endHUD();
 
@@ -668,7 +666,7 @@ void Game::toggleFullscreen()
 		SDL_SetWindowSize(window, windowWidth, windowHeight);
 		SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
-		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+		renderingEngine->setResolution(windowWidth, windowHeight);
 		glViewport(0, 0, windowWidth, windowHeight);
 
 		isFullscreen = false;
@@ -680,7 +678,7 @@ void Game::toggleFullscreen()
 		SDL_SetWindowSize(window, windowWidth, windowHeight);
 		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
-		renderingEngine->loadProjectionMatrix(windowWidth, windowHeight);
+		renderingEngine->setResolution(windowWidth, windowHeight);
 		glViewport(0, 0, windowWidth, windowHeight);
 
 		isFullscreen = true;

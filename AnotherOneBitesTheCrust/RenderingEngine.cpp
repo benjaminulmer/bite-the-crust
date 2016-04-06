@@ -13,6 +13,8 @@ RenderingEngine::RenderingEngine()
 	//glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
 
+	O = ortho(0.0f, 5.0f, 5.0f, 0.0f, 1.0f, 1000.0f);
+
 	generateIDs();
 	//resolution = vec2(640,360);
 	initText2D("res\\Fonts\\Carbon.DDS");
@@ -136,12 +138,6 @@ void RenderingEngine::generateIDs()
 	basicmvpID = glGetUniformLocation(basicProgramID, "MVP");
 }
 
-void RenderingEngine::loadProjectionMatrix(int width, int height)
-{
-	P = perspective(1.0472f, (float)width/(float)height, 1.0f, 1000.0f);	//radians kek
-	O = ortho(0.0f, 5.0f, 5.0f, 0.0f, 1.0f, 1000.0f);
-}
-
 void RenderingEngine::updateView(Camera& c)
 {
 	V = glm::lookAt(c.getPosition(), c.getLookAtPosition(), c.getUpVector());
@@ -241,9 +237,10 @@ void RenderingEngine::initText2D(const char * texturePath){
 	textTextureID = ContentLoading::loadDDS(texturePath);
 }
 
-void RenderingEngine::setTextResolution(int width, int height)
+void RenderingEngine::setResolution(int width, int height)
 {
-	resolution = vec2(width/2, height/2);
+	P = perspective(1.0472f, (float)width/(float)height, 1.0f, 1000.0f);	//radians kek
+	resolution = vec2(width, height);
 }
 
 void RenderingEngine::printText2D(const char * text, float x, float y, int size)
@@ -257,10 +254,12 @@ void RenderingEngine::printBanner(const char * text, float x, float y, int size,
 	printText2Doutline(text, x, y, size, glm::vec4(color.x, color.y, color.z, 1), true);
 }
 
-void RenderingEngine::printText2Doutline(const char * text, float x, float y, int size, glm::vec4 color, bool invert){
-
-
+void RenderingEngine::printText2Doutline(const char * text, float xIn, float yIn, int sizeIn, glm::vec4 color, bool invert)
+{
 	unsigned int length = strlen(text);
+	float x = xIn * resolution.x;
+	float y = yIn * resolution.y;
+	float size = sizeIn;
 
 	// Fill buffers
 	std::vector<glm::vec2> textvertices;
@@ -342,7 +341,7 @@ void RenderingEngine::printText2Doutline(const char * text, float x, float y, in
     glDisable(GL_DEPTH_TEST);
 
 	glUniform4f(colorID, color.x, color.y, color.z, color.a);
-	glUniform2f(resID, resolution.x, resolution.y);
+	glUniform2f(resID, resolution.x/2, resolution.y/2);
 
 	// Draw call
 	glBindVertexArray(textVAO);

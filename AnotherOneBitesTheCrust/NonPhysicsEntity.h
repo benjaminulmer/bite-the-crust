@@ -13,6 +13,7 @@ public:
 
 	void rotate(float angle, glm::vec3 axis);
 	void translate(glm::vec3 pos);
+	void setTranslation(glm::vec3 pos);
 
 	glm::vec3 getPosition();
 	glm::mat4 getModelMatrix();

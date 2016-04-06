@@ -29,7 +29,8 @@ public:
 	~RenderingEngine(void);	
 
 	void displayFunc(std::vector<Entity*> entities);
-	void displayFuncTex(std::vector<Entity*> entities);
+	void displayFuncTex(std::vector<Entity*> entities, Entity* arrow);
+	void drawEntity(Entity* entity);
 
 	void generateIDs();
 	void deleteIDs();

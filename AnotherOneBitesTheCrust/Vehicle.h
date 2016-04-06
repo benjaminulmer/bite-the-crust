@@ -1,6 +1,7 @@
 #pragma once
 #include <PxPhysicsAPI.h>
 #include "DynamicEntity.h"
+#include "NonPhysicsEntity.h"
 #include <sigslot.h>
 
 struct VehicleInput
@@ -88,6 +89,7 @@ public:
 	glm::vec3 color;
 	std::string pizzaBoxRenderName;
 	std::string colorName;
+	NonPhysicsEntity* arrow;
 
 	bool isSlipping;
 	bool isInAir;

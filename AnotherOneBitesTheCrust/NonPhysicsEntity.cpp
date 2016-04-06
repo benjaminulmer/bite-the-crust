@@ -18,6 +18,12 @@ void NonPhysicsEntity::translate(glm::vec3 pos)
 	modelMatrix = transMatrix * rotMatrix;
 }
 
+void NonPhysicsEntity::setTranslation(glm::vec3 pos)
+{
+	transMatrix = glm::translate(glm::mat4(1), pos);
+	modelMatrix = transMatrix * rotMatrix;
+}
+
 glm::vec3 NonPhysicsEntity::getPosition()
 {
 	return glm::vec3(modelMatrix * glm::vec4(0, 0, 0, 1));

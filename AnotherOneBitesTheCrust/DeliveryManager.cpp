@@ -69,6 +69,7 @@ Delivery DeliveryManager::newDelivery(Vehicle* player) {
 		d.location->ground->setTexture(deliveryTextures[player]);
 	player->newDestination = true;
 	player->deliveryLocation = map->getTileLocation(d.location);
+	player->arrow->setTranslation(player->deliveryLocation + glm::vec3(0, 15, 0));
 	return d;
 }
 

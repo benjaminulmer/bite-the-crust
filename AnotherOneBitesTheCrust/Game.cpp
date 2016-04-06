@@ -245,6 +245,7 @@ void Game::setupEntities()
 void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 {
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", vehicle);
+	NonPhysicsEntity* arrow = new NonPhysicsEntity();
 	switch(num) {
 		case 0:
 			vehicle->setRenderable(renderablesMap["redVan"]);
@@ -252,6 +253,8 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->color = glm::vec3(1,0,0);
 			vehicle->pizzaBoxRenderName = "pizzaBoxRed";
 			vehicle->colorName = "Red";
+			arrow->setRenderable(renderablesMap["redArrow"]);
+			arrow->setTexture(textureMap["redArrow"]);
 			break;
 		case 1:
 			vehicle->setRenderable(renderablesMap["blueVan"]);
@@ -259,6 +262,8 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->color = glm::vec3(0,0,1);
 			vehicle->pizzaBoxRenderName = "pizzaBoxBlue";
 			vehicle->colorName = "Blue";
+			arrow->setRenderable(renderablesMap["blueArrow"]);
+			arrow->setTexture(textureMap["blueArrow"]);
 			break;
 		case 2:
 			vehicle->setRenderable(renderablesMap["greenVan"]);
@@ -266,6 +271,8 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->color = glm::vec3(0,1,0);
 			vehicle->pizzaBoxRenderName = "pizzaBoxGreen";
 			vehicle->colorName = "Green";
+			arrow->setRenderable(renderablesMap["greenArrow"]);
+			arrow->setTexture(textureMap["greenArrow"]);
 			break;
 		case 3:
 			vehicle->setRenderable(renderablesMap["yellowVan"]);
@@ -273,10 +280,14 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->color = glm::vec3(1,1,0);
 			vehicle->pizzaBoxRenderName = "pizzaBoxYellow";
 			vehicle->colorName = "Yellow";
+			arrow->setRenderable(renderablesMap["yellowArrow"]);
+			arrow->setTexture(textureMap["yellowArrow"]);
 			break;
 	}
 	physicsEngine->createVehicle(vehicle, transform);
 	entities.push_back(vehicle);
+
+	vehicle->arrow = arrow;
 
 	physx::PxShape* wheels[4];
 	physx::PxRigidActor* actor = vehicle->getActor();
@@ -332,7 +343,7 @@ void Game::connectSystems()
 
 void Game::gameDisplay(int player)
 {
-	renderingEngine->displayFuncTex(entities);
+	renderingEngine->displayFuncTex(entities, players[player]->arrow);
 	for(int i = 0 ; i < MAX_PLAYERS; i++)
 	{
 		renderingEngine->drawShadow(players[i]->getPosition());

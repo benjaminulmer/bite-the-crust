@@ -33,6 +33,7 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	isSlipping = false;
 
 	type = EntityType::VEHICLE;
+	arrow = nullptr;
 }
 
 glm::vec3 Vehicle::getDestination()

@@ -21,7 +21,7 @@ RenderingEngine::RenderingEngine()
 
 RenderingEngine::~RenderingEngine(void) {}
 
-void RenderingEngine::displayFuncTex(vector<Entity*> entities)
+void RenderingEngine::displayFuncTex(vector<Entity*> entities, Entity* arrow)
 {
 	//glClearDepth(1.0);
 
@@ -35,40 +35,46 @@ void RenderingEngine::displayFuncTex(vector<Entity*> entities)
 	glUniform3f(ambientScale, 0.6f, 0.6f, 0.6f);
 
 	for (int i = 0; i < (int)entities.size(); i++) {
-		if (!entities[i]->hasRenderable())
-			continue;
-
-
-		M = mat4(1.0f);
-
-		//Translations done here. Order of translations is scale, rotate, translate
-		M = entities[i]->getModelMatrix();
-		//M = calculateDefaultModel(M, entities[i]);
-
-		mat4 MVP = P * V * M;
-
-		// Not used. Need to remove from shader
-		//mat4 normal = glm::transpose(glm::inverse(V * M));
-
-		glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
-		glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(V));
-		glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(M));
-		//glUniformMatrix4fv(normalID, 1, GL_FALSE, value_ptr(normal));
-
-		glBindVertexArray(entities[i]->getRenderable()->vao);
-		GLuint tex = entities[i]->getTexture();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex);
-		//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
-
-		// Set our "myTextureSampler" sampler to user Texture Unit 0
-		glUniform1i(tID, 0);
-		//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
-		
-		glDrawElements(GL_TRIANGLES, entities[i]->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
-
-		glBindVertexArray(0);
+		drawEntity(entities[i]);
 	}
+	drawEntity(arrow);
+}
+
+// Assumes that the program and uniforms have already been set up
+void RenderingEngine::drawEntity(Entity* entity) {
+	if (!entity->hasRenderable()) {
+		return;
+	}
+
+	M = mat4(1.0f);
+
+	//Translations done here. Order of translations is scale, rotate, translate
+	M = entity->getModelMatrix();
+	//M = calculateDefaultModel(M, entities[i]);
+
+	mat4 MVP = P * V * M;
+
+	// Not used. Need to remove from shader
+	//mat4 normal = glm::transpose(glm::inverse(V * M));
+
+	glUniformMatrix4fv(mvpID, 1, GL_FALSE, value_ptr(MVP));
+	glUniformMatrix4fv(vID, 1, GL_FALSE, value_ptr(V));
+	glUniformMatrix4fv(mID, 1, GL_FALSE, value_ptr(M));
+	//glUniformMatrix4fv(normalID, 1, GL_FALSE, value_ptr(normal));
+
+	glBindVertexArray(entity->getRenderable()->vao);
+	GLuint tex = entity->getTexture();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	//glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA8, 1024, 768, false );
+
+	// Set our "myTextureSampler" sampler to user Texture Unit 0
+	glUniform1i(tID, 0);
+	//glDrawArrays(GL_TRIANGLES, 0, entities[i]->getRenderable()->verts.size());
+		
+	glDrawElements(GL_TRIANGLES, entity->getRenderable()->drawFaces.size(), GL_UNSIGNED_SHORT, (void*)0);
+
+	glBindVertexArray(0);
 }
 
 void RenderingEngine::generateIDs()

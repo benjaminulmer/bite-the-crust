@@ -74,9 +74,9 @@ public:
 	glm::vec2 resolution;
 	void setTextResolution(int width, int height);
 	void initText2D(const char * texturePath);
-	void printText2D(const char * text, int x, int y, int size);
-	void printBanner(const char * text, int x, int y, int size, glm::vec3 color);
-	void printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color, bool invert);
+	void printText2D(const char * text, float x, float y, int size);
+	void printBanner(const char * text, float x, float y, int size, glm::vec3 color);
+	void printText2Doutline(const char * text, float x, float y, int size, glm::vec4 color, bool invert);
 	void cleanupText2D();
 
 	GLuint textProgramID;			//shader

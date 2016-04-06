@@ -246,18 +246,18 @@ void RenderingEngine::setTextResolution(int width, int height)
 	resolution = vec2(width/2, height/2);
 }
 
-void RenderingEngine::printText2D(const char * text, int x, int y, int size)
+void RenderingEngine::printText2D(const char * text, float x, float y, int size)
 {
 	//printText2Doutline(text, x+1, y+1, (int)(size+0.5f), glm::vec4(0,0,0,1));
 	printText2Doutline(text, x, y, size, glm::vec4(1,1,1,1), false);
 }
 
-void RenderingEngine::printBanner(const char * text, int x, int y, int size, glm::vec3 color)
+void RenderingEngine::printBanner(const char * text, float x, float y, int size, glm::vec3 color)
 {
 	printText2Doutline(text, x, y, size, glm::vec4(color.x, color.y, color.z, 1), true);
 }
 
-void RenderingEngine::printText2Doutline(const char * text, int x, int y, int size, glm::vec4 color, bool invert){
+void RenderingEngine::printText2Doutline(const char * text, float x, float y, int size, glm::vec4 color, bool invert){
 
 
 	unsigned int length = strlen(text);

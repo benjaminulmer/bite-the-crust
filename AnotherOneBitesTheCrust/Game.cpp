@@ -355,24 +355,24 @@ void Game::playHUD(int player)
 {
 	string speed = "Speed: ";
 	speed.append(to_string(players[player]->getPhysicsVehicle()->computeForwardSpeed()));
-	renderingEngine->printText2D(speed.data(), 0, 690, 24);
+	renderingEngine->printText2D(speed.data(), 0, 0.96f * windowHeight, 24);
 
 	string frameRate = "DeltaTime: ";
 	frameRate.append(to_string(deltaTimeMs));
-	renderingEngine->printText2D(frameRate.data(), 0, 640, 20);
+	renderingEngine->printText2D(frameRate.data(), 0, 0.89f * windowHeight, 20);
 
 	string deltaAcc = "DeltaTimeACC: ";
 	deltaAcc.append(to_string(deltaTimeAccMs));
-	renderingEngine->printText2D(deltaAcc.data(), 0, 670, 20);
+	renderingEngine->printText2D(deltaAcc.data(), 0, 0.93f * windowHeight, 20);
 
 	string score = "Tips: $";
 	score.append(to_string(deliveryManager->getScore(players[player])));
-	renderingEngine->printText2D(score.data(), 1050, 690, 24);
-	renderingEngine->printText2D(deliveryManager->getDeliveryText(players[player]).data(), 725, 670, 20);
+	renderingEngine->printText2D(score.data(), 0.82f * windowWidth, 0.96f * windowHeight, 24);
+	renderingEngine->printText2D(deliveryManager->getDeliveryText(players[player]).data(), 0.57f * windowWidth, 0.93f * windowHeight, 20);
 
 	string pizzas = "Pizzas: ";
 	pizzas.append(to_string(players[player]->pizzaCount));
-	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 1050, 640, 24) : renderingEngine->printText2Doutline(pizzas.data(), 990, 640, 30, glm::vec4(1,0,0,1), false);
+	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 0.82f * windowWidth, 0.89f * windowHeight, 24) : renderingEngine->printText2Doutline(pizzas.data(), 0.77f * windowWidth, 0.89f * windowHeight, 30, glm::vec4(1,0,0,1), false);
 
 	(numHumans == 1) ? renderingEngine->drawMinimap(players, player, windowHeight) : renderingEngine->drawMinimap(players, player, windowHeight/2); // TODO: Should support arbitrary number of vans
 }

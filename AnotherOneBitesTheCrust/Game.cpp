@@ -324,12 +324,6 @@ void Game::connectSystems()
 		deliveryManager->addPlayer(players[i]);
 	}
 
-	// TODO: Should have a textures array or something that corresponds to each player so we can add this to above loop
-	deliveryManager->deliveryTextures[players[0]] = ContentLoading::loadDDS("res\\Textures\\lawnRed.DDS");
-	deliveryManager->deliveryTextures[players[1]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
-	deliveryManager->deliveryTextures[players[2]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
-	deliveryManager->deliveryTextures[players[3]] = ContentLoading::loadDDS("res\\Textures\\lawnBlue.DDS");
-
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
 	deliveryManager->houseColorSignal.connect(renderingEngine, &RenderingEngine::updateHouseColor);
 

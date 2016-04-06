@@ -65,8 +65,7 @@ Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	d.location = freeLocations[randomTile];
 	d.time = 1000.0 * 30.0; // 20 seconds
 	// Only draw delivery tile for player
-	if (!player->isAI)
-		d.location->ground->setTexture(deliveryTextures[player]);
+
 	player->newDestination = true;
 	player->deliveryLocation = map->getTileLocation(d.location);
 	player->arrow->setTranslation(player->deliveryLocation + glm::vec3(0, 15, 0));

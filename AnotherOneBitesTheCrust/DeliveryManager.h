@@ -31,7 +31,6 @@ public:
 	std::vector<Vehicle*> players;
 	std::map<Vehicle*, Delivery> deliveries;
 	std::map<Vehicle*, int> scores;
-	std::map<Vehicle*, GLuint> deliveryTextures;
 	sigslot::signal1<std::map<Vehicle*, int>> gameOverSignal;
 	sigslot::signal1<Vehicle*> pizzasRefilled;
 	sigslot::signal2<Vehicle*, glm::vec3> deliveryLocationUpdate;

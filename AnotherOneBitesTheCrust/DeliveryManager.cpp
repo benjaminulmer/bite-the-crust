@@ -102,3 +102,9 @@ void DeliveryManager::refillPizza(Vehicle* player) {
 	player->pickingUp = false;
 	player->pizzaCount = Vehicle::MAX_PIZZAS;
 }
+
+void DeliveryManager::reset() {
+	players.clear();
+	scores.clear();
+	deliveries.clear();
+}

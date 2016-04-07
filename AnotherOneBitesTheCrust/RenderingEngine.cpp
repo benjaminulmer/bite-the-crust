@@ -548,6 +548,10 @@ void RenderingEngine::drawSkybox(glm::vec3 position)
 void RenderingEngine::setupMinimap(Map map)
 {
 	glUseProgram(basicProgramID);
+	mmRoadColors.clear();
+	mmHouseColors.clear();
+	mmRoadVerts.clear();
+	mmHouseVerts.clear();
 
 	//push back tiles and colors
 	for(unsigned int i = 0; i < map.tiles.size(); i++)

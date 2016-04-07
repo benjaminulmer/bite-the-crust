@@ -19,6 +19,7 @@ void PhysicsEngine::reset()
 {
 	vehicles.erase(vehicles.begin(), vehicles.end());
 	scene = physics->createScene(*sceneDesc);
+	batchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *vehicleSceneQueryData, scene);
 }
 
 void PhysicsEngine::initSimulationData()

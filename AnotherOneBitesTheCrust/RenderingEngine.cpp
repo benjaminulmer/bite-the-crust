@@ -259,7 +259,7 @@ void RenderingEngine::printText2Doutline(const char * text, float xIn, float yIn
 	unsigned int length = strlen(text);
 	float x = xIn * resolution.x;
 	float y = yIn * resolution.y;
-	float size = (float)sizeIn;
+	float size = (resolution.y * sizeIn)/720.0f;
 
 	// Fill buffers
 	std::vector<glm::vec2> textvertices;

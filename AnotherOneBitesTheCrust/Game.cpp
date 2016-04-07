@@ -56,7 +56,8 @@ void Game::setGameState(GameState state)
 void Game::reset() 
 {
 	entities.erase(entities.begin(), entities.end());
-	std::cout << entities.size() << std::endl;
+	map.deliveryTiles.clear();
+	deliveryManager->reset();
 }
 
 // The entry point of the game

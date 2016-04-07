@@ -31,8 +31,7 @@ std::string DeliveryManager::getDeliveryText(Vehicle* player) {
 	int seconds = (int)(ceil(deliveries[player].time / 1000.0f));
 	int minutes = seconds / 60;
 	seconds = seconds % 60;
-    std::string text = std::to_string(minutes);
-	text = text + "M " + std::to_string(seconds) + "S";
+	std::string text = std::to_string(seconds) + "S";
 	return text;
 }
 
@@ -47,6 +46,7 @@ void DeliveryManager::timePassed(double timeMs) {
 		if (d->time <= 0.0) {
 			if (!players[i]->isAI)
 				d->location->ground->setTexture(d->location->groundTexture);
+			scores[players[i]] -= 5;
 			deliveries[players[i]] = newDelivery(players[i]);
 			freeLocations.push_back(d->location); // Free the tile back up, since it wasn't claimed
 			// Free the location after assigning delivery, so you don't get the same location twice
@@ -63,7 +63,11 @@ Delivery DeliveryManager::newDelivery(Vehicle* player) {
 	std::uniform_int_distribution<int> dist(0, freeLocations.size()-1);
 	int randomTile = dist(generator);
 	d.location = freeLocations[randomTile];
-	d.time = 1000.0 * 30.0; // 20 seconds
+	if (player->isAI) {
+		d.time = 1000.0 * 30.0; // 20 seconds
+	} else {
+		d.time = 1000.0 * 20.0;
+	}
 	// Only draw delivery tile for player
 
 	player->newDestination = true;
@@ -101,4 +105,10 @@ void DeliveryManager::refillPizza(Vehicle* player) {
 		pizzasRefilled(player);
 	player->pickingUp = false;
 	player->pizzaCount = Vehicle::MAX_PIZZAS;
+}
+
+void DeliveryManager::reset() {
+	players.clear();
+	scores.clear();
+	deliveries.clear();
 }

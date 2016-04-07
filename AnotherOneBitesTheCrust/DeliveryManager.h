@@ -45,6 +45,7 @@ public:
 	Delivery newDelivery(Vehicle* player);
 	void pizzaLanded(PizzaBox* pizza);
 	void refillPizza(Vehicle* player);
+	void reset();
 
 private:
 	std::mt19937 generator;

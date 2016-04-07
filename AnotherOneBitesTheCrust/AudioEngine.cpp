@@ -2,7 +2,6 @@
 const float DISTANCE_FACTOR = 5;
 const int MAX_CHANNELS = 100;
 FMOD_RESULT AudioEngine::result;
-FMOD::Sound *AudioEngine::backgroundMusic, *AudioEngine::cannonSound, *AudioEngine::brakeSound, *AudioEngine::engineIdleSound, *AudioEngine::engineRevSound, *AudioEngine::reloadSound, *AudioEngine::dryFireSound, *AudioEngine::crashSound;
 
 AudioEngine::AudioEngine(void)
 {
@@ -84,7 +83,7 @@ FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, Physi
 	errorCheck();
 	result = playingOn->setCallback(channelCallback);
 	errorCheck();
-	result = playingOn->setUserData((void*)(&currentlyPlaying));
+	result = playingOn->setUserData((void*)this);
 	errorCheck();
 
 	currentlyPlaying[playingOn] = source;
@@ -302,19 +301,20 @@ FMOD_RESULT F_CALLBACK AudioEngine::channelCallback(FMOD_CHANNELCONTROL *chanCon
         FMOD::Channel *channel = (FMOD::Channel *)chanControl;
         // Channel specific functions here...
 
-		std::map<FMOD::Channel *, PhysicsEntity*> * currentlyPlaying;
-		result = channel->getUserData((void**)(&currentlyPlaying));
+		AudioEngine * engine;
+		result = channel->getUserData((void**)(&engine));
 		errorCheck();
 		
 		FMOD::Sound* sound;
 		channel->getCurrentSound(&sound);
-		if(sound == brakeSound)
+		if(sound == engine->brakeSound)
 		{
-			currentlyPlaying[channel];
+			PhysicsEntity* source =  engine->currentlyPlaying[channel];
+			engine->vehicleLoops[source].brake = false;
 		}
 
-		auto iter = currentlyPlaying->find(channel);
-		currentlyPlaying->erase(iter);
+		auto iter = engine->currentlyPlaying.find(channel);
+		engine->currentlyPlaying.erase(iter);
     }
     else
     {

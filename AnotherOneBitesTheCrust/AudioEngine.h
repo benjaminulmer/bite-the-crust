@@ -43,7 +43,7 @@ public:
 
 private:
 	FMOD::System *fmodSystem;
-	static FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound, *reloadSound, *dryFireSound, *crashSound;
+	FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound, *reloadSound, *dryFireSound, *crashSound;
 	std::vector<FMOD::Sound*> backgroundSongs;
 	FMOD::Channel *backgroundChannel, *engineChannel;
 	static FMOD_RESULT result;

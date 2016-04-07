@@ -246,6 +246,8 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 {
 	ContentLoading::loadVehicleData("res\\JSON\\car.json", vehicle);
 	NonPhysicsEntity* arrow = new NonPhysicsEntity();
+	NonPhysicsEntity* leftArrow = new NonPhysicsEntity();
+	NonPhysicsEntity* rightArrow = new NonPhysicsEntity();
 	switch(num) {
 		case 0:
 			vehicle->setRenderable(renderablesMap["redVan"]);
@@ -255,6 +257,14 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->colorName = "Red";
 			arrow->setRenderable(renderablesMap["redArrow"]);
 			arrow->setTexture(textureMap["redArrow"]);
+			leftArrow->setRenderable(renderablesMap["redHudArrow"]);
+			leftArrow->setTexture(textureMap["redHudArrow"]);
+			leftArrow->setTranslation(vec3(-6,2,0));
+			leftArrow->rotate(glm::radians(90.0f), vec3(0,0,1));
+			rightArrow->setRenderable(renderablesMap["redHudArrow"]);
+			rightArrow->setTexture(textureMap["redHudArrow"]);
+			rightArrow->setTranslation(vec3(6,2,0));
+			rightArrow->rotate(glm::radians(-90.0f), vec3(0,0,1));
 			break;
 		case 1:
 			vehicle->setRenderable(renderablesMap["blueVan"]);
@@ -264,6 +274,14 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->colorName = "Blue";
 			arrow->setRenderable(renderablesMap["blueArrow"]);
 			arrow->setTexture(textureMap["blueArrow"]);
+			leftArrow->setRenderable(renderablesMap["blueHudArrow"]);
+			leftArrow->setTexture(textureMap["blueHudArrow"]);
+			leftArrow->setTranslation(vec3(-6,2,0));
+			leftArrow->rotate(glm::radians(90.0f), vec3(0,0,1));
+			rightArrow->setRenderable(renderablesMap["blueHudArrow"]);
+			rightArrow->setTexture(textureMap["blueHudArrow"]);
+			rightArrow->setTranslation(vec3(6,2,0));
+			rightArrow->rotate(glm::radians(-90.0f), vec3(0,0,1));
 			break;
 		case 2:
 			vehicle->setRenderable(renderablesMap["greenVan"]);
@@ -273,6 +291,14 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->colorName = "Green";
 			arrow->setRenderable(renderablesMap["greenArrow"]);
 			arrow->setTexture(textureMap["greenArrow"]);
+			leftArrow->setRenderable(renderablesMap["greenHudArrow"]);
+			leftArrow->setTexture(textureMap["greenHudArrow"]);
+			leftArrow->setTranslation(vec3(-6,2,0));
+			leftArrow->rotate(glm::radians(90.0f), vec3(0,0,1));
+			rightArrow->setRenderable(renderablesMap["greenHudArrow"]);
+			rightArrow->setTexture(textureMap["greenHudArrow"]);
+			rightArrow->setTranslation(vec3(6,2,0));
+			rightArrow->rotate(glm::radians(-90.0f), vec3(0,0,1));
 			break;
 		case 3:
 			vehicle->setRenderable(renderablesMap["yellowVan"]);
@@ -282,12 +308,22 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 			vehicle->colorName = "Yellow";
 			arrow->setRenderable(renderablesMap["yellowArrow"]);
 			arrow->setTexture(textureMap["yellowArrow"]);
+			leftArrow->setRenderable(renderablesMap["yellowHudArrow"]);
+			leftArrow->setTexture(textureMap["yellowHudArrow"]);
+			leftArrow->setTranslation(vec3(-6,2,0));
+			leftArrow->rotate(glm::radians(90.0f), vec3(0,0,1));
+			rightArrow->setRenderable(renderablesMap["yellowHudArrow"]);
+			rightArrow->setTexture(textureMap["yellowHudArrow"]);
+			rightArrow->setTranslation(vec3(6,2,0));
+			rightArrow->rotate(glm::radians(-90.0f), vec3(0,0,1));
 			break;
 	}
 	physicsEngine->createVehicle(vehicle, transform);
 	entities.push_back(vehicle);
 
 	vehicle->arrow = arrow;
+	vehicle->leftArrow = leftArrow;
+	vehicle->rightArrow = rightArrow;
 
 	physx::PxShape* wheels[4];
 	physx::PxRigidActor* actor = vehicle->getActor();
@@ -305,7 +341,7 @@ void Game::setupVehicle(Vehicle* vehicle, physx::PxTransform transform, int num)
 // Connects systems together
 void Game::connectSystems()
 {
-	for (int i = 0; i < 1; i++) 
+	for (int i = 0; i < numHumans; i++) 
 	{
 		inputEngine->setInputStruct(&players[i]->input, i);
 		inputEngine->setCamera(camera[i], i);
@@ -442,6 +478,15 @@ void Game::playHUD(int player)
 	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 0.82f, 0.89f, 24) : renderingEngine->printText2Doutline(pizzas.data(), 0.77f, 0.89f, 30, glm::vec4(1,0,0,1), false);
 
 	(numHumans == 1) ? renderingEngine->drawMinimap(players, player, windowHeight) : renderingEngine->drawMinimap(players, player, windowHeight/2); // TODO: Should support arbitrary number of vans
+
+	if (camera[player]->arrowState == ArrowState::LEFT)
+	{
+		renderingEngine->displayHudArrow(players[player]->leftArrow, menuLogic->menusM, menuLogic->menusV);
+	}
+	else if (camera[player]->arrowState == ArrowState::RIGHT)
+	{
+		renderingEngine->displayHudArrow(players[player]->rightArrow, menuLogic->menusM, menuLogic->menusV);
+	}
 }
 
 void Game::endHUD()

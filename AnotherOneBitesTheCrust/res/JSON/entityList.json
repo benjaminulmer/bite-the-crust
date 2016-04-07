@@ -20,6 +20,10 @@
         {"name": "blueArrow", "model": "houseArrow.obj", "texture": "blueVan.DDS"},
         {"name": "greenArrow", "model": "houseArrow.obj", "texture": "greenVan.DDS"},
         {"name": "yellowArrow", "model": "houseArrow.obj", "texture": "yellowVan.DDS"},
+        {"name": "redHudArrow", "model": "VanArrow.obj", "texture": "redVan.DDS"},
+        {"name": "blueHudArrow", "model": "VanArrow.obj", "texture": "blueVan.DDS"},
+        {"name": "greenHudArrow", "model": "VanArrow.obj", "texture": "greenVan.DDS"},
+        {"name": "yellowHudArrow", "model": "VanArrow.obj", "texture": "yellowVan.DDS"},
 
 		{"name": "house1", "model": "house1.obj", "physics": "staticDrivableTriangle.json", "texture": "house.DDS"},
 		{"name": "house2", "model": "house2.obj", "physics": "staticDrivableTriangle.json", "texture": "house.DDS"},

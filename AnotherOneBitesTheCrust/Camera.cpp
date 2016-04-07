@@ -46,7 +46,7 @@ void Camera::update()
 	float angle = glm::acos(glm::dot(toDest, viewDir));
 	float leftCos = glm::dot(toDest, left);
 
-	if (angle > 0.87f)
+	if (angle > 0.8f)
 	{
 		arrowState = (leftCos < 0) ? ArrowState::RIGHT : ArrowState::LEFT;
 	}

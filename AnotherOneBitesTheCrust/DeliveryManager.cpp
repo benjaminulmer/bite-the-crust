@@ -46,6 +46,7 @@ void DeliveryManager::timePassed(double timeMs) {
 		if (d->time <= 0.0) {
 			if (!players[i]->isAI)
 				d->location->ground->setTexture(d->location->groundTexture);
+			scores[players[i]] -= 5;
 			deliveries[players[i]] = newDelivery(players[i]);
 			freeLocations.push_back(d->location); // Free the tile back up, since it wasn't claimed
 			// Free the location after assigning delivery, so you don't get the same location twice

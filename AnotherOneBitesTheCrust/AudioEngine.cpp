@@ -1,6 +1,8 @@
 #include "AudioEngine.h"
 const float DISTANCE_FACTOR = 5;
 const int MAX_CHANNELS = 100;
+FMOD_RESULT AudioEngine::result;
+FMOD::Sound *AudioEngine::backgroundMusic, *AudioEngine::cannonSound, *AudioEngine::brakeSound, *AudioEngine::engineIdleSound, *AudioEngine::engineRevSound, *AudioEngine::reloadSound, *AudioEngine::dryFireSound, *AudioEngine::crashSound;
 
 AudioEngine::AudioEngine(void)
 {
@@ -19,7 +21,6 @@ AudioEngine::AudioEngine(void)
 	errorCheck();
 	
 	result = fmodSystem->set3DSettings(1.0, DISTANCE_FACTOR, 1.0);
-
 
 	initStreams();
 	startBackgroundMusic();
@@ -66,53 +67,34 @@ void AudioEngine::startBackgroundMusic()
 	errorCheck();
 }
 
-Sound3D * AudioEngine::getOpenChannel()
+FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, PhysicsEntity * source, float volume = 1)
 {
-	Sound3D * playingOn;
 
-	if(availablePointers.empty())
+	FMOD::Channel * playingOn = nullptr;
+
+	result = fmodSystem->playSound(sound, 0, false, &playingOn);
+	errorCheck();
+	result = playingOn->setVolumeRamp(false); // For fixing popping noise at low volume.
+	errorCheck();
+	result = playingOn->set3DAttributes(&glmVec3ToFmodVec(pos), 0);
+	errorCheck();
+	result = playingOn->setPaused(false);
+	errorCheck();
+	result = playingOn->setVolume(volume);
+	errorCheck();
+	result = playingOn->setCallback(channelCallback);
+	errorCheck();
+	result = playingOn->setUserData((void*)(&currentlyPlaying));
+	errorCheck();
+
+	currentlyPlaying[playingOn] = source;
+	if(currentlyPlaying.size() > numChannels)
 	{
-		if(numChannels < MAX_CHANNELS)
-		{
-			playingOn = new Sound3D();
-			playingOn->channel = nullptr;
-			numChannels++;
-			printf("Number of channels: %d\n", numChannels);
-		}
-		else
-		{
-			printf("CANNOT PLAY SOUND: The maximum of %d channels are currently in use! Consider upping the limit!\n", MAX_CHANNELS);
-			return nullptr;
-		}
-	}
-	else
-	{
-		playingOn = availablePointers.front();
-		availablePointers.pop_front();
+		numChannels = currentlyPlaying.size();
+		printf("%d/%d channels used\n", numChannels, MAX_CHANNELS);
 	}
 
 	return playingOn;
-}
-
-FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, PhysicsEntity * source, float volume = 1)
-{
-	Sound3D * playingOn = getOpenChannel();
-	
-	if(!playingOn)
-		return nullptr;
-
-	playingOn->source = source;
-
-	result = fmodSystem->playSound(sound, 0, false, &playingOn->channel);
-	playingOn->channel->setVolumeRamp(false); // For fixing popping noise at low volume.
-	playingOn->channel->set3DAttributes(&glmVec3ToFmodVec(pos), 0);
-	playingOn->channel->setPaused(false);
-	playingOn->channel->setVolume(volume);
-
-	playing.push_back(playingOn);
-	errorCheck();
-
-	return playingOn->channel;
 }
 
 void AudioEngine::playReloadSound(Vehicle * source)
@@ -160,8 +142,7 @@ void AudioEngine::playBrakeSound(Vehicle * source)
 			playing.engineIdleChannel->setPaused(false);
 		
 		playing.brake = true;
-		FMOD::Channel * brakeChannel = playSound(brakeSound, pos, source);
-		brakeChannel->setVolume(0.3f);
+		FMOD::Channel * brakeChannel = playSound(brakeSound, pos, source, 0.3f);
 
 		vehicleLoops[source] = playing;
 	}
@@ -246,57 +227,12 @@ void AudioEngine::initStreams()
     errorCheck();
 }
 
-bool AudioEngine::stillPlaying(FMOD::Channel * playingOn)
-{
-	FMOD::Sound * sound;
-
-
-	unsigned int soundPos;
-	unsigned int length;
-	result = playingOn->getPosition(&soundPos, FMOD_TIMEUNIT_MS);
-	errorCheck();
-	result = playingOn->getCurrentSound(&sound);
-	errorCheck();
-
-	// TODO: Loops are not working as expected
-	if(sound == engineIdleSound || sound == engineRevSound)
-		return true;
-	
-	result = sound->getLength(&length, FMOD_TIMEUNIT_MS);
-	errorCheck();
-	bool paused;
-	result = playingOn->getPaused(&paused);
-
-	return (soundPos < length) && !paused;
-}
-
 void AudioEngine::update3DPositions()
 {
 		bool isPlaying = false;
-		for(std::list<Sound3D*>::iterator i = playing.begin(); i != playing.end(); i++)
-	{
-			Sound3D * s = *i;
-		
-			if(!stillPlaying(s->channel))
-			{
-				FMOD::Sound * sound;
-				result = s->channel->getCurrentSound(&sound);
-				errorCheck();
-
-				if(sound == brakeSound)
-					vehicleLoops[s->source].brake = false;
-
-				s->channel = nullptr;
-				s->source = nullptr;
-				availablePointers.push_back(s);
-				playing.erase(i++);
-
-			}
-			else
-			{
-				s->channel->set3DAttributes(&glmVec3ToFmodVec(s->source->getPosition()), nullptr);
-			}
-	}
+		for(auto i : currentlyPlaying)
+			i.first->set3DAttributes(&glmVec3ToFmodVec(i.second->getPosition()), nullptr);		
+	
 }
 
 void AudioEngine::update(glm::mat4 listenerModelMatrix)
@@ -352,4 +288,41 @@ void AudioEngine::update(glm::mat4 listenerModelMatrix)
         }
     }
 
+}
+
+FMOD_RESULT F_CALLBACK AudioEngine::channelCallback(FMOD_CHANNELCONTROL *chanControl, FMOD_CHANNELCONTROL_TYPE controlType, FMOD_CHANNELCONTROL_CALLBACK_TYPE callbackType, void *commandData1, void *commandData2)
+{
+	// We only care about when the sound ends
+	if(callbackType != FMOD_CHANNELCONTROL_CALLBACK_END)
+		return FMOD_OK;
+	
+
+	if (controlType == FMOD_CHANNELCONTROL_CHANNEL)
+    {
+        FMOD::Channel *channel = (FMOD::Channel *)chanControl;
+        // Channel specific functions here...
+
+		std::map<FMOD::Channel *, PhysicsEntity*> * currentlyPlaying;
+		result = channel->getUserData((void**)(&currentlyPlaying));
+		errorCheck();
+		
+		FMOD::Sound* sound;
+		channel->getCurrentSound(&sound);
+		if(sound == brakeSound)
+		{
+			currentlyPlaying[channel];
+		}
+
+		auto iter = currentlyPlaying->find(channel);
+		currentlyPlaying->erase(iter);
+    }
+    else
+    {
+        FMOD::ChannelGroup *group = (FMOD::ChannelGroup *)chanControl;
+        // ChannelGroup specific functions here... (but we don't use channelgroups)
+    }
+
+    // ChannelControl generic functions here...
+
+    return FMOD_OK;
 }

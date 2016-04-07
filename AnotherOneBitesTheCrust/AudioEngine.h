@@ -43,11 +43,12 @@ public:
 
 private:
 	FMOD::System *fmodSystem;
-	FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound, *reloadSound, *dryFireSound, *crashSound;
+	static FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound, *reloadSound, *dryFireSound, *crashSound;
 	std::vector<FMOD::Sound*> backgroundSongs;
 	FMOD::Channel *backgroundChannel, *engineChannel;
-	FMOD_RESULT result;
+	static FMOD_RESULT result;
 	std::list<Sound3D*> playing;
+	std::map<FMOD::Channel*, PhysicsEntity*> currentlyPlaying;
 	std::deque<Sound3D*> availablePointers;
 
 	std::map<PhysicsEntity *, VehicleSounds> vehicleLoops;
@@ -61,7 +62,8 @@ private:
 	FMOD_VECTOR glmVec3ToFmodVec(glm::vec3);
 	bool stillPlaying(FMOD::Channel *);
 	void update3DPositions();
-	Sound3D * getOpenChannel();
 
-	inline void	errorCheck();
+	static inline void	errorCheck();
+
+	static FMOD_RESULT F_CALLBACK channelCallback(FMOD_CHANNELCONTROL *chanControl, FMOD_CHANNELCONTROL_TYPE controlType, FMOD_CHANNELCONTROL_CALLBACK_TYPE callbackType, void *commandData1, void *commandData2);
 };

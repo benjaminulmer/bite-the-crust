@@ -37,4 +37,5 @@ glm::vec3 Map::getTileLocation(Tile *tile) {
 			}
 		}
 	}
+	return glm::vec3();
 }

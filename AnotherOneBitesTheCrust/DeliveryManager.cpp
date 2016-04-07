@@ -86,7 +86,7 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 		scores[pizza->owner] += score;
 		freeLocations.erase(std::remove(freeLocations.begin(), freeLocations.end(), deliveries[pizza->owner].location), freeLocations.end());
 		deliveries[pizza->owner] = newDelivery(pizza->owner);
-		for (int i = 0; i < players.size(); i++) {
+		for (unsigned int i = 0; i < players.size(); i++) {
 			if (deliveries[players[i]].location == tile) {
 				deliveries[players[i]] = newDelivery(players[i]);
 			}

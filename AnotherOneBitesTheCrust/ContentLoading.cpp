@@ -308,13 +308,13 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 				shape->isDrivable = (geometry[i]["isDrivable"].GetInt() != 0);
 			}
 			if (geometry[i].HasMember("staticFriction")) {
-				shape->staticFriction = geometry[i]["staticFriction"].GetDouble();
+				shape->staticFriction = (float)geometry[i]["staticFriction"].GetDouble();
 			}
 			if (geometry[i].HasMember("dynamicFriction")) {
-				shape->dynamicFriction = geometry[i]["dynamicFriction"].GetDouble();
+				shape->dynamicFriction = (float)geometry[i]["dynamicFriction"].GetDouble();
 			}
 			if (geometry[i].HasMember("restitution")) {
-				shape->restitution = geometry[i]["restitution"].GetDouble();
+				shape->restitution = (float)geometry[i]["restitution"].GetDouble();
 			}
 			info->shapeInfo.push_back(shape);
 		}
@@ -419,11 +419,11 @@ bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
 			}
 			const rapidjson::Value& goalNode = tileArray[i]["goal"];
 			if (goalNode.HasMember("x"))
-				t.goal.x = goalNode["x"].GetDouble();
+				t.goal.x = (float)goalNode["x"].GetDouble();
 			if (goalNode.HasMember("y"))
-				t.goal.y = goalNode["y"].GetDouble();
+				t.goal.y = (float)goalNode["y"].GetDouble();
 			if (goalNode.HasMember("z"))
-				t.goal.z = goalNode["z"].GetDouble();
+				t.goal.z = (float)goalNode["z"].GetDouble();
 			
 		} else {
 			t.deliverable = false;

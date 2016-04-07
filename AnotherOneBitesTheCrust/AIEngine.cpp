@@ -274,7 +274,7 @@ void AIEngine::trimPath(Vehicle* toUpdate)
 
 	int closestIndex;
 	double minDist = DBL_MAX;
-	for(int i = 0; i < toUpdate->currentPath.size(); i++)
+	for(unsigned int i = 0; i < toUpdate->currentPath.size(); i++)
 	{
 		double currentDistance = glm::length(toUpdate->currentPath[i] - toUpdate->getPosition());
 
@@ -291,7 +291,7 @@ void AIEngine::trimPath(Vehicle* toUpdate)
 
 bool AIEngine::isStuck(Vehicle * driver)
 {
-	float sigma = 0.1;
+	float sigma = 0.1f;
 
 	if(driver->getPhysicsVehicle()->computeForwardSpeed() < sigma && driver->input.forward > 0)
 		driver->stuckDuration++;

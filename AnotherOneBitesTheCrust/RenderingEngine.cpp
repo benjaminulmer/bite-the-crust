@@ -259,7 +259,7 @@ void RenderingEngine::printText2Doutline(const char * text, float xIn, float yIn
 	unsigned int length = strlen(text);
 	float x = xIn * resolution.x;
 	float y = yIn * resolution.y;
-	float size = sizeIn;
+	float size = (float)sizeIn;
 
 	// Fill buffers
 	std::vector<glm::vec2> textvertices;
@@ -771,7 +771,7 @@ void RenderingEngine::setupMinimap(Map map)
 
 
 
-	for(int i = 0; i < mmDeliveryVerts.size(); i++)
+	for(unsigned int i = 0; i < mmDeliveryVerts.size(); i++)
 	{
 		//cout << mmDeliveryVerts[i].x << " " << mmDeliveryVerts[i].y << " " << mmDeliveryVerts[i].z << " " << endl;
 		mmDeliveryColors.push_back(vec3(0.1f,0.1f,0.1f));
@@ -856,7 +856,7 @@ void RenderingEngine::setupMinimap(Map map)
 
 
 	vec3 diameter(maxX - minX, maxY - minY, maxZ - minZ);
-	float mmRadius = glm::length(diameter)*1.7;
+	float mmRadius = glm::length(diameter)*1.7f;
 	//cout << "radius " << mmRadius << endl;
 
 
@@ -903,7 +903,7 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4], int player, int height)
 		value_ptr(mmMVP)	// pointer to data in Mat4f
 		);
 
-	GLfloat width = height/36;
+	GLfloat width = height/36.0f;
 	glPointSize(width);
 
 	glDrawArrays(GL_POINTS, 0, mmRoadVerts.size());
@@ -957,7 +957,7 @@ void RenderingEngine::drawDelivery(vec3 pos, int height)
 			GL_FALSE,
 			value_ptr(mmMVP)
 			);
-	GLfloat width = height/144;
+	GLfloat width = height/144.0f;
 	glLineWidth(width);
 	glDrawArrays(GL_LINE_LOOP, 0, mmDeliveryVerts.size());
 	glBindVertexArray(0);
@@ -1122,9 +1122,9 @@ void RenderingEngine::displayMenu(std::vector<Entity*> menuEntities, mat4 menusM
 
 	glUniform3f(lightPos, 0.0f, 7.0f, 1.0f);
 	glUniform1f(lightPow, 70.0f);
-	glUniform3f(ambientScale, 0.6, 0.6, 0.6);
+	glUniform3f(ambientScale, 0.6f, 0.6f, 0.6f);
 
-	for(int i = 0; i < menuEntities.size(); i++)
+	for(unsigned int i = 0; i < menuEntities.size(); i++)
 	{
 		menusM = mat4(1.0f);
 
@@ -1166,7 +1166,7 @@ void RenderingEngine::displayPause(std::vector<Entity*> pausedEntities, mat4 men
 	glUniform1f(lightPow, 70.0f);
 	glUniform3f(ambientScale, 0.5, 0.5, 0.5);
 
-	for(int i = 0; i < pausedEntities.size(); i++)
+	for(unsigned int i = 0; i < pausedEntities.size(); i++)
 	{
 		menusM = mat4(1.0f);
 
@@ -1218,7 +1218,7 @@ void RenderingEngine::displayHudArrow(Entity* hudArrow, glm::mat4 menusM, glm::m
 
 	glUniform3f(lightPos, 0.0f, 7.0f, 1.0f);
 	glUniform1f(lightPow, 70.0f);
-	glUniform3f(ambientScale, 0.6, 0.6, 0.6);
+	glUniform3f(ambientScale, 0.6f, 0.6f, 0.6f);
 
 	menusM = mat4(1.0f);
 

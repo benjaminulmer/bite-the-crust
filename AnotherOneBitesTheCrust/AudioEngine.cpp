@@ -62,7 +62,7 @@ void AudioEngine::startBackgroundMusic()
 	backgroundSongChoice = dist(generator);
     result = fmodSystem->playSound(backgroundSongs[backgroundSongChoice], 0, false, &backgroundChannel);
     errorCheck();
-	result = backgroundChannel->setVolume(0.3);
+	result = backgroundChannel->setVolume(0.3f);
 	errorCheck();
 }
 

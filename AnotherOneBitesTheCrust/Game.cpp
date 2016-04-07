@@ -185,7 +185,7 @@ void Game::setupPhysicsEntity(std::string name, Tile* tile, TileEntity tileEntit
 	e->setRenderable(renderablesMap[name]);
 	e->setTexture(textureMap[name]);
 
-	std::uniform_int_distribution<int> rotationDist(tileEntity.lowerRotation, tileEntity.upperRotation);
+	std::uniform_int_distribution<int> rotationDist((int)tileEntity.lowerRotation, (int)tileEntity.upperRotation);
 	float rotationRad = physx::PxPi * (rotationDist(generator) / 180.0f);
 	physx::PxTransform transform(physx::PxVec3(pos.x, pos.y, pos.z), physx::PxQuat(rotationRad, physx::PxVec3(0, 1, 0)));
 
@@ -228,7 +228,7 @@ void Game::setupEntities()
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
 		float rotationRad = physx::PxPi * 0.5f;
-		setupVehicle(players[i], physx::PxTransform(physx::PxVec3(20, 2, 135 - 15.0*i), physx::PxQuat(rotationRad, physx::PxVec3(0,1,0))), i);
+		setupVehicle(players[i], physx::PxTransform(physx::PxVec3(20, 2, 135 - 15.0f*i), physx::PxQuat(rotationRad, physx::PxVec3(0,1,0))), i);
 
 		camera[i] = new Camera(players[i]);
 
@@ -501,7 +501,7 @@ void Game::endHUD()
 	renderingEngine->printBanner(winnerText.data(), 0, 0.5f, 100, winner->color);	
 	for (int i = 0; i < MAX_PLAYERS; i++) {
 		string scoreText = "TIPS: $" + std::to_string(scores[players[i]]);
-		renderingEngine->printBanner(scoreText.data(), 0.078f, 0.417f - i*0.069, 50, players[i]->color);
+		renderingEngine->printBanner(scoreText.data(), 0.078f, 0.417f - i*0.069f, 50, players[i]->color);
 	}
 }
 

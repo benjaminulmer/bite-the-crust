@@ -59,8 +59,5 @@ crash.wav
 Obj and DDS loading
 	http://www.opengl-tutorial.org/
 
-Textures from
-	http://www.textures.com/
-
 Low poly models by Quaternius
 	https://twitter.com/quaternius

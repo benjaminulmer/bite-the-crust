@@ -37,6 +37,7 @@ void Game::setGameState(GameState state)
 	if (state == GameState::STARTING_GAME)
 	{
 		numHumans = menuLogic->numPlayers;
+		audioEngine->setNumListeners(numHumans);
 		setupEntities();
 		connectSystems();
 		gameState = GameState::PLAY;
@@ -539,7 +540,12 @@ void Game::playLoop()
 		}
 		physicsEngine->fetchSimulationResults();
 	}
-	audioEngine->update(players[0]->getModelMatrix());
+
+	// getting model matrices of player characters
+	std::vector<glm::mat4> models;
+	for(int i =0; i < numHumans; i++)
+		models.push_back(players[i]->getModelMatrix());
+	audioEngine->update(models);
 }
 
 void Game::menuLoop()
@@ -584,7 +590,13 @@ void Game::endLoop()
 		}
 		physicsEngine->fetchSimulationResults();
 	}
-	audioEngine->update(players[0]->getModelMatrix());
+
+	// Getting model matrices of player characters
+	std::vector<glm::mat4> models;
+	for(int i =0; i < numHumans; i++)
+		models.push_back(players[i]->getModelMatrix());
+
+	audioEngine->update(models);
 }
 
 // Main loop of the game

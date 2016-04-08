@@ -11,12 +11,6 @@
 #include <random>
 
 #include "Vehicle.h"
-
-struct Sound3D
-{
-	FMOD::Channel * channel;
-	PhysicsEntity * source;
-};
 struct VehicleSounds
 {
 	FMOD::Channel * engineIdleChannel;
@@ -38,8 +32,9 @@ public:
 	void playBrakeSound(Vehicle * source);
 	void playEngineIdleSound(Vehicle * source);
 	void playEngineRevSound(Vehicle * source);
+	void setNumListeners(int numPlayers);
 	FMOD::Channel * playSound(FMOD::Sound *, glm::vec3, PhysicsEntity *,float volume);
-	void update(glm::mat4);
+	void update(std::vector<glm::mat4>);
 
 private:
 	FMOD::System *fmodSystem;
@@ -47,9 +42,7 @@ private:
 	std::vector<FMOD::Sound*> backgroundSongs;
 	FMOD::Channel *backgroundChannel, *engineChannel;
 	static FMOD_RESULT result;
-	std::list<Sound3D*> playing;
 	std::map<FMOD::Channel*, PhysicsEntity*> currentlyPlaying;
-	std::deque<Sound3D*> availablePointers;
 
 	std::map<PhysicsEntity *, VehicleSounds> vehicleLoops;
 

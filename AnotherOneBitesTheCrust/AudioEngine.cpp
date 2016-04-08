@@ -3,7 +3,7 @@ const float DISTANCE_FACTOR = 5;
 const int MAX_CHANNELS = 100;
 FMOD_RESULT AudioEngine::result;
 
-AudioEngine::AudioEngine(void)
+AudioEngine::AudioEngine()
 {
 	fmodSystem = nullptr;
 	backgroundChannel = nullptr;
@@ -32,16 +32,22 @@ AudioEngine::~AudioEngine(void)
     errorCheck();
 	result = cannonSound->release();
 	errorCheck();
+	result = brakeSound->release();
+	errorCheck();
+	result = engineIdleSound->release();
+	errorCheck();
+	result = engineRevSound->release();
+	errorCheck();
+	result = reloadSound->release();
+	errorCheck();
+	result = dryFireSound->release();
+	errorCheck();
+	result = crashSound->release();
+	errorCheck();
     result = fmodSystem->close();
     errorCheck();
     result = fmodSystem->release();
     errorCheck();
-
-	// Delete Sound3D pointers
-	for(Sound3D * s : playing)
-		delete(s);
-	for(Sound3D * s : availablePointers)
-		delete(s);
 }
 
 void AudioEngine::errorCheck()
@@ -179,10 +185,7 @@ void AudioEngine::playEngineRevSound(Vehicle * source)
 	{
 		playing.engineRevChannel = playSound(engineRevSound, pos, source);
 		playing.engineRevChannel->setVolume(0.3f);
-	}
-	//if(playing.engineIdleChannel != nullptr)
-		//playing.engineIdleChannel->setPaused(true);
-	
+	}	
 
 	vehicleLoops[source] = playing;
 }
@@ -234,17 +237,25 @@ void AudioEngine::update3DPositions()
 	
 }
 
-void AudioEngine::update(glm::mat4 listenerModelMatrix)
+void AudioEngine::setNumListeners(int numPlayers)
 {
-	glm::vec3 forward(glm::normalize(listenerModelMatrix * glm::vec4(0,0,-1,0)));
-	glm::vec3 pos(listenerModelMatrix * glm::vec4(0,0,0,1));
-	glm::vec3 up(glm::normalize(listenerModelMatrix * glm::vec4(0,1,0,0)));
+	fmodSystem->set3DNumListeners(numPlayers);
+}
 
-	FMOD_VECTOR p = {pos.x, pos.y, pos.z};
-	FMOD_VECTOR f = {forward.x, forward.y, forward.z};
-	FMOD_VECTOR u = {up.x, up.y, up.z};
+void AudioEngine::update (std::vector<glm::mat4> listenerModelMatrices)
+{
+	for(int i = 0; i < listenerModelMatrices.size(); i++)
+	{
+		glm::vec3 forward(glm::normalize(listenerModelMatrices.at(i) * glm::vec4(0,0,-1,0)));
+		glm::vec3 pos(listenerModelMatrices.at(i) * glm::vec4(0,0,0,1));
+		glm::vec3 up(glm::normalize(listenerModelMatrices.at(i) * glm::vec4(0,1,0,0)));
 
-	fmodSystem->set3DListenerAttributes(0, &p, nullptr, &f, &u);
+		FMOD_VECTOR p = {pos.x, pos.y, pos.z};
+		FMOD_VECTOR f = {forward.x, forward.y, forward.z};
+		FMOD_VECTOR u = {up.x, up.y, up.z};
+
+		fmodSystem->set3DListenerAttributes(i, &p, nullptr, &f, &u);
+	}
 
 	update3DPositions();
 

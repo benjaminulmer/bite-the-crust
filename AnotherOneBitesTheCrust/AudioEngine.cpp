@@ -102,6 +102,20 @@ FMOD::Channel * AudioEngine::playSound(FMOD::Sound * sound, glm::vec3 pos, Physi
 	return playingOn;
 }
 
+void AudioEngine::playDeliveryGetSound(Vehicle * source)
+{
+	glm::vec3 pos = source->getPosition();
+
+	playSound(deliveryGetSound, pos, source);
+}
+
+void AudioEngine::playDeliveryFailSound(Vehicle * source)
+{
+	glm::vec3 pos = source->getPosition();
+
+	playSound(deliveryFailSound, pos, source);
+}
+
 void AudioEngine::playReloadSound(Vehicle * source)
 {
 	glm::vec3 pos = source->getPosition();
@@ -206,6 +220,12 @@ void AudioEngine::initStreams()
 	result = fmodSystem->createSound("res\\Audio\\Wagon Wheel - Electronic.mp3", FMOD_LOOP_NORMAL | FMOD_2D, 0, &background);
     errorCheck();
 	backgroundSongs.push_back(background);
+
+	result = fmodSystem->createSound("res\\Audio\\deliveryGet.mp3", FMOD_3D, 0, &deliveryGetSound);
+    errorCheck();
+
+	result = fmodSystem->createSound("res\\Audio\\deliveryFail.wav", FMOD_3D, 0, &deliveryFailSound);
+    errorCheck();
 
 	result = fmodSystem->createSound("res\\Audio\\cannon.wav", FMOD_3D, 0, &cannonSound);
     errorCheck();

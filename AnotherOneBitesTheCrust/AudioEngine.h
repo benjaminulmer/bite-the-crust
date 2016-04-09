@@ -25,6 +25,8 @@ public:
 	~AudioEngine(void);
 
 	void startBackgroundMusic();
+	void playDeliveryGetSound(Vehicle * source);
+	void playDeliveryFailSound(Vehicle * source);
 	void playReloadSound(Vehicle * source);
 	void playDryFireSound(Vehicle * source);
 	void playCollisionSound(Vehicle * source);
@@ -38,7 +40,7 @@ public:
 
 private:
 	FMOD::System *fmodSystem;
-	FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound, *reloadSound, *dryFireSound, *crashSound;
+	FMOD::Sound *backgroundMusic, *cannonSound, *brakeSound, *engineIdleSound, *engineRevSound, *reloadSound, *dryFireSound, *crashSound, *deliveryFailSound, *deliveryGetSound;
 	std::vector<FMOD::Sound*> backgroundSongs;
 	FMOD::Channel *backgroundChannel, *engineChannel;
 	static FMOD_RESULT result;

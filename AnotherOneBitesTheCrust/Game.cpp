@@ -365,6 +365,8 @@ void Game::connectSystems()
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
 	deliveryManager->houseColorSignal.connect(renderingEngine, &RenderingEngine::updateHouseColor);
+	deliveryManager->deliveryGetSignal.connect(audioEngine, &AudioEngine::playDeliveryGetSound);
+	deliveryManager->deliveryFailSignal.connect(audioEngine, &AudioEngine::playDeliveryFailSound);
 
 	deliveryManager->assignDeliveries();
 	physicsEngine->simulationCallback->collision.connect(audioEngine, &AudioEngine::playCollisionSound);

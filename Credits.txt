@@ -55,6 +55,11 @@ dryFire.wav
 crash.wav
 	http://www.freesound.org/people/squareal/sounds/237375/
 	
+deliveryGet.mp3
+	http://freesound.org/people/kiddpark/sounds/201159/
+
+deliveryFail.wav
+	http://freesound.org/people/Timbre/sounds/73750/
 	
 Obj and DDS loading
 	http://www.opengl-tutorial.org/

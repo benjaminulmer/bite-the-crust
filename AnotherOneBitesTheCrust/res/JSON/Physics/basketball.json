@@ -1,0 +1,9 @@
+{
+    "geometry": [
+        {"shape":"sphere", "staticFriction": 1.5, "dynamicFriction": 1.5, "restitution": 1.0, "radius": 0.46}
+    ],
+    "type": "dynamic",
+    "dynamicInfo": {
+        "density": 1.0
+    }
+}

@@ -36,7 +36,7 @@
         {"name": "barrier", "model": "barrier.obj", "physics": "default.json", "texture": "barrier.DDS"},
         {"name": "roadBlock", "model": "roadBlock.obj", "physics": "roadBlock.json", "texture": "roadBlock.DDS"},
         {"name": "pole", "model": "pole.obj", "physics": "staticDrivableTriangle.json", "texture": "pole.DDS"},
-		{"name": "bench", "model": "bench.obj", "physics": "default.json", "texture": "bench.DDS"},	
+		{"name": "bench", "model": "bench.obj", "physics": "default.json", "texture": "bench.DDS"},
         
         {"name": "aspen", "model": "aspen.obj", "physics": "staticDrivableTriangle.json", "texture": "tree.DDS"},
 		{"name": "birch", "model": "birch.obj", "physics": "staticDrivableTriangle.json", "texture": "tree.DDS"},
@@ -57,6 +57,12 @@
 
         {"name": "rock1", "model" :"rock1.obj", "texture": "rock.DDS"},
         {"name": "rock2", "model" :"rock2.obj", "physics": "smallRock.json", "texture": "rock.DDS"},
-        {"name": "rock3", "model" :"rock3.obj", "physics": "staticDrivableTriangle.json", "texture": "rock.DDS"}
+        {"name": "rock3", "model" :"rock3.obj", "physics": "staticDrivableTriangle.json", "texture": "rock.DDS"},
+
+        {"name": "basketballCourt", "model" :"basketballCourt.obj", "physics": "staticDrivableTriangle.json", "texture": "basketballCourt-colored.DDS"},
+        {"name": "basketball", "model" :"basketball.obj", "physics": "basketball.json", "texture": "basketball.DDS"},
+        {"name": "basketballRack", "model" :"ballRack.obj", "physics": "default.json", "texture": "ballRack.DDS"}
+
+
     ]
 }

@@ -268,8 +268,10 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			}
 			else if (shapeName == "sphere") {
 				SphereInfo* sphere = new SphereInfo();
+				sphere->geometry = Geometry::SPHERE;
 				if (geometry[i].HasMember("radius"))
 					sphere->radius = (float)geometry[i]["radius"].GetDouble();
+				shape = sphere;
 			}
 			else if (shapeName == "capsule") {
 				CapsuleInfo* capsule = new CapsuleInfo();

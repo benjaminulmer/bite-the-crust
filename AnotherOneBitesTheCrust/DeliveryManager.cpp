@@ -45,7 +45,8 @@ void DeliveryManager::timePassed(double timeMs) {
 		d->time = d->time - timeMs;
 		if (d->time <= 0.0) {
 			scores[players[i]] -= 5;
-			deliveryFailSignal(players[i]);
+			if (!players[i]->isAI)
+				deliveryFailSignal(players[i]);
 			deliveries[players[i]] = newDelivery(players[i]);
 			freeLocations.push_back(d->location); // Free the tile back up, since it wasn't claimed
 			// Free the location after assigning delivery, so you don't get the same location twice
@@ -83,14 +84,16 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 		tile->house->setTexture(pizza->owner->houseTexture);
 		houseColorSignal(map, tile, pizza->owner->color);
 		int score = 5 + (int)(ceil(deliveries[pizza->owner].time / 1000.0f / 3)); // Bonus of remaining time in seconds, divided by 3
-		deliveryGetSignal(pizza->owner);
+		if (!pizza->owner->isAI)
+			deliveryGetSignal(pizza->owner);
 		scores[pizza->owner] += score;
 		freeLocations.erase(std::remove(freeLocations.begin(), freeLocations.end(), deliveries[pizza->owner].location), freeLocations.end());
 		deliveries[pizza->owner] = newDelivery(pizza->owner);
 		for (unsigned int i = 0; i < players.size(); i++) {
 			if (deliveries[players[i]].location == tile) {
 				scores[players[i]] -= 5;
-				deliveryFailSignal(players[i]);
+				if (!players[i]->isAI)
+					deliveryFailSignal(players[i]);
 				deliveries[players[i]] = newDelivery(players[i]);
 			}
 		}

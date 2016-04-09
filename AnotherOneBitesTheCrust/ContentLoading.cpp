@@ -252,7 +252,6 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			ShapeInfo* shape;
 			if (shapeName == "box") {
 				BoxInfo* box = new BoxInfo();
-				box->geometry = Geometry::BOX;
 				// Use the model dimensions by default
 				box->halfX = dims.x * 0.5f;
 				box->halfY = dims.y * 0.5f;
@@ -268,7 +267,6 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			}
 			else if (shapeName == "sphere") {
 				SphereInfo* sphere = new SphereInfo();
-				sphere->geometry = Geometry::SPHERE;
 				if (geometry[i].HasMember("radius"))
 					sphere->radius = (float)geometry[i]["radius"].GetDouble();
 				shape = sphere;
@@ -282,13 +280,11 @@ PhysicsEntityInfo* createPhysicsInfo(const char* filename, Renderable* model) {
 			}
 			else if (shapeName == "convexMesh") {
 				ConvexMeshInfo* convexMesh = new ConvexMeshInfo();
-				convexMesh->geometry = Geometry::CONVEX_MESH;
 				convexMesh->vertsFromGLMVerts(model->raw_verts);
 				shape = convexMesh;
 			}
 			else if (shapeName == "triangleMesh") {
 				TriangleMeshInfo* triangleMesh = new TriangleMeshInfo();
-				triangleMesh->geometry = Geometry::TRIANGLE_MESH;
 				triangleMesh->vertsFromGLMVerts(model->raw_verts);
 				triangleMesh->faces = model->faces;
 				shape = triangleMesh;

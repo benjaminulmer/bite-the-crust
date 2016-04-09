@@ -60,6 +60,10 @@ struct ShapeInfo
 struct BoxInfo
 	: public ShapeInfo
 {
+	BoxInfo()
+	{
+		geometry = Geometry::BOX;
+	}
 	physx::PxF32 halfX;
 	physx::PxF32 halfY;
 	physx::PxF32 halfZ;
@@ -68,12 +72,20 @@ struct BoxInfo
 struct SphereInfo
 	: public ShapeInfo
 {
+	SphereInfo()
+	{
+		geometry = Geometry::SPHERE;
+	}
 	physx::PxF32 radius;
 };
 
 struct CapsuleInfo
 	: public ShapeInfo
 {
+	CapsuleInfo()
+	{
+		geometry = Geometry::CAPSULE;
+	}
 	physx::PxF32 radius;
 	physx::PxF32 halfHeight;
 };
@@ -81,6 +93,10 @@ struct CapsuleInfo
 struct ConvexMeshInfo
 	: public ShapeInfo
 {
+	ConvexMeshInfo()
+	{
+		geometry = Geometry::CONVEX_MESH;
+	}
 	std::vector<physx::PxVec3> verts;
 
 	void vertsFromGLMVerts(std::vector<glm::vec3> glmVerts) 
@@ -95,6 +111,10 @@ struct ConvexMeshInfo
 struct TriangleMeshInfo
 	: public ConvexMeshInfo
 {
+	TriangleMeshInfo()
+	{
+		geometry = Geometry::TRIANGLE_MESH;
+	}
 	std::vector<physx::PxU32> faces;
 };
 

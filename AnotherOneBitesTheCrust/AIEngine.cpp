@@ -4,6 +4,8 @@
 
 const int MIN_DIST = 5;
 const int MAX_ATTEMPTS = 120;
+const float MIN_ANGLE = 0.05;
+const float PIZZA_SHOOT_DISTANCE = 25;
 
 AIEngine::AIEngine(void)
 {
@@ -110,7 +112,6 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	VehicleInput* input = &driver->input;
 	
 	glm::vec3 desiredDirection = desiredPos - driver->getPosition();
-	float distance = glm::length(desiredDirection);
 	desiredDirection = glm::normalize(desiredDirection);
 	glm::vec3 forward(glm::normalize(driver->getModelMatrix() * glm::vec4(0,0,1,0)));
 	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
@@ -133,7 +134,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	
 	input->handBrake = false;
 
-	if(ratio > 0.05)
+	if(ratio > MIN_ANGLE)
 	{
 		if(leftCosAngle > 0)
 			input->steer = glm::clamp(ratio*2.5f, 0.f, 1.f);
@@ -168,7 +169,7 @@ inline bool sphereIntersect(const glm::vec3& raydir, const glm::vec3& rayorig, c
 	return true;
 }
 
-void AIEngine::fireAt(Vehicle * driver, const glm::vec3 & goal)
+float AIEngine::angleToGoal(Vehicle * driver, const glm::vec3 & goal)
 {
 	glm::vec3 desiredDirection = glm::normalize(goal - driver->getPosition());
 	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
@@ -178,12 +179,22 @@ void AIEngine::fireAt(Vehicle * driver, const glm::vec3 & goal)
 
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
-	if(driver->pizzaDelivered == false && ratio < 0.05)
-	{
-		driver->pizzaDelivered = true;
-		driver->input.shootPizza = true;
-		brake(driver, 1);
-	}
+	return ratio;
+}
+
+void AIEngine::shootPizza(Vehicle * driver)
+{
+	driver->pizzaDelivered = true;
+	driver->input.shootPizza = true;
+	brake(driver, 1);
+}
+
+void AIEngine::fireAt(Vehicle * driver, const glm::vec3 & goal)
+{
+	float ratio = angleToGoal(driver, goal);
+
+	if(driver->pizzaDelivered == false && ratio < MIN_ANGLE)
+		shootPizza(driver);
 
 
 	if(driver->getPhysicsVehicle()->computeForwardSpeed() > 0.2)
@@ -191,8 +202,6 @@ void AIEngine::fireAt(Vehicle * driver, const glm::vec3 & goal)
 	else
 		facePoint(driver, goal);
 	
-
-
 }
 
 void AIEngine::facePoint(Vehicle * driver, const glm::vec3 & pointTo)
@@ -301,6 +310,37 @@ bool AIEngine::isStuck(Vehicle * driver)
 	return driver->stuckDuration > MAX_ATTEMPTS*2;
 }
 
+void AIEngine::refillPizzas(Vehicle* toUpdate, Map & map)
+{
+
+	if(!toUpdate->pickingUp)
+	{
+		toUpdate->pickingUp = true;
+		std::vector<glm::vec3> pathToPickup = aStar(findClosestNode(toUpdate->getPosition(), map), nullptr, map.allNodes, map.pickup);
+		if(pathToPickup.size() > 0 && toUpdate->currentPath.size() > 0)
+		{
+			std::vector<glm::vec3> pathBack = aStar(findClosestNode(pathToPickup.back(), map), findClosestNode(toUpdate->currentPath.front(),map), map.allNodes);
+			pathToPickup.insert(pathToPickup.end(), pathBack.begin(), pathBack.end());
+		}
+
+		toUpdate->currentPath.insert(toUpdate->currentPath.begin(), pathToPickup.begin(), pathToPickup.end());
+	}
+}
+
+void AIEngine::avoid(Vehicle * toUpdate, const glm::vec3 & goal)
+{
+	toUpdate->avoidAttempts++;
+	if(toUpdate->avoidAttempts > MAX_ATTEMPTS)
+	{
+		toUpdate->avoiding = false;
+		toUpdate->avoidAttempts = 0;
+	}
+	if(toUpdate->currentPath.size() > 0)
+		facePoint(toUpdate, toUpdate->currentPath.front());
+	else
+		facePoint(toUpdate, goal);
+}
+
 void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICollisionEntity & obstacle) 
 {
 	toUpdate->input.shootPizza = false;
@@ -308,17 +348,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 
 	if(toUpdate->avoiding)
 	{
-		toUpdate->avoidAttempts++;
-		if(toUpdate->avoidAttempts > MAX_ATTEMPTS)
-		{
-			toUpdate->avoiding = false;
-			toUpdate->avoidAttempts = 0;
-		}
-		if(toUpdate->currentPath.size() > 0)
-			facePoint(toUpdate, toUpdate->currentPath.front());
-		else
-			facePoint(toUpdate, goal);
-
+		avoid(toUpdate, goal);
 		return;
 	}
 
@@ -327,19 +357,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	if(toUpdate->pizzaCount == 0)
 	{	
 		goal = map.pickup;
-
-		if(!toUpdate->pickingUp)
-		{
-			toUpdate->pickingUp = true;
-			std::vector<glm::vec3> pathToPickup = aStar(findClosestNode(toUpdate->getPosition(), map), nullptr, map.allNodes, map.pickup);
-			if(pathToPickup.size() > 0 && toUpdate->currentPath.size() > 0)
-			{
-				std::vector<glm::vec3> pathBack = aStar(findClosestNode(pathToPickup.back(), map), findClosestNode(toUpdate->currentPath.front(),map), map.allNodes);
-				pathToPickup.insert(pathToPickup.end(), pathBack.begin(), pathBack.end());
-			}
-
-			toUpdate->currentPath.insert(toUpdate->currentPath.begin(), pathToPickup.begin(), pathToPickup.end());
-		}
+		refillPizzas(toUpdate, map);
 	}
 	if(toUpdate->currentPath.empty())
 	{
@@ -349,8 +367,6 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	}
 	else
 		trimPath(toUpdate);
-
-
 	
 	// Should be goal node
 	if(toUpdate->newDestination)
@@ -363,6 +379,7 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	}
 
 	glm::vec3 nextPoint;
+
 	if(toUpdate->currentPath.size() >= 5)
 		nextPoint = toUpdate->currentPath.at(4);
 	else if(toUpdate->currentPath.size() >= 3)
@@ -376,8 +393,13 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 
 	if(distanceToGoal < MIN_DIST * 5 && toUpdate->pizzaCount != 0)
 	{
-			fireAt(toUpdate, destination.location->goal);
-			return;
+		fireAt(toUpdate, destination.location->goal);
+		return;
+	}
+	else if(distanceToGoal < toUpdate->getPhysicsVehicle()->computeForwardSpeed() + PIZZA_SHOOT_DISTANCE && angleToGoal(toUpdate, goal) < MIN_ANGLE && toUpdate->pizzaDelivered == false)
+	{
+		shootPizza(toUpdate);
+		return;
 	}
 
 	if(distanceToNext < MIN_DIST)

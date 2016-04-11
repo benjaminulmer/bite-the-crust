@@ -113,7 +113,7 @@ void AudioEngine::playDeliveryFailSound(Vehicle * source)
 {
 	glm::vec3 pos = source->getPosition();
 
-	playSound(deliveryFailSound, pos, source);
+	playSound(deliveryFailSound, pos, source, 2.0f);
 }
 
 void AudioEngine::playReloadSound(Vehicle * source)

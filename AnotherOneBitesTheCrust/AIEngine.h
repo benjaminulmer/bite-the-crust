@@ -31,6 +31,10 @@ private:
 	void trimPath(Vehicle*);
 	void fireAt(Vehicle*, const glm::vec3 &);
 	bool isStuck(Vehicle *);
+	float angleToGoal(Vehicle*, const glm::vec3&);
+	void shootPizza(Vehicle*);
+	void refillPizzas(Vehicle*, Map &);
+	void avoid(Vehicle*, const glm::vec3&);
 
 	std::vector<glm::vec3> aStar(graphNode *, graphNode *, std::vector<graphNode*>, glm::vec3);
 };

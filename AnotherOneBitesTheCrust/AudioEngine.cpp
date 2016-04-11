@@ -264,7 +264,7 @@ void AudioEngine::setNumListeners(int numPlayers)
 
 void AudioEngine::update (std::vector<glm::mat4> listenerModelMatrices)
 {
-	for(int i = 0; i < listenerModelMatrices.size(); i++)
+	for(unsigned int i = 0; i < listenerModelMatrices.size(); i++)
 	{
 		glm::vec3 forward(glm::normalize(listenerModelMatrices.at(i) * glm::vec4(0,0,-1,0)));
 		glm::vec3 pos(listenerModelMatrices.at(i) * glm::vec4(0,0,0,1));

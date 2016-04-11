@@ -886,7 +886,7 @@ void RenderingEngine::setupMinimap(Map map)
 	
 }
 
-void RenderingEngine::drawMinimap(Vehicle* vans[4], int player, int height)
+void RenderingEngine::drawMinimap(Vehicle* vans[4], int player)
 {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -907,7 +907,7 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4], int player, int height)
 		value_ptr(mmMVP)	// pointer to data in Mat4f
 		);
 
-	GLfloat width = height/36.0f;
+	GLfloat width = resolution.y/36.0f;
 	glPointSize(width);
 
 	glDrawArrays(GL_POINTS, 0, mmRoadVerts.size());
@@ -944,10 +944,10 @@ void RenderingEngine::drawMinimap(Vehicle* vans[4], int player, int height)
 	}
 
 	glEnable(GL_CULL_FACE);
-	drawDelivery(vans[player]->deliveryLocation, height);
+	drawDelivery(vans[player]->deliveryLocation);
 }
 
-void RenderingEngine::drawDelivery(vec3 pos, int height)
+void RenderingEngine::drawDelivery(vec3 pos)
 {
 	glUseProgram(basicProgramID);
 	glBindVertexArray(mmDeliveryVAO);
@@ -961,7 +961,7 @@ void RenderingEngine::drawDelivery(vec3 pos, int height)
 			GL_FALSE,
 			value_ptr(mmMVP)
 			);
-	GLfloat width = height/144.0f;
+	GLfloat width = resolution.y/144.0f;
 	glLineWidth(width);
 	glDrawArrays(GL_LINE_LOOP, 0, mmDeliveryVerts.size());
 	glBindVertexArray(0);

@@ -118,9 +118,9 @@ public:
 
 	//minimap stuff
 	void setupMinimap(Map map);
-	void drawMinimap(Vehicle* vans[4], int player, int height);
+	void drawMinimap(Vehicle* vans[4], int player);
 	void updateHouseColor(Map *map, Tile* tile, glm::vec3 color);
-	void drawDelivery(glm::vec3 pos, int height);
+	void drawDelivery(glm::vec3 pos);
 	std::vector<glm::vec3> mmRoadVerts;
 	std::vector<float> mmRoadColors;
 	GLuint mmRoadVAO;

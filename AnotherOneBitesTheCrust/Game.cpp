@@ -475,14 +475,13 @@ void Game::playHUD(int player)
 
 	string score = "Tips: $";
 	score.append(to_string(deliveryManager->getScore(players[player])));
-	renderingEngine->printText2D(score.data(), 0, 0.7f, 30);
-	renderingEngine->printText2D(deliveryManager->getDeliveryText(players[player]).data(), 0.57f, 0.93f, 20);
+	renderingEngine->printText2D(score.data(), 0.025f, 0.62f, 34);
+
+	renderingEngine->printText2D(deliveryManager->getDeliveryText(players[player]).data(), 0.5f, 0.85f, 34);
 
 	string pizzas = "Pizzas: ";
 	pizzas.append(to_string(players[player]->pizzaCount));
-	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 0.025f, 0.6f, 30) : renderingEngine->printText2Doutline(pizzas.data(), 0.025f, 0.6f, 30, glm::vec4(1,0,0,1), false);
-
-	(numHumans == 1) ? renderingEngine->drawMinimap(players, player, windowHeight) : renderingEngine->drawMinimap(players, player, windowHeight/2); // TODO: Should support arbitrary number of vans
+	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 0.025f, 0.55f, 34) : renderingEngine->printText2Doutline(pizzas.data(), 0.025f, 0.55f, 34, glm::vec4(1,0,0,1), false);
 
 	if (camera[player]->arrowState == ArrowState::LEFT)
 	{
@@ -492,6 +491,8 @@ void Game::playHUD(int player)
 	{
 		renderingEngine->displayHudArrow(players[player]->rightArrow, menuLogic->menusM, menuLogic->menusV);
 	}
+
+	renderingEngine->drawMinimap(players, player); // TODO: Should support arbitrary number of vans
 }
 
 void Game::endHUD()

@@ -48,7 +48,7 @@ private:
 
 	std::map<PhysicsEntity *, VehicleSounds> vehicleLoops;
 
-	int numChannels;
+	unsigned int numChannels;
 	int backgroundSongChoice;
 
 	std::mt19937 generator;

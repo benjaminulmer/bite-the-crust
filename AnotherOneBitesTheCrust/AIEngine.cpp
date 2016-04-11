@@ -4,7 +4,7 @@
 
 const int MIN_DIST = 5;
 const int MAX_ATTEMPTS = 120;
-const float MIN_ANGLE = 0.05;
+const float MIN_ANGLE = 0.05f;
 const float PIZZA_SHOOT_DISTANCE = 25;
 
 AIEngine::AIEngine(void)

@@ -3,7 +3,7 @@
 #include <sigslot.h>
 #include "Vehicle.h"
 #include "PizzaBox.h"
-#include <vector>
+#include <list>
 
 class SimulationCallback
 	: public physx::PxSimulationEventCallback
@@ -25,5 +25,6 @@ public:
 	sigslot::signal1<Vehicle*> inPickUpLocation;
 	sigslot::signal1<Vehicle*> collision;
 
-	std::vector<physx::PxActor*> toEndSleepNotifies;
+	std::list<physx::PxActor*> toEndSleepNotifies;
+	std::list<std::pair<physx::PxRigidDynamic*, physx::PxVec3>> toApplyForce;
 };

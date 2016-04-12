@@ -44,9 +44,10 @@ void DeliveryManager::timePassed(double timeMs) {
 		Delivery* d = &deliveries[players[i]];
 		d->time = d->time - timeMs;
 		if (d->time <= 0.0) {
-			scores[players[i]] -= 5;
-			if (!players[i]->isAI)
+			if (!players[i]->isAI) {
+				scores[players[i]] -= 5;
 				deliveryFailSignal(players[i]);
+			}
 			deliveries[players[i]] = newDelivery(players[i]);
 			freeLocations.push_back(d->location); // Free the tile back up, since it wasn't claimed
 			// Free the location after assigning delivery, so you don't get the same location twice
@@ -91,9 +92,10 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 		deliveries[pizza->owner] = newDelivery(pizza->owner);
 		for (unsigned int i = 0; i < players.size(); i++) {
 			if (deliveries[players[i]].location == tile) {
-				scores[players[i]] -= 5;
-				if (!players[i]->isAI)
+				if (!players[i]->isAI) {
 					deliveryFailSignal(players[i]);
+					scores[players[i]] -= 5;
+				}
 				deliveries[players[i]] = newDelivery(players[i]);
 			}
 		}

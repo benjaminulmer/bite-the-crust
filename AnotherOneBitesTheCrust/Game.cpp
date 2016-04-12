@@ -233,7 +233,7 @@ void Game::setupEntities()
 		float rotationRad = physx::PxPi * 0.5f;
 		setupVehicle(players[i], physx::PxTransform(physx::PxVec3(20, 2, 135 - 15.0f*i), physx::PxQuat(rotationRad, physx::PxVec3(0,1,0))), i);
 
-		camera[i] = new Camera(players[i]);
+		camera[i] = new Camera(players[i], physicsEngine->scene);
 
 		// TODO: get info from menu selection (ie. number of player characters)
 

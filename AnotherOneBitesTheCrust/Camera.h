@@ -14,7 +14,7 @@ class Camera
 	: public Entity, public sigslot::has_slots<>
 {
 public:
-	Camera(Vehicle* vehicle);
+	Camera(Vehicle* vehicle, physx::PxScene* scene);
 	~Camera(void);
 
 	static const int BUFFER_SIZE = 10;
@@ -41,5 +41,6 @@ private:
 	bool reverseCam;
 
 	Vehicle* vehicle;
+	physx::PxScene* scene;
 };
 

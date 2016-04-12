@@ -262,7 +262,6 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 
 	if (buffer1.hasBlock) 
 	{
-		
 		PxRaycastHit hit = buffer1.block;
 
 		PxVec3 actorCentre = hit.actor->getGlobalPose().p;

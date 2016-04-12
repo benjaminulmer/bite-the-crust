@@ -26,7 +26,7 @@ void PhysicsEngine::reset()
 void PhysicsEngine::initSimulationData()
 {
 	scale = PxTolerancesScale();
-	scale.speed = 50;
+	scale.speed = 100;
 	scale.length = 2;
 	defaultErrorCallback = new PxDefaultErrorCallback();
 	defaultAllocator = new PxDefaultAllocator();
@@ -178,7 +178,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 
 void PhysicsEngine::createPizzaPickup(physx::PxVec3 location, physx::PxF32 radius)
 {
-	PxSphereGeometry geometry(radius); 
+	PxBoxGeometry geometry(radius, radius, radius); 
 	PxTransform transform(location, PxQuat::createIdentity());
 	PxMaterial* material = physics->createMaterial(0.5f, 0.5f, 0.5f);
 

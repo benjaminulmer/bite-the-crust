@@ -153,7 +153,7 @@ Tile* Game::setupTile(int i, int j)
 	if (tile->pickup)
 	{
 		// TODO make this better/less hardcoded
-		physicsEngine->createPizzaPickup(physx::PxVec3((float)j*map.tileSize + map.tileSize/2, 0, (float)i*map.tileSize + map.tileSize/2), 8.0f);
+		physicsEngine->createPizzaPickup(physx::PxVec3((float)j*map.tileSize + map.tileSize/2, 0, (float)i*map.tileSize + map.tileSize/2), 10.0f);
 	}
 
 	StaticEntity* ground = new StaticEntity();

@@ -275,6 +275,26 @@
 			],
 			"nodes": [
 			]
+		},
+		{
+			"id": 23,
+			"description": "Basketball court",
+			"ground": "lawn",
+			"entities": [
+				{"name": "basketballCourt", "x": 10, "z": 10}
+			],
+			"nodes": [
+			]
+		},
+		{
+			"id": 24,
+			"description": "Center lawn tile with nothing",
+			"ground": "lawn",
+			"entities": [
+			],
+			"nodes": [
+
+			]
 		}
     ]
 }

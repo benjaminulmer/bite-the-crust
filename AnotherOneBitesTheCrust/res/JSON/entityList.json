@@ -61,7 +61,13 @@
 
         {"name": "basketballCourt", "model" :"basketballCourt.obj", "physics": "staticDrivableTriangle.json", "texture": "basketballCourt-colored.DDS"},
         {"name": "basketball", "model" :"basketball.obj", "physics": "basketball.json", "texture": "basketball.DDS"},
-        {"name": "basketballRack", "model" :"ballRack.obj", "physics": "default.json", "texture": "ballRack.DDS"}
+        {"name": "basketballRack", "model" :"ballRack.obj", "physics": "default.json", "texture": "ballRack.DDS"},
+        
+        {"name": "tennisCourt", "model" :"tennisCourt.obj", "physics": "staticDrivableTriangle.json", "texture": "tennisCourt.DDS"},
+
+        {"name": "fountain", "model" :"fountain.obj", "physics": "staticDrivableTriangle.json", "texture": "fountain.DDS"},
+        {"name": "gazebo", "model" :"gazebo.obj", "physics": "staticDrivableTriangle.json", "texture": "gazebo.DDS"},
+        {"name": "picnicTable", "model" :"picnicTable.obj", "physics": "default.json", "texture": "picnicTable.DDS"}
 
 
     ]

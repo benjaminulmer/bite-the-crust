@@ -281,7 +281,14 @@
 			"description": "Basketball court",
 			"ground": "lawn",
 			"entities": [
-				{"name": "basketballCourt", "x": 10, "z": 10}
+				{"name": "basketballCourt", "x": 10, "z": 10},
+				{"name": "basketballRack", "x": 30, "z": 27},
+				{"name": "basketballRack", "x": -10, "z": -7},
+				{"name": "basketball", "x": 0, "z": -7},
+				{"name": "basketball", "x": 0, "z": 0},
+				{"name": "basketball", "x": 7, "z": 7},
+				{"name": "basketball", "x": 15, "z": 10},
+				{"name": "basketball", "x": 20, "z": 15}
 			],
 			"nodes": [
 			]
@@ -291,6 +298,41 @@
 			"description": "Center lawn tile with nothing",
 			"ground": "lawn",
 			"entities": [
+			],
+			"nodes": [
+
+			]
+		},
+		{
+			"id": 25,
+			"description": "Center lawn tile with fountain",
+			"ground": "lawn",
+			"entities": [
+				{"name": "fountain", "x": 10, "z": 10},
+				{"name": "bench", "x": 0, "z": 0}
+			],
+			"nodes": [
+
+			]
+		},
+		{
+			"id": 26,
+			"description": "Center lawn tile with gazebo",
+			"ground": "lawn",
+			"entities": [
+				{"name": "gazebo", "x": 10, "z": 10},
+				{"name": "picnicTable", "x": 0, "z": 0}
+			],
+			"nodes": [
+
+			]
+		},
+		{
+			"id": 27,
+			"description": "Tennis court",
+			"ground": "lawn",
+			"entities": [
+				{"name": "tennisCourt", "x": 10, "z": 10}
 			],
 			"nodes": [
 

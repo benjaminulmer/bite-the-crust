@@ -21,6 +21,10 @@ Camera::Camera(Vehicle* vehicle, PxScene* scene)
 	type = EntityType::CAMERA;
 }
 
+Camera::~Camera(void)
+{
+}
+
 void Camera::update()
 {
 	// Update buffer from vehicle position
@@ -83,10 +87,6 @@ void Camera::update()
 	{
 		arrowState = ArrowState::ON_SCREEN;
 	}
-}
-
-Camera::~Camera(void)
-{
 }
 
 void Camera::setPosition(glm::vec3 v) {

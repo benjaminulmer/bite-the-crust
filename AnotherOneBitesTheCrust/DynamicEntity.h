@@ -6,7 +6,7 @@ class DynamicEntity :
 {
 public:
 	DynamicEntity(void);
-	~DynamicEntity(void);
+	virtual ~DynamicEntity(void);
 
 	physx::PxRigidDynamic* getRigidDynamic();
 };

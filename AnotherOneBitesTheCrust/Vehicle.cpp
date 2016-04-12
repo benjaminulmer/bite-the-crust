@@ -36,6 +36,14 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	arrow = nullptr;
 }
 
+Vehicle::~Vehicle(void)
+{
+	delete arrow;
+	delete rightArrow;
+	delete leftArrow;
+	physicsVehicle->release();
+}
+
 glm::vec3 Vehicle::getDestination()
 {
 	return currentPath.back();
@@ -209,8 +217,3 @@ glm::mat4 Vehicle::getModelMatrix()
 	}
 	return newM;
 }
-
-Vehicle::~Vehicle(void)
-{
-}
-

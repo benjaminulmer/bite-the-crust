@@ -6,7 +6,7 @@ enum class EntityType
 {
 	BASE,
 	CAMERA,
-	DECORATION,
+	NON_PHYSICS,
 	PHYSICS,
 	DYNAMIC,
 	STATIC,
@@ -19,7 +19,7 @@ class Entity
 {
 public:
 	Entity(void);
-	~Entity(void);
+	virtual ~Entity(void);
 
 	EntityType type;
 	void testPrint();

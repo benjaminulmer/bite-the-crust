@@ -38,10 +38,8 @@ void Game::setGameState(GameState state)
 	{
 		if (menuLogic->numPlayers > inputEngine->numControllers())
 		{
-			gameState = GameState::MENU;
 			return;
 		}
-
 		numHumans = menuLogic->numPlayers;
 		audioEngine->setNumListeners(numHumans);
 		setupEntities();
@@ -54,6 +52,16 @@ void Game::setGameState(GameState state)
 		physicsEngine->reset();
 		gameState = GameState::MENU;
 	}
+	else if (state == GameState::RESET)
+	{
+		reset();
+		physicsEngine->reset();
+		numHumans = menuLogic->numPlayers;
+		audioEngine->setNumListeners(numHumans);
+		setupEntities();
+		connectSystems();
+		gameState = GameState::PLAY;
+	}
 	else 
 	{
 		gameState = state;
@@ -62,7 +70,7 @@ void Game::setGameState(GameState state)
 
 void Game::reset() 
 {
-	entities.erase(entities.begin(), entities.end());
+	entities.clear();
 	map.deliveryTiles.clear();
 	deliveryManager->reset();
 }
@@ -768,10 +776,4 @@ void Game::shootPizza(Vehicle* vehicle)
 
 Game::~Game(void)
 {
-	/*for (unsigned int i = 0; i < entities.size(); i++)
-		delete entities[i];*/
-
-	std::map<std::string, Renderable*>::iterator it;
-	for (it = ContentLoading::loadedModels.begin(); it != ContentLoading::loadedModels.end(); ++it)
-		delete it->second;
 }

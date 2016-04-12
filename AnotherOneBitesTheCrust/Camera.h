@@ -15,7 +15,7 @@ class Camera
 {
 public:
 	Camera(Vehicle* vehicle, physx::PxScene* scene);
-	~Camera(void);
+	virtual ~Camera(void);
 
 	static const int BUFFER_SIZE = 10;
 

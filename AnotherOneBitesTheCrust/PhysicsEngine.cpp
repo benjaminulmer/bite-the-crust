@@ -17,7 +17,8 @@ PhysicsEngine::PhysicsEngine(void)
 
 void PhysicsEngine::reset()
 {
-	vehicles.erase(vehicles.begin(), vehicles.end());
+	vehicles.clear();
+	scene->release();
 	scene = physics->createScene(*sceneDesc);
 	batchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *vehicleSceneQueryData, scene);
 }
@@ -143,6 +144,9 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		material = (sInfo->isDrivable) ? drivingSurfaces[0] : physics->createMaterial(sInfo->dynamicFriction, sInfo->staticFriction, sInfo->restitution);
 		PxShape* shape = actor->createShape(*geometry, *material); // TODO support shape flags
 		shape->setLocalPose(sInfo->transform);
+
+		material->release();
+		delete geometry;
 
 		// Set up querry filter data for shape
 		PxFilterData qryFilterData;

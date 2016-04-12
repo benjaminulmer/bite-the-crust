@@ -8,7 +8,7 @@ class PhysicsEntity :
 {
 public:
 	PhysicsEntity(void);
-	~PhysicsEntity(void);
+	virtual ~PhysicsEntity(void);
 
 	void setPosition(glm::vec3);
 	glm::vec3 getPosition();

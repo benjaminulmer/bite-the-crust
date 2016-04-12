@@ -408,14 +408,14 @@ void Game::splitscreenViewports()
 	}
 	else if (numHumans == 2)
 	{
-		renderingEngine->setResolution(windowWidth/2, windowHeight/2);
+		renderingEngine->setResolution(windowWidth, windowHeight/2);
 
-		glViewport(windowWidth/4, windowHeight/2, windowWidth/2, windowHeight/2);
+		glViewport(0, windowHeight/2, windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[0]);
 		gameDisplay(0);
 		if(gameState == GameState::PLAY) playHUD(0);
 
-		glViewport(windowWidth/4, 0, windowWidth/2, windowHeight/2);
+		glViewport(0, 0, windowWidth, windowHeight/2);
 		renderingEngine->updateView(*camera[1]);
 		gameDisplay(1);
 		if(gameState == GameState::PLAY) playHUD(1);
@@ -472,27 +472,17 @@ void Game::splitscreenViewports()
 // +-6 , 2 trans for arrow
 void Game::playHUD(int player)
 {
-	/*string speed = "Speed: ";
-	speed.append(to_string(players[player]->getPhysicsVehicle()->computeForwardSpeed()));
-	renderingEngine->printText2D(speed.data(), 0, 0.96f, 24);
-
-	string frameRate = "DeltaTime: ";
-	frameRate.append(to_string(deltaTimeMs));
-	renderingEngine->printText2D(frameRate.data(), 0, 0.89f, 20);
-
-	string deltaAcc = "DeltaTimeACC: ";
-	deltaAcc.append(to_string(deltaTimeAccMs));
-	renderingEngine->printText2D(deltaAcc.data(), 0, 0.93f, 20);*/
-
-	string score = "Tips: $";
-	score.append(to_string(deliveryManager->getScore(players[player])));
-	renderingEngine->printText2D(score.data(), 0.025f, 0.62f, 34);
+	float xOffset = (numHumans == 2) ? 0.23f : 0.0f;
 
 	renderingEngine->printText2D(deliveryManager->getDeliveryText(players[player]).data(), 0.5f, 0.85f, 34);
 
+	string score = "Tips: $";
+	score.append(to_string(deliveryManager->getScore(players[player])));
+	renderingEngine->printText2D(score.data(), xOffset+0.025f, 0.62f, 34);
+
 	string pizzas = "Pizzas: ";
 	pizzas.append(to_string(players[player]->pizzaCount));
-	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), 0.025f, 0.55f, 34) : renderingEngine->printText2Doutline(pizzas.data(), 0.025f, 0.55f, 34, glm::vec4(1,0,0,1), false);
+	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), xOffset+0.025f, 0.55f, 34) : renderingEngine->printText2Doutline(pizzas.data(), 0.025f, 0.55f, 34, glm::vec4(1,0,0,1), false);
 
 	if (camera[player]->arrowState == ArrowState::LEFT)
 	{

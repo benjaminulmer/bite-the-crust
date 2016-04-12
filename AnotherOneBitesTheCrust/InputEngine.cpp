@@ -31,11 +31,11 @@ int InputEngine::numControllers()
 
 void InputEngine::controllerAxisMotion(SDL_Event e, GameState state)
 {
-	if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;
-
-	if (e.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
+	if (state == GameState::PLAY || state == GameState::END)
 	{
-		if (mode == InputMode::NORMAL)
+		if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;
+
+		if (e.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
 		{
 			if (e.caxis.value < -deadzoneSize)
 			{
@@ -50,26 +50,58 @@ void InputEngine::controllerAxisMotion(SDL_Event e, GameState state)
 				inputs[e.cdevice.which]->steer = 0;
 			}
 		}
-
+		else if (e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT)
+		{
+			inputs[e.cdevice.which]->backward = (float)e.caxis.value/MAX_AXIS_VALUE;
+		}
+		else if (e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT)
+		{
+			inputs[e.cdevice.which]->forward = (float)e.caxis.value/MAX_AXIS_VALUE;
+		}
 	}
-	else if (e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT)
+	else if (state == GameState::MENU)
 	{
-		inputs[e.cdevice.which]->backward = (float)e.caxis.value/MAX_AXIS_VALUE;
+		if (e.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
+		{
+			if (e.caxis.value >= MAX_AXIS_VALUE - 5)
+			{
+				menuInput(InputType::DOWN);
+			}
+			else if (e.caxis.value <= MIN_AXIS_VALUE + 5)
+			{
+				menuInput(InputType::UP);
+			}
+		}
+		else if (e.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
+		{
+			if (e.caxis.value >= MAX_AXIS_VALUE - 5)
+			{
+				menuInput(InputType::RIGHT);
+			}
+			else if (e.caxis.value <= MIN_AXIS_VALUE + 5)
+			{
+				menuInput(InputType::LEFT);
+			}
+		}
 	}
-	else if (e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT)
+	else if (state == GameState::PAUSE)
 	{
-		inputs[e.cdevice.which]->forward = (float)e.caxis.value/MAX_AXIS_VALUE;
-	}
-
-	if (mode == InputMode::DEBUG) 
-	{
-
+		if (e.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
+		{
+			if (e.caxis.value >= MAX_AXIS_VALUE - 5)
+			{
+				pauseInput(InputType::DOWN);
+			}
+			else if (e.caxis.value <= MIN_AXIS_VALUE + 5)
+			{
+				pauseInput(InputType::UP);
+			}
+		}
 	}
 }
 
 void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 {
-
 	if (state == GameState::PLAY || state == GameState::END)
 	{
 		if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;
@@ -149,23 +181,22 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 			pauseInput(InputType::BACK);
 		}
 	}
-	/*else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSTICK)
-	{
-		mode = (mode == InputMode::NORMAL) ? InputMode::DEBUG : InputMode::NORMAL; 
-	}*/
 }
 
 void InputEngine::controllerButtonUp(SDL_Event e, GameState state)
 {
-	if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;
+	if (state == GameState::PLAY || state == GameState::END)
+	{
+		if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;
 
-	if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
-	{
-		inputs[e.cdevice.which]->handBrake = false;
-	}
-	else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
-	{
-		cameras[e.cdevice.which]->setReverseCam(false);
+		if (e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+		{
+			inputs[e.cdevice.which]->handBrake = false;
+		}
+		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+		{
+			cameras[e.cdevice.which]->setReverseCam(false);
+		}
 	}
 }
 

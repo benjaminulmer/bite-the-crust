@@ -36,6 +36,12 @@ void Game::setGameState(GameState state)
 {
 	if (state == GameState::STARTING_GAME)
 	{
+		if (menuLogic->numPlayers > inputEngine->numControllers())
+		{
+			gameState == GameState::MENU;
+			return;
+		}
+
 		numHumans = menuLogic->numPlayers;
 		audioEngine->setNumListeners(numHumans);
 		setupEntities();
@@ -234,9 +240,6 @@ void Game::setupEntities()
 		setupVehicle(players[i], physx::PxTransform(physx::PxVec3(20, 2, 135 - 15.0f*i), physx::PxQuat(rotationRad, physx::PxVec3(0,1,0))), i);
 
 		camera[i] = new Camera(players[i], physicsEngine->scene);
-
-		// TODO: get info from menu selection (ie. number of player characters)
-
 	}
 	// hard code textures for now
 	players[0]->houseTexture = ContentLoading::loadDDS("res\\Textures\\houseRed.DDS");
@@ -346,8 +349,8 @@ void Game::connectSystems()
 {
 	for (int i = 0; i < numHumans; i++) 
 	{
-		inputEngine->setInputStruct(&players[i]->input, i);
-		inputEngine->setCamera(camera[i], i);
+		inputEngine->setInputStruct(&players[i]->input, inputEngine->numControllers()-1-i);
+		inputEngine->setCamera(camera[i], inputEngine->numControllers()-1-i);
 		players[i]->isAI = false;
 	}
 

@@ -30,6 +30,7 @@ public:
 	void controllerButtonDown(SDL_Event e, GameState state);
 	void controllerButtonUp(SDL_Event e, GameState state);
 	void openControllers();
+	int numControllers();
 
 	sigslot::signal0<> unFucker;
 	sigslot::signal1<InputType> menuInput;

@@ -19,6 +19,7 @@ Entity::Entity(void)
 
 Entity::~Entity(void)
 {
+	delete renderable;
 }
 
 void Entity::setTexture(GLuint tex)

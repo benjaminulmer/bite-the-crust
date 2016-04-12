@@ -36,6 +36,14 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	arrow = nullptr;
 }
 
+Vehicle::~Vehicle(void)
+{
+	delete arrow;
+	delete rightArrow;
+	delete leftArrow;
+	physicsVehicle->release();
+}
+
 glm::vec3 Vehicle::getDestination()
 {
 	return currentPath.back();
@@ -92,9 +100,8 @@ void Vehicle::resetIfNeeded()
 	if (cos <= 0.707f && vel.x == 0 && vel.y == 0 && vel.z == 0)
 	{
 		PxVec3 forw(0, 0, 1);
-		PxVec3 left(1, 0, 0);
 		PxVec3 vehForw = actor->getGlobalPose().rotate(forw);
-		PxVec3 vehLeft = actor->getGlobalPose().rotate(left);
+		PxVec3 vehLeft = PxTransform(PxVec3(0), PxQuat(-PxPi/2, PxVec3(0, 1, 0))).rotate(vehForw);
 		
 		PxF32 angleRad = (vehLeft.dot(forw) < 0) ? -acos(vehForw.dot(forw)) : acos(vehForw.dot(forw));
 		PxTransform cur = actor->getGlobalPose();
@@ -210,8 +217,3 @@ glm::mat4 Vehicle::getModelMatrix()
 	}
 	return newM;
 }
-
-Vehicle::~Vehicle(void)
-{
-}
-

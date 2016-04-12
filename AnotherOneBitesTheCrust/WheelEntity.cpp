@@ -10,6 +10,10 @@ WheelEntity::WheelEntity(Vehicle* vehicle, PxShape* physicsShape)
 	type = EntityType::WHEEL;
 }
 
+WheelEntity::~WheelEntity(void)
+{
+}
+
 glm::vec3 WheelEntity::getPosition()
 {
 	PxTransform vehicleTransform = vehicle->getActor()->getGlobalPose();
@@ -32,8 +36,4 @@ glm::mat4 WheelEntity::getModelMatrix()
 		}
 	}
 	return vehicleMatrix * newM;
-}
-
-WheelEntity::~WheelEntity(void)
-{
 }

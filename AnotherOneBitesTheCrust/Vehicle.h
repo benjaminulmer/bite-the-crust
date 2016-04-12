@@ -68,7 +68,7 @@ class Vehicle :
 {
 public:
 	Vehicle(unsigned int stepSizeMS);
-	~Vehicle(void);
+	virtual ~Vehicle(void);
 
 	static const int MAX_PIZZAS = 3;
 	int pizzaCount;

@@ -3,6 +3,7 @@ enum class GameState
 {
 	STARTING_GAME,
 	BACK_TO_MENU,
+	RESET,
 
 	INTRO,
 	MENU,

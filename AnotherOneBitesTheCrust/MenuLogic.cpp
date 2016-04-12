@@ -354,6 +354,10 @@ void MenuLogic::pauseInput(InputType type)
 			gameStateSelected(GameState::PLAY);
 			pauseSelection = PauseOptions::RESUME;
 		}
+		else if(pauseSelection == PauseOptions::RESTART)
+		{
+			gameStateSelected(GameState::RESET);
+		}
 		else if(pauseSelection == PauseOptions::MAIN_MENU)
 		{
 			gameStateSelected(GameState::BACK_TO_MENU);

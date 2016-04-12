@@ -3,7 +3,7 @@
 NonPhysicsEntity::NonPhysicsEntity(void)
 {
 	modelMatrix = glm::mat4(1);
-	type = EntityType::DECORATION;
+	type = EntityType::NON_PHYSICS;
 }
 
 void NonPhysicsEntity::rotate(float angle, glm::vec3 axis)

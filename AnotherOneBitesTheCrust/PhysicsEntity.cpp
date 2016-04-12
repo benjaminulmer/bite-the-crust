@@ -9,6 +9,7 @@ PhysicsEntity::PhysicsEntity(void)
 
 PhysicsEntity::~PhysicsEntity(void)
 {
+	actor->release();
 }
 
 void PhysicsEntity::setActor(physx::PxRigidActor* a)

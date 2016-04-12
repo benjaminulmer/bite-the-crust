@@ -89,7 +89,7 @@ private:
 	void toggleFullscreen();
 
 	Camera* camera[MAX_PLAYERS];
-	Vehicle * players[MAX_PLAYERS];
+	Vehicle* players[MAX_PLAYERS];
 	std::map<Vehicle*, int> scores;
 
 	PhysicsEntityInfo* pizzaInfo;

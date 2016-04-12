@@ -24,6 +24,11 @@ void InputEngine::openControllers()
 	std::cout << "NUM CONTROLLERS: " << SDL_NumJoysticks() << std::endl;
 }
 
+int InputEngine::numControllers()
+{
+	return SDL_NumJoysticks();
+}
+
 void InputEngine::controllerAxisMotion(SDL_Event e, GameState state)
 {
 	if (inputs[e.cdevice.which] == nullptr || cameras[e.cdevice.which] == nullptr) return;

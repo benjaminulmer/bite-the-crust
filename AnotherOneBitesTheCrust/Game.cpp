@@ -38,7 +38,7 @@ void Game::setGameState(GameState state)
 	{
 		if (menuLogic->numPlayers > inputEngine->numControllers())
 		{
-			gameState == GameState::MENU;
+			gameState = GameState::MENU;
 			return;
 		}
 

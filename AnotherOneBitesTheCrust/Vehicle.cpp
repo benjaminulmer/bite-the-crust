@@ -18,6 +18,7 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	isAI = true;
 	pizzaDelivered = false;
 	avoiding = false;
+	avoidForward = false;
 	pickingUp = false;
 	avoidAttempts = 0;
 

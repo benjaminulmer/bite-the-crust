@@ -121,7 +121,7 @@ void AIEngine::goToPoint(Vehicle* driver, const glm::vec3 & desiredPos, const fl
 	float ratio = glm::acos(cosAngle) / glm::pi<float>();
 
 	// TODO: Should divide by half the map or something
-	float gas = glm::clamp(distanceToGoal / 100, 0.3f, 0.7f);
+	float gas = glm::clamp(distanceToGoal / 100, 0.3f, 0.65f);
 
 	// TODO: Maybe put these in an init file for tuning purposes?
 	if (gas > 0.15)
@@ -204,19 +204,32 @@ void AIEngine::fireAt(Vehicle * driver, const glm::vec3 & goal)
 	
 }
 
-void AIEngine::facePoint(Vehicle * driver, const glm::vec3 & pointTo)
+void AIEngine::facePoint(Vehicle * driver, const glm::vec3 & pointTo, bool backwards)
 {
 	glm::vec3 desiredDirection = glm::normalize(pointTo - driver->getPosition());
 	glm::vec3 left(glm::normalize(driver->getModelMatrix() * glm::vec4(1,0,0,0)));
 	float leftCosAngle = glm::dot(desiredDirection, left);
 
-	driver->input.backward = 1.0;
-	driver->input.forward = 0.0;
+	if(backwards)
+	{
+		driver->input.backward = 1.0;
+		driver->input.forward = 0.0;
 
-	if(leftCosAngle > 0)
-		driver->input.steer = -1.0;
-	else	
-		driver->input.steer = 1.0;
+		if(leftCosAngle > 0)
+			driver->input.steer = -1.0;
+		else	
+			driver->input.steer = 1.0;
+	}
+	else
+	{
+		driver->input.backward = 1.0;
+		driver->input.forward = 0.0;
+
+		if(leftCosAngle > 0)
+			driver->input.steer = -1.0;
+		else	
+			driver->input.steer = 1.0;
+	}
 }
 
 graphNode * findClosestNode(glm::vec3 position, Map & map)
@@ -302,7 +315,8 @@ bool AIEngine::isStuck(Vehicle * driver)
 {
 	float sigma = 0.1f;
 
-	if(driver->getPhysicsVehicle()->computeForwardSpeed() < sigma && driver->input.forward > 0)
+	if((driver->getPhysicsVehicle()->computeForwardSpeed() < sigma && driver->input.forward > 0) || 
+		(driver->getPhysicsVehicle()->computeForwardSpeed() > -sigma && driver->input.backward < 0))
 		driver->stuckDuration++;
 	else
 		driver->stuckDuration = 0;
@@ -333,12 +347,13 @@ void AIEngine::avoid(Vehicle * toUpdate, const glm::vec3 & goal)
 	if(toUpdate->avoidAttempts > MAX_ATTEMPTS)
 	{
 		toUpdate->avoiding = false;
+		toUpdate->avoidForward = false;
 		toUpdate->avoidAttempts = 0;
 	}
 	if(toUpdate->currentPath.size() > 0)
-		facePoint(toUpdate, toUpdate->currentPath.front());
+		facePoint(toUpdate, toUpdate->currentPath.front(), toUpdate->avoidForward);
 	else
-		facePoint(toUpdate, goal);
+		facePoint(toUpdate, goal, toUpdate->avoidForward);
 }
 
 void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICollisionEntity & obstacle) 
@@ -417,8 +432,11 @@ void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICo
 	Tile * currentTile = map.getTile(toUpdate->getPosition());
 	// Should be 'goal node' of this tile
 	if((obstacle.entity != nullptr && obstacle.distance < 1 && obstacle.entity->type == EntityType::STATIC) || isStuck(toUpdate))
+	{
 		toUpdate->avoiding = true;
-
+		if(toUpdate->input.backward > 0)
+			toUpdate->avoidForward = true;
+	}
 
 	goToPoint(toUpdate, nextPoint, glm::length(goal - toUpdate->getPosition()));
 }

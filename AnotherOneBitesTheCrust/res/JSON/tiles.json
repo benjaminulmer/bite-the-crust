@@ -23,8 +23,9 @@
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
 				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]},
 				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
 			]
         },
@@ -113,7 +114,11 @@
 				{"name": ["grass1", "grass2", "grass3"], "x": 4, "z": 7}
 			],
 			"nodes": [
-
+				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
+				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]}
 			]
 		},
 		{
@@ -189,8 +194,10 @@
             ],
 			"nodes" : [
 				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
-				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2]},
-				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]}
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
+				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+                {"x" : 0.5, "z" : 1.0, "neighbours" : [1]}
 			]
         },
         {
@@ -232,14 +239,28 @@
             "entities": [
                 {"name": ["flower1", "flower2", "flower3", "rock1", "smallBush"], "x": 1, "z": 17},
                 {"name": ["flower1", "flower2", "flower3", "rock1", "smallBush"], "x": 17, "z": 8}
-            ]
+            ],
+			"nodes":[
+				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
+				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]}
+			]
         },
         {
             "id": 19,
             "description": "parking lot",
             "ground": "parkingLot",
             "pickup": true,
-            "entities": []
+            "entities": [],
+			"nodes":[
+				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
+				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]}
+				]
         },        
 		{
             "id": 20,
@@ -284,6 +305,11 @@
 				{"name": "basketballCourt", "x": 10, "z": 10}
 			],
 			"nodes": [
+				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
+				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]}
 			]
 		},
 		{
@@ -293,6 +319,11 @@
 			"entities": [
 			],
 			"nodes": [
+				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 0.5, "neighbours" : [0,2,3,4]},
+				{"x" : 0.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 1.0, "z" : 0.5, "neighbours" : [1]},
+				{"x" : 0.5, "z" : 1.0, "neighbours" : [1]}
 
 			]
 		}

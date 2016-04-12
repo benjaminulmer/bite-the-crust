@@ -394,6 +394,7 @@ void Game::splitscreenViewports()
 		renderingEngine->updateView(*camera[0]);
 		gameDisplay(0);
 		if(gameState == GameState::PLAY) playHUD(0);
+		renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
 	}
 	else if (numHumans == 2)
 	{
@@ -442,7 +443,7 @@ void Game::splitscreenViewports()
 		gameDisplay(1);
 		if(gameState == GameState::PLAY) playHUD(1);
 		
-		renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
+		
 
 		glViewport(0, 0, windowWidth/2, windowHeight/2);
 		renderingEngine->updateView(*camera[2]);

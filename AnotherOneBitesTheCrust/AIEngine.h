@@ -26,7 +26,7 @@ public:
 private:
 	void updatePath(Vehicle*, Delivery, Map &);
 	void goToPoint(Vehicle*, const glm::vec3 &, const float &);
-	void facePoint(Vehicle *, const glm::vec3&);
+	void facePoint(Vehicle *, const glm::vec3&, bool = true);
 	void brake(Vehicle*, const float &);
 	void trimPath(Vehicle*);
 	void fireAt(Vehicle*, const glm::vec3 &);

@@ -111,7 +111,7 @@ void Vehicle::resetIfNeeded()
 }
 
 // Called every frame for vehicle
-void Vehicle::update()
+void Vehicle::update(bool spaceMode)
 {
 	resetIfNeeded();
 

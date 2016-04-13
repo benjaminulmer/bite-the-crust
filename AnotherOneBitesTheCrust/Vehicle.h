@@ -95,7 +95,7 @@ public:
 	bool isSlipping;
 	bool isInAir;
 
-	void update();
+	void update(bool spaceMode);
 	glm::mat4 getModelMatrix();
 	glm::vec3 getShadowLocation();
 

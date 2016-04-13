@@ -40,6 +40,7 @@ public:
 private:
 	static const unsigned int PHYSICS_STEP_MS = 16;
 
+	void startGame();
 	void setGameState(GameState state);
 	void initSystems();
 	void loadJSONfiles();

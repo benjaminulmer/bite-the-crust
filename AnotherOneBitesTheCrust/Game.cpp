@@ -33,6 +33,30 @@ Game::Game(void)
 	generator.seed(rd());
 }
 
+void Game::startGame()
+{
+	numHumans = menuLogic->numPlayers;
+	audioEngine->setNumListeners(numHumans);
+	setupEntities();
+	connectSystems();
+	gameState = GameState::PLAY;
+		
+	for (int i = 3; i > 0; i--)
+	{
+		int start = SDL_GetTicks();
+		int time = start;
+		while (time < start + 1000)
+		{
+			splitscreenViewports();
+			renderingEngine->printText2D(to_string(i).data(), 0.48f, 0.5f, 100);
+			SDL_GL_SwapWindow(window);
+			time = SDL_GetTicks();
+		}
+	}
+	
+	oldTimeMs = SDL_GetTicks();
+}
+
 void Game::setGameState(GameState state)
 {
 	if (state == GameState::STARTING_GAME)
@@ -41,29 +65,17 @@ void Game::setGameState(GameState state)
 		{
 			return;
 		}
-		numHumans = menuLogic->numPlayers;
-		audioEngine->setNumListeners(numHumans);
-		setupEntities();
-		connectSystems();
-		gameState = GameState::PLAY;
-		oldTimeMs = SDL_GetTicks();
+		startGame();
 	}
 	else if (state == GameState::BACK_TO_MENU)
 	{
 		reset();
-		physicsEngine->reset();
 		gameState = GameState::MENU;
 	}
 	else if (state == GameState::RESET)
 	{
 		reset();
-		physicsEngine->reset();
-		numHumans = menuLogic->numPlayers;
-		audioEngine->setNumListeners(numHumans);
-		setupEntities();
-		connectSystems();
-		gameState = GameState::PLAY;
-		oldTimeMs = SDL_GetTicks();
+		startGame();
 	}
 	else
 	{
@@ -77,6 +89,7 @@ void Game::reset()
 	map.deliveryTiles.clear();
 	deliveryManager->reset();
 	spaceMode = false;
+	physicsEngine->reset();
 	renderingEngine->reset();
 }
 
@@ -490,7 +503,7 @@ void Game::playHUD(int player)
 
 	string pizzas = "Pizzas: ";
 	pizzas.append(to_string(players[player]->pizzaCount));
-	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), xOffset+0.025f, 0.55f, 34) : renderingEngine->printText2Doutline(pizzas.data(), 0.025f, 0.55f, 34, glm::vec4(1,0,0,1), false);
+	(players[player]->pizzaCount > 0) ? renderingEngine->printText2D(pizzas.data(), xOffset+0.025f, 0.55f, 34) : renderingEngine->printText2Doutline(pizzas.data(), xOffset+0.025f, 0.55f, 34, glm::vec4(1,0,0,1), false);
 
 	if (camera[player]->arrowState == ArrowState::LEFT)
 	{

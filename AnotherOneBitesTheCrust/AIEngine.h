@@ -14,14 +14,14 @@
 using std::vector;
 using glm::vec3;
 
-class AIEngine
+class AIEngine : public sigslot::has_slots<>
 {
 public:
 	AIEngine(void);
 	~AIEngine(void);
 
 	void updateAI(Vehicle*, Delivery, Map &, AICollisionEntity &);
-	
+	void backToDestination(Vehicle *, Map *,Delivery);
 
 private:
 	void updatePath(Vehicle*, Delivery, Map &);

@@ -390,6 +390,7 @@ void Game::connectSystems()
 	physicsEngine->simulationCallback->pizzaBoxSleep.connect(deliveryManager, &DeliveryManager::pizzaLanded);
 	physicsEngine->simulationCallback->inPickUpLocation.connect(deliveryManager, &DeliveryManager::refillPizza);
 	deliveryManager->pizzasRefilled.connect(audioEngine, &AudioEngine::playReloadSound);
+	deliveryManager->backToDestination.connect(aiEngine, &AIEngine::backToDestination);
 }
 
 void Game::gameDisplay(int player)
@@ -410,7 +411,7 @@ void Game::splitscreenViewports()
 		renderingEngine->updateView(*camera[0]);
 		gameDisplay(0);
 		if(gameState == GameState::PLAY) playHUD(0);
-		renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
+		//renderingEngine->drawNodes(players[1]->currentPath.size(), "points");
 	}
 	else if (numHumans == 2)
 	{
@@ -542,8 +543,8 @@ void Game::playLoop()
 			{
 				AICollisionEntity closest = physicsEngine->AISweep(players[i]);
 				aiEngine->updateAI(players[i], deliveryManager->deliveries[players[i]], map, closest);
-				if(i == 1)
-					renderingEngine->setupNodes(players[i]->currentPath, glm::vec3(1,1,0));
+				//if(i == 1)
+					//renderingEngine->setupNodes(players[i]->currentPath, glm::vec3(1,1,0));
 			}
 			players[i]->update();
 			camera[i]->update();

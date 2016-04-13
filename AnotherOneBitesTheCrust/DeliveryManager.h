@@ -33,6 +33,7 @@ public:
 	std::map<Vehicle*, int> scores;
 	sigslot::signal1<std::map<Vehicle*, int>> gameOverSignal;
 	sigslot::signal1<Vehicle*> pizzasRefilled;
+	sigslot::signal3<Vehicle*, Map*, Delivery> backToDestination;
 	sigslot::signal2<Vehicle*, glm::vec3> deliveryLocationUpdate;
 	sigslot::signal3<Map*, Tile*, glm::vec3> houseColorSignal;
 	sigslot::signal1<Vehicle*> deliveryGetSignal;

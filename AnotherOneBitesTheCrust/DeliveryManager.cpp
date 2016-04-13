@@ -106,8 +106,10 @@ void DeliveryManager::pizzaLanded(PizzaBox* pizza) {
 
 void DeliveryManager::refillPizza(Vehicle* player) {
 	if (player->pizzaCount < Vehicle::MAX_PIZZAS)
+	{
 		pizzasRefilled(player);
-	player->pickingUp = false;
+		backToDestination(player, map, deliveries[player]);
+	}
 	player->pizzaCount = Vehicle::MAX_PIZZAS;
 }
 

@@ -331,13 +331,7 @@ void AIEngine::refillPizzas(Vehicle* toUpdate, Map & map)
 	{
 		toUpdate->pickingUp = true;
 		std::vector<glm::vec3> pathToPickup = aStar(findClosestNode(toUpdate->getPosition(), map), nullptr, map.allNodes, map.pickup);
-		if(pathToPickup.size() > 0 && toUpdate->currentPath.size() > 0)
-		{
-			std::vector<glm::vec3> pathBack = aStar(findClosestNode(pathToPickup.back(), map), findClosestNode(toUpdate->currentPath.front(),map), map.allNodes);
-			pathToPickup.insert(pathToPickup.end(), pathBack.begin(), pathBack.end());
-		}
-
-		toUpdate->currentPath.insert(toUpdate->currentPath.begin(), pathToPickup.begin(), pathToPickup.end());
+		toUpdate->currentPath = pathToPickup;
 	}
 }
 
@@ -354,6 +348,12 @@ void AIEngine::avoid(Vehicle * toUpdate, const glm::vec3 & goal)
 		facePoint(toUpdate, toUpdate->currentPath.front(), toUpdate->avoidForward);
 	else
 		facePoint(toUpdate, goal, toUpdate->avoidForward);
+}
+
+void AIEngine::backToDestination(Vehicle * toUpdate, Map * map, Delivery destination)
+{
+	toUpdate->pickingUp = false;
+	updatePath(toUpdate, destination, *map);	
 }
 
 void AIEngine::updateAI(Vehicle* toUpdate, Delivery destination, Map & map, AICollisionEntity & obstacle) 

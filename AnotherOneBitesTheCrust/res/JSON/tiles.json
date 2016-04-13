@@ -343,13 +343,6 @@
 			"description": "Outside of world tile",
 			"ground": "lawn",
 			"entities": [
-				{"name": ["flower1", "flower2", "flower3"], "x": 3, "z": 7, "upperRotation": 360},
-                {"name": ["flower1", "flower2", "flower3"], "x": 8, "z": 5, "upperRotation": 360},
-                {"name": ["flower1", "flower2", "flower3"], "x": 15, "z": 17, "upperRotation": 360},
-                {"name": ["rock1", "rock2", "rock3", "bigBush", "smallBush", "pine"], "x": 3, "z": 5, "upperRotation": 360},
-                {"name": ["rock1", "rock2", "rock3", "bigBush", "smallBush", "birch"], "x": 5, "z": 16, "upperRotation": 360},
-                {"name": ["rock1", "rock2", "rock3", "bigBush", "smallBush", "oak"], "x": 17, "z": 3, "upperRotation": 360},
-                {"name": ["rock1", "rock2", "rock3", "bigBush", "smallBush", "deadTree"], "x": 11, "z": 12, "upperRotation": 360}
 			],
 			"nodes": [
 			]

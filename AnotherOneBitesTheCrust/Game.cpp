@@ -362,8 +362,8 @@ void Game::connectSystems()
 {
 	for (int i = 0; i < numHumans; i++) 
 	{
-		inputEngine->setInputStruct(&players[i]->input, inputEngine->numControllers()-1-i);
-		inputEngine->setCamera(camera[i], inputEngine->numControllers()-1-i);
+		inputEngine->setInputStruct(&players[i]->input, numHumans-1-i);
+		inputEngine->setCamera(camera[i], numHumans-1-i);
 		players[i]->isAI = false;
 	}
 

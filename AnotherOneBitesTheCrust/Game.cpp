@@ -65,7 +65,7 @@ void Game::setGameState(GameState state)
 		gameState = GameState::PLAY;
 		oldTimeMs = SDL_GetTicks();
 	}
-	else 
+	else
 	{
 		gameState = state;
 	}
@@ -661,6 +661,7 @@ void Game::mainLoop()
 void Game::endGame(std::map<Vehicle*, int> scores) {
 	gameState = GameState::END;
 	this->scores = scores;
+	deliveryManager->backToDestination.disconnect(aiEngine);
 }
 
 void Game::toggleVSync()

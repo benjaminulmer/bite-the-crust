@@ -4,8 +4,9 @@
 
 using namespace physx;
 
-Vehicle::Vehicle(unsigned int stepSizeMS)
+Vehicle::Vehicle(unsigned int stepSizeMS, PxScene* scene)
 {
+	this->scene = scene;
 	currentPath = std::vector<glm::vec3>();
 
 	input.forward = 0;
@@ -32,9 +33,18 @@ Vehicle::Vehicle(unsigned int stepSizeMS)
 	pizzaCount = MAX_PIZZAS;
 	isInAir = false;
 	isSlipping = false;
+	spaceMode = false;
 
 	type = EntityType::VEHICLE;
 	arrow = nullptr;
+}
+
+Vehicle::~Vehicle(void)
+{
+	delete arrow;
+	delete rightArrow;
+	delete leftArrow;
+	physicsVehicle->release();
 }
 
 glm::vec3 Vehicle::getDestination()
@@ -93,9 +103,8 @@ void Vehicle::resetIfNeeded()
 	if (cos <= 0.707f && vel.x == 0 && vel.y == 0 && vel.z == 0)
 	{
 		PxVec3 forw(0, 0, 1);
-		PxVec3 left(1, 0, 0);
 		PxVec3 vehForw = actor->getGlobalPose().rotate(forw);
-		PxVec3 vehLeft = actor->getGlobalPose().rotate(left);
+		PxVec3 vehLeft = PxTransform(PxVec3(0), PxQuat(-PxPi/2, PxVec3(0, 1, 0))).rotate(vehForw);
 		
 		PxF32 angleRad = (vehLeft.dot(forw) < 0) ? -acos(vehForw.dot(forw)) : acos(vehForw.dot(forw));
 		PxTransform cur = actor->getGlobalPose();
@@ -186,7 +195,15 @@ glm::mat4 Vehicle::getModelMatrix()
 	if (!isInAir)
 	{
 		PxF32 alpha = 0.01f;
-		tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.008f);
+		if (spaceMode)
+		{
+			tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * -0.02f);
+		}
+		else 
+		{
+			tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.008f);
+		}
+
 		if (tipAngle > PxPi * (45.0f/180.0f))
 		{
 			tipAngle = PxPi * (45.0f/180.0f);
@@ -212,7 +229,23 @@ glm::mat4 Vehicle::getModelMatrix()
 	return newM;
 }
 
-Vehicle::~Vehicle(void)
+glm::vec3 Vehicle::getShadowLocation()
 {
-}
+	PxVec3 origin = actor->getGlobalPose().p;
+	origin.y -= 1.5f;
+	PxVec3 direction(0, -1, 0);
+	PxF32 distance = 200.0f;
+	PxRaycastBuffer buffer;
 
+	scene->raycast(origin, direction, distance, buffer);
+
+	if (buffer.hasBlock) 
+	{
+		PxRaycastHit hit = buffer.block;
+		return glm::vec3(hit.position.x, hit.position.y + 0.01f, hit.position.z); 
+	}
+	else 
+	{
+		return glm::vec3(0, -10, 0);
+	}
+}

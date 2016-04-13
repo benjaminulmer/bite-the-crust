@@ -120,6 +120,11 @@ struct TriangleMeshInfo
 
 struct PhysicsEntityInfo
 {
+	~PhysicsEntityInfo()
+	{
+		delete dynamicInfo;
+		shapeInfo.clear();
+	}
 	PhysicsType type;
 	DynamicInfo* dynamicInfo;
 

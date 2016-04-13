@@ -26,6 +26,7 @@ public:
 
 	AICollisionEntity AISweep(Vehicle* vehicle);
 
+	physx::PxScene* scene;
 	SimulationCallback* simulationCallback;
 
 private:
@@ -45,7 +46,6 @@ private:
 	physx::PxCooking* cooking;
 	physx::PxDefaultCpuDispatcher* cpuDispatcher;
 	physx::PxSceneDesc* sceneDesc;
-	physx::PxScene* scene;
 	
 	VehicleSceneQueryData* vehicleSceneQueryData;
 	physx::PxBatchQuery* batchQuery;

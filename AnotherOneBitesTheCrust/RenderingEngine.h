@@ -17,7 +17,7 @@
 #include "Renderable.h"
 #include "Camera.h"
 #include "ContentLoading.h"
-#include "Entity.h"
+#include "Vehicle.h"
 #include "GameState.h"
 #include <sigslot.h>
 

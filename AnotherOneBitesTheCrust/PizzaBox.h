@@ -6,7 +6,7 @@ class PizzaBox :
 {
 public:
 	PizzaBox(Vehicle* owner);
-	~PizzaBox(void);
+	virtual ~PizzaBox(void);
 
 	Vehicle* owner;
 };

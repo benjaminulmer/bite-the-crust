@@ -7,7 +7,7 @@ class WheelEntity :
 {
 public:
 	WheelEntity(Vehicle* parent, physx::PxShape* physicsShape);
-	~WheelEntity(void);
+	virtual ~WheelEntity(void);
 
 	glm::vec3 getPosition();
 	glm::mat4 getModelMatrix();

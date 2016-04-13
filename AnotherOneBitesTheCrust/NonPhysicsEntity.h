@@ -9,7 +9,7 @@ class NonPhysicsEntity :
 {
 public:
 	NonPhysicsEntity(void);
-	~NonPhysicsEntity(void);
+	virtual ~NonPhysicsEntity(void);
 
 	void rotate(float angle, glm::vec3 axis);
 	void translate(glm::vec3 pos);

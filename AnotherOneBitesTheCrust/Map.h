@@ -30,6 +30,8 @@ struct Tile
 	Entity* house; // null if the tile doesn't have a house
 	bool pickup;
 
+	bool minimap;
+
 	Tile() {
 		house = nullptr;
 		ground = nullptr;

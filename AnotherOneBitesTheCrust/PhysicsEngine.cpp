@@ -17,7 +17,8 @@ PhysicsEngine::PhysicsEngine(void)
 
 void PhysicsEngine::reset()
 {
-	vehicles.erase(vehicles.begin(), vehicles.end());
+	vehicles.clear();
+	scene->release();
 	scene = physics->createScene(*sceneDesc);
 	batchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *vehicleSceneQueryData, scene);
 }
@@ -25,7 +26,7 @@ void PhysicsEngine::reset()
 void PhysicsEngine::initSimulationData()
 {
 	scale = PxTolerancesScale();
-	scale.speed = 50;
+	scale.speed = 100;
 	scale.length = 2;
 	defaultErrorCallback = new PxDefaultErrorCallback();
 	defaultAllocator = new PxDefaultAllocator();
@@ -144,6 +145,9 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 		PxShape* shape = actor->createShape(*geometry, *material); // TODO support shape flags
 		shape->setLocalPose(sInfo->transform);
 
+		material->release();
+		delete geometry;
+
 		// Set up querry filter data for shape
 		PxFilterData qryFilterData;
 		qryFilterData.word3 = (sInfo->isDrivable) ? (PxU32)Surface::DRIVABLE : (PxU32)Surface::UNDRIVABLE;
@@ -174,7 +178,7 @@ void PhysicsEngine::createEntity(PhysicsEntity* entity, PhysicsEntityInfo* info,
 
 void PhysicsEngine::createPizzaPickup(physx::PxVec3 location, physx::PxF32 radius)
 {
-	PxSphereGeometry geometry(radius); 
+	PxBoxGeometry geometry(radius, radius, radius); 
 	PxTransform transform(location, PxQuat::createIdentity());
 	PxMaterial* material = physics->createMaterial(0.5f, 0.5f, 0.5f);
 
@@ -262,7 +266,6 @@ AICollisionEntity PhysicsEngine::AISweep(Vehicle* vehicle)
 
 	if (buffer1.hasBlock) 
 	{
-		
 		PxRaycastHit hit = buffer1.block;
 
 		PxVec3 actorCentre = hit.actor->getGlobalPose().p;

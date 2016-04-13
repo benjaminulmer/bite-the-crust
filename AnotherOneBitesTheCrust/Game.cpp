@@ -45,6 +45,7 @@ void Game::setGameState(GameState state)
 		setupEntities();
 		connectSystems();
 		gameState = GameState::PLAY;
+		oldTimeMs = SDL_GetTicks();
 	}
 	else if (state == GameState::BACK_TO_MENU)
 	{
@@ -61,6 +62,7 @@ void Game::setGameState(GameState state)
 		setupEntities();
 		connectSystems();
 		gameState = GameState::PLAY;
+		oldTimeMs = SDL_GetTicks();
 	}
 	else 
 	{

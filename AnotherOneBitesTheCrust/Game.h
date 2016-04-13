@@ -56,6 +56,7 @@ private:
 	void quitGame();
 	void endGame(std::map<Vehicle*, int> scores);
 	void shootPizza(Vehicle* vehicle);
+	void enableSpaceShips();
 
 	void gameDisplay(int player);
 	void splitscreenViewports();
@@ -91,6 +92,7 @@ private:
 	Camera* camera[MAX_PLAYERS];
 	Vehicle* players[MAX_PLAYERS];
 	std::map<Vehicle*, int> scores;
+	bool spaceMode;
 
 	PhysicsEntityInfo* pizzaInfo;
 	std::vector<Entity*> entities;

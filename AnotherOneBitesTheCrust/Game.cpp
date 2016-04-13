@@ -27,6 +27,7 @@ Game::Game(void)
 	numHumans = 1;
 	isVSync = true;
 	gameState = GameState::MENU;
+	spaceMode = false;
 
 	std::random_device rd;
 	generator.seed(rd());
@@ -75,6 +76,7 @@ void Game::reset()
 	entities.clear();
 	map.deliveryTiles.clear();
 	deliveryManager->reset();
+	spaceMode = false;
 }
 
 // The entry point of the game
@@ -541,7 +543,7 @@ void Game::playLoop()
 				if(i == 1)
 					renderingEngine->setupNodes(players[i]->currentPath, glm::vec3(1,1,0));
 			}
-			players[i]->update();
+			players[i]->update(spaceMode);
 			camera[i]->update();
 		}
 		physicsEngine->fetchSimulationResults();
@@ -591,7 +593,7 @@ void Game::endLoop()
 		// Update the player and AI cars and cameras
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
-			players[i]->update();
+			players[i]->update(spaceMode);
 			camera[i]->update();
 		}
 		physicsEngine->fetchSimulationResults();
@@ -741,6 +743,10 @@ void Game::processSDLEvents()
 			{
 				toggleFullscreen();
 			}
+			else if (event.key.keysym.scancode == SDL_SCANCODE_S)
+			{
+				enableSpaceShips();
+			}
 		}
 	}
 }
@@ -764,6 +770,26 @@ void Game::shootPizza(Vehicle* vehicle)
 	pizzaBox->getRigidDynamic()->setLinearVelocity(velocity);
 	pizzaBox->getActor()->setActorFlag(physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, true);
 	entities.push_back(pizzaBox);
+}
+
+void Game::enableSpaceShips() 
+{
+	if (spaceMode)
+		return;
+	spaceMode = true;
+	for (int i = 0; i < MAX_PLAYERS; i++) 
+	{
+		players[i]->setRenderable(renderablesMap["redShip"]);
+	}
+	for (int i = 0; i < entities.size();)
+	{
+		if (entities[i]->getRenderable() == renderablesMap["wheel"]) 
+		{
+			entities.erase(entities.begin() + i);
+		} else {
+			i++;
+		}
+	}
 }
 
 Game::~Game(void)

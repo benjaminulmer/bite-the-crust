@@ -28,6 +28,8 @@ public:
 	RenderingEngine(void);
 	~RenderingEngine(void);	
 
+	void reset();
+
 	void displayFunc(std::vector<Entity*> entities);
 	void displayFuncTex(std::vector<Entity*> entities, Entity* arrow);
 	void drawEntity(Entity* entity);
@@ -66,6 +68,8 @@ public:
 	std::vector <glm::vec3> skyNorms;
 	std::vector <glm::vec2> skyUVs;
 	GLuint skyTex;
+	GLuint skyTexDay;
+	GLuint skyTexNight;
 	void setupMiscBuffers();
 	void drawShadow(glm::vec3 position);
 	void drawSkybox(glm::vec3 position);

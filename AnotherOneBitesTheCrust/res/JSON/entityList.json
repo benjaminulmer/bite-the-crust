@@ -5,6 +5,7 @@
         {"name": "threewayRoad", "model": "threewayRoad.obj", "physics": "tile.json", "texture": "threewayRoad.DDS"},
         {"name": "fourwayRoad", "model": "fourwayRoad.obj", "physics": "tile.json", "texture": "fourwayRoad.DDS"},
 		{"name": "lawn", "model": "lawn.obj", "physics": "tile.json", "texture": "lawn.DDS"},
+        {"name": "mowedLawn", "model": "lawn.obj", "physics": "tile.json", "texture": "mowedLawn.DDS"},
         {"name": "parkingLot", "model": "parkingLot.obj", "physics": "tile.json", "texture": "parkingLot.DDS"},
 
         {"name": "pizzaBoxRed", "model": "pizzaBox.obj", "physics": "pizzaBox.json", "texture": "redPizzaBox.DDS"},

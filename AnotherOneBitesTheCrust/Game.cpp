@@ -77,6 +77,7 @@ void Game::reset()
 	map.deliveryTiles.clear();
 	deliveryManager->reset();
 	spaceMode = false;
+	renderingEngine->reset();
 }
 
 // The entry point of the game
@@ -563,18 +564,12 @@ void Game::menuLoop()
 {
 	oldTimeMs = SDL_GetTicks();
 	menuLogic->updateMenu();
-
-	string instructions = "D-pad - Move, A - Select, B - Back";
-	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 }
 
 void Game::pauseLoop()
 {
 	oldTimeMs = SDL_GetTicks();
 	menuLogic->updatePaused();
-
-	string instructions = "D-pad - Move, A - Select, B - Back";
-	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 }
 
 void Game::endLoop()
@@ -792,6 +787,7 @@ void Game::enableSpaceShips()
 		}
 	}
 	physicsEngine->scene->setGravity(physx::PxVec3(0, -5, 0));
+	renderingEngine->skyTex = renderingEngine->skyTexNight;
 }
 
 Game::~Game(void)

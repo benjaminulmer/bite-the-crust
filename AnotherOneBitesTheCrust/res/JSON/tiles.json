@@ -56,7 +56,7 @@
         {
             "id": 5,
             "description": "Lawn tile with fence and house",
-            "ground": "lawn",
+            "ground": "mowedLawn",
             "deliverable": true,
             "goal": {"x": 10, "z": 10},
             "entities": [
@@ -70,7 +70,7 @@
 		{
 			"id": 6,
 			"description": "Lawn tile corner, with house",
-			"ground": "lawn",
+			"ground": "mowedLawn",
             "deliverable": true,
             "goal": {"x": 10, "z": 10},
 			"entities": [

@@ -23,6 +23,11 @@ RenderingEngine::RenderingEngine()
 
 RenderingEngine::~RenderingEngine(void) {}
 
+void RenderingEngine::reset()
+{
+	skyTex = skyTexDay;
+}
+
 void RenderingEngine::displayFuncTex(vector<Entity*> entities, Entity* arrow)
 {
 	//glClearDepth(1.0);
@@ -421,7 +426,9 @@ void RenderingEngine::setupMiscBuffers()
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
 
-	skyTex = ContentLoading::loadDDS("res\\Textures\\skybox.DDS");
+	skyTexDay = ContentLoading::loadDDS("res\\Textures\\Skybox2.DDS");
+	skyTexNight = ContentLoading::loadDDS("res\\Textures\\nightBox.DDS");
+	skyTex = skyTexDay;
 
 //Loading shadows
 	glUseProgram(basicProgramID);

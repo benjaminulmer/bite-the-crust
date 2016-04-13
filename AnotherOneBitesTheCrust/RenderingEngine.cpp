@@ -498,7 +498,7 @@ void RenderingEngine::drawShadow(glm::vec3 position)
 	
 
 	M = mat4(1.0f);
-	M = translate(M, glm::vec3(position.x, 0.01, position.z));
+	M = translate(M, glm::vec3(position.x, 0.01f, position.z));
 	mat4 MVP = P * V * M;
 
 	glUniformMatrix4fv(basicmvpID,		// ID

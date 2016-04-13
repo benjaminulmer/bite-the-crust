@@ -4,8 +4,9 @@
 
 using namespace physx;
 
-Vehicle::Vehicle(unsigned int stepSizeMS)
+Vehicle::Vehicle(unsigned int stepSizeMS, PxScene* scene)
 {
+	this->scene = scene;
 	currentPath = std::vector<glm::vec3>();
 
 	input.forward = 0;
@@ -216,4 +217,25 @@ glm::mat4 Vehicle::getModelMatrix()
 		}
 	}
 	return newM;
+}
+
+glm::vec3 Vehicle::getShadowLocation()
+{
+	PxVec3 origin = actor->getGlobalPose().p;
+	origin.y -= 1.5f;
+	PxVec3 direction(0, -1, 0);
+	PxF32 distance = 200.0f;
+	PxRaycastBuffer buffer;
+
+	scene->raycast(origin, direction, distance, buffer);
+
+	if (buffer.hasBlock) 
+	{
+		PxRaycastHit hit = buffer.block;
+		return glm::vec3(hit.position.x, hit.position.y + 0.01f, hit.position.z); 
+	}
+	else 
+	{
+		return glm::vec3(0, -10, 0);
+	}
 }

@@ -67,7 +67,7 @@ class Vehicle :
 	public DynamicEntity
 {
 public:
-	Vehicle(unsigned int stepSizeMS);
+	Vehicle(unsigned int stepSizeMS, physx::PxScene* scene);
 	virtual ~Vehicle(void);
 
 	static const int MAX_PIZZAS = 3;
@@ -97,6 +97,7 @@ public:
 
 	void update();
 	glm::mat4 getModelMatrix();
+	glm::vec3 getShadowLocation();
 
 	void setPhysicsVehicle(physx::PxVehicleDrive4W* vehicle);
 	physx::PxVehicleDrive4W* getPhysicsVehicle();
@@ -108,6 +109,8 @@ public:
 	sigslot::signal1<Vehicle*> gasSignal;
 
 private:
+	physx::PxScene* scene;
+
 	physx::PxF32 tipAngle;
 
 	physx::PxF32 stepSizeS;

@@ -180,7 +180,7 @@ void Vehicle::update()
 		input.shootPizza = false;
 	}
 
-	if (input.jump && !isInAir)
+	if (input.jump && (!isInAir || spaceMode))
 	{
 		PxRigidBody* rigid = (PxRigidBody*)actor;
 		rigid->addForce(PxVec3(0, 375, 0), PxForceMode::eACCELERATION);

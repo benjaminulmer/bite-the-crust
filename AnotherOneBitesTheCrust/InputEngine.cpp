@@ -2,12 +2,17 @@
 #include <iostream>
 #include <sigslot.h>
 
+const int InputEngine::KONAMI[InputEngine::BUFFER_SIZE] = {SDL_CONTROLLER_BUTTON_DPAD_UP, SDL_CONTROLLER_BUTTON_DPAD_UP, SDL_CONTROLLER_BUTTON_DPAD_DOWN,
+SDL_CONTROLLER_BUTTON_DPAD_DOWN, SDL_CONTROLLER_BUTTON_DPAD_LEFT, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, SDL_CONTROLLER_BUTTON_DPAD_LEFT, SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
+SDL_CONTROLLER_BUTTON_B, SDL_CONTROLLER_BUTTON_A};
+
 InputEngine::InputEngine(void) {
 	openControllers();
 	for (unsigned int i = 0; i < MAX_NUM_CONTROLLERS; i++)
 	{
 		inputs[i] = nullptr;
 		cameras[i] = nullptr;
+		pastInputsIndex[i] = 0;
 	}
 	deadzonePercent = 0.25f;
 	deadzoneSize = (int) (MAX_AXIS_VALUE * deadzonePercent);
@@ -128,8 +133,15 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 		}
 		else if (e.cbutton.button == SDL_CONTROLLER_BUTTON_START)
 		{
+			if (isCheatCode(e.cdevice.which))
+			{
+				std::cout << "You're really good at pressing 'A'. Good job!" << std::endl;
+			}
 			(state == GameState::PLAY) ? setGameState(GameState::PAUSE) : setGameState(GameState::BACK_TO_MENU);
 		}
+
+		pastInputs[e.cdevice.which][pastInputsIndex[e.cdevice.which]] = e.cbutton.button;
+		pastInputsIndex[e.cdevice.which] = (pastInputsIndex[e.cdevice.which] + 1) % BUFFER_SIZE;
 	}
 	else if (state == GameState::MENU)
 	{
@@ -181,6 +193,20 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 			pauseInput(InputType::BACK);
 		}
 	}
+}
+
+bool InputEngine::isCheatCode(int index)
+{
+	for (int i = 0; i < BUFFER_SIZE; i++)
+	{
+		int test = (pastInputsIndex[index]+i)%BUFFER_SIZE;
+		int test2 = pastInputs[index][(pastInputsIndex[i]+i)%BUFFER_SIZE];
+		if (pastInputs[index][(pastInputsIndex[index]+i)%BUFFER_SIZE] != KONAMI[i])
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 void InputEngine::controllerButtonUp(SDL_Event e, GameState state)

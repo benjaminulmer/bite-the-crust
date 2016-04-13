@@ -29,6 +29,9 @@
         {"name": "blueShip", "model": "SpaceShip.obj", "texture": "blueVan.DDS"},
         {"name": "greenShip", "model": "SpaceShip.obj", "texture": "greenVan.DDS"},
         {"name": "yellowShip", "model": "SpaceShip.obj", "texture": "yellowVan.DDS"},
+        {"name": "racecar", "model": "RaceCar.obj", "texture": "CarTextureLightBlue.DDS"},
+        {"name": "simpleCar", "model": "SimpleCar.obj", "texture": "CarTextureOrange.DDS"},
+        {"name": "truck", "model": "Truck.obj", "texture": "CarTexturePurple.DDS"},
 
 		{"name": "house1", "model": "house1.obj", "physics": "staticDrivableTriangle.json", "texture": "house.DDS"},
 		{"name": "house2", "model": "house2.obj", "physics": "staticDrivableTriangle.json", "texture": "house.DDS"},

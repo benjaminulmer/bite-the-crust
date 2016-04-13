@@ -32,6 +32,7 @@ Vehicle::Vehicle(unsigned int stepSizeMS, PxScene* scene)
 	pizzaCount = MAX_PIZZAS;
 	isInAir = false;
 	isSlipping = false;
+	spaceMode = false;
 
 	type = EntityType::VEHICLE;
 	arrow = nullptr;
@@ -111,7 +112,7 @@ void Vehicle::resetIfNeeded()
 }
 
 // Called every frame for vehicle
-void Vehicle::update(bool spaceMode)
+void Vehicle::update()
 {
 	resetIfNeeded();
 
@@ -193,7 +194,15 @@ glm::mat4 Vehicle::getModelMatrix()
 	if (!isInAir)
 	{
 		PxF32 alpha = 0.01f;
-		tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.008f);
+		if (spaceMode)
+		{
+			tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * -0.02f);
+		}
+		else 
+		{
+			tipAngle = (1 - alpha) * tipAngle + (alpha * input.steer * physicsVehicle->computeForwardSpeed() * 0.008f);
+		}
+
 		if (tipAngle > PxPi * (45.0f/180.0f))
 		{
 			tipAngle = PxPi * (45.0f/180.0f);

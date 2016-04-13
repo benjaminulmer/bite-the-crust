@@ -377,6 +377,7 @@ void Game::connectSystems()
 
 		deliveryManager->addPlayer(players[i]);
 	}
+	inputEngine->space.connect(this, &Game::enableSpaceShips);
 
 	deliveryManager->gameOverSignal.connect(this, &Game::endGame);
 	deliveryManager->houseColorSignal.connect(renderingEngine, &RenderingEngine::updateHouseColor);
@@ -543,7 +544,7 @@ void Game::playLoop()
 				if(i == 1)
 					renderingEngine->setupNodes(players[i]->currentPath, glm::vec3(1,1,0));
 			}
-			players[i]->update(spaceMode);
+			players[i]->update();
 			camera[i]->update();
 		}
 		physicsEngine->fetchSimulationResults();
@@ -593,7 +594,7 @@ void Game::endLoop()
 		// Update the player and AI cars and cameras
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
-			players[i]->update(spaceMode);
+			players[i]->update();
 			camera[i]->update();
 		}
 		physicsEngine->fetchSimulationResults();
@@ -743,10 +744,6 @@ void Game::processSDLEvents()
 			{
 				toggleFullscreen();
 			}
-			else if (event.key.keysym.scancode == SDL_SCANCODE_S)
-			{
-				enableSpaceShips();
-			}
 		}
 	}
 }
@@ -780,6 +777,7 @@ void Game::enableSpaceShips()
 	for (int i = 0; i < MAX_PLAYERS; i++) 
 	{
 		players[i]->setRenderable(renderablesMap["redShip"]);
+		players[i]->spaceMode = true;
 	}
 	for (int i = 0; i < entities.size();)
 	{
@@ -790,6 +788,7 @@ void Game::enableSpaceShips()
 			i++;
 		}
 	}
+	physicsEngine->scene->setGravity(physx::PxVec3(0, -5, 0));
 }
 
 Game::~Game(void)

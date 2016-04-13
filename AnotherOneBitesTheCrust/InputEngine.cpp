@@ -135,7 +135,7 @@ void InputEngine::controllerButtonDown(SDL_Event e, GameState state)
 		{
 			if (isCheatCode(e.cdevice.which))
 			{
-				std::cout << "You're really good at pressing 'A'. Good job!" << std::endl;
+				space();
 			}
 			(state == GameState::PLAY) ? setGameState(GameState::PAUSE) : setGameState(GameState::BACK_TO_MENU);
 		}

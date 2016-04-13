@@ -34,7 +34,7 @@ public:
 	void openControllers();
 	int numControllers();
 
-	sigslot::signal0<> unFucker;
+	sigslot::signal0<> space;
 	sigslot::signal1<InputType> menuInput;
 	sigslot::signal1<InputType> pauseInput;
 	sigslot::signal1<GameState> setGameState;

@@ -396,7 +396,10 @@
             "entities": [
 				{"name": "roadBlock", "x": 20, "z": 5, "rotation": 90},
 				{"name": "roadBlock", "x": 20, "z": 10, "rotation": 90},
-				{"name": "roadBlock", "x": 20, "z": 15, "rotation": 90}
+				{"name": "roadBlock", "x": 20, "z": 15, "rotation": 90},
+				{"name": "truck", "x": 30, "z": 15, "rotation": 90},
+				{"name": "racecar", "x": 50, "z": 15, "rotation": 90},
+				{"name": "simpleCar", "x": 30, "z": 5, "rotation": 90}
             ],
 			"nodes" : [
 			]

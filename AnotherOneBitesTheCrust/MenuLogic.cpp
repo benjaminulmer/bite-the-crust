@@ -49,7 +49,6 @@ void MenuLogic::setupMenus()
 	Renderable *play = ContentLoading::createRenderable("res\\Models\\play.obj");
 	Renderable *howtoplay = ContentLoading::createRenderable("res\\Models\\howtoplay.obj");
 	Renderable *controls = ContentLoading::createRenderable("res\\Models\\controls.obj");
-	Renderable *story = ContentLoading::createRenderable("res\\Models\\story.obj");
 	Renderable *exit = ContentLoading::createRenderable("res\\Models\\exit.obj");
 	Renderable *billboard = ContentLoading::createRenderable("res\\Models\\Billboard.obj");
 	
@@ -63,7 +62,6 @@ void MenuLogic::setupMenus()
 	renderingEngine->assignBuffersTex(play);
 	renderingEngine->assignBuffersTex(howtoplay);
 	renderingEngine->assignBuffersTex(controls);
-	renderingEngine->assignBuffersTex(story);
 	renderingEngine->assignBuffersTex(exit);
 	renderingEngine->assignBuffersTex(billboard);
 
@@ -81,11 +79,6 @@ void MenuLogic::setupMenus()
 	eControls->setRenderable(controls);
 	eControls->setTexture(unselected);
 	menuEntities.push_back(eControls);
-
-	Entity *eStory = new Entity();
-	eStory->setRenderable(story);
-	eStory->setTexture(unselected);
-	menuEntities.push_back(eStory);
 
 	Entity *eExit = new Entity();
 	eExit->setRenderable(exit);

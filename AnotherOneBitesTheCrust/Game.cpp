@@ -77,6 +77,7 @@ void Game::reset()
 	map.deliveryTiles.clear();
 	deliveryManager->reset();
 	spaceMode = false;
+	renderingEngine->reset();
 }
 
 // The entry point of the game
@@ -783,6 +784,7 @@ void Game::enableSpaceShips()
 		}
 	}
 	physicsEngine->scene->setGravity(physx::PxVec3(0, -5, 0));
+	renderingEngine->skyTex = renderingEngine->skyTexNight;
 }
 
 Game::~Game(void)

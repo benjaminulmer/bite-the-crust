@@ -10,7 +10,6 @@ enum class MenuOptions
 	PLAY = 0,
 	HOW_TO,
 	CONTROLS,
-	STORY,
 	EXIT,
 	MAX,
 };

@@ -563,7 +563,7 @@ void RenderingEngine::setupMinimap(Map map)
 			//cout << "TEST ";
 			Entity* ground = tile->ground;
 			
-			if(tile->groundModel == "straightRoad" || tile->groundModel == "turnRoad" || tile->groundModel == "threewayRoad" || tile->groundModel == "fourwayRoad")
+			if((tile->groundModel == "straightRoad" || tile->groundModel == "turnRoad" || tile->groundModel == "threewayRoad" || tile->groundModel == "fourwayRoad") && tile->minimap)
 			{
 
 				glm::vec3 pos = vec3((float)ground->getPosition().x, (float)ground->getPosition().y, (float)ground->getPosition().z);
@@ -881,7 +881,8 @@ void RenderingEngine::setupMinimap(Map map)
 		glm::vec3(0, 0, 1)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
 	
-	mmV = translate(mmV, vec3(650,0,-170));
+	//mmV = translate(mmV, vec3(650,0,-170));
+	mmV = translate(mmV, vec3(240 + 650,0,-170));
 	mmV = rotate(mmV, radians(90.0f), vec3(0,-1,0));
 	
 }

@@ -245,7 +245,7 @@ void Game::setupEntities()
 	{
 		players[i] = new Vehicle(PHYSICS_STEP_MS);
 		float rotationRad = physx::PxPi * 0.5f;
-		setupVehicle(players[i], physx::PxTransform(physx::PxVec3(20, 2, 135 - 15.0f*i), physx::PxQuat(rotationRad, physx::PxVec3(0,1,0))), i);
+		setupVehicle(players[i], physx::PxTransform(physx::PxVec3(120 + 20, 2, 120 + 135 - 15.0f*i), physx::PxQuat(rotationRad, physx::PxVec3(0,1,0))), i);
 
 		camera[i] = new Camera(players[i], physicsEngine->scene);
 	}

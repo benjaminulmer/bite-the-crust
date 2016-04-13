@@ -431,6 +431,11 @@ bool ContentLoading::loadMap(char* tilesFilename, char* mapFilename, Map &map) {
 		} else {
 			t.pickup = false;
 		}
+		if (tileArray[i].HasMember("minimap")) {
+			t.minimap = tileArray[i]["minimap"].GetBool();
+		} else {
+			t.minimap = true;
+		}
 		const rapidjson::Value& entityArray = tileArray[i]["entities"];
 		for (rapidjson::SizeType j = 0; j < entityArray.Size(); j++) {
 			std::vector<std::string> names;

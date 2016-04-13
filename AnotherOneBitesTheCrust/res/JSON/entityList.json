@@ -30,7 +30,7 @@
 		{"name": "house3", "model": "house3.obj", "physics": "staticDrivableTriangle.json", "texture": "house.DDS"},
 		{"name": "house4", "model": "house4.obj", "physics": "staticDrivableTriangle.json", "texture": "house.DDS"},
         {"name": "stripMall", "model": "stripMall.obj", "physics": "staticDrivableTriangle.json", "texture": "stripMall.DDS"},
-		{"name": "fence", "model": "newFence.obj", "physics": "fence.json", "texture": "newFence.DDS"},
+		{"name": "fence", "model": "newFence.obj", "physics": "staticBox.json", "texture": "newFence.DDS"},
 
 		{"name": "ramp", "model": "ramp.obj", "physics": "staticDrivableConvex.json", "texture": "ramp.DDS"},
         {"name": "barrier", "model": "barrier.obj", "physics": "default.json", "texture": "barrier.DDS"},

@@ -306,10 +306,13 @@
 				{"name": "basketballRack", "x": 30, "z": 27},
 				{"name": "basketballRack", "x": -10, "z": -7},
 				{"name": "basketball", "x": 0, "z": -7},
-				{"name": "basketball", "x": 0, "z": 0},
+				{"name": "basketball", "x": 0, "z": 3},
 				{"name": "basketball", "x": 7, "z": 7},
 				{"name": "basketball", "x": 15, "z": 10},
-				{"name": "basketball", "x": 20, "z": 15}
+				{"name": "basketball", "x": 20, "z": 15},
+				{"name": "basketball", "x": 23, "z": 19},
+				{"name": "basketball", "x": -10, "z": 11},
+				{"name": "basketball", "x": 20, "z": -15}
 			],
 			"nodes": [
 				{"x" : 0.5, "z" : 0.0, "neighbours" : [1]},

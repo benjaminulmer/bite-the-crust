@@ -561,18 +561,12 @@ void Game::menuLoop()
 {
 	oldTimeMs = SDL_GetTicks();
 	menuLogic->updateMenu();
-
-	string instructions = "D-pad - Move, A - Select, B - Back";
-	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 }
 
 void Game::pauseLoop()
 {
 	oldTimeMs = SDL_GetTicks();
 	menuLogic->updatePaused();
-
-	string instructions = "D-pad - Move, A - Select, B - Back";
-	renderingEngine->printText2D(instructions.data(), 0, 0, 24);
 }
 
 void Game::endLoop()

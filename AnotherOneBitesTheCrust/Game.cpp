@@ -49,6 +49,7 @@ void Game::startGame()
 		{
 			splitscreenViewports();
 			renderingEngine->printText2D(to_string(i).data(), 0.48f, 0.5f, 100);
+			processSDLEvents();
 			SDL_GL_SwapWindow(window);
 			time = SDL_GetTicks();
 		}

@@ -791,7 +791,7 @@ void Game::enableSpaceShips()
 		players[i]->setRenderable(renderablesMap["redShip"]);
 		players[i]->spaceMode = true;
 	}
-	for (int i = 0; i < entities.size();)
+	for (unsigned int i = 0; i < entities.size();)
 	{
 		if (entities[i]->getRenderable() == renderablesMap["wheel"]) 
 		{
